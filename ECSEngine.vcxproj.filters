@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="SRC\Assertions.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ModulePoolAllocator.cpp">
+      <Filter>Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\Module.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ModuleId.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\stdafx.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\PositionModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ModuleController.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\EntityWorld.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\EntityId.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\Entity.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\EntityTemplate.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\EntityModuleKey.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\Singleton.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\EntityTemplateManager.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ModuleAccessor.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SRC\Assertions.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Types.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ModulePoolAllocator.h">
+      <Filter>Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ModuleId.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Module.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\PositionModule.h">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\stdafx.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ModuleController.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Macros.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityWorld.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\WorldDeclaration.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityId.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Entity.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Constants.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityTemplate.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityModuleKey.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Singleton.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityTemplateManager.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ModuleAccessor.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{572220ab-9415-4a27-a319-2a086fb7506b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{0e6baafa-5b68-4aba-806e-18385bff15e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Allocators">
+      <UniqueIdentifier>{d3e4f8b1-a5c8-4f8f-a4a0-7879e0863691}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules">
+      <UniqueIdentifier>{93cdbc57-5a39-4982-8a6a-7087970e3396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{246fb5c2-a137-40c6-a92b-c26ba1fe384c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SRC\ModuleList.inl">
+      <Filter>Entity</Filter>
+    </None>
+    <None Include="SRC\EntityWorld.inl">
+      <Filter>Entity</Filter>
+    </None>
+    <None Include="SRC\ModuleAccessor.inl">
+      <Filter>Entity</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,96 @@
+BasedOnStyle: WebKit
+UseTab: Never
+# ---
+# ObjectiveC
+Language: ObjC
+DisableFormat: true
+# ---
+# CSharp
+Language: CSharp
+DisableFormat: true
+# ---
+# Java
+Language: Java
+DisableFormat: true
+# ---
+# JavaScript
+Language: JavaScript
+DisableFormat: true
+# ---
+# Proto
+Language: Proto
+DisableFormat: true
+# ---
+# TableGen
+Language: TableGen
+DisableFormat: true
+# ---
+# TextProto
+Language: TextProto
+DisableFormat: true
+# ---
+# Cpp
+Language: Cpp
+DisableFormat: false
+IndentWidth: 4
+IndentCaseLabels: false
+ColumnLimit: 180
+DerivePointerAlignment: false
+FixNamespaceComments: true
+PenaltyBreakAssignment: 20
+PenaltyBreakComment: 50
+PenaltyReturnTypeOnItsOwnLine: 180
+PenaltyBreakBeforeFirstCallParameter: 0
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowAllParametersOfDeclarationOnNextLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BinPackParameters: false
+BreakBeforeBinaryOperators: None
+ContinuationIndentWidth: 6
+PointerAlignment: Left
+#ForEachMacros:
+#    - foreach
+#    - foreachconst
+#    - reverseforeach
+#    - reverseforeachconst
+#    - foreachitem
+#    - foreachitemconst
+#    - reverseforeachitem
+#    - reverseforeachitemconst
+#    - forever
+#    - foreachinpair
+#    - forrange
+#    - reverseforrange
+#StatementMacros:
+#    - OnlyInReleaseCheckEnabled
+##    - OnlyInContainerStats
+#    - OnlyInDebug
+#    - OnlyInEugAssertsChecked
+#    - OnlyInEugPtrCheck
+#    - OnlyInIaDebug
+#    - OnlyInIAStratDebug
+#    - OnlyInNoIAStratDebug
+##    - OnlyInUIDebug
+#    - OnlyInVisualDebug
+BreakBeforeBraces: Allman
+NamespaceIndentation: None
+CompactNamespaces: true
+IncludeCategories:
+  - Regex: '^"stdafx.h"$'
+    Priority: -1
+#  - Regex: '"EugBase\/CheckIfProjectIsDefined.h"'
+#    Priority: 2
+#  - Regex: '"Common.h"'
+#    Priority: 3
+#  - Regex: '^.*\/.*$'
+#    Priority: 1000
+#  - Regex: '^\<.*\>$'
+#    Priority: 1001
+IncludeIsMainRegex: '$'
+IncludeBlocks: Regroup
+KeepEmptyLinesAtTheStartOfBlocks: true
+#MacroBlockBegin: "^((ABSTRACT)?METACLASSCPP.*$|SYNCHRONISATION_ITEM_WITH_PROPERTY)$"
+#MacroBlockEnd: "^(ENDMETACLASSCPP|ENDMETACLASS|SYNCHRONISATION_ITEM_WITH_PROPERTY_END)$"
+SortIncludes: true
+SpaceAfterTemplateKeyword: false
+SpaceBeforeCpp11BracedList: false
