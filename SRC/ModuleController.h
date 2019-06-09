@@ -77,47 +77,80 @@ public:
 
     bool IsLocked() const { return FLock; }
 
-    std::set<EntityId>::iterator begin()
+    template<class Iterator>
+    class ModuleControllerIterator
     {
-        AlwaysCheckedAssert(IsLocked());
-        return FAllocatedModules.begin();
-    }
-    std::set<EntityId>::const_iterator begin() const
-    {
-        AlwaysCheckedAssert(IsLocked());
-        return FAllocatedModules.begin();
-    }
-    std::set<EntityId>::reverse_iterator rbegin()
-    {
-        AlwaysCheckedAssert(IsLocked());
-        return FAllocatedModules.rbegin();
-    }
-    std::set<EntityId>::const_reverse_iterator rbegin() const
-    {
-        AlwaysCheckedAssert(IsLocked());
-        return FAllocatedModules.rbegin();
-    }
+    public:
+        ModuleControllerIterator(ModuleController<Mod>* parController, Iterator parIt)
+            : FController(parController)
+            , FIt(parIt)
+        {
+            AssertRelease(FController != nullptr);
+        }
 
-    std::set<EntityId>::iterator end()
+        bool operator==(const ModuleControllerIterator<Iterator>& other) { return FIt == other.FIt; }
+        bool operator!=(const ModuleControllerIterator<Iterator>& other) { return FIt != other.FIt; }
+
+        void operator++(int) { FIt++; }
+        void operator++() { ++FIt; }
+
+        Mod* operator*()
+        {
+            AssertRelease(FController != nullptr);
+            return FController->GetModuleForEntity(*FIt);
+        }
+
+    private:
+        Iterator FIt;
+        ModuleController<Mod>* FController;
+    };
+
+    using iterator = typename ModuleControllerIterator<std::set<EntityId>::iterator>;
+    // using const_iterator = typename ModuleControllerIterator<std::set<EntityId>::const_iterator>;
+    using reverse_iterator = typename ModuleControllerIterator<std::set<EntityId>::reverse_iterator>;
+    // using const_reverse_iterator = typename ModuleControllerIterator<std::set<EntityId>::const_reverse_iterator>;
+
+    iterator begin()
     {
         AlwaysCheckedAssert(IsLocked());
-        return FAllocatedModules.end();
+        return iterator(this, FAllocatedModules.begin());
     }
-    std::set<EntityId>::const_iterator end() const
+    /*const_iterator begin() const
     {
         AlwaysCheckedAssert(IsLocked());
-        return FAllocatedModules.end();
-    }
-    std::set<EntityId>::reverse_iterator rend()
+        return const_iterator(this, FAllocatedModules.begin());
+    }*/
+    reverse_iterator rbegin()
     {
         AlwaysCheckedAssert(IsLocked());
-        return FAllocatedModules.rend();
+        return reverse_iterator(this, FAllocatedModules.rbegin());
     }
-    std::set<EntityId>::const_reverse_iterator rend() const
+    /*const_reverse_iterator rbegin() const
     {
         AlwaysCheckedAssert(IsLocked());
-        return FAllocatedModules.rend();
+        return const_reverse_iterator(this, FAllocatedModules.rbegin());
+    }*/
+
+    iterator end()
+    {
+        AlwaysCheckedAssert(IsLocked());
+        return iterator(this, FAllocatedModules.end());
     }
+    /*const_iterator end() const
+    {
+        AlwaysCheckedAssert(IsLocked());
+        return iterator(this, FAllocatedModules.end());
+    }*/
+    reverse_iterator rend()
+    {
+        AlwaysCheckedAssert(IsLocked());
+        return reverse_iterator(this, FAllocatedModules.rend());
+    }
+    /*const_reverse_iterator rend() const
+    {
+        AlwaysCheckedAssert(IsLocked());
+        return const_reverse_iterator(this, FAllocatedModules.rend());
+    }*/
 
 private:
     ModulePoolAllocator<Mod, ModulePoolSize, true> FAllocator;

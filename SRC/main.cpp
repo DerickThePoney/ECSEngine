@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
     for (auto it = moduleAccessor.begin(); it != moduleAccessor.end(); ++it)
     {
-        std::cout << "Position module " << it->GetSequentialId() << std::endl;
+        std::cout << "Position module " << *it << std::endl;
     }
 
     dynamic_cast<ECSEngine::ModuleController<ECSEngine::PositionModule>*>(world.GetControllerIFP<ECSEngine::PositionModule>())->Unlock();
