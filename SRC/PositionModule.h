@@ -14,6 +14,8 @@ public:
     {
     }
 
+    const glm::aligned_vec3& GetPosition3D() const { return FPosition; }
+
 private:
     glm::aligned_vec3 FPosition;
 };

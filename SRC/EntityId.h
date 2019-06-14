@@ -5,7 +5,7 @@ namespace ECSEngine
 struct PackedEntityId
 {
     PackedEntityId(u8 parWorldId, u32 parId)
-        : FId(parWorldId << 24 && parId)
+        : FId(parWorldId << 24 | parId)
     {
     }
 

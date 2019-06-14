@@ -34,6 +34,7 @@ int main(int argc, char** argv)
     newTemplate->SetHasModule<ECSEngine::PositionModule>();
 
     ECSEngine::EntityId unitID = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
+    ECSEngine::EntityId unitID2 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
 
     dynamic_cast<ECSEngine::ModuleController<ECSEngine::PositionModule>*>(world.GetControllerIFP<ECSEngine::PositionModule>())->Lock();
     ECSEngine::ModuleAccessor<ECSEngine::PositionModule> moduleAccessor(&world);
@@ -42,11 +43,10 @@ int main(int argc, char** argv)
     const ECSEngine::PositionModule* positionModuleConst = moduleAccessor[unitID];
 
     AssertRelease(positionModule != nullptr && positionModule == positionModuleConst);
-    ECSEngine::ModuleAccessor<ECSEngine::PositionModule>::const_iterator it = moduleAccessor.cbegin();
-    for (; it != moduleAccessor.cend(); ++it)
-    {
-        std::cout << "Position module " << *it << std::endl;
-    }
+    foreachitem(positionMod, moduleAccessor) { std::cout << "Position module " << &positionMod << "\t" << glm::to_string(positionMod.GetPosition3D()) << std::endl; }
+    foreachitemconst(positionMod, moduleAccessor) { std::cout << "Position module " << &positionMod << "\t" << glm::to_string(positionMod.GetPosition3D()) << std::endl; }
+    reverseforeachitem(positionMod, moduleAccessor) { std::cout << "Position module " << &positionMod << "\t" << glm::to_string(positionMod.GetPosition3D()) << std::endl; }
+    reverseforeachitemconst(positionMod, moduleAccessor) { std::cout << "Position module " << &positionMod << "\t" << glm::to_string(positionMod.GetPosition3D()) << std::endl; }
 
     dynamic_cast<ECSEngine::ModuleController<ECSEngine::PositionModule>*>(world.GetControllerIFP<ECSEngine::PositionModule>())->Unlock();
 
