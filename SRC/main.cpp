@@ -42,8 +42,8 @@ int main(int argc, char** argv)
     const ECSEngine::PositionModule* positionModuleConst = moduleAccessor[unitID];
 
     AssertRelease(positionModule != nullptr && positionModule == positionModuleConst);
-
-    for (auto it = moduleAccessor.begin(); it != moduleAccessor.end(); ++it)
+    ECSEngine::ModuleAccessor<ECSEngine::PositionModule>::const_iterator it = moduleAccessor.cbegin();
+    for (; it != moduleAccessor.cend(); ++it)
     {
         std::cout << "Position module " << *it << std::endl;
     }

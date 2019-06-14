@@ -16,47 +16,52 @@ public:
     T* operator[](const EntityId& parId);
     const T* operator[](const EntityId& parId) const;
 
-    typename ModuleController<T>::iterator begin()
-    {
-        AssertRelease(FController != nullptr);
-        return FController->begin();
-    }
-    /*typename ModuleController<T>::const_iterator begin() const
-    {
-        AssertRelease(FController != nullptr);
-        return FController->begin();
-    }*/
-    typename ModuleController<T>::reverse_iterator rbegin()
-    {
-        AssertRelease(FController != nullptr);
-        return FController->rbegin();
-    }
-    /*typename ModuleController<T>::const_reverse_iterator rbegin() const
-    {
-        AssertRelease(FController != nullptr);
-        return FController->rbegin();
-    }*/
+    using iterator = typename ModuleController<T>::iterator;
+    using const_iterator = typename ModuleController<T>::const_iterator;
+    using reverse_iterator = typename ModuleController<T>::reverse_iterator;
+    using const_reverse_iterator = typename ModuleController<T>::const_reverse_iterator;
 
-    typename ModuleController<T>::iterator end()
+    iterator begin()
+    {
+        AssertRelease(FController != nullptr);
+        return FController->begin();
+    }
+    const_iterator cbegin() const
+    {
+        AssertRelease(FController != nullptr);
+        return FController->cbegin();
+    }
+    reverse_iterator rbegin()
+    {
+        AssertRelease(FController != nullptr);
+        return FController->rbegin();
+    }
+    const_reverse_iterator crbegin() const
+    {
+        AssertRelease(FController != nullptr);
+        return FController->crbegin();
+    }
+
+    iterator end()
     {
         AssertRelease(FController != nullptr);
         return FController->end();
     }
-    /*typename ModuleController<T>::const_iterator end() const
+    const_iterator cend() const
     {
         AssertRelease(FController != nullptr);
-        return FController->end();
-    }*/
-    typename ModuleController<T>::reverse_iterator rend()
+        return FController->cend();
+    }
+    reverse_iterator rend()
     {
         AssertRelease(FController != nullptr);
         return FController->rend();
     }
-    /*typename ModuleController<T>::const_reverse_iterator rend() const
+    const_reverse_iterator crend() const
     {
         AssertRelease(FController != nullptr);
-        return FController->rend();
-    }*/
+        return FController->crend();
+    }
 
 private:
     ModuleController<T>* FController;
