@@ -34,7 +34,7 @@
 
 # VS FILES
 *.db
-
+.vs
 *.ipch
 
 Final

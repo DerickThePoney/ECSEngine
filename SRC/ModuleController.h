@@ -94,10 +94,12 @@ public:
         void operator++(int) { FIt++; }
         void operator++() { ++FIt; }
 
-        Mod* operator*()
+        Mod& operator*() { return GetRef(); }
+        Mod& operator->() = delete;
+        Mod& GetRef()
         {
             AssertRelease(FController != nullptr);
-            return FController->GetModuleForEntity(*FIt);
+            return *FController->GetModuleForEntity(*FIt);
         }
 
     private:
@@ -122,10 +124,13 @@ public:
         void operator++(int) { FIt++; }
         void operator++() { ++FIt; }
 
-        const Mod* operator*()
+        const Mod& operator*() { return GetRef(); }
+        const Mod& operator->() = delete;
+
+        const Mod& GetRef()
         {
             AssertRelease(FController != nullptr);
-            return FController->GetModuleForEntity(*FIt);
+            return *FController->GetModuleForEntity(*FIt);
         }
 
     private:
