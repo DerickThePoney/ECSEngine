@@ -24,7 +24,7 @@
 #define GLM_FORCE_MESSAGES
 #endif
 #include <glm/glm.hpp>
-#include <glm/gtx/type_aligned.hpp>
+#include <glm/ext.hpp>
 
 #include "Types.h"
 
