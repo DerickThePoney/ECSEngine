@@ -52,5 +52,17 @@ int main(int argc, char** argv)
 
     world.DestroyEntity(unitID);
 
+    ECSEngine::EntityId unitID3 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
+    ECSEngine::EntityId unitID4 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
+
+    world.DestroyEntity(unitID2);
+    world.DestroyEntity(unitID3);
+
+    ECSEngine::EntityId unitID5 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
+    ECSEngine::EntityId unitID6 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
+    world.DestroyEntity(unitID4);
+    world.DestroyEntity(unitID5);
+    world.DestroyEntity(unitID6);
+
     return 0;
 }

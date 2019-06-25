@@ -16,12 +16,13 @@ EntityWorld::EntityWorld()
     : FSize((u32)EModuleId::Length)
     , FControllers(nullptr)
     , FWorldID(sWorldIdGenerator++)
-    , FEntityIdGenerator(0)
+    , FEntityIdGenerator()
 {
     AssertRelease(FSize != 0);
 
     FControllers = new IModuleController*[FSize];
     FEntities.resize(ModulePoolSize);
+    FEntityIdGenerator.SetWorldId(FWorldID);
 }
 
 EntityWorld::EntityWorld(EntityWorld&& other) noexcept
@@ -33,7 +34,7 @@ EntityWorld::EntityWorld(EntityWorld&& other) noexcept
     other.FEntities.clear();
 
     FWorldID = other.FWorldID;
-    FEntityIdGenerator = other.FEntityIdGenerator;
+    FEntityIdGenerator = std::move(other.FEntityIdGenerator);
 }
 
 EntityWorld::~EntityWorld()
@@ -59,8 +60,8 @@ EntityWorld::~EntityWorld()
 
 ECSEngine::EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(EntityTemplate* parTemplate)
 {
-    EntityId newID = EntityId(FWorldID, FEntityIdGenerator++);
-    AssertRelease(FEntityIdGenerator < ModulePoolSize);
+    EntityId newID = FEntityIdGenerator.GetNextEntityId();
+    AssertRelease(newID.GetSequentialId() < ModulePoolSize);
     FAllocatedEntityIds.insert(newID);
 
     Entity newEntity(newID, parTemplate);
@@ -83,6 +84,7 @@ void EntityWorld::DestroyEntity(const EntityId& parId)
     AssertRelease(parId.GetWorldId() == FWorldID);
     AssertRelease(FAllocatedEntityIds.find(parId) != FAllocatedEntityIds.end());
     FAllocatedEntityIds.erase(parId);
+    FEntityIdGenerator.ReleaseEntityId(parId);
 
     const Entity& entity = FEntities[parId.GetSequentialId()];
 

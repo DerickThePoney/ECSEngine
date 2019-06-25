@@ -49,6 +49,9 @@
     <ClCompile Include="SRC\ModuleAccessor.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
+    <ClCompile Include="SRC\EntityIDGenerator.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SRC\Assertions.h">
@@ -106,6 +109,9 @@
       <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="SRC\ModuleAccessor.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityIDGenerator.h">
       <Filter>Entity</Filter>
     </ClInclude>
   </ItemGroup>
