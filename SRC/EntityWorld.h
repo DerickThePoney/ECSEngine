@@ -1,5 +1,6 @@
 #pragma once
 #include "Entity.h"
+#include "EntityIDGenerator.h"
 
 namespace ECSEngine
 {
@@ -27,8 +28,8 @@ private:
     IModuleController** FControllers;
     std::vector<Entity> FEntities;
     std::set<EntityId> FAllocatedEntityIds;
+    EntityIDGenerator FEntityIdGenerator;
     u32 FSize;
-    u32 FEntityIdGenerator;
     u8 FWorldID;
 
     static u8 sWorldIdGenerator;
