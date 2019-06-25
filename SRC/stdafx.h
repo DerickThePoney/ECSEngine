@@ -8,6 +8,7 @@
 #include <string>
 #include <Windows.h>
 #include <vector>
+#include <queue>
 #include <array>
 #include <thread>
 #include <atomic>

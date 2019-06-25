@@ -226,6 +226,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="SRC\Entity.cpp" />
+    <ClCompile Include="SRC\EntityIDGenerator.cpp" />
     <ClCompile Include="SRC\EntityTemplateManager.cpp" />
     <ClCompile Include="SRC\EntityModuleKey.cpp" />
     <ClCompile Include="SRC\EntityTemplate.cpp" />
@@ -251,6 +252,7 @@
     <ClInclude Include="SRC\Constants.h" />
     <ClInclude Include="SRC\Entity.h" />
     <ClInclude Include="SRC\EntityId.h" />
+    <ClInclude Include="SRC\EntityIDGenerator.h" />
     <ClInclude Include="SRC\EntityTemplateManager.h" />
     <ClInclude Include="SRC\EntityModuleKey.h" />
     <ClInclude Include="SRC\EntityTemplate.h" />
