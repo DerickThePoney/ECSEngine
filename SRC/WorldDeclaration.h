@@ -1,12 +1,14 @@
 #pragma once
 #include "EntityWorld.h"
 #include "ModuleId.h"
+#include "PositionModule.h"
 #include "Types.h"
 
 #include <standalone/brigand.hpp>
 
 namespace ECSEngine
 {
+
 using Controllers = brigand::list<ECSEngine::PositionModule>;
 
 struct f

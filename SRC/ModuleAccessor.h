@@ -11,6 +11,7 @@ template<typename T>
 class ModuleAccessor
 {
 public:
+    ModuleAccessor();
     ModuleAccessor(EntityWorld* world);
 
     T* operator[](const EntityId& parId);
@@ -66,6 +67,7 @@ public:
 private:
     ModuleController<T>* FController;
 };
+
 } // namespace ECSEngine
 
 #include "ModuleAccessor.inl"

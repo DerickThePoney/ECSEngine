@@ -11,6 +11,7 @@ class EntityWorld
 public:
     EntityWorld();
     EntityWorld(EntityWorld&& other) noexcept;
+    void operator=(EntityWorld&& other) noexcept;
     ~EntityWorld();
 
     template<typename T>
