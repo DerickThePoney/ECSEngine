@@ -8,6 +8,9 @@ namespace ECSEngine
 class IModuleController
 {
 public:
+    virtual void Lock() = 0;
+    virtual void Unlock() = 0;
+    virtual bool IsLocked() const = 0;
     virtual void AllocateForEntity(const EntityId& parEntity) = 0;
     virtual void DeallocateForEntity(const EntityId& parEntity) = 0;
 };
@@ -63,19 +66,19 @@ public:
         return nullptr;
     }
 
-    void Lock()
+    void Lock() override
     {
         AlwaysCheckedAssert(FLock == false);
         FLock = true;
     }
 
-    void Unlock()
+    void Unlock() override
     {
         AlwaysCheckedAssert(FLock == true);
         FLock = false;
     }
 
-    bool IsLocked() const { return FLock; }
+    bool IsLocked() const override { return FLock; }
 
     template<class Iterator>
     class ModuleControllerIterator

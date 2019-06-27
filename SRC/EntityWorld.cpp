@@ -37,6 +37,18 @@ EntityWorld::EntityWorld(EntityWorld&& other) noexcept
     FEntityIdGenerator = std::move(other.FEntityIdGenerator);
 }
 
+void EntityWorld::operator=(EntityWorld&& other) noexcept
+{
+    FSize = other.FSize;
+    FControllers = other.FControllers;
+    other.FControllers = nullptr;
+    FEntities = std::move(other.FEntities);
+    other.FEntities.clear();
+
+    FWorldID = other.FWorldID;
+    FEntityIdGenerator = std::move(other.FEntityIdGenerator);
+}
+
 EntityWorld::~EntityWorld()
 {
     AssertRelease(FSize != 0);
