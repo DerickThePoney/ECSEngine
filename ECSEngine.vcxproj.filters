@@ -7,12 +7,6 @@
     <ClCompile Include="SRC\ModulePoolAllocator.cpp">
       <Filter>Allocators</Filter>
     </ClCompile>
-    <ClCompile Include="SRC\Module.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="SRC\ModuleId.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
     <ClCompile Include="SRC\main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
@@ -20,37 +14,52 @@
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="SRC\PositionModule.cpp">
-      <Filter>Modules</Filter>
-    </ClCompile>
-    <ClCompile Include="SRC\ModuleController.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="SRC\EntityWorld.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="SRC\EntityId.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="SRC\Entity.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="SRC\EntityTemplate.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="SRC\EntityModuleKey.cpp">
-      <Filter>Entity</Filter>
+      <Filter>CommonModules</Filter>
     </ClCompile>
     <ClCompile Include="SRC\Singleton.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="SRC\EntityTemplateManager.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="SRC\ModuleAccessor.cpp">
-      <Filter>Entity</Filter>
+    <ClCompile Include="SRC\EntityId.cpp">
+      <Filter>ECS\EntityIds</Filter>
     </ClCompile>
     <ClCompile Include="SRC\EntityIDGenerator.cpp">
-      <Filter>Entity</Filter>
+      <Filter>ECS\EntityIds</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\EntityWorld.cpp">
+      <Filter>ECS\World</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\Entity.cpp">
+      <Filter>ECS\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\EntityModuleKey.cpp">
+      <Filter>ECS\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\Module.cpp">
+      <Filter>ECS\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ModuleAccessor.cpp">
+      <Filter>ECS\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ModuleId.cpp">
+      <Filter>ECS\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ModuleController.cpp">
+      <Filter>ECS\World</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\EntityTemplate.cpp">
+      <Filter>ECS\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\EntityTemplateManager.cpp">
+      <Filter>ECS\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ModuleSystem.cpp">
+      <Filter>ECS\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\MovementSystem.cpp">
+      <Filter>Gameplay\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\WorldManager.cpp">
+      <Filter>ECS\World</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -63,84 +72,114 @@
     <ClInclude Include="SRC\ModulePoolAllocator.h">
       <Filter>Allocators</Filter>
     </ClInclude>
-    <ClInclude Include="SRC\ModuleId.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="SRC\Module.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
     <ClInclude Include="SRC\PositionModule.h">
-      <Filter>Modules</Filter>
+      <Filter>CommonModules</Filter>
     </ClInclude>
     <ClInclude Include="SRC\stdafx.h">
       <Filter>Main</Filter>
     </ClInclude>
-    <ClInclude Include="SRC\ModuleController.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
     <ClInclude Include="SRC\Macros.h">
       <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="SRC\EntityWorld.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="SRC\WorldDeclaration.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="SRC\EntityId.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="SRC\Entity.h">
-      <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="SRC\Constants.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="SRC\EntityTemplate.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="SRC\EntityModuleKey.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
     <ClInclude Include="SRC\Singleton.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="SRC\EntityTemplateManager.h">
-      <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="SRC\ModuleAccessor.h">
-      <Filter>Entity</Filter>
+    <ClInclude Include="SRC\EntityId.h">
+      <Filter>ECS\EntityIds</Filter>
     </ClInclude>
     <ClInclude Include="SRC\EntityIDGenerator.h">
-      <Filter>Entity</Filter>
+      <Filter>ECS\EntityIds</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityWorld.h">
+      <Filter>ECS\World</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Entity.h">
+      <Filter>ECS\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityModuleKey.h">
+      <Filter>ECS\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Module.h">
+      <Filter>ECS\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ModuleAccessor.h">
+      <Filter>ECS\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ModuleId.h">
+      <Filter>ECS\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ModuleController.h">
+      <Filter>ECS\World</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\WorldDeclaration.h">
+      <Filter>ECS\World</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityTemplate.h">
+      <Filter>ECS\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\EntityTemplateManager.h">
+      <Filter>ECS\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ModuleSystem.h">
+      <Filter>ECS\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\MovementSystem.h">
+      <Filter>Gameplay\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\WorldManager.h">
+      <Filter>ECS\World</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
       <UniqueIdentifier>{572220ab-9415-4a27-a319-2a086fb7506b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Entity">
-      <UniqueIdentifier>{0e6baafa-5b68-4aba-806e-18385bff15e7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Allocators">
       <UniqueIdentifier>{d3e4f8b1-a5c8-4f8f-a4a0-7879e0863691}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Modules">
-      <UniqueIdentifier>{93cdbc57-5a39-4982-8a6a-7087970e3396}</UniqueIdentifier>
     </Filter>
     <Filter Include="Main">
       <UniqueIdentifier>{246fb5c2-a137-40c6-a92b-c26ba1fe384c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{0e6baafa-5b68-4aba-806e-18385bff15e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\EntityIds">
+      <UniqueIdentifier>{d48ed016-10bf-4826-b0b1-e31fb3d70ecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\World">
+      <UniqueIdentifier>{60ef7876-24de-424e-8a1a-e19a7b11ea76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\Entity">
+      <UniqueIdentifier>{0313d15a-bac4-4f53-ae44-253e557b7fbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\Modules">
+      <UniqueIdentifier>{957dba83-10b9-4c5c-8e19-eec506223b34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\Systems">
+      <UniqueIdentifier>{532cb79a-f930-4c2f-9c4b-375710c8c875}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CommonModules">
+      <UniqueIdentifier>{93cdbc57-5a39-4982-8a6a-7087970e3396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gameplay">
+      <UniqueIdentifier>{0a57988f-6256-4eb4-b807-603a7a2cfc46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Gameplay\Systems">
+      <UniqueIdentifier>{47744de7-ea8d-4132-ae82-b7e259243a14}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SRC\ModuleList.inl">
-      <Filter>Entity</Filter>
-    </None>
     <None Include="SRC\EntityWorld.inl">
-      <Filter>Entity</Filter>
+      <Filter>ECS\World</Filter>
     </None>
     <None Include="SRC\ModuleAccessor.inl">
-      <Filter>Entity</Filter>
+      <Filter>ECS\Modules</Filter>
+    </None>
+    <None Include="SRC\ModuleList.inl">
+      <Filter>ECS\Modules</Filter>
     </None>
   </ItemGroup>
 </Project>

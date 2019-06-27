@@ -6,6 +6,9 @@ template<typename T>
 class Singleton
 {
 public:
+    virtual ~Singleton() { Destroy(); }
+
+public:
     static void CreateIFP()
     {
         if (FInstance == nullptr)
