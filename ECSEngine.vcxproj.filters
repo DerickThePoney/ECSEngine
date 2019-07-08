@@ -4,9 +4,6 @@
     <ClCompile Include="SRC\Assertions.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="SRC\ModulePoolAllocator.cpp">
-      <Filter>Allocators</Filter>
-    </ClCompile>
     <ClCompile Include="SRC\main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
@@ -61,6 +58,33 @@
     <ClCompile Include="SRC\WorldManager.cpp">
       <Filter>ECS\World</Filter>
     </ClCompile>
+    <ClCompile Include="SRC\ModulePoolAllocator.cpp">
+      <Filter>ECS\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\StackAllocator.cpp">
+      <Filter>Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\Resource.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ResourceFile.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ResourceLoader.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\StringUtilities.cpp">
+      <Filter>StringHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ResourceFileDirectoryView.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ResourceCache.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ResourceHandle.cpp">
+      <Filter>ResourceManagement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SRC\Assertions.h">
@@ -68,9 +92,6 @@
     </ClInclude>
     <ClInclude Include="SRC\Types.h">
       <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="SRC\ModulePoolAllocator.h">
-      <Filter>Allocators</Filter>
     </ClInclude>
     <ClInclude Include="SRC\PositionModule.h">
       <Filter>CommonModules</Filter>
@@ -132,6 +153,33 @@
     <ClInclude Include="SRC\WorldManager.h">
       <Filter>ECS\World</Filter>
     </ClInclude>
+    <ClInclude Include="SRC\ModulePoolAllocator.h">
+      <Filter>ECS\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\StackAllocator.h">
+      <Filter>Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Resource.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ResourceFile.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ResourceLoader.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\StringUtilities.h">
+      <Filter>StringHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ResourceCache.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ResourceFileDirectoryView.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ResourceHandle.h">
+      <Filter>ResourceManagement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -169,6 +217,12 @@
     </Filter>
     <Filter Include="Gameplay\Systems">
       <UniqueIdentifier>{47744de7-ea8d-4132-ae82-b7e259243a14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ResourceManagement">
+      <UniqueIdentifier>{a40d3476-9985-4d49-a2c7-14fb6099f17d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StringHandling">
+      <UniqueIdentifier>{a94da1ca-03e4-4ea5-8130-b37c2b1aa2e5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

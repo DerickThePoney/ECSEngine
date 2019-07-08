@@ -8,6 +8,9 @@
 #include "ModuleId.h"
 #include "MovementSystem.h"
 #include "PositionModule.h"
+#include "Resource.h"
+#include "ResourceCache.h"
+#include "ResourceFileDirectoryView.h"
 #include "WorldManager.h"
 
 int main(int argc, char** argv)
@@ -64,7 +67,7 @@ int main(int argc, char** argv)
     ECSEngine::MovementSystem movementSystem;
     movementSystem.Init();
 
-    for (int i = 0; i < 1000000; ++i)
+    for (int i = 0; i < 1000; ++i)
     {
         movementSystem.Update();
     }
@@ -77,6 +80,15 @@ int main(int argc, char** argv)
     world.DestroyEntity(unitID6);
 
     worldManagerInstance.Destroy();
+
+    worldManagerInstance.Destroy();
+
+    ECSEngine::ResourceCache resCache(10, new ECSEngine::ResourceFileDirectoryView("D:\\Programmation\\GameEngine\\ECSEngine\\Assets"));
+    if (!resCache.Initialize())
+        AssertNotReachedMsg("Unable to init the resource cache!!");
+
+    ECSEngine::Resource r("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\2D\\Textures\\element_yellow_square_glossy.png");
+    std::shared_ptr<ECSEngine::ResourceHandle> handle = resCache.GetResourceHandle(&r);
 
     return 0;
 }
