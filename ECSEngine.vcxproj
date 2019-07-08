@@ -246,12 +246,20 @@
     <ClCompile Include="SRC\ModuleSystem.cpp" />
     <ClCompile Include="SRC\MovementSystem.cpp" />
     <ClCompile Include="SRC\PositionModule.cpp" />
+    <ClCompile Include="SRC\Resource.cpp" />
+    <ClCompile Include="SRC\ResourceCache.cpp" />
+    <ClCompile Include="SRC\ResourceFile.cpp" />
+    <ClCompile Include="SRC\ResourceFileDirectoryView.cpp" />
+    <ClCompile Include="SRC\ResourceHandle.cpp" />
+    <ClCompile Include="SRC\ResourceLoader.cpp" />
     <ClCompile Include="SRC\Singleton.cpp" />
+    <ClCompile Include="SRC\StackAllocator.cpp" />
     <ClCompile Include="SRC\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Final|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SRC\StringUtilities.cpp" />
     <ClCompile Include="SRC\WorldManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -267,7 +275,15 @@
     <ClInclude Include="SRC\ModuleAccessor.h" />
     <ClInclude Include="SRC\ModuleSystem.h" />
     <ClInclude Include="SRC\MovementSystem.h" />
+    <ClInclude Include="SRC\Resource.h" />
+    <ClInclude Include="SRC\ResourceCache.h" />
+    <ClInclude Include="SRC\ResourceFile.h" />
+    <ClInclude Include="SRC\ResourceFileDirectoryView.h" />
+    <ClInclude Include="SRC\ResourceHandle.h" />
+    <ClInclude Include="SRC\ResourceLoader.h" />
     <ClInclude Include="SRC\Singleton.h" />
+    <ClInclude Include="SRC\StackAllocator.h" />
+    <ClInclude Include="SRC\StringUtilities.h" />
     <ClInclude Include="SRC\WorldDeclaration.h" />
     <ClInclude Include="SRC\Macros.h" />
     <ClInclude Include="SRC\Module.h" />
