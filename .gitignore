@@ -39,6 +39,21 @@
 
 Final
 TEMP
-x64/Release/ECSEngine_Release.iobj
 
-x64/Release/ECSEngine_Release.ipdb
+ECSEngine_BACKUP_5676.vcxproj
+
+
+ECSEngine_BASE_5676.vcxproj
+
+
+ECSEngine_LOCAL_5676.vcxproj
+
+
+ECSEngine_REMOTE_5676.vcxproj
+
+
+*.orig
+
+
+*.iobj
+*.ipdb

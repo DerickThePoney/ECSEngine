@@ -9,17 +9,19 @@
 namespace ECSEngine
 {
 
-AssertImplementation::AssertImplementation(const bool shouldLetGo, const std::string& msg)
+AssertImplementation::AssertImplementation(const bool shouldLetGo, const char* msg, const char* additionalMessage)
 {
     if (!shouldLetGo)
-        Assert(msg);
+        Assert(msg, additionalMessage);
 }
 
-void AssertImplementation::Assert(const std::string& msg)
+void AssertImplementation::Assert(const char* msg, const char* additionalMessage)
 {
     std::ostringstream sstr;
 
     sstr << msg << "\n";
+    if (additionalMessage != nullptr)
+        sstr << additionalMessage << "\n";
     sstr << boost::stacktrace::stacktrace() << "\n";
 
     OutputDebugString(sstr.str().c_str());
