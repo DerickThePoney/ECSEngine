@@ -229,6 +229,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SRC\ConfigurationManager.cpp" />
     <ClCompile Include="SRC\Entity.cpp" />
     <ClCompile Include="SRC\EntityIDGenerator.cpp" />
     <ClCompile Include="SRC\EntityTemplateManager.cpp" />
@@ -264,6 +265,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SRC\Assertions.h" />
+    <ClInclude Include="SRC\ConfigurationManager.h" />
     <ClInclude Include="SRC\Constants.h" />
     <ClInclude Include="SRC\Entity.h" />
     <ClInclude Include="SRC\EntityId.h" />

@@ -85,6 +85,9 @@
     <ClCompile Include="SRC\ResourceHandle.cpp">
       <Filter>ResourceManagement</Filter>
     </ClCompile>
+    <ClCompile Include="SRC\ConfigurationManager.cpp">
+      <Filter>Configuration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SRC\Assertions.h">
@@ -180,6 +183,9 @@
     <ClInclude Include="SRC\ResourceHandle.h">
       <Filter>ResourceManagement</Filter>
     </ClInclude>
+    <ClInclude Include="SRC\ConfigurationManager.h">
+      <Filter>Configuration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -223,6 +229,9 @@
     </Filter>
     <Filter Include="StringHandling">
       <UniqueIdentifier>{a94da1ca-03e4-4ea5-8130-b37c2b1aa2e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configuration">
+      <UniqueIdentifier>{a4e004d4-88e5-4fa1-b252-e532f172af68}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
