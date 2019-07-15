@@ -1,0 +1,56 @@
+#include "stdafx.h"
+
+#include "BGFXRenderer.h"
+
+#include "DisplayWindow.h"
+
+#include <bgfx/bgfx.h>
+
+namespace ECSEngine
+{
+namespace Rendering
+{
+
+BGFXRenderer::BGFXRenderer()
+{
+}
+
+BGFXRenderer::~BGFXRenderer()
+{
+}
+
+void BGFXRenderer::Init()
+{
+    AssertRelease(DisplayWindow::HasInstance());
+    DisplayWindow& window = DisplayWindow::Instance();
+    bgfx::PlatformData pd;
+    pd.nwh = window.GetNativeWindowHandle();
+
+    bgfx::Init bgfxInit;
+    bgfxInit.platformData = pd;
+    bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a renderer.
+    bgfxInit.resolution.width = window.GetSize().x;
+    bgfxInit.resolution.height = window.GetSize().y;
+    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+    bgfx::init(bgfxInit);
+
+    bgfx::RendererType::Enum chosenType = bgfx::getRendererType();
+
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x443355FF, 1.0f, 0);
+    bgfx::setViewRect(0, 0, 0, window.GetSize().x, window.GetSize().y);
+}
+
+void BGFXRenderer::Shutdown()
+{
+    bgfx::shutdown();
+}
+
+void BGFXRenderer::RenderFrame()
+{
+    // Set view 0 default viewport.
+    bgfx::touch(0);
+    bgfx::frame();
+}
+
+} // namespace Rendering
+} // namespace ECSEngine

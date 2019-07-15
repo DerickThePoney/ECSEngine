@@ -88,6 +88,12 @@
     <ClCompile Include="SRC\ConfigurationManager.cpp">
       <Filter>Configuration</Filter>
     </ClCompile>
+    <ClCompile Include="SRC\BGFXRenderer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\DisplayWindow.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SRC\Assertions.h">
@@ -186,6 +192,12 @@
     <ClInclude Include="SRC\ConfigurationManager.h">
       <Filter>Configuration</Filter>
     </ClInclude>
+    <ClInclude Include="SRC\BGFXRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\DisplayWindow.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -232,6 +244,9 @@
     </Filter>
     <Filter Include="Configuration">
       <UniqueIdentifier>{a4e004d4-88e5-4fa1-b252-e532f172af68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{48e0750b-70ce-4da6-9644-a5fb915267f7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

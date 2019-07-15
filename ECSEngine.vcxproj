@@ -129,7 +129,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>External\BGFX\bgfx\include;External\BGFX\bimg\include; External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -142,8 +142,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>External\BGFX\bgfx\.build\win64_vs2019\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>bgfx$(Configuration).lib;bimg$(Configuration).lib;bx$(Configuration).lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>External\glfw-3.3.bin.WIN64\lib-vc2019;External\BGFX\bgfx\.build\win64_vs2019\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3dll.lib;bgfxDebug.lib;bimgDebug.lib;bxDebug.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -187,7 +187,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>External\BGFX\bgfx\include;External\BGFX\bimg\include; External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -203,8 +203,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <Profile>true</Profile>
-      <AdditionalLibraryDirectories>External\BGFX\bgfx\.build\win64_vs2019\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>bgfx$(Configuration).lib;bimg$(Configuration).lib;bx$(Configuration).lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>External\glfw-3.3.bin.WIN64\lib-vc2019;External\BGFX\bgfx\.build\win64_vs2019\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3dll.lib;bgfxRelease.lib;bimgRelease.lib;bxRelease.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Final|x64'">
@@ -215,7 +215,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>External\BGFX\bgfx\include;External\BGFX\bimg\include; External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -233,12 +233,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <Profile>true</Profile>
-      <AdditionalLibraryDirectories>External\BGFX\bgfx\.build\win64_vs2019\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>bgfx$(Configuration).lib;bimg$(Configuration).lib;bx$(Configuration).lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>External\glfw-3.3.bin.WIN64\lib-vc2019;External\BGFX\bgfx\.build\win64_vs2019\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3dll.lib;bgfxRelease.lib;bimgRelease.lib;bxRelease.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SRC\BGFXRenderer.cpp" />
     <ClCompile Include="SRC\ConfigurationManager.cpp" />
+    <ClCompile Include="SRC\DisplayWindow.cpp" />
     <ClCompile Include="SRC\Entity.cpp" />
     <ClCompile Include="SRC\EntityIDGenerator.cpp" />
     <ClCompile Include="SRC\EntityTemplateManager.cpp" />
@@ -274,8 +276,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SRC\Assertions.h" />
+    <ClInclude Include="SRC\BGFXRenderer.h" />
     <ClInclude Include="SRC\ConfigurationManager.h" />
     <ClInclude Include="SRC\Constants.h" />
+    <ClInclude Include="SRC\DisplayWindow.h" />
     <ClInclude Include="SRC\Entity.h" />
     <ClInclude Include="SRC\EntityId.h" />
     <ClInclude Include="SRC\EntityIDGenerator.h" />

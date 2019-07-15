@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+#include "../glfw-3.3.bin.WIN64/include/GLFW/glfw3.h"
+#include "BGFXRenderer.h"
+#include "DisplayWindow.h"
 #include "EntityId.h"
 #include "EntityTemplateManager.h"
 #include "EntityWorld.h"
@@ -89,6 +92,29 @@ int main(int argc, char** argv)
 
     ECSEngine::Resource r("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\2D\\Textures\\element_yellow_square_glossy.png");
     std::shared_ptr<ECSEngine::ResourceHandle> handle = resCache.GetResourceHandle(&r);
+
+    glfwInit();
+
+    ECSEngine::Rendering::DisplayWindow::CreateIFP();
+    ECSEngine::Rendering::DisplayWindow::Instance().Init();
+
+    ECSEngine::Rendering::BGFXRenderer::CreateIFP();
+    ECSEngine::Rendering::BGFXRenderer& rendererInstance = ECSEngine::Rendering::BGFXRenderer::Instance();
+    rendererInstance.Init();
+
+    unsigned int counter = 0;
+    while (!glfwWindowShouldClose(ECSEngine::Rendering::DisplayWindow::Instance().GetWindowHandle()))
+    {
+        rendererInstance.RenderFrame();
+        glfwPollEvents();
+        counter++;
+    }
+
+    rendererInstance.Shutdown();
+
+    ECSEngine::Rendering::DisplayWindow::Instance().Shutdown();
+
+    glfwTerminate();
 
     return 0;
 }
