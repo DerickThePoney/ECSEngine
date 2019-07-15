@@ -1,4 +1,5 @@
 #pragma once
+#define _ITERATOR_DEBUG_LEVEL 0
 
 #include "Macros.h"
 // clang-format off
@@ -28,6 +29,7 @@
 #endif
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/ext/vector_uint2.hpp>
 
 #include "Types.h"
 
