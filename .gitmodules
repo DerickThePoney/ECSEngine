@@ -7,3 +7,6 @@
 [submodule "External/BGFX/bgfx"]
 	path = External/BGFX/bgfx
 	url = git://github.com/bkaradzic/bgfx.git
+[submodule "External/IMGUI/imgui"]
+	path = External/IMGUI/imgui
+	url = git://github.com/ocornut/imgui.git

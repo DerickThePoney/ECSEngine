@@ -11,6 +11,7 @@ Resource::Resource(const std::string& parName)
     : FName(parName)
 {
     std::transform(FName.begin(), FName.end(), FName.begin(), std::tolower);
+    std::replace(FName.begin(), FName.end(), '/', '\\');
 }
 
 } // namespace ECSEngine

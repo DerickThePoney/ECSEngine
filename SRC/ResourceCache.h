@@ -1,4 +1,5 @@
 #pragma once
+#include "Singleton.h"
 
 namespace ECSEngine
 {
@@ -46,5 +47,27 @@ private:
 
     u32 FCacheSize;
     u32 FAllocated;
+};
+
+class GlobalResourceCache final : public Singleton<GlobalResourceCache>
+{
+public:
+    GlobalResourceCache()
+        : Singleton<GlobalResourceCache>()
+        , FCache(nullptr)
+    {
+    }
+
+    ~GlobalResourceCache()
+    {
+        if (FCache != nullptr)
+        {
+            delete FCache;
+            FCache = nullptr;
+        }
+    }
+
+public:
+    ResourceCache* FCache;
 };
 } // namespace ECSEngine
