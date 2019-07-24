@@ -10,7 +10,6 @@ namespace ECSEngine
 {
 namespace Rendering
 {
-
 BGFXRenderer::BGFXRenderer()
 {
 }
@@ -44,11 +43,11 @@ void BGFXRenderer::Shutdown()
 {
     bgfx::shutdown();
 }
-
 void BGFXRenderer::RenderFrame()
 {
     // Set view 0 default viewport.
     bgfx::touch(0);
+
     bgfx::frame();
 }
 

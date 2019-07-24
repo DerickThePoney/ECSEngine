@@ -248,6 +248,9 @@
     <Filter Include="Rendering">
       <UniqueIdentifier>{48e0750b-70ce-4da6-9644-a5fb915267f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\IMGUI">
+      <UniqueIdentifier>{2c95c245-e823-4a34-ac4f-8aa6cdb10aff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="SRC\EntityWorld.inl">

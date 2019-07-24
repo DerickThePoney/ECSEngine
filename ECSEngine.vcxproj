@@ -129,7 +129,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External\IMGUI\imgui;External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -187,7 +187,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External\IMGUI\imgui;External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -215,7 +215,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External\IMGUI\imgui;External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
