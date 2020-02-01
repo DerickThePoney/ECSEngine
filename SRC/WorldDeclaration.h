@@ -1,6 +1,8 @@
 #pragma once
+#include "ApparenceModule.h"
 #include "EntityWorld.h"
 #include "ModuleId.h"
+#include "OrientationModule.h"
 #include "PositionModule.h"
 #include "Types.h"
 
@@ -9,7 +11,7 @@
 namespace ECSEngine
 {
 
-using Controllers = brigand::list<ECSEngine::PositionModule>;
+using Controllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule>;
 
 struct f
 {

@@ -1,10 +1,23 @@
 #include "stdafx.h"
 
 #include "DisplayWindow.h"
+
+#include "BGFXRenderer.h"
 namespace ECSEngine
 {
 namespace Rendering
 {
+
+namespace
+{
+void WindowSizeCallback(GLFWwindow* window, int width, int height)
+{
+    AssertRelease(DisplayWindow::HasInstance());
+    DisplayWindow::Instance().ResizeWindow(window, width, height);
+    AssertRelease(BGFXRenderer::HasInstance());
+    BGFXRenderer::Instance().Resize(width, height);
+}
+} // namespace
 DisplayWindow::DisplayWindow()
     : FWindow(nullptr)
     , FWidth(800)
@@ -28,6 +41,8 @@ void DisplayWindow::Init()
 
     FWindow = glfwCreateWindow(FWidth, FHeight, FName.c_str(), nullptr, nullptr);
     AssertRelease(FWindow != nullptr);
+
+    glfwSetWindowSizeCallback(FWindow, &WindowSizeCallback);
 }
 
 void DisplayWindow::Shutdown()
@@ -38,6 +53,15 @@ void DisplayWindow::Shutdown()
         glfwDestroyWindow(FWindow);
         FWindow = nullptr;
     }
+}
+
+void DisplayWindow::ResizeWindow(GLFWwindow* window, int width, int height)
+{
+    AssertRelease(FWindow != nullptr);
+    AlwaysCheckedAssert(window == FWindow);
+
+    FHeight = height;
+    FWidth = width;
 }
 
 } // namespace Rendering

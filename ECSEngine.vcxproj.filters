@@ -94,6 +94,24 @@
     <ClCompile Include="SRC\DisplayWindow.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="SRC\CameraManager.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\Camera.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ApparenceModule.cpp">
+      <Filter>CommonModules</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\BGFXRenderingUtils.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\OrientationModule.cpp">
+      <Filter>CommonModules</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\ModuleParameters.cpp">
+      <Filter>ECS\Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SRC\Assertions.h">
@@ -198,6 +216,24 @@
     <ClInclude Include="SRC\DisplayWindow.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="SRC\CameraManager.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\Camera.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\BGFXRenderingUtils.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ApparenceModule.h">
+      <Filter>CommonModules</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\OrientationModule.h">
+      <Filter>CommonModules</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\ModuleParameters.h">
+      <Filter>ECS\Modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -260,6 +296,9 @@
       <Filter>ECS\Modules</Filter>
     </None>
     <None Include="SRC\ModuleList.inl">
+      <Filter>ECS\Modules</Filter>
+    </None>
+    <None Include="SRC\ModuleParameters.inl">
       <Filter>ECS\Modules</Filter>
     </None>
   </ItemGroup>

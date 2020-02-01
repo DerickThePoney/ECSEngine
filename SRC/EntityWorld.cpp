@@ -5,6 +5,7 @@
 #include "Constants.h"
 #include "Entity.h"
 #include "EntityTemplate.h"
+#include "Module.h"
 #include "ModuleController.h"
 
 namespace ECSEngine
@@ -70,7 +71,7 @@ EntityWorld::~EntityWorld()
     }
 }
 
-ECSEngine::EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(EntityTemplate* parTemplate)
+ECSEngine::EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer)
 {
     EntityId newID = FEntityIdGenerator.GetNextEntityId();
     AssertRelease(newID.GetSequentialId() < ModulePoolSize);
@@ -87,6 +88,14 @@ ECSEngine::EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(EntityTe
         }
     }
 
+    for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
+    {
+        if (parTemplate->HasModule(i))
+        {
+            FControllers[i]->GetModulePtrForEntity(newID)->Init(parParameterContainer);
+        }
+    }
+
     return newID;
 }
 
@@ -99,6 +108,14 @@ void EntityWorld::DestroyEntity(const EntityId& parId)
     FEntityIdGenerator.ReleaseEntityId(parId);
 
     const Entity& entity = FEntities[parId.GetSequentialId()];
+
+    for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
+    {
+        if (entity.HasModule(i))
+        {
+            FControllers[i]->GetModulePtrForEntity(parId)->Deinit();
+        }
+    }
 
     for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
     {

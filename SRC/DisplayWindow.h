@@ -42,6 +42,8 @@ public:
         return FWindow;
     }
 
+    void ResizeWindow(GLFWwindow* window, int width, int height);
+
 private:
     std::string FName;
     u32 FWidth;
