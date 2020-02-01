@@ -14,6 +14,9 @@ public:
     void Init();
     void RenderFrame();
     void Shutdown();
+
+    void Resize(u32 width, u32 height);
 };
+
 } // namespace Rendering
 } // namespace ECSEngine

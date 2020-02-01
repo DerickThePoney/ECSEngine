@@ -5,6 +5,8 @@
 
 namespace ECSEngine
 {
+class Module;
+
 class IModuleController
 {
 public:
@@ -13,6 +15,7 @@ public:
     virtual bool IsLocked() const = 0;
     virtual void AllocateForEntity(const EntityId& parEntity) = 0;
     virtual void DeallocateForEntity(const EntityId& parEntity) = 0;
+    virtual Module* GetModulePtrForEntity(const EntityId& parEntity) = 0;
 };
 
 template<class Mod>
@@ -24,7 +27,7 @@ public:
     {
     }
 
-    void AllocateForEntity(const EntityId& parEntity)
+    void AllocateForEntity(const EntityId& parEntity) override
     {
         Lock();
         const u32 entitySequentialId = parEntity.GetSequentialId();
@@ -34,7 +37,7 @@ public:
         Unlock();
     }
 
-    void DeallocateForEntity(const EntityId& parEntity)
+    void DeallocateForEntity(const EntityId& parEntity) override
     {
         Lock();
         const u32 entitySequentialId = parEntity.GetSequentialId();
@@ -44,6 +47,16 @@ public:
         FAllocator.DeallocateAtIndex(entitySequentialId);
         FAllocatedModules.erase(itFind);
         Unlock();
+    }
+
+    Module* GetModulePtrForEntity(const EntityId& parEntity) override
+    {
+        AlwaysCheckedAssert(parEntity.Valid());
+        if (FAllocatedModules.find(parEntity) != FAllocatedModules.end())
+        {
+            return FAllocator.GetAtIndex(parEntity.GetSequentialId());
+        }
+        return nullptr;
     }
 
     Mod* GetModuleForEntity(const EntityId& parEntity)

@@ -30,7 +30,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{77C3FA4B-B09A-45D2-A10F-75A8123003DA}</ProjectGuid>
     <RootNamespace>ECSEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -238,7 +238,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SRC\ApparenceModule.cpp" />
     <ClCompile Include="SRC\BGFXRenderer.cpp" />
+    <ClCompile Include="SRC\BGFXRenderingUtils.cpp" />
+    <ClCompile Include="SRC\Camera.cpp" />
+    <ClCompile Include="SRC\CameraManager.cpp" />
     <ClCompile Include="SRC\ConfigurationManager.cpp" />
     <ClCompile Include="SRC\DisplayWindow.cpp" />
     <ClCompile Include="SRC\Entity.cpp" />
@@ -251,12 +255,14 @@
     <ClCompile Include="SRC\ModuleAccessor.cpp" />
     <ClCompile Include="SRC\ModuleController.cpp" />
     <ClCompile Include="SRC\ModuleId.cpp" />
+    <ClCompile Include="SRC\ModuleParameters.cpp" />
     <ClCompile Include="SRC\ModulePoolAllocator.cpp" />
     <ClCompile Include="SRC\Assertions.cpp" />
     <ClCompile Include="SRC\EntityId.cpp" />
     <ClCompile Include="SRC\main.cpp" />
     <ClCompile Include="SRC\ModuleSystem.cpp" />
     <ClCompile Include="SRC\MovementSystem.cpp" />
+    <ClCompile Include="SRC\OrientationModule.cpp" />
     <ClCompile Include="SRC\PositionModule.cpp" />
     <ClCompile Include="SRC\Resource.cpp" />
     <ClCompile Include="SRC\ResourceCache.cpp" />
@@ -275,8 +281,12 @@
     <ClCompile Include="SRC\WorldManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SRC\ApparenceModule.h" />
     <ClInclude Include="SRC\Assertions.h" />
     <ClInclude Include="SRC\BGFXRenderer.h" />
+    <ClInclude Include="SRC\BGFXRenderingUtils.h" />
+    <ClInclude Include="SRC\Camera.h" />
+    <ClInclude Include="SRC\CameraManager.h" />
     <ClInclude Include="SRC\ConfigurationManager.h" />
     <ClInclude Include="SRC\Constants.h" />
     <ClInclude Include="SRC\DisplayWindow.h" />
@@ -288,8 +298,10 @@
     <ClInclude Include="SRC\EntityTemplate.h" />
     <ClInclude Include="SRC\EntityWorld.h" />
     <ClInclude Include="SRC\ModuleAccessor.h" />
+    <ClInclude Include="SRC\ModuleParameters.h" />
     <ClInclude Include="SRC\ModuleSystem.h" />
     <ClInclude Include="SRC\MovementSystem.h" />
+    <ClInclude Include="SRC\OrientationModule.h" />
     <ClInclude Include="SRC\Resource.h" />
     <ClInclude Include="SRC\ResourceCache.h" />
     <ClInclude Include="SRC\ResourceFile.h" />
@@ -314,6 +326,7 @@
     <None Include="SRC\EntityWorld.inl" />
     <None Include="SRC\ModuleAccessor.inl" />
     <None Include="SRC\ModuleList.inl" />
+    <None Include="SRC\ModuleParameters.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

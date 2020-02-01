@@ -51,5 +51,11 @@ void BGFXRenderer::RenderFrame()
     bgfx::frame();
 }
 
+void BGFXRenderer::Resize(u32 width, u32 height)
+{
+    bgfx::reset(width, height);
+    bgfx::setViewRect(0, 0, 0, width, height);
+}
+
 } // namespace Rendering
 } // namespace ECSEngine

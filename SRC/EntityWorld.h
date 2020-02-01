@@ -4,6 +4,14 @@
 
 namespace ECSEngine
 {
+namespace ModuleParameters
+{
+class ParameterContainer;
+}
+} // namespace ECSEngine
+
+namespace ECSEngine
+{
 class IModuleController;
 class EntityId;
 class EntityWorld
@@ -20,7 +28,7 @@ public:
     template<typename T>
     IModuleController* GetControllerIFP();
 
-    EntityId CreateEntityFromTemplateReturnEntityId(EntityTemplate* parTemplate);
+    EntityId CreateEntityFromTemplateReturnEntityId(EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer);
     void DestroyEntity(const EntityId& parId);
 
     const u8 WorldID() const { return FWorldID; }

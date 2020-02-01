@@ -2,13 +2,16 @@
 
 #include "../glfw-3.3.bin.WIN64/include/GLFW/glfw3.h"
 #include "BGFXRenderer.h"
+#include "BGFXRenderingUtils.h"
 #include "DisplayWindow.h"
 #include "EntityId.h"
 #include "EntityTemplateManager.h"
 #include "EntityWorld.h"
+#include "Module.h"
 #include "ModuleAccessor.h"
 #include "ModuleController.h"
 #include "ModuleId.h"
+#include "ModuleParameters.h"
 #include "MovementSystem.h"
 #include "PositionModule.h"
 #include "Resource.h"
@@ -106,8 +109,11 @@ void TestFunction()
     ECSEngine::EntityTemplate* newTemplate = ECSEngine::EntityTemplateManager::Instance().CreateNewEntityTemplate();
     newTemplate->SetHasModule<ECSEngine::PositionModule>();
 
-    ECSEngine::EntityId unitID = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
-    ECSEngine::EntityId unitID2 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
+    ECSEngine::ModuleParameters::ParameterContainer container;
+    container.Set<ECSEngine::ModuleParameters::Position>(glm::vec3(1.5f, 2.5f, 3.5f));
+
+    ECSEngine::EntityId unitID = world.CreateEntityFromTemplateReturnEntityId(newTemplate, container);
+    ECSEngine::EntityId unitID2 = world.CreateEntityFromTemplateReturnEntityId(newTemplate, container);
 
     dynamic_cast<ECSEngine::ModuleController<ECSEngine::PositionModule>*>(world.GetControllerIFP<ECSEngine::PositionModule>())->Lock();
     ECSEngine::ModuleAccessor<ECSEngine::PositionModule> moduleAccessor;
@@ -123,10 +129,10 @@ void TestFunction()
 
     dynamic_cast<ECSEngine::ModuleController<ECSEngine::PositionModule>*>(world.GetControllerIFP<ECSEngine::PositionModule>())->Unlock();
 
-    ECSEngine::EntityId unitID3 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
-    ECSEngine::EntityId unitID4 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
-    ECSEngine::EntityId unitID5 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
-    ECSEngine::EntityId unitID6 = world.CreateEntityFromTemplateReturnEntityId(newTemplate);
+    ECSEngine::EntityId unitID3 = world.CreateEntityFromTemplateReturnEntityId(newTemplate, container);
+    ECSEngine::EntityId unitID4 = world.CreateEntityFromTemplateReturnEntityId(newTemplate, container);
+    ECSEngine::EntityId unitID5 = world.CreateEntityFromTemplateReturnEntityId(newTemplate, container);
+    ECSEngine::EntityId unitID6 = world.CreateEntityFromTemplateReturnEntityId(newTemplate, container);
 
     ECSEngine::MovementSystem movementSystem;
     movementSystem.Init();
@@ -148,58 +154,9 @@ void TestFunction()
     worldManagerInstance.Destroy();
 }
 
-bgfx::ShaderHandle loadShader(const std::string& FILENAME)
-{
-    const std::string baseAssetPath = "D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\";
-    std::string shaderPath = "???";
-
-    switch (bgfx::getRendererType())
-    {
-    case bgfx::RendererType::Noop:
-    case bgfx::RendererType::Direct3D9:
-        shaderPath = "shaders/dx9/";
-        break;
-    case bgfx::RendererType::Direct3D11:
-    case bgfx::RendererType::Direct3D12:
-        shaderPath = "shaders/dx11/";
-        break;
-    case bgfx::RendererType::Gnm:
-        shaderPath = "shaders/pssl/";
-        break;
-    case bgfx::RendererType::Metal:
-        shaderPath = "shaders/metal/";
-        break;
-    case bgfx::RendererType::OpenGL:
-        shaderPath = "shaders/glsl/";
-        break;
-    case bgfx::RendererType::OpenGLES:
-        shaderPath = "shaders/essl/";
-        break;
-    case bgfx::RendererType::Vulkan:
-        shaderPath = "shaders/spirv/";
-        break;
-    }
-
-    ECSEngine::ResourceCache* cache = ECSEngine::GlobalResourceCache::Instance().FCache;
-    ECSEngine::Resource shaderResource(baseAssetPath + shaderPath + FILENAME);
-    std::shared_ptr<ECSEngine::ResourceHandle> shaderDataHandle = cache->GetResourceHandle(&shaderResource);
-
-    AssertRelease(shaderDataHandle != nullptr);
-    const c8* shaderData = shaderDataHandle->Buffer();
-    const u32 bufferSize = shaderDataHandle->Size();
-
-    AssertRelease(bufferSize > 0);
-    AssertRelease(shaderData != nullptr);
-
-    const bgfx::Memory* mem = bgfx::alloc(bufferSize + 1);
-    memcpy(mem->data, shaderData, bufferSize);
-    mem->data[mem->size - 1] = '\0';
-
-    return bgfx::createShader(mem);
-}
-
 int main(int argc, char** argv)
 {
+    ECSEngine::ModuleParameters::InitParameterIdentifiersTraits();
     TestFunction();
 
     ECSEngine::GlobalResourceCache::CreateIFP();
@@ -208,9 +165,6 @@ int main(int argc, char** argv)
 
     if (!ECSEngine::GlobalResourceCache::Instance().FCache->Initialize())
         AssertNotReachedMsg("Unable to init the resource cache!!");
-
-    ECSEngine::Resource r("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\2D\\Textures\\element_yellow_square_glossy.png");
-    std::shared_ptr<ECSEngine::ResourceHandle> handle = ECSEngine::GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
 
     glfwInit();
 
@@ -221,18 +175,23 @@ int main(int argc, char** argv)
     ECSEngine::Rendering::BGFXRenderer& rendererInstance = ECSEngine::Rendering::BGFXRenderer::Instance();
     rendererInstance.Init();
 
-    bgfx::VertexDecl pcvDecl;
+    bgfx::VertexLayout pcvDecl;
     pcvDecl.begin().add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float).add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true).end();
     bgfx::VertexBufferHandle vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), pcvDecl);
     bgfx::IndexBufferHandle ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
 
-    bgfx::ShaderHandle vsh = loadShader("vs_cubes.bin");
-    bgfx::ShaderHandle fsh = loadShader("fs_cubes.bin");
-    bgfx::ProgramHandle program = bgfx::createProgram(vsh, fsh, true);
+    bgfx::ProgramHandle program = ECSEngine::Rendering::LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "VertexColor");
 
+    bgfx::UniformHandle u_color = bgfx::createUniform("u_color", bgfx::UniformType::Vec4);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    auto end = start;
+    auto timeElapsed = end - start;
     unsigned int counter = 0;
     while (!glfwWindowShouldClose(ECSEngine::Rendering::DisplayWindow::Instance().GetWindowHandle()))
     {
+        auto this_tick = std::chrono::high_resolution_clock::now();
+        const float timepoint = (float)(this_tick - start).count() / 1000000000.0f;
         const glm::uvec2 windowSize = ECSEngine::Rendering::DisplayWindow::Instance().GetSize();
 
         const bx::Vec3 at = { 0.0f, 0.0f, 0.0f };
@@ -247,14 +206,21 @@ int main(int argc, char** argv)
         bgfx::setIndexBuffer(ibh);
 
         float mtx[16];
-        bx::mtxRotateXY(mtx, counter * 0.01f, counter * 0.01f);
+        bx::mtxRotateXY(mtx, timepoint, timepoint);
         bgfx::setTransform(mtx);
+
+        float colorMult = sin(0.1f * timepoint);
+        colorMult *= colorMult;
+        const float color[4] = { colorMult, colorMult, colorMult, 1.f };
+        bgfx::setUniform(u_color, color);
 
         bgfx::submit(0, program);
 
         rendererInstance.RenderFrame();
         glfwPollEvents();
         counter++;
+        end = std::chrono::high_resolution_clock::now();
+        auto timeElapsed = end - start;
     }
 
     rendererInstance.Shutdown();
@@ -262,6 +228,8 @@ int main(int argc, char** argv)
     ECSEngine::Rendering::DisplayWindow::Instance().Shutdown();
 
     glfwTerminate();
+
+    ECSEngine::ModuleParameters::DestroyParameterIdentifiersTraits();
 
     return 0;
 }
