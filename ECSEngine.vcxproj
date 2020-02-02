@@ -278,6 +278,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Final|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SRC\StringUtilities.cpp" />
+    <ClCompile Include="SRC\VertexLayout.cpp" />
     <ClCompile Include="SRC\WorldManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -297,6 +298,8 @@
     <ClInclude Include="SRC\EntityModuleKey.h" />
     <ClInclude Include="SRC\EntityTemplate.h" />
     <ClInclude Include="SRC\EntityWorld.h" />
+    <ClInclude Include="SRC\Mesh.h" />
+    <ClInclude Include="SRC\MeshUtils.h" />
     <ClInclude Include="SRC\ModuleAccessor.h" />
     <ClInclude Include="SRC\ModuleParameters.h" />
     <ClInclude Include="SRC\ModuleSystem.h" />
@@ -311,6 +314,7 @@
     <ClInclude Include="SRC\Singleton.h" />
     <ClInclude Include="SRC\StackAllocator.h" />
     <ClInclude Include="SRC\StringUtilities.h" />
+    <ClInclude Include="SRC\VertexLayout.h" />
     <ClInclude Include="SRC\WorldDeclaration.h" />
     <ClInclude Include="SRC\Macros.h" />
     <ClInclude Include="SRC\Module.h" />
@@ -327,6 +331,7 @@
     <None Include="SRC\ModuleAccessor.inl" />
     <None Include="SRC\ModuleList.inl" />
     <None Include="SRC\ModuleParameters.inl" />
+    <None Include="SRC\VertextLayout.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

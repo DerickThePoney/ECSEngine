@@ -112,6 +112,9 @@
     <ClCompile Include="SRC\ModuleParameters.cpp">
       <Filter>ECS\Modules</Filter>
     </ClCompile>
+    <ClCompile Include="SRC\VertexLayout.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SRC\Assertions.h">
@@ -234,6 +237,15 @@
     <ClInclude Include="SRC\ModuleParameters.h">
       <Filter>ECS\Modules</Filter>
     </ClInclude>
+    <ClInclude Include="SRC\Mesh.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\VertexLayout.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\MeshUtils.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -300,6 +312,9 @@
     </None>
     <None Include="SRC\ModuleParameters.inl">
       <Filter>ECS\Modules</Filter>
+    </None>
+    <None Include="SRC\VertextLayout.inl">
+      <Filter>Rendering</Filter>
     </None>
   </ItemGroup>
 </Project>

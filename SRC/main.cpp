@@ -18,6 +18,7 @@
 #include "ResourceCache.h"
 #include "ResourceFileDirectoryView.h"
 #include "ResourceHandle.h"
+#include "VertexLayout.h"
 #include "WorldManager.h"
 #include "bgfx/embedded_shader.h"
 #include "bx/math.h"
@@ -175,8 +176,8 @@ int main(int argc, char** argv)
     ECSEngine::Rendering::BGFXRenderer& rendererInstance = ECSEngine::Rendering::BGFXRenderer::Instance();
     rendererInstance.Init();
 
-    bgfx::VertexLayout pcvDecl;
-    pcvDecl.begin().add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float).add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true).end();
+    ECSEngine::Rendering::VextexPositionColorN<1> vertexLayout;
+    bgfx::VertexLayout pcvDecl = vertexLayout.GetVertexLayout();
     bgfx::VertexBufferHandle vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), pcvDecl);
     bgfx::IndexBufferHandle ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
 
