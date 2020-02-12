@@ -115,6 +115,13 @@
     <ClCompile Include="SRC\VertexLayout.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="SRC\VertexBuffer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\IndexBuffer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="SRC\VertexBufferLayoutConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SRC\Assertions.h">
@@ -246,6 +253,15 @@
     <ClInclude Include="SRC\MeshUtils.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="SRC\VertexBuffer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\IndexBuffer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SRC\VertexBufferLayoutConverter.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -313,7 +329,7 @@
     <None Include="SRC\ModuleParameters.inl">
       <Filter>ECS\Modules</Filter>
     </None>
-    <None Include="SRC\VertextLayout.inl">
+    <None Include="SRC\VertexBuffer.inl">
       <Filter>Rendering</Filter>
     </None>
   </ItemGroup>

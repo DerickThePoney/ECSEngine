@@ -3,7 +3,6 @@
 #define _ITERATOR_DEBUG_LEVEL 2
 #endif
 
-#include "Macros.h"
 // clang-format off
 #include <iostream>
 #include <set>
@@ -18,6 +17,8 @@
 #include <thread>
 #include <atomic>
 // clang-format on
+
+#include "Macros.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_ALIGNED_GENTYPES

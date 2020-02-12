@@ -9,7 +9,7 @@ void EntityWorld::AddController()
 {
     constexpr u32 moduleId = ModuleTraits<T>::GetModuleId();
     AssertRelease(moduleId < FSize);
-    AssertRelease(FControllers[moduleId] != nullptr);
+    AssertRelease(FControllers[moduleId] == nullptr);
     FControllers[moduleId] = new ModuleController<T>();
 }
 

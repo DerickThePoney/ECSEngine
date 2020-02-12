@@ -128,9 +128,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>External\IMGUI\imgui;External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>External\BGFX\bx\include\compat\msvc;External\IMGUI\imgui;External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -139,6 +140,12 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PreprocessorDefinitions>PERFORM_SECURITY_CHECKS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <OmitFramePointers>true</OmitFramePointers>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeTypeInfo>
+      </RuntimeTypeInfo>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -187,7 +194,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>External\IMGUI\imgui;External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External\BGFX\bx\include\compat\msvc;External\IMGUI\imgui;External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -197,6 +204,8 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -215,7 +224,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>External\IMGUI\imgui;External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External\BGFX\bx\include\compat\msvc;External\IMGUI\imgui;External\glfw-3.3.bin.WIN64\include;External\BGFX\bgfx\include;External\BGFX\bimg\include;External\BGFX\bx\include;D:\Applications\glm-0.9.9.5\glm;D:\Applications\brigand-master\include;D:\Applications\boost_1_70_0;D:\Programmation\GameEngine\ECSEngine\ECSEngine\SRC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -251,6 +260,7 @@
     <ClCompile Include="SRC\EntityModuleKey.cpp" />
     <ClCompile Include="SRC\EntityTemplate.cpp" />
     <ClCompile Include="SRC\EntityWorld.cpp" />
+    <ClCompile Include="SRC\IndexBuffer.cpp" />
     <ClCompile Include="SRC\Module.cpp" />
     <ClCompile Include="SRC\ModuleAccessor.cpp" />
     <ClCompile Include="SRC\ModuleController.cpp" />
@@ -278,6 +288,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Final|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SRC\StringUtilities.cpp" />
+    <ClCompile Include="SRC\VertexBuffer.cpp" />
+    <ClCompile Include="SRC\VertexBufferLayoutConverter.cpp" />
     <ClCompile Include="SRC\VertexLayout.cpp" />
     <ClCompile Include="SRC\WorldManager.cpp" />
   </ItemGroup>
@@ -298,6 +310,7 @@
     <ClInclude Include="SRC\EntityModuleKey.h" />
     <ClInclude Include="SRC\EntityTemplate.h" />
     <ClInclude Include="SRC\EntityWorld.h" />
+    <ClInclude Include="SRC\IndexBuffer.h" />
     <ClInclude Include="SRC\Mesh.h" />
     <ClInclude Include="SRC\MeshUtils.h" />
     <ClInclude Include="SRC\ModuleAccessor.h" />
@@ -314,6 +327,8 @@
     <ClInclude Include="SRC\Singleton.h" />
     <ClInclude Include="SRC\StackAllocator.h" />
     <ClInclude Include="SRC\StringUtilities.h" />
+    <ClInclude Include="SRC\VertexBuffer.h" />
+    <ClInclude Include="SRC\VertexBufferLayoutConverter.h" />
     <ClInclude Include="SRC\VertexLayout.h" />
     <ClInclude Include="SRC\WorldDeclaration.h" />
     <ClInclude Include="SRC\Macros.h" />
@@ -331,7 +346,7 @@
     <None Include="SRC\ModuleAccessor.inl" />
     <None Include="SRC\ModuleList.inl" />
     <None Include="SRC\ModuleParameters.inl" />
-    <None Include="SRC\VertextLayout.inl" />
+    <None Include="SRC\VertexBuffer.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
