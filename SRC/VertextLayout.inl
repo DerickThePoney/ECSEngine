@@ -7,7 +7,7 @@ namespace Rendering
 {
 
 template<int N>
-bgfx::VertexLayout VextexPositionColorN<N>::GetVertexLayout() const
+bgfx::VertexLayout VertexPositionColorN<N>::GetVertexLayout() const
 {
     static_assert(N > 0 && N <= 4, "N doit être compris entre 1 et 4");
     bgfx::VertexLayout pcvDecl;

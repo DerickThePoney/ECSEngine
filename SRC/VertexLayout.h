@@ -15,41 +15,39 @@ bgfx::VertexLayout GetVertexLayout(const T& parVertexLayout)
     return parVertexLayout.GetVertexLayout();
 }
 
-class IVertexLayout
+struct VextexPosition
 {
 public:
-    virtual ~IVertexLayout() {}
-
-    virtual bgfx::VertexLayout GetVertexLayout() const = 0;
-};
-
-class VextexPosition : public IVertexLayout
-{
-public:
-    virtual bgfx::VertexLayout GetVertexLayout() const override;
+    bgfx::VertexLayout GetVertexLayout() const;
 
     glm::vec3 FPosition;
 };
+static_assert(sizeof(VextexPosition) == 12);
 
-class VextexPositionColor : public IVertexLayout
+struct VextexPositionColor
 {
 public:
-    virtual bgfx::VertexLayout GetVertexLayout() const override;
+    bgfx::VertexLayout GetVertexLayout() const;
 
     glm::vec3 FPosition;
     u32 FColor;
 };
+static_assert(sizeof(VextexPositionColor) == 16);
 
 template<int N>
-class VextexPositionColorN : public IVertexLayout
+struct VertexPositionColorN
 {
 public:
-    virtual bgfx::VertexLayout GetVertexLayout() const override;
+    bgfx::VertexLayout GetVertexLayout() const;
 
     glm::vec3 FPosition;
     u32 FColor[N];
 };
 
+static_assert(sizeof(VertexPositionColorN<1>) == 16);
+static_assert(sizeof(VertexPositionColorN<2>) == 20);
+static_assert(sizeof(VertexPositionColorN<3>) == 24);
+static_assert(sizeof(VertexPositionColorN<4>) == 28);
 } // namespace Rendering
 } // namespace ECSEngine
 

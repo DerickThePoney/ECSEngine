@@ -7,6 +7,7 @@
 #include "EntityId.h"
 #include "EntityTemplateManager.h"
 #include "EntityWorld.h"
+#include "IndexBuffer.h"
 #include "Module.h"
 #include "ModuleAccessor.h"
 #include "ModuleController.h"
@@ -18,6 +19,7 @@
 #include "ResourceCache.h"
 #include "ResourceFileDirectoryView.h"
 #include "ResourceHandle.h"
+#include "VertexBuffer.h"
 #include "VertexLayout.h"
 #include "WorldManager.h"
 #include "bgfx/embedded_shader.h"
@@ -42,7 +44,7 @@ static PosColorVertex cubeVertices[] = {
     { 1.0f, -1.0f, -1.0f, 0xffffffff },
 };
 
-static const uint16_t cubeTriList[] = {
+static const u32 cubeTriList[] = {
     0,
     1,
     2,
@@ -85,6 +87,9 @@ void TestFunction()
 {
     std::cout << "EntityID size: " << sizeof(ECSEngine::EntityId) << "\n";
     std::cout << "glm::vec3 size: " << sizeof(glm::aligned_vec3) << "\n";
+
+    std::cout << sizeof(ECSEngine::Rendering::VertexPositionColorN<1>) << "\n";
+    std::cout << sizeof(glm::vec3) << "\n";
 
     ECSEngine::ModuleTraits<ECSEngine::PositionModule> b;
 
@@ -155,8 +160,43 @@ void TestFunction()
     worldManagerInstance.Destroy();
 }
 
+class Data
+{
+public:
+    Data()
+        : FData(nullptr)
+        , FSize(0)
+        , FBool(false)
+        , FHandle()
+    {
+        FHandle.idx = bgfx::kInvalidHandle;
+    }
+    ~Data()
+    {
+        FHandle.idx = bgfx::kInvalidHandle;
+
+        if (FData != nullptr)
+        {
+            delete[] FData;
+            FData = nullptr;
+        }
+
+        FSize = 0;
+    }
+
+private:
+    u32* FData;
+    u32 FSize;
+
+    bool FBool;
+    bgfx::IndexBufferHandle FHandle;
+};
+
 int main(int argc, char** argv)
 {
+    Data* d = new Data();
+    delete d;
+
     ECSEngine::ModuleParameters::InitParameterIdentifiersTraits();
     TestFunction();
 
@@ -176,10 +216,17 @@ int main(int argc, char** argv)
     ECSEngine::Rendering::BGFXRenderer& rendererInstance = ECSEngine::Rendering::BGFXRenderer::Instance();
     rendererInstance.Init();
 
-    ECSEngine::Rendering::VextexPositionColorN<1> vertexLayout;
-    bgfx::VertexLayout pcvDecl = vertexLayout.GetVertexLayout();
-    bgfx::VertexBufferHandle vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), pcvDecl);
-    bgfx::IndexBufferHandle ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
+    using VertexLayout = ECSEngine::Rendering::VertexPositionColorN<1>;
+    ECSEngine::Rendering::VertexBuffer<VertexLayout>* vertexBuffer = new ECSEngine::Rendering::VertexBuffer<VertexLayout>();
+    vertexBuffer->SetRawData(cubeVertices, sizeof(cubeVertices));
+
+    bgfx::VertexBufferHandle vbh = vertexBuffer->GetVertexBufferHandle();
+    AssertRelease(bgfx::isValid(vbh));
+
+    ECSEngine::Rendering::IndexBuffer* indexBuffer = new ECSEngine::Rendering::IndexBuffer();
+    indexBuffer->SetData(cubeTriList, sizeof(cubeTriList));
+    bgfx::IndexBufferHandle ibh = indexBuffer->GetIndexBufferHandle();
+    AssertRelease(bgfx::isValid(ibh));
 
     bgfx::ProgramHandle program = ECSEngine::Rendering::LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "VertexColor");
 
@@ -223,6 +270,9 @@ int main(int argc, char** argv)
         end = std::chrono::high_resolution_clock::now();
         auto timeElapsed = end - start;
     }
+
+    delete vertexBuffer;
+    delete indexBuffer;
 
     rendererInstance.Shutdown();
 
