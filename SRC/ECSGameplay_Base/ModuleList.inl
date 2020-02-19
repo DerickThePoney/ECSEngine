@@ -1,4 +1,4 @@
 
-// DECLARE_MODULE(PositionModule)
-// DECLARE_MODULE(OrientationModule)
+DECLARE_MODULE(PositionModule)
+DECLARE_MODULE(OrientationModule)
 DECLARE_MODULE(ApparenceModule)

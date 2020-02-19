@@ -93,7 +93,7 @@ EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(EntityTemplate* par
     {
         if (parTemplate->HasModule(i))
         {
-            FControllers[i]->GetModulePtrForEntity(newID)->Init(parParameterContainer);
+            FControllers[i]->GetModulePtrForEntity(newID)->Init(newID, parParameterContainer);
         }
     }
 

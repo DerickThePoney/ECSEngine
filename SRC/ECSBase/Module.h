@@ -1,4 +1,5 @@
 #pragma once
+#include "EntityId.h"
 #include "ModuleId.h"
 
 namespace ECSEngine
@@ -19,14 +20,17 @@ protected:
     virtual ~Module() {}
 
 public:
-    void Init(const ModuleParameters::ParameterContainer& parParameters);
+    void Init(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
     void Deinit();
 
+    const EntityId& UnitId() { return FUnitId; }
+
 protected:
-    virtual void VirtualInit(const ModuleParameters::ParameterContainer& parParameters);
+    virtual void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
     virtual void VirtualDeinit();
 
 private:
+    EntityId FUnitId;
 #ifdef PERFORM_SECURITY_CHECKS
     bool FVirtualInitCalled = false;
     bool FVirtualDeinitCalled = false;

@@ -4,13 +4,15 @@
 #include "Common/Types.h"
 #include "ECSBase/EntityWorld.h"
 #include "ECSBase/ModuleId.h"
+#include "OrientationModule.h"
+#include "PositionModule.h"
 
 #include <standalone/brigand.hpp>
 
 namespace ECSEngine
 {
 
-using Controllers = brigand::list</*ECSEngine::PositionModule, ECSEngine::OrientationModule*/ ECSEngine::ApparenceModule>;
+using Controllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule>;
 
 struct f
 {
