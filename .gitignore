@@ -37,26 +37,11 @@
 .vs
 *.ipch
 
-Final
-TEMP
+bin
+obj
+build
 
-ECSEngine_BACKUP_5676.vcxproj
-
-
-ECSEngine_BASE_5676.vcxproj
-
-
-ECSEngine_LOCAL_5676.vcxproj
-
-
-ECSEngine_REMOTE_5676.vcxproj
-
+External/brigand-master
+External/glm-0.9.9.5
 
 *.orig
-
-
-*.iobj
-*.ipdb
-x64/Debug/ECSEngine_Debug.exp
-
-x64/Release/ECSEngine_Release.exp

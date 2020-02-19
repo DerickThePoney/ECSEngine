@@ -1,0 +1,32 @@
+#include "stdafx.h"
+
+#include "Assertions.h"
+
+#include "dbghelp.h"
+
+#include <boost/stacktrace.hpp>
+
+namespace ECSEngine
+{
+
+AssertImplementation::AssertImplementation(const bool shouldLetGo, const char* msg, const char* additionalMessage)
+{
+    if (!shouldLetGo)
+        Assert(msg, additionalMessage);
+}
+
+void AssertImplementation::Assert(const char* msg, const char* additionalMessage)
+{
+    std::ostringstream sstr;
+
+    sstr << msg << "\n";
+    if (additionalMessage != nullptr)
+        sstr << additionalMessage << "\n";
+    sstr << boost::stacktrace::stacktrace() << "\n";
+
+    OutputDebugStringA(sstr.str().c_str());
+
+    __debugbreak();
+}
+
+} // namespace ECSEngine
