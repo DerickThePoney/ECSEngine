@@ -9,13 +9,13 @@ Module::Module()
 {
 }
 
-void Module::Init(const ModuleParameters::ParameterContainer& parParameters)
+void Module::Init(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualInitCalled = false;
 #endif
 
-    VirtualInit(parParameters);
+    VirtualInit(parUnitId, parParameters);
 
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssertMsg(FVirtualInitCalled, "You forgot to call the parent's VirtualInit, you naughtyboy !");
@@ -35,8 +35,11 @@ void Module::Deinit()
 #endif
 }
 
-void Module::VirtualInit(const ModuleParameters::ParameterContainer& parParameters)
+void Module::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
+    FUnitId = parUnitId;
+    AssertRelease(FUnitId.Valid());
+
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualInitCalled = true;
 #endif

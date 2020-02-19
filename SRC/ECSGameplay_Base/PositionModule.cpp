@@ -7,9 +7,9 @@
 namespace ECSEngine
 {
 
-void PositionModule::VirtualInit(const ModuleParameters::ParameterContainer& parParameters)
+void PositionModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
-    parent_type::VirtualInit(parParameters);
+    parent_type::VirtualInit(parUnitId, parParameters);
 
     FPosition = parParameters.Get_IFP<ModuleParameters::Position>(glm::vec3(0.0f));
 }

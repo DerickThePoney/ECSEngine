@@ -18,7 +18,7 @@ public:
     void SetPosition3D(const glm::aligned_vec3& parPosition) { FPosition = parPosition; }
 
 protected:
-    void VirtualInit(const ModuleParameters::ParameterContainer& parParameters) override;
+    void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
 private:
     glm::aligned_vec3 FPosition;

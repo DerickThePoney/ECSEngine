@@ -259,24 +259,6 @@ public:
 
 int main(int argc, char** argv)
 {
-    ECSEngine::ObjectPoolAllocator<ECSEngine::OrientationModule, 1024, true>* poolOr = new ECSEngine::ObjectPoolAllocator<ECSEngine::OrientationModule, 1024, true>();
-    poolOr->AllocateAtIndex(0);
-    ECSEngine::OrientationModule* moduleOr = poolOr->GetAtIndex(0);
-    poolOr->DeallocateAtIndex(0);
-    delete poolOr;
-
-    ECSEngine::ObjectPoolAllocator<ECSEngine::PositionModule, 1024, true>* poolPos = new ECSEngine::ObjectPoolAllocator<ECSEngine::PositionModule, 1024, true>();
-    poolPos->AllocateAtIndex(0);
-    ECSEngine::PositionModule* modulePos = poolPos->GetAtIndex(0);
-    poolPos->DeallocateAtIndex(0);
-    delete poolPos;
-
-    ECSEngine::ObjectPoolAllocator<ECSEngine::ApparenceModule, 1024, true>* poolApp = new ECSEngine::ObjectPoolAllocator<ECSEngine::ApparenceModule, 1024, true>();
-    poolApp->AllocateAtIndex(0);
-    ECSEngine::ApparenceModule* moduleApp = poolApp->GetAtIndex(0);
-    poolApp->DeallocateAtIndex(0);
-    delete poolApp;
-
     // module params
     ECSEngine::ModuleParameters::InitParameterIdentifiersTraits();
 
@@ -298,6 +280,7 @@ int main(int argc, char** argv)
     AssertRelease(ECSEngine::EntityTemplateManager::HasInstance());
     ECSEngine::EntityTemplate* newTemplate = ECSEngine::EntityTemplateManager::Instance().CreateNewEntityTemplate();
     newTemplate->SetHasModule<ECSEngine::ApparenceModule>();
+    newTemplate->SetHasModule<ECSEngine::PositionModule>();
 
     // init rendering
     ECSEngine::Rendering::DisplayWindow::CreateIFP();
@@ -314,15 +297,22 @@ int main(int argc, char** argv)
     ECSEngine::Rendering::MeshHandle handle = ECSEngine::Rendering::MeshManager::Instance().CreateMesh(cubeVertices, sizeof(cubeVertices), cubeTriList, sizeof(cubeTriList));
 
     // init units
-    ECSEngine::EntityId unitID;
+    std::vector<ECSEngine::EntityId> entities;
     ECSEngine::EntityWorld& world = worldManagerInstance.GetWorld(ECSEngine::Worlds::STANDARD);
+    for (int i = -5; i < 6; ++i)
     {
-        ECSEngine::ModuleParameters::ParameterContainer container;
-        container.Set<ECSEngine::ModuleParameters::Mesh>(handle);
+        for (int j = -5; j < 6; ++j)
+        {
+            ECSEngine::ModuleParameters::ParameterContainer container;
+            container.Set<ECSEngine::ModuleParameters::Mesh>(handle);
+            container.Set<ECSEngine::ModuleParameters::Position>(glm::vec3((float)i, (float)j, 0.f));
 
-        unitID = world.CreateEntityFromTemplateReturnEntityId(newTemplate, container);
-        AssertRelease(unitID.Valid());
+            ECSEngine::EntityId unitId = world.CreateEntityFromTemplateReturnEntityId(newTemplate, container);
+            AssertRelease(unitId.Valid());
+            entities.push_back(unitId);
+        }
     }
+
     // main loop
 
     while (!ECSEngine::Rendering::DisplayWindow::Instance().ShouldClose())
@@ -333,7 +323,7 @@ int main(int argc, char** argv)
     }
 
     // destroy units
-    world.DestroyEntity(unitID);
+    foreachitem(id, entities) { world.DestroyEntity(id); }
 
     // shutdown rendering
     ECSEngine::Rendering::MeshManager::Destroy();

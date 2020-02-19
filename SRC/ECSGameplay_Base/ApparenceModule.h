@@ -21,7 +21,7 @@ public:
     // bgfx::ProgramHandle GetProgramHandle() const { return FProgram; }
 
 protected:
-    void VirtualInit(const ModuleParameters::ParameterContainer& parParameters) override;
+    void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
     void VirtualDeinit() override;
 
 private:

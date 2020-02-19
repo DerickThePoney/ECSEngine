@@ -7,6 +7,7 @@
 #include "DisplayWindow.h"
 #include "ECSBase/ModuleAccessor.h"
 #include "ECSGameplay_Base/ApparenceModule.h"
+#include "ECSGameplay_Base/PositionModule.h"
 #include "Mesh.h"
 #include "MeshManager.h"
 #include "bx/bx.h"
@@ -18,6 +19,7 @@ RenderingSystem::RenderingSystem()
     : parent_type()
 {
     RegisterDepency<ApparenceModule>(Worlds::STANDARD);
+    RegisterDepency<PositionModule>(Worlds::STANDARD);
 }
 
 RenderingSystem::~RenderingSystem()
@@ -41,6 +43,7 @@ void RenderingSystem::VirtualUpdate()
     parent_type::VirtualUpdate();
 
     ModuleAccessor<ApparenceModule> apparenceController;
+    ModuleAccessor<PositionModule> positionController;
 
     auto this_tick = std::chrono::high_resolution_clock::now();
     const float timepoint = (float)(this_tick - FStart).count() / 1000000000.0f;
@@ -67,8 +70,13 @@ void RenderingSystem::VirtualUpdate()
         float uniformVal[4] = { sinTime, sinTime, sinTime, sinTime };
         bgfx::setUniform(kUniform, &uniformVal);
 
+        PositionModule* positionModule = positionController[apparenceModule.UnitId()];
+        AssertRelease(positionModule != nullptr);
+
         float mtx[16];
-        bx::mtxRotateXY(mtx, timepoint, timepoint);
+        const glm::aligned_vec3 position = positionModule->GetPosition3D();
+        bx::mtxSRT(mtx, 0.1f, 0.1f, 0.1f, timepoint, timepoint, 0.f, position.x, position.y, position.z);
+        /*bx::mtxRotateXY(mtx, timepoint, timepoint);*/
         bgfx::setTransform(mtx);
         bgfx::submit(0, kProgram);
     }

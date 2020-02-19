@@ -13,9 +13,9 @@ ApparenceModule::ApparenceModule()
 {
 }
 
-void ApparenceModule::VirtualInit(const ModuleParameters::ParameterContainer& parParameters)
+void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
-    parent_type::VirtualInit(parParameters);
+    parent_type::VirtualInit(parUnitId, parParameters);
     FMeshHandle = parParameters.Get<ModuleParameters::Mesh>();
     // FProgram = parParameters.Get<ModuleParameters::Material>();
 }
