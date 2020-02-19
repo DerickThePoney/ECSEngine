@@ -1,0 +1,41 @@
+#pragma once
+namespace ECSEngine
+{
+#pragma pack(1)
+struct PackedEntityId
+{
+    PackedEntityId(u8 parWorldId, u32 parId)
+        : FId(parWorldId << 24 | parId)
+    {
+    }
+
+    const u8 GetWorldId() const { return FId >> 24 & 0xFF; }
+    const u32 GetSequentialId() const { return FId & 0xFFFFFF; }
+
+    bool operator==(const PackedEntityId& other) const { return FId == other.FId; }
+
+private:
+    u32 FId;
+};
+
+class EntityId
+{
+public:
+    explicit EntityId(u8 parWorldId = 0xFF, u32 parId = 0xFFFFFF);
+
+    const u8 GetWorldId() const { return FId.GetWorldId(); }
+    const u32 GetSequentialId() const { return FId.GetSequentialId(); }
+    bool Valid() const { return FId.GetWorldId() != 0xFF && FId.GetSequentialId() != 0xFFFFFF; }
+
+    bool operator==(const EntityId& other) const { return FId == other.FId; }
+    bool operator!=(const EntityId& other) const { return !(FId == other.FId); }
+
+private:
+    PackedEntityId FId;
+};
+
+static bool operator<(const EntityId& left, const EntityId& right)
+{
+    return left.GetSequentialId() < right.GetSequentialId();
+}
+} // namespace ECSEngine
