@@ -31,10 +31,6 @@ project "RenderingBase"
      links {"bgfxDebug", "bimgDebug","bxDebug"}
      debugenvs {"PATH=%PATH%;../External/BGFX/bgfx/.build/win64_vs2019/bin"}
 
-   filter "configurations:Release"
-     links {"bgfxRelease", "bimgRelease","bxRelease"}
-     debugenvs {"PATH=%PATH%;../External/BGFX/bgfx/.build/win64_vs2019/bin"}
-
-   filter "configurations:Final"
+   filter "configurations:not Debug"
      links {"bgfxRelease", "bimgRelease","bxRelease"}
      debugenvs {"PATH=%PATH%;../External/BGFX/bgfx/.build/win64_vs2019/bin"}
