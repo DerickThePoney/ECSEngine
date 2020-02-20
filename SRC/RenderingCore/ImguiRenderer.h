@@ -12,7 +12,7 @@ namespace Rendering
 namespace ImGUI
 {
 void Init();
-void NextFrame();
+void NewFrame();
 void Render();
 void Shutdown();
 } // namespace ImGUI

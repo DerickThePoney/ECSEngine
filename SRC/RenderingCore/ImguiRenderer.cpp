@@ -35,6 +35,9 @@ public:
     void Shutdown();
 
 private:
+    void InitMouseAndButtons(ImGuiIO& io);
+
+private:
     ImGuiContext* FImguiContext;
     bgfx::VertexLayout FVertexLayout;
     bgfx::ProgramHandle FProgam;
@@ -86,7 +89,7 @@ void ImguiRenderer::Init()
 
     FTextureHandle = bgfx::createTexture2D((uint16_t)width, (uint16_t)height, false, 1, bgfx::TextureFormat::BGRA8, 0, bgfx::copy(data, width * height * 4));
 
-    // ImGui::InitDockContext();
+    DisplayWindow::Instance().InitInputsForImGui(io);
 }
 
 void ImguiRenderer::Render(ImDrawData* parDrawData)
@@ -198,6 +201,15 @@ void ImguiRenderer::Shutdown()
     bgfx::destroy(FProgam);
 }
 
+void ImguiRenderer::InitMouseAndButtons(ImGuiIO& io)
+{
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos; // We can honor io.WantSetMousePos requests (optional, rarely used)
+    io.BackendPlatformName = "imgui_impl_glfw";
+
+    DisplayWindow::Instance().InitInputsForImGui(io);
+}
+
 namespace ImGUI
 {
 void Init()
@@ -206,13 +218,24 @@ void Init()
     ECSEngine::Rendering::ImguiRenderer::Instance().Init();
 }
 
-void NextFrame()
+void NewFrame()
 {
     ImGuiIO& io = ImGui::GetIO();
     io.DeltaTime = 1.0f / 60.0f; // set the time elapsed since the previous frame (in seconds)
     glm::uvec2 winSize = DisplayWindow::Instance().GetSize();
     io.DisplaySize.x = (float)winSize.x; // set the current display width
     io.DisplaySize.y = (float)winSize.y; // set the current display height here
+    /*TODOIMGUI
+    glfwGetFramebufferSize(g_Window, &display_w, &display_h);
+    if (w > 0 && h > 0)
+        io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);*/
+
+    DisplayWindow::Instance().UpdateMousePosAndButtonsForImGUI(io);
+    // ImGui_ImplGlfw_UpdateMouseCursor();
+
+    //// Update game controllers (if enabled and available)
+    // ImGui_ImplGlfw_UpdateGamepads();
+
     ImGui::NewFrame();
 }
 
