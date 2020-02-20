@@ -1,6 +1,6 @@
 -- premake5.lua
 workspace "ECSEngine"
-   configurations { "Debug", "Release", "Final" }
+   configurations { "Debug", "Release", "Profile", "Final" }
    platforms { "Win64" }
 
    location ("build/")

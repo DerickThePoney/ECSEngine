@@ -33,6 +33,10 @@ void BGFXRenderer::Init()
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
     bgfx::init(bgfxInit);
 
+#ifdef ENABLE_BGFX_PROFILING
+    bgfx::setDebug(BGFX_DEBUG_PROFILER);
+#endif
+
     bgfx::RendererType::Enum chosenType = bgfx::getRendererType();
 
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x443355FF, 1.0f, 0);
