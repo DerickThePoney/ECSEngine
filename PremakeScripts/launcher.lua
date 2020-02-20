@@ -15,10 +15,10 @@ project "Launcher"
    pchheader "stdafx.h"
    pchsource(srcfiles.."stdafx.cpp")
 
-   links { "Common", "ECSBase", "ECSGameplay_Base", "RenderingBase"}
+   links { "Common", "ECSCore", "ECSGameplay_Common", "Rendering"}
 
    postbuildcommands {"{COPY} ../External/glfw-3.3.bin.WIN64/lib-vc2019/*.dll %{cfg.targetdir}"}
 
-   includedirs { "../SRC"}
+   includedirs { "../SRC", "../External/imgui"}
 
    dofile("projectsconfigs.lua")

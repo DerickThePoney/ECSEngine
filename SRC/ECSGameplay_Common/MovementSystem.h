@@ -1,5 +1,5 @@
 #pragma once
-#include "ECSBase/ModuleSystem.h"
+#include "ECSCore/ModuleSystem.h"
 
 namespace ECSEngine
 {

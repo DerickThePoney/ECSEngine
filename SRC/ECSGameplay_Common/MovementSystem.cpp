@@ -2,7 +2,7 @@
 
 #include "MovementSystem.h"
 
-#include "ECSBase/ModuleAccessor.h"
+#include "ECSCore/ModuleAccessor.h"
 #include "PositionModule.h"
 
 namespace ECSEngine

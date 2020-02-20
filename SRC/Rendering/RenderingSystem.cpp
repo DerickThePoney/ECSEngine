@@ -2,14 +2,14 @@
 
 #include "RenderingSystem.h"
 
-#include "BGFXRenderer.h"
-#include "BGFXRenderingUtils.h"
-#include "DisplayWindow.h"
-#include "ECSBase/ModuleAccessor.h"
-#include "ECSGameplay_Base/ApparenceModule.h"
-#include "ECSGameplay_Base/PositionModule.h"
-#include "Mesh.h"
-#include "MeshManager.h"
+#include "ECSCore/ModuleAccessor.h"
+#include "ECSGameplay_Common/ApparenceModule.h"
+#include "ECSGameplay_Common/PositionModule.h"
+#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/BGFXRenderingUtils.h"
+#include "RenderingCore/DisplayWindow.h"
+#include "RenderingCore/Mesh.h"
+#include "RenderingCore/MeshManager.h"
 #include "bx/bx.h"
 #include "bx/math.h"
 
@@ -80,8 +80,6 @@ void RenderingSystem::VirtualUpdate()
         bgfx::setTransform(mtx);
         bgfx::submit(0, kProgram);
     }
-
-    Rendering::BGFXRenderer::Instance().RenderFrame();
 }
 
 void RenderingSystem::VirtualDestroy()

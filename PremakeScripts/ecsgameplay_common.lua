@@ -1,11 +1,11 @@
 -- ecsgameplay_base.lua
 
-project "ECSGameplay_Base"
+project "ECSGameplay_Common"
    language "C++"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "on"
    kind "StaticLib"
-   local srcfiles = "../SRC/ECSGameplay_Base/"
+   local srcfiles = "../SRC/ECSGameplay_Common/"
 
    vpaths { 
       ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
@@ -16,7 +16,7 @@ project "ECSGameplay_Base"
    pchheader "stdafx.h"
    pchsource(srcfiles.."stdafx.cpp")
 
-   links { "Common", "ECSBase"}
+   links { "Common", "ECSCore"}
 
    includedirs { "../SRC"}
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "ECSBase/Module.h"
+#include "ECSCore/Module.h"
 namespace ECSEngine
 {
 class OrientationModule final : public Module

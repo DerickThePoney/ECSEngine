@@ -19,17 +19,18 @@
 #include "Common/ObjectPoolAllocator.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFileDirectoryView.h"
-#include "ECSBase/EntityTemplate.h"
-#include "ECSBase/EntityTemplateManager.h"
-#include "ECSBase/ModuleParameters.h"
-#include "ECSBase/WorldManager.h"
-#include "ECSGameplay_Base/ApparenceModule.h"
-#include "ECSGameplay_Base/OrientationModule.h"
-#include "ECSGameplay_Base/PositionModule.h"
-#include "RenderingBase/BGFXRenderer.h"
-#include "RenderingBase/DisplayWindow.h"
-#include "RenderingBase/MeshManager.h"
-#include "RenderingBase/RenderingSystem.h"
+#include "ECSCore/EntityTemplate.h"
+#include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/ModuleParameters.h"
+#include "ECSCore/WorldManager.h"
+#include "ECSGameplay_Common/ApparenceModule.h"
+#include "ECSGameplay_Common/OrientationModule.h"
+#include "ECSGameplay_Common/PositionModule.h"
+#include "Rendering/RenderingSystem.h"
+#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/DisplayWindow.h"
+#include "RenderingCore/ImguiRenderer.h"
+#include "RenderingCore/MeshManager.h"
 //#include "RenderingSystem.h"
 //#include "Resource.h"
 //#include "ResourceCache.h"
@@ -290,6 +291,8 @@ int main(int argc, char** argv)
     ECSEngine::Rendering::BGFXRenderer& rendererInstance = ECSEngine::Rendering::BGFXRenderer::Instance();
     rendererInstance.Init();
 
+    ECSEngine::Rendering::ImGUI::Init();
+
     ECSEngine::RenderingSystem renderSystem;
     renderSystem.Init();
 
@@ -317,7 +320,19 @@ int main(int argc, char** argv)
 
     while (!ECSEngine::Rendering::DisplayWindow::Instance().ShouldClose())
     {
+        ECSEngine::Rendering::ImGUI::NextFrame();
+
+        // Updates
+        ImGui::Begin("Test");
+        ImGui::Text("Hello!");
+        ImGui::End();
+
+        // Rendering
         renderSystem.Update();
+
+        ECSEngine::Rendering::ImGUI::Render();
+
+        ECSEngine::Rendering::BGFXRenderer::Instance().RenderFrame();
 
         ECSEngine::Rendering::DisplayWindow::Instance().PollEvents();
     }
@@ -329,6 +344,8 @@ int main(int argc, char** argv)
     ECSEngine::Rendering::MeshManager::Destroy();
 
     renderSystem.Destroy();
+
+    ECSEngine::Rendering::ImGUI::Shutdown();
 
     rendererInstance.Shutdown();
     ECSEngine::Rendering::BGFXRenderer::Destroy();
