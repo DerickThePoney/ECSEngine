@@ -2,8 +2,8 @@
 
 #include "ApparenceModule.h"
 #include "Common/Types.h"
-#include "ECSBase/EntityWorld.h"
-#include "ECSBase/ModuleId.h"
+#include "ECSCore/EntityWorld.h"
+#include "ECSCore/ModuleId.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
 

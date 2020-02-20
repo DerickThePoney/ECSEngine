@@ -1,6 +1,6 @@
 #pragma once
 #include "Common/MeshHandle.h"
-#include "ECSBase/Module.h"
+#include "ECSCore/Module.h"
 
 namespace ECSEngine
 {

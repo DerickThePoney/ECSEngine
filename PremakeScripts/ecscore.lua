@@ -1,11 +1,11 @@
 -- ecsbase.lua
 
-project "ECSBase"
+project "ECSCore"
    language "C++"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "on"
    kind "StaticLib"
-   local srcfiles = "../SRC/ECSBase/"
+   local srcfiles = "../SRC/ECSCore/"
 
    vpaths { 
       ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 

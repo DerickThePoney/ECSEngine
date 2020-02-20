@@ -2,7 +2,7 @@
 
 #include "WorldManager.h"
 
-#include "ECSGameplay_Base/WorldDeclaration.h"
+#include "ECSGameplay_Common/WorldDeclaration.h"
 
 namespace ECSEngine
 {

@@ -13,5 +13,6 @@ namespace Rendering
 {
 bgfx::ShaderHandle loadShader(const std::string& parFilename);
 bgfx::ProgramHandle LoadProgram(const std::string& parBasePath, const std::string& parBaseProgramName);
+bgfx::ProgramHandle LoadProgram(const std::string& parBasePath, const std::string& parFolderName, const std::string& parBaseProgramName);
 } // namespace Rendering
 } // namespace ECSEngine

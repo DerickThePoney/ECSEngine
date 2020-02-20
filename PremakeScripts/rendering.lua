@@ -1,15 +1,15 @@
 -- ecsgameplay_base.lua
 
-project "RenderingBase"
+project "Rendering"
    language "C++"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "on"
    kind "StaticLib"
-   local srcfiles = "../SRC/RenderingBase/"
+   local srcfiles = "../SRC/Rendering/"
 
    vpaths { 
       ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
-      ["Sources"] = {srcfiles.."*.cpp"}
+      ["Sources"] = {srcfiles.."*.cpp"},
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
 
@@ -17,9 +17,9 @@ project "RenderingBase"
    pchsource(srcfiles.."stdafx.cpp")
 
    libdirs {"../External/glfw-3.3.bin.WIN64/lib-vc2019", "../External/BGFX/bgfx/.build/win64_vs2019/bin"}
-   links { "glfw3dll", "Common", "ECSBase"}
+   links { "glfw3dll", "RenderingCore", "ECSCore"}
 
-   includedirs { "../External/glfw-3.3.bin.WIN64/include", "../External/BGFX/bgfx/include", "../External/BGFX/bimg/include", "../External/BGFX/bx/include", "../External/BGFX/bx/include/compat/msvc" }
+   includedirs { "../External/imgui", "../External/glfw-3.3.bin.WIN64/include", "../External/BGFX/bgfx/include", "../External/BGFX/bimg/include", "../External/BGFX/bx/include", "../External/BGFX/bx/include/compat/msvc" }
    includedirs { "../SRC"}
 
    dofile("projectsconfigs.lua")

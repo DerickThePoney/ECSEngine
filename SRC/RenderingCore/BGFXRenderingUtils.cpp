@@ -31,12 +31,17 @@ bgfx::ShaderHandle loadShader(const std::string& parFilename)
     return bgfx::createShader(mem);
 }
 
-bgfx::ProgramHandle LoadProgram(const std::string& parBasePath, const std::string& parBaseProgramName)
+bgfx::ProgramHandle LoadProgram(const std::string& parBasePath, const std::string& parFolderName, const std::string& parBaseProgramName)
 {
-    bgfx::ShaderHandle vsh = loadShader(parBasePath + parBaseProgramName + "\\vs_" + parBaseProgramName + ".bin");
-    bgfx::ShaderHandle fsh = loadShader(parBasePath + parBaseProgramName + "\\fs_" + parBaseProgramName + ".bin");
+    bgfx::ShaderHandle vsh = loadShader(parBasePath + parFolderName + "\\vs_" + parBaseProgramName + ".bin");
+    bgfx::ShaderHandle fsh = loadShader(parBasePath + parFolderName + "\\fs_" + parBaseProgramName + ".bin");
 
     return bgfx::createProgram(vsh, fsh, true);
+}
+
+bgfx::ProgramHandle LoadProgram(const std::string& parBasePath, const std::string& parBaseProgramName)
+{
+    return LoadProgram(parBasePath, parBaseProgramName, parBaseProgramName);
 }
 
 } // namespace Rendering

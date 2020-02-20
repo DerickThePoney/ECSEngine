@@ -2,7 +2,7 @@
 
 #include "PositionModule.h"
 
-#include "ECSBase/ModuleParameters.h"
+#include "ECSCore/ModuleParameters.h"
 
 namespace ECSEngine
 {

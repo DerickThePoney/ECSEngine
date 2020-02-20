@@ -17,10 +17,14 @@ workspace "ECSEngine"
 
 include("PremakeScripts/common.lua")
 
-include("PremakeScripts/renderingbase.lua")
+include("PremakeScripts/imgui.lua")
 
-include("PremakeScripts/ecsbase.lua")
+include("PremakeScripts/renderingcore.lua")
 
-include("PremakeScripts/ecsgameplay_base.lua")
+include("PremakeScripts/rendering.lua")
+
+include("PremakeScripts/ecscore.lua")
+
+include("PremakeScripts/ecsgameplay_common.lua")
 
 include("PremakeScripts/launcher.lua")
