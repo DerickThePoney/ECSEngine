@@ -36,6 +36,10 @@ public:
 
     void ResizeWindow(GLFWwindow* window, int width, int height);
 
+    void InitInputsForImGui(ImGuiIO& io);
+
+    void UpdateMousePosAndButtonsForImGUI(ImGuiIO& io);
+
 private:
     std::string FName;
     u32 FWidth;

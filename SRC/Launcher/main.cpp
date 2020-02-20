@@ -320,12 +320,10 @@ int main(int argc, char** argv)
 
     while (!ECSEngine::Rendering::DisplayWindow::Instance().ShouldClose())
     {
-        ECSEngine::Rendering::ImGUI::NextFrame();
+        ECSEngine::Rendering::ImGUI::NewFrame();
 
         // Updates
-        ImGui::Begin("Test");
-        ImGui::Text("Hello!");
-        ImGui::End();
+        ImGui::ShowDemoWindow();
 
         // Rendering
         renderSystem.Update();
