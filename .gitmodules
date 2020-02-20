@@ -13,3 +13,6 @@
 [submodule "External/brigand/brigand"]
 	path = External/brigand/brigand
 	url = https://github.com/edouarda/brigand.git
+[submodule "External/glm"]
+	path = External/glm
+	url = https://github.com/g-truc/glm.git
