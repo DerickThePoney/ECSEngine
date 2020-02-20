@@ -10,3 +10,6 @@
 [submodule "External/IMGUI/imgui"]
 	path = External/IMGUI/imgui
 	url = git://github.com/ocornut/imgui.git
+[submodule "External/brigand/brigand"]
+	path = External/brigand/brigand
+	url = https://github.com/edouarda/brigand.git
