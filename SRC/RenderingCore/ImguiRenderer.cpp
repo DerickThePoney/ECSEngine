@@ -35,13 +35,13 @@ public:
     void Shutdown();
 
 private:
-    ImGuiContext* m_imgui;
-    bgfx::VertexLayout m_layout;
-    bgfx::ProgramHandle m_program;
-    bgfx::ProgramHandle m_imageProgram;
-    bgfx::TextureHandle m_texture;
-    bgfx::UniformHandle s_tex;
-    bgfx::UniformHandle u_imageLodEnabled;
+    ImGuiContext* FImguiContext;
+    bgfx::VertexLayout FVertexLayout;
+    bgfx::ProgramHandle FProgam;
+    bgfx::ProgramHandle FImageProgram;
+    bgfx::TextureHandle FTextureHandle;
+    bgfx::UniformHandle FTextureSampleUniform;
+    bgfx::UniformHandle FImageLodEnabledUniform;
     // ImFont* m_font[ImGui::Font::Count];
     int64_t m_last;
     int32_t m_lastScroll;
@@ -54,7 +54,7 @@ void ImguiRenderer::Init()
     m_lastScroll = 0;
     m_last = bx::getHPCounter();
 
-    m_imgui = ImGui::CreateContext();
+    FImguiContext = ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -65,18 +65,18 @@ void ImguiRenderer::Init()
     // setupStyle(true);
 
     bgfx::RendererType::Enum type = bgfx::getRendererType();
-    m_program = LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "ImGUI", "ocornut_imgui");
+    FProgam = LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "ImGUI", "ocornut_imgui");
 
-    u_imageLodEnabled = bgfx::createUniform("u_imageLodEnabled", bgfx::UniformType::Vec4);
-    m_imageProgram = LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "ImGUI", "imgui_image");
+    FImageLodEnabledUniform = bgfx::createUniform("u_imageLodEnabled", bgfx::UniformType::Vec4);
+    FImageProgram = LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "ImGUI", "imgui_image");
 
-    m_layout.begin()
+    FVertexLayout.begin()
           .add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
           .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
           .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
           .end();
 
-    s_tex = bgfx::createUniform("s_tex", bgfx::UniformType::Sampler);
+    FTextureSampleUniform = bgfx::createUniform("s_tex", bgfx::UniformType::Sampler);
 
     uint8_t* data;
     int32_t width;
@@ -84,7 +84,7 @@ void ImguiRenderer::Init()
 
     io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
-    m_texture = bgfx::createTexture2D((uint16_t)width, (uint16_t)height, false, 1, bgfx::TextureFormat::BGRA8, 0, bgfx::copy(data, width * height * 4));
+    FTextureHandle = bgfx::createTexture2D((uint16_t)width, (uint16_t)height, false, 1, bgfx::TextureFormat::BGRA8, 0, bgfx::copy(data, width * height * 4));
 
     // ImGui::InitDockContext();
 }
@@ -116,13 +116,13 @@ void ImguiRenderer::Render(ImDrawData* parDrawData)
         uint32_t numVertices = (uint32_t)drawList->VtxBuffer.size();
         uint32_t numIndices = (uint32_t)drawList->IdxBuffer.size();
 
-        if (!checkAvailTransientBuffers(numVertices, m_layout, numIndices))
+        if (!checkAvailTransientBuffers(numVertices, FVertexLayout, numIndices))
         {
             // not enough space in transient buffer just quit drawing the rest...
             break;
         }
 
-        bgfx::allocTransientVertexBuffer(&tvb, numVertices, m_layout);
+        bgfx::allocTransientVertexBuffer(&tvb, numVertices, FVertexLayout);
         bgfx::allocTransientIndexBuffer(&tib, numIndices);
 
         ImDrawVert* verts = (ImDrawVert*)tvb.data;
@@ -142,8 +142,8 @@ void ImguiRenderer::Render(ImDrawData* parDrawData)
             {
                 uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA;
 
-                bgfx::TextureHandle th = m_texture;
-                bgfx::ProgramHandle program = m_program;
+                bgfx::TextureHandle th = FTextureHandle;
+                bgfx::ProgramHandle program = FProgam;
 
                 if (NULL != cmd->TextureId)
                 {
@@ -161,8 +161,8 @@ void ImguiRenderer::Render(ImDrawData* parDrawData)
                     if (0 != texture.s.mip)
                     {
                         const float lodEnabled[4] = { float(texture.s.mip), 1.0f, 0.0f, 0.0f };
-                        bgfx::setUniform(u_imageLodEnabled, lodEnabled);
-                        program = m_imageProgram;
+                        bgfx::setUniform(FImageLodEnabledUniform, lodEnabled);
+                        program = FImageProgram;
                     }
                 }
                 else
@@ -175,7 +175,7 @@ void ImguiRenderer::Render(ImDrawData* parDrawData)
                 bgfx::setScissor(xx, yy, uint16_t(bx::min(cmd->ClipRect.z, 65535.0f) - xx), uint16_t(bx::min(cmd->ClipRect.w, 65535.0f) - yy));
 
                 bgfx::setState(state);
-                bgfx::setTexture(0, s_tex, th);
+                bgfx::setTexture(0, FTextureSampleUniform, th);
                 bgfx::setVertexBuffer(0, &tvb, 0, numVertices);
                 bgfx::setIndexBuffer(&tib, offset, cmd->ElemCount);
                 bgfx::submit(m_viewId, program);
@@ -188,14 +188,14 @@ void ImguiRenderer::Render(ImDrawData* parDrawData)
 
 void ImguiRenderer::Shutdown()
 {
-    ImGui::DestroyContext(m_imgui);
+    ImGui::DestroyContext(FImguiContext);
 
-    bgfx::destroy(s_tex);
-    bgfx::destroy(m_texture);
+    bgfx::destroy(FTextureSampleUniform);
+    bgfx::destroy(FTextureHandle);
 
-    bgfx::destroy(u_imageLodEnabled);
-    bgfx::destroy(m_imageProgram);
-    bgfx::destroy(m_program);
+    bgfx::destroy(FImageLodEnabledUniform);
+    bgfx::destroy(FImageProgram);
+    bgfx::destroy(FProgam);
 }
 
 namespace ImGUI
