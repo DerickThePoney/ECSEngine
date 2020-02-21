@@ -4,7 +4,7 @@
 
 #include "BGFXRenderingUtils.h"
 #include "Common/TimeManager.h"
-#include "DisplayWindow.h"
+#include "GLFWDisplayWindowHandler.h"
 #include "bx/math.h"
 
 #include <bx/timer.h>
@@ -90,11 +90,12 @@ void ImguiRenderer::Init()
 
     FTextureHandle = bgfx::createTexture2D((uint16_t)width, (uint16_t)height, false, 1, bgfx::TextureFormat::BGRA8, 0, bgfx::copy(data, width * height * 4));
 
-    DisplayWindow::Instance().InitInputsForImGui(io);
+    GLFWDisplayWindowHandler::Instance().InitInputsForImGui(io);
 }
 
 void ImguiRenderer::Render(ImDrawData* parDrawData)
 {
+    // SHAMELESSLY STOLEN FROM BGFX EXAMPLES...
     const ImGuiIO& io = ImGui::GetIO();
     const float width = io.DisplaySize.x;
     const float height = io.DisplaySize.y;
@@ -206,9 +207,9 @@ void ImguiRenderer::InitMouseAndButtons(ImGuiIO& io)
 {
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos; // We can honor io.WantSetMousePos requests (optional, rarely used)
-    io.BackendPlatformName = "imgui_impl_glfw";
+    io.BackendPlatformName = "ECSEngine_GLFW";
 
-    DisplayWindow::Instance().InitInputsForImGui(io);
+    GLFWDisplayWindowHandler::Instance().InitInputsForImGui(io);
 }
 
 namespace ImGUI
@@ -222,18 +223,18 @@ void Init()
 void NewFrame()
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.DeltaTime = ECSEngine::TimeManager::Instance().FrameDeltaTime();
-    glm::uvec2 winSize = DisplayWindow::Instance().GetSize();
+    io.DeltaTime = ECSEngine::TimeManager::FrameDeltaTime();
+    if (io.DeltaTime == 0.0f)
+        io.DeltaTime = 1.f / 60.f;
+    glm::uvec2 winSize = GLFWDisplayWindowHandler::Instance().GetSize();
     io.DisplaySize.x = (float)winSize.x; // set the current display width
     io.DisplaySize.y = (float)winSize.y; // set the current display height here
-    /*TODOIMGUI
-    glfwGetFramebufferSize(g_Window, &display_w, &display_h);
-    if (w > 0 && h > 0)
-        io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);*/
 
-    DisplayWindow::Instance().UpdateMousePosAndButtonsForImGUI(io);
-    DisplayWindow::Instance().UpdateMouseCursorForImGUI(io);
-    // ImGui_ImplGlfw_UpdateMouseCursor();
+    if (winSize.x > 0 && winSize.y > 0)
+        io.DisplayFramebufferScale = ImVec2((float)1.0f, (float)1.0f);
+
+    GLFWDisplayWindowHandler::Instance().UpdateMousePosAndButtonsForImGUI(io);
+    GLFWDisplayWindowHandler::Instance().UpdateMouseCursorForImGUI(io);
 
     //// Update game controllers (if enabled and available)
     // ImGui_ImplGlfw_UpdateGamepads();

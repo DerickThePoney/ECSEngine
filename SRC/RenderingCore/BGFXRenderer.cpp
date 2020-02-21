@@ -2,7 +2,7 @@
 
 #include "BGFXRenderer.h"
 
-#include "DisplayWindow.h"
+#include "GLFWDisplayWindowHandler.h"
 
 #include <bgfx/bgfx.h>
 
@@ -20,8 +20,8 @@ BGFXRenderer::~BGFXRenderer()
 
 void BGFXRenderer::Init()
 {
-    AssertRelease(DisplayWindow::HasInstance());
-    DisplayWindow& window = DisplayWindow::Instance();
+    AssertRelease(GLFWDisplayWindowHandler::HasInstance());
+    GLFWDisplayWindowHandler& window = GLFWDisplayWindowHandler::Instance();
     bgfx::PlatformData pd;
     pd.nwh = window.GetNativeWindowHandle();
 
