@@ -17,6 +17,7 @@
 #include <thread>
 #include <atomic>
 #include <malloc.h>
+#include <chrono>
 // clang-format on
 
 #include "Macros.h"
