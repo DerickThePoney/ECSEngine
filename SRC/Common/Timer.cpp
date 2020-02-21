@@ -21,39 +21,43 @@ Timer::~Timer()
 void Timer::Start()
 {
     AlwaysCheckedAssert(!FRunning);
-#ifdef PERFORM_SECURITY_CHECKS
     FRunning = true;
-#endif
     FStart = std::chrono::high_resolution_clock::now();
 }
 
 const float Timer::Stop()
 {
     FEnd = std::chrono::high_resolution_clock::now();
-#ifdef PERFORM_SECURITY_CHECKS
     FRunning = false;
-#endif
     return ElapsedTimeInSeconds(FEnd);
 }
 
 const float Timer::ElapsedTimeInSeconds(const std::chrono::high_resolution_clock::time_point& parTo) const
 {
-    return (float)(parTo - FStart).count() / 1000000000.f;
+    using fpSeconds = std::chrono::duration<float, std::chrono::seconds::period>;
+    static_assert(std::chrono::treat_as_floating_point<fpSeconds::rep>::value, "Rep required to be floating point");
+    return fpSeconds(parTo - FStart).count();
 }
 
 const float Timer::ElapsedTimeInMilliseconds(const std::chrono::high_resolution_clock::time_point& parTo) const
 {
-    return (float)(parTo - FStart).count() / 1000000.f;
+    using fpMilli = std::chrono::duration<float, std::chrono::milliseconds::period>;
+    static_assert(std::chrono::treat_as_floating_point<fpMilli::rep>::value, "Rep required to be floating point");
+    return fpMilli(parTo - FStart).count();
 }
 
 const float Timer::ElapsedTimeInMicroseconds(const std::chrono::high_resolution_clock::time_point& parTo) const
 {
-    return (float)(parTo - FStart).count() / 1000.f;
+    using fpMicro = std::chrono::duration<float, std::chrono::microseconds::period>;
+    static_assert(std::chrono::treat_as_floating_point<fpMicro::rep>::value, "Rep required to be floating point");
+    return fpMicro(parTo - FStart).count();
 }
 
 const float Timer::ElapsedTimeInNanoseconds(const std::chrono::high_resolution_clock::time_point& parTo) const
 {
-    return (float)(parTo - FStart).count();
+    using fpNano = std::chrono::duration<float, std::chrono::nanoseconds::period>;
+    static_assert(std::chrono::treat_as_floating_point<fpNano::rep>::value, "Rep required to be floating point");
+    return fpNano(parTo - FStart).count();
 }
 
 } // namespace ECSEngine

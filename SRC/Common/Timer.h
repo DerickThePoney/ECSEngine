@@ -84,8 +84,6 @@ private:
     std::chrono::high_resolution_clock::time_point FStart;
     std::chrono::high_resolution_clock::time_point FEnd;
 
-#ifdef PERFORM_SECURITY_CHECKS
     bool FRunning;
-#endif
 };
 } // namespace ECSEngine

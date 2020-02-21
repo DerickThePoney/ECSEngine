@@ -16,7 +16,7 @@ project "ECSGameplay_Common"
    pchheader "stdafx.h"
    pchsource(srcfiles.."stdafx.cpp")
 
-   links { "Common", "ECSCore"}
+   links { "ECSCore"}
 
    includedirs { "../SRC"}
 
