@@ -232,6 +232,7 @@ void NewFrame()
         io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);*/
 
     DisplayWindow::Instance().UpdateMousePosAndButtonsForImGUI(io);
+    DisplayWindow::Instance().UpdateMouseCursorForImGUI(io);
     // ImGui_ImplGlfw_UpdateMouseCursor();
 
     //// Update game controllers (if enabled and available)

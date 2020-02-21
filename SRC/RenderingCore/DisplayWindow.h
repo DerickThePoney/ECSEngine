@@ -2,6 +2,7 @@
 #include "Common/Singleton.h"
 
 struct GLFWwindow;
+struct GLFWcursor;
 namespace ECSEngine
 {
 namespace Rendering
@@ -39,6 +40,7 @@ public:
     void InitInputsForImGui(ImGuiIO& io);
 
     void UpdateMousePosAndButtonsForImGUI(ImGuiIO& io);
+    void UpdateMouseCursorForImGUI(ImGuiIO& io);
 
 private:
     std::string FName;
@@ -46,6 +48,7 @@ private:
     u32 FHeight;
 
     GLFWwindow* FWindow;
+    GLFWcursor* FMouseCursors[ImGuiMouseCursor_COUNT] = {};
 };
 } // namespace Rendering
 } // namespace ECSEngine
