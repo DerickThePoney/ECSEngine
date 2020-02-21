@@ -12,6 +12,7 @@ public:
     {
     }
     EntityTemplate* CreateNewEntityTemplate();
+    const EntityTemplate* GetEntityTemplate(u32 parIndex);
 
 private:
     std::vector<EntityTemplate> FEntityTemplates;

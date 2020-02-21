@@ -28,7 +28,7 @@ public:
     template<typename T>
     IModuleController* GetControllerIFP();
 
-    EntityId CreateEntityFromTemplateReturnEntityId(EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer);
+    EntityId CreateEntityFromTemplateReturnEntityId(const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer);
     void DestroyEntity(const EntityId& parId);
 
     const u8 WorldID() const { return FWorldID; }

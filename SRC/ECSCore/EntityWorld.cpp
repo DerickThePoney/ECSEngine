@@ -72,13 +72,16 @@ EntityWorld::~EntityWorld()
     }
 }
 
-EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer)
+EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer)
 {
     EntityId newID = FEntityIdGenerator.GetNextEntityId();
-    AssertRelease(newID.GetSequentialId() < ModulePoolSize);
     FAllocatedEntityIds.insert(newID);
 
     Entity newEntity(newID, parTemplate);
+
+    if (newID.GetSequentialId() >= FEntities.size())
+        FEntities.resize(FEntities.size() + ModulePoolSize);
+
     FEntities[newID.GetSequentialId()] = newEntity;
 
     for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
