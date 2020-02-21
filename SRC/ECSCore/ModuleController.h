@@ -31,7 +31,7 @@ public:
     {
         Lock();
         const u32 entitySequentialId = parEntity.GetSequentialId();
-        AssertRelease(parEntity.Valid() && parEntity.GetSequentialId() < ModulePoolSize);
+        AssertRelease(parEntity.Valid());
         FAllocator.AllocateAtIndex(entitySequentialId);
         FAllocatedModules.insert(parEntity);
         Unlock();
@@ -41,7 +41,7 @@ public:
     {
         Lock();
         const u32 entitySequentialId = parEntity.GetSequentialId();
-        AssertRelease(parEntity.Valid() && parEntity.GetSequentialId() < ModulePoolSize);
+        AssertRelease(parEntity.Valid());
         auto itFind = FAllocatedModules.find(parEntity);
         AlwaysCheckedAssert(itFind != FAllocatedModules.end());
         FAllocator.DeallocateAtIndex(entitySequentialId);
@@ -202,7 +202,7 @@ public:
     }
 
 private:
-    ObjectPoolAllocator<Mod, ModulePoolSize, true> FAllocator;
+    ObjectPoolAllocator<Mod, ModulePoolSize, false> FAllocator;
     std::set<EntityId> FAllocatedModules;
     std::atomic_bool FLock;
 };

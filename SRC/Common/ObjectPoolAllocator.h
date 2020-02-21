@@ -12,7 +12,25 @@ private:
     alignas(T) u8 FData[sizeof(T)];
 };
 
-template<class T, int InitSize, bool IsFixed>
+template<typename T, int ChunkSize>
+struct ModuleDataChunk
+{
+    T* AsPtr(u32 idx)
+    {
+        AssertRelease(idx < ChunkSize);
+        return FChunk[idx].AsPtr();
+    }
+    const T* AsPtr(u32 idx) const
+    {
+        AssertRelease(idx < ChunkSize);
+        return FChunk[idx].AsPtr();
+    }
+
+private:
+    alignas(T) ModuleData<T> FChunk[ChunkSize];
+};
+
+template<class T, int ChunkSize, bool IsFixed>
 class ObjectPoolAllocator
 {
     using pointer_type = T*;
@@ -26,58 +44,83 @@ public:
     T* GetAtIndex(u32 parIndex);
 
 private:
+    void AllocateNewChunk();
+
+private:
     u32 FSize;
     std::set<u32> FAllocatedIndexes;
-    alignas(T) ModuleData<T> FChunk[InitSize];
+    std::vector<ModuleDataChunk<T, ChunkSize>> FChunks;
 };
 
-template<class T, int InitSize, bool IsFixed>
-T* ObjectPoolAllocator<T, InitSize, IsFixed>::GetAtIndex(u32 parIndex)
+template<class T, int ChunkSize, bool IsFixed>
+void ECSEngine::ObjectPoolAllocator<T, ChunkSize, IsFixed>::AllocateNewChunk()
 {
-    AssertRelease(parIndex < FSize);
-    return FChunk[parIndex].AsPtr();
+    AssertRelease(!IsFixed || FSize == 0);
+    FChunks.push_back(ModuleDataChunk<T, ChunkSize>());
+    FSize += ChunkSize;
 }
 
-template<class T, int InitSize, bool IsFixed>
-ObjectPoolAllocator<T, InitSize, IsFixed>::~ObjectPoolAllocator()
+template<class T, int ChunkSize, bool IsFixed>
+T* ObjectPoolAllocator<T, ChunkSize, IsFixed>::GetAtIndex(u32 parIndex)
+{
+    AssertRelease(parIndex < FSize);
+    const u32 chunkIndex = parIndex / ChunkSize;
+    const u32 indexInChunk = parIndex % ChunkSize;
+    return FChunks[chunkIndex].AsPtr(indexInChunk);
+}
+
+template<class T, int ChunkSize, bool IsFixed>
+ObjectPoolAllocator<T, ChunkSize, IsFixed>::~ObjectPoolAllocator()
 {
     AlwaysCheckedAssert(FAllocatedIndexes.empty());
     for (auto it = FAllocatedIndexes.begin(); it != FAllocatedIndexes.end(); ++it)
     {
-        FChunk[*it].AsPtr()->~T();
+        const u32 chunkIndex = *it / ChunkSize;
+        const u32 indexInChunk = *it % ChunkSize;
+        FChunks[chunkIndex].AsPtr(indexInChunk)->~T();
     }
 }
 
-template<class T, int InitSize, bool IsFixed>
-void ObjectPoolAllocator<T, InitSize, IsFixed>::DeallocateAtIndex(u32 parIndex)
+template<class T, int ChunkSize, bool IsFixed>
+void ObjectPoolAllocator<T, ChunkSize, IsFixed>::DeallocateAtIndex(u32 parIndex)
 {
     AssertRelease(parIndex < FSize);
     AssertRelease(FAllocatedIndexes.find(parIndex) != FAllocatedIndexes.end());
-    FChunk[parIndex].AsPtr()->~T();
+    const u32 chunkIndex = parIndex / ChunkSize;
+    const u32 indexInChunk = parIndex % ChunkSize;
+    FChunks[chunkIndex].AsPtr(indexInChunk)->~T();
 #ifdef PERFORM_SECURITY_CHECKS
-    memset(&FChunk[parIndex], 0xCD, sizeof(T));
+    // memset(&FChunk[parIndex], 0xCD, sizeof(T));
 #endif // PERFORM_SECURITY_CHECKS
 
     FAllocatedIndexes.erase(parIndex);
 }
 
-template<class T, int InitSize, bool IsFixed>
-void ObjectPoolAllocator<T, InitSize, IsFixed>::AllocateAtIndex(u32 parIndex)
+template<class T, int ChunkSize, bool IsFixed>
+void ObjectPoolAllocator<T, ChunkSize, IsFixed>::AllocateAtIndex(u32 parIndex)
 {
-    AssertRelease(IsFixed && parIndex < FSize);
+    if (!IsFixed && parIndex >= FSize)
+        AllocateNewChunk();
+
+    AssertRelease(!IsFixed || parIndex < FSize);
     AssertRelease(FAllocatedIndexes.find(parIndex) == FAllocatedIndexes.end());
-    pointer_type ptr = FChunk[parIndex].AsPtr();
+
+    const u32 chunkIndex = parIndex / ChunkSize;
+    const u32 indexInChunk = parIndex % ChunkSize;
+
+    pointer_type ptr = FChunks[chunkIndex].AsPtr(indexInChunk);
     new (ptr) T;
     FAllocatedIndexes.insert(parIndex);
 }
 
-template<class T, int InitSize, bool IsFixed>
-ObjectPoolAllocator<T, InitSize, IsFixed>::ObjectPoolAllocator()
-    : FSize(InitSize)
+template<class T, int ChunkSize, bool IsFixed>
+ObjectPoolAllocator<T, ChunkSize, IsFixed>::ObjectPoolAllocator()
+    : FSize(0)
     , FAllocatedIndexes()
 {
+    AllocateNewChunk();
 #ifdef PERFORM_SECURITY_CHECKS
-    memset(FChunk, 0xCD, sizeof(ModuleData<T>) * InitSize);
+    // memset(FChunk, 0xCD, sizeof(ModuleData<T>) * ChunkSize);
 #endif // PERFORM_SECURITY_CHECKS
 }
 
