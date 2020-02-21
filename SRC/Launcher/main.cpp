@@ -10,10 +10,11 @@
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
 #include "ECSGameplay_Common/OrientationModule.h"
+#include "ECSGameplay_Common/OrientationSystem.h"
 #include "ECSGameplay_Common/PositionModule.h"
 #include "Rendering/RenderingSystem.h"
 #include "RenderingCore/BGFXRenderer.h"
-#include "RenderingCore/DisplayWindow.h"
+#include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/MeshManager.h"
 
@@ -75,10 +76,41 @@ static const u32 cubeTriList[] = {
     7,
 };
 
+void AllocateUnits(const ECSEngine::EntityTemplate* temp, ECSEngine::EntityWorld& world, ECSEngine::Rendering::MeshHandle& handle, std::vector<ECSEngine::EntityId>& entities)
+{
+    entities.reserve(entities.size() + 900);
+    for (int i = -50; i < 50; ++i)
+    {
+        for (int j = -4; j < 5; ++j)
+        {
+            ECSEngine::ModuleParameters::ParameterContainer container;
+            container.Set<ECSEngine::ModuleParameters::Mesh>(handle);
+            container.Set<ECSEngine::ModuleParameters::Position>(glm::vec3((float)i, (float)j, 0.f));
+
+            ECSEngine::EntityId unitId = world.CreateEntityFromTemplateReturnEntityId(temp, container);
+            AssertRelease(unitId.Valid());
+            entities.push_back(unitId);
+        }
+    }
+}
+
+void StressTestDebug(const ECSEngine::EntityTemplate* temp, ECSEngine::EntityWorld& world, ECSEngine::Rendering::MeshHandle& handle, std::vector<ECSEngine::EntityId>& entities)
+{
+    ImGui::Begin("Stress test");
+    int realVal = entities.size();
+    ImGui::InputInt("Current number of entities", &realVal, 1, 100, ImGuiInputTextFlags_ReadOnly);
+    float frameTime = ECSEngine::TimeManager::FrameDeltaTime();
+    ImGui::InputFloat("Frame Time", &frameTime, 1, 100, "%.5f", ImGuiInputTextFlags_ReadOnly);
+    if (ImGui::Button("Add 900 units"))
+    {
+        AllocateUnits(temp, world, handle, entities);
+    }
+    ImGui::End();
+}
+
 int main(int argc, char** argv)
 {
-    ECSEngine::TimeManager::CreateIFP();
-    ECSEngine::TimeManager::Instance().Start();
+    ECSEngine::TimeManager::Start();
 
     // module params
     ECSEngine::ModuleParameters::InitParameterIdentifiersTraits();
@@ -102,10 +134,11 @@ int main(int argc, char** argv)
     ECSEngine::EntityTemplate* newTemplate = ECSEngine::EntityTemplateManager::Instance().CreateNewEntityTemplate();
     newTemplate->SetHasModule<ECSEngine::ApparenceModule>();
     newTemplate->SetHasModule<ECSEngine::PositionModule>();
+    newTemplate->SetHasModule<ECSEngine::OrientationModule>();
 
     // init rendering
-    ECSEngine::Rendering::DisplayWindow::CreateIFP();
-    ECSEngine::Rendering::DisplayWindow::Instance().Init();
+    ECSEngine::Rendering::GLFWDisplayWindowHandler::CreateIFP();
+    ECSEngine::Rendering::GLFWDisplayWindowHandler::Instance().Init();
 
     ECSEngine::Rendering::BGFXRenderer::CreateIFP();
     ECSEngine::Rendering::BGFXRenderer& rendererInstance = ECSEngine::Rendering::BGFXRenderer::Instance();
@@ -122,30 +155,26 @@ int main(int argc, char** argv)
     // init units
     std::vector<ECSEngine::EntityId> entities;
     ECSEngine::EntityWorld& world = worldManagerInstance.GetWorld(ECSEngine::Worlds::STANDARD);
-    for (int i = -5; i < 6; ++i)
-    {
-        for (int j = -5; j < 6; ++j)
-        {
-            ECSEngine::ModuleParameters::ParameterContainer container;
-            container.Set<ECSEngine::ModuleParameters::Mesh>(handle);
-            container.Set<ECSEngine::ModuleParameters::Position>(glm::vec3((float)i, (float)j, 0.f));
 
-            ECSEngine::EntityId unitId = world.CreateEntityFromTemplateReturnEntityId(newTemplate, container);
-            AssertRelease(unitId.Valid());
-            entities.push_back(unitId);
-        }
-    }
+    AllocateUnits(newTemplate, world, handle, entities);
+
+    std::cout << "Init duration : " << ECSEngine::TimeManager::DurationSinceStartRealTime() << std::endl;
+
+    ECSEngine::OrientationSystem orientationSystem;
+    orientationSystem.Init();
 
     // main loop
-    ECSEngine::Timer t;
-    t.Start();
-    while (!ECSEngine::Rendering::DisplayWindow::Instance().ShouldClose())
+    while (!ECSEngine::Rendering::GLFWDisplayWindowHandler::Instance().ShouldClose())
     {
-        ECSEngine::TimeManager::Instance().NewFrame();
+        ECSEngine::TimeManager::NewFrame();
+
         ECSEngine::Rendering::ImGUI::NewFrame();
 
         // Updates
         ImGui::ShowDemoWindow();
+        StressTestDebug(newTemplate, world, handle, entities);
+
+        orientationSystem.Update();
 
         // Rendering
         renderSystem.Update();
@@ -154,12 +183,10 @@ int main(int argc, char** argv)
 
         ECSEngine::Rendering::BGFXRenderer::Instance().RenderFrame();
 
-        ECSEngine::Rendering::DisplayWindow::Instance().PollEvents();
+        ECSEngine::Rendering::GLFWDisplayWindowHandler::Instance().PollEvents();
     }
-    t.Stop();
 
-    std::cout << t.ElapsedTime() << "\t" << t.ElapsedTime<ECSEngine::ETimePeriod::MILLISECONDS>() << "\t" << t.ElapsedTime<ECSEngine::ETimePeriod::MICROSECONDS>() << "\t"
-              << t.ElapsedTime<ECSEngine::ETimePeriod::NANOSECONDS>() << std::endl;
+    orientationSystem.Destroy();
 
     // destroy units
     foreachitem(id, entities) { world.DestroyEntity(id); }
@@ -174,8 +201,8 @@ int main(int argc, char** argv)
     rendererInstance.Shutdown();
     ECSEngine::Rendering::BGFXRenderer::Destroy();
 
-    ECSEngine::Rendering::DisplayWindow::Instance().Shutdown();
-    ECSEngine::Rendering::DisplayWindow::Destroy();
+    ECSEngine::Rendering::GLFWDisplayWindowHandler::Instance().Shutdown();
+    ECSEngine::Rendering::GLFWDisplayWindowHandler::Destroy();
 
     // destroy ecs
     ECSEngine::EntityTemplateManager::Destroy();
@@ -187,6 +214,5 @@ int main(int argc, char** argv)
     // destroy module params
     ECSEngine::ModuleParameters::DestroyParameterIdentifiersTraits();
 
-    ECSEngine::TimeManager::Instance().End();
-    ECSEngine::TimeManager::Destroy();
+    ECSEngine::TimeManager::End();
 }

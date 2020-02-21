@@ -2,6 +2,22 @@
 
 #include "OrientationModule.h"
 
+#include "ECSCore/ModuleParameters.h"
+
 namespace ECSEngine
 {
+
+void OrientationModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
+{
+    parent_type::VirtualInit(parUnitId, parParameters);
+
+    const glm::vec3 yawPitchRoll = parParameters.Get_IFP<ModuleParameters::Orientation>(glm::vec3(0.0f));
+    FOrientation = glm::quat(yawPitchRoll);
 }
+
+const glm::vec3 OrientationModule::GetOrientationAsYawPitchRoll() const
+{
+    return glm::vec3(glm::yaw(FOrientation), glm::pitch(FOrientation), glm::roll(FOrientation));
+}
+
+} // namespace ECSEngine

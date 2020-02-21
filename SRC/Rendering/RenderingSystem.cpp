@@ -2,12 +2,14 @@
 
 #include "RenderingSystem.h"
 
+#include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
+#include "ECSGameplay_Common/OrientationModule.h"
 #include "ECSGameplay_Common/PositionModule.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/BGFXRenderingUtils.h"
-#include "RenderingCore/DisplayWindow.h"
+#include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/Mesh.h"
 #include "RenderingCore/MeshManager.h"
 #include "bx/bx.h"
@@ -20,6 +22,7 @@ RenderingSystem::RenderingSystem()
 {
     RegisterDepency<ApparenceModule>(Worlds::STANDARD);
     RegisterDepency<PositionModule>(Worlds::STANDARD);
+    RegisterDepency<OrientationModule>(Worlds::STANDARD);
 }
 
 RenderingSystem::~RenderingSystem()
@@ -34,8 +37,6 @@ void RenderingSystem::VirtualInit()
     kProgram = ECSEngine::Rendering::LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "VertexColor");
 
     kUniform = bgfx::createUniform("u_color", bgfx::UniformType::Vec4);
-
-    FStart = std::chrono::high_resolution_clock::now();
 }
 
 void RenderingSystem::VirtualUpdate()
@@ -44,10 +45,10 @@ void RenderingSystem::VirtualUpdate()
 
     ModuleAccessor<ApparenceModule> apparenceController;
     ModuleAccessor<PositionModule> positionController;
+    ModuleAccessor<OrientationModule> orientationController;
 
-    auto this_tick = std::chrono::high_resolution_clock::now();
-    const float timepoint = (float)(this_tick - FStart).count() / 1000000000.0f;
-    const glm::uvec2 windowSize = Rendering::DisplayWindow::Instance().GetSize();
+    const float timepoint = TimeManager::DurationSinceStartRealTime();
+    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
     const bx::Vec3 at = { 0.0f, 0.0f, 0.0f };
     const bx::Vec3 eye = { 0.0f, 0.0f, -5.0f };
@@ -57,8 +58,13 @@ void RenderingSystem::VirtualUpdate()
     bx::mtxProj(proj, 60.0f, float(windowSize.x) / float(windowSize.y), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
     bgfx::setViewTransform(0, view, proj);
 
+    const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
+    float uniformVal[4] = { sinTime, sinTime, sinTime, sinTime };
+    bgfx::setUniform(kUniform, &uniformVal);
+
     foreachitem(apparenceModule, apparenceController)
     {
+        const EntityId& unitId = apparenceModule.UnitId();
         Rendering::MeshHandle meshHandle = apparenceModule.GetMeshHandle();
 
         Rendering::IMesh* mesh = Rendering::MeshManager::Instance().GetMesh(meshHandle);
@@ -66,16 +72,15 @@ void RenderingSystem::VirtualUpdate()
         bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
         bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
 
-        const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
-        float uniformVal[4] = { sinTime, sinTime, sinTime, sinTime };
-        bgfx::setUniform(kUniform, &uniformVal);
-
-        PositionModule* positionModule = positionController[apparenceModule.UnitId()];
+        const PositionModule* positionModule = positionController[unitId];
         AssertRelease(positionModule != nullptr);
 
+        const OrientationModule* orientationModule = orientationController[unitId];
+        AssertRelease(orientationModule != nullptr);
         float mtx[16];
         const glm::aligned_vec3 position = positionModule->GetPosition3D();
-        bx::mtxSRT(mtx, 0.1f, 0.1f, 0.1f, timepoint, timepoint, 0.f, position.x, position.y, position.z);
+        const glm::vec3 yawPitchRoll = orientationModule->GetOrientationAsYawPitchRoll();
+        bx::mtxSRT(mtx, 0.1f, 0.1f, 0.1f, yawPitchRoll.x, yawPitchRoll.y, yawPitchRoll.z, position.x, position.y, position.z);
         /*bx::mtxRotateXY(mtx, timepoint, timepoint);*/
         bgfx::setTransform(mtx);
         bgfx::submit(0, kProgram);
