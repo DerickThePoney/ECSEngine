@@ -8,11 +8,11 @@ namespace ECSEngine
 namespace Rendering
 {
 
-class DisplayWindow : public Singleton<DisplayWindow>
+class GLFWDisplayWindowHandler : public Singleton<GLFWDisplayWindowHandler>
 {
 public:
-    DisplayWindow();
-    ~DisplayWindow();
+    GLFWDisplayWindowHandler();
+    ~GLFWDisplayWindowHandler();
 
     void Init();
     void Shutdown();

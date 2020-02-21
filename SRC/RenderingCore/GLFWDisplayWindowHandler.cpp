@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "DisplayWindow.h"
+#include "GLFWDisplayWindowHandler.h"
 //clang-format off
 #include <GLFW/glfw3.h>
 
@@ -19,8 +19,8 @@ namespace
 {
 void WindowSizeCallback(GLFWwindow* window, int width, int height)
 {
-    AssertRelease(DisplayWindow::HasInstance());
-    DisplayWindow::Instance().ResizeWindow(window, width, height);
+    AssertRelease(GLFWDisplayWindowHandler::HasInstance());
+    GLFWDisplayWindowHandler::Instance().ResizeWindow(window, width, height);
     AssertRelease(BGFXRenderer::HasInstance());
     BGFXRenderer::Instance().Resize(width, height);
 }
@@ -57,7 +57,7 @@ void WindowCharCallback(GLFWwindow* window, unsigned int c)
     io.AddInputCharacter(c);
 }
 } // namespace
-DisplayWindow::DisplayWindow()
+GLFWDisplayWindowHandler::GLFWDisplayWindowHandler()
     : FWindow(nullptr)
     , FWidth(800)
     , FHeight(600)
@@ -65,14 +65,14 @@ DisplayWindow::DisplayWindow()
 {
 }
 
-DisplayWindow::~DisplayWindow()
+GLFWDisplayWindowHandler::~GLFWDisplayWindowHandler()
 {
     AlwaysCheckedAssert(FWindow == nullptr);
     if (FWindow != nullptr)
         Destroy();
 }
 
-void DisplayWindow::Init()
+void GLFWDisplayWindowHandler::Init()
 {
     glfwInit();
 
@@ -91,7 +91,7 @@ void DisplayWindow::Init()
     glfwSetCharCallback(FWindow, &WindowCharCallback);
 }
 
-void DisplayWindow::Shutdown()
+void GLFWDisplayWindowHandler::Shutdown()
 {
     AlwaysCheckedAssert(FWindow != nullptr);
     if (FWindow != nullptr)
@@ -102,31 +102,31 @@ void DisplayWindow::Shutdown()
     glfwTerminate();
 }
 
-void* DisplayWindow::GetNativeWindowHandle() const
+void* GLFWDisplayWindowHandler::GetNativeWindowHandle() const
 {
     AssertRelease(FWindow != nullptr);
     return glfwGetWin32Window(FWindow);
 }
 
-GLFWwindow* DisplayWindow::GetWindowHandle() const
+GLFWwindow* GLFWDisplayWindowHandler::GetWindowHandle() const
 {
     AssertRelease(FWindow != nullptr);
     return FWindow;
 }
 
-bool DisplayWindow::ShouldClose()
+bool GLFWDisplayWindowHandler::ShouldClose()
 {
     AssertRelease(FWindow != nullptr);
     return glfwWindowShouldClose(FWindow);
 }
 
-void DisplayWindow::PollEvents()
+void GLFWDisplayWindowHandler::PollEvents()
 {
     AssertRelease(FWindow != nullptr);
     glfwPollEvents();
 }
 
-void DisplayWindow::ResizeWindow(GLFWwindow* window, int width, int height)
+void GLFWDisplayWindowHandler::ResizeWindow(GLFWwindow* window, int width, int height)
 {
     AssertRelease(FWindow != nullptr);
     AlwaysCheckedAssert(window == FWindow);
@@ -135,11 +135,11 @@ void DisplayWindow::ResizeWindow(GLFWwindow* window, int width, int height)
     FWidth = width;
 }
 
-void DisplayWindow::InitInputsForImGui(ImGuiIO& io)
+void GLFWDisplayWindowHandler::InitInputsForImGui(ImGuiIO& io)
 {
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors; // We can honor GetMouseCursor() values (optional)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos; // We can honor io.WantSetMousePos requests (optional, rarely used)
-    io.BackendPlatformName = "imgui_impl_glfw";
+    io.BackendPlatformName = "ECSEngine_GLFW";
 
     // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
     io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
@@ -196,7 +196,7 @@ void DisplayWindow::InitInputsForImGui(ImGuiIO& io)
 #endif
 }
 
-void DisplayWindow::UpdateMousePosAndButtonsForImGUI(ImGuiIO& io)
+void GLFWDisplayWindowHandler::UpdateMousePosAndButtonsForImGUI(ImGuiIO& io)
 {
     // Update buttons
     for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++)
@@ -227,7 +227,7 @@ void DisplayWindow::UpdateMousePosAndButtonsForImGUI(ImGuiIO& io)
     }
 }
 
-void DisplayWindow::UpdateMouseCursorForImGUI(ImGuiIO& io)
+void GLFWDisplayWindowHandler::UpdateMouseCursorForImGUI(ImGuiIO& io)
 {
     if ((io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) || glfwGetInputMode(FWindow, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
         return;
