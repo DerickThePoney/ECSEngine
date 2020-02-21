@@ -3,6 +3,7 @@
 #include "ImguiRenderer.h"
 
 #include "BGFXRenderingUtils.h"
+#include "Common/TimeManager.h"
 #include "DisplayWindow.h"
 #include "bx/math.h"
 
@@ -221,7 +222,7 @@ void Init()
 void NewFrame()
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.DeltaTime = 1.0f / 60.0f; // set the time elapsed since the previous frame (in seconds)
+    io.DeltaTime = ECSEngine::TimeManager::Instance().FrameDeltaTime();
     glm::uvec2 winSize = DisplayWindow::Instance().GetSize();
     io.DisplaySize.x = (float)winSize.x; // set the current display width
     io.DisplaySize.y = (float)winSize.y; // set the current display height here
