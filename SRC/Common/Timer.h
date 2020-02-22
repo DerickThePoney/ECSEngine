@@ -86,4 +86,15 @@ private:
 
     bool FRunning;
 };
+
+class TScopedTimer
+{
+public:
+    TScopedTimer(const char* name);
+    ~TScopedTimer();
+
+private:
+    std::string FName;
+    Timer FTimer;
+};
 } // namespace ECSEngine

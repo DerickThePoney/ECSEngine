@@ -60,4 +60,16 @@ const float Timer::ElapsedTimeInNanoseconds(const std::chrono::high_resolution_c
     return fpNano(parTo - FStart).count();
 }
 
+TScopedTimer::TScopedTimer(const char* name)
+    : FName(name)
+{
+    FTimer.Start();
+}
+
+TScopedTimer::~TScopedTimer()
+{
+    const float elapsed = FTimer.Stop();
+    std::cout << "Timer " << FName << " : " << elapsed << " sec\n";
+}
+
 } // namespace ECSEngine
