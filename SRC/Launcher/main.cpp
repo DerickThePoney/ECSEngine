@@ -78,6 +78,7 @@ static const u32 cubeTriList[] = {
 
 void AllocateUnits(const ECSEngine::EntityTemplate* temp, ECSEngine::EntityWorld& world, ECSEngine::Rendering::MeshHandle& handle, std::vector<ECSEngine::EntityId>& entities)
 {
+    ECSEngine::TScopedTimer st("Allocate 900 Units");
     entities.reserve(entities.size() + 900);
     for (int i = -50; i < 50; ++i)
     {
@@ -97,7 +98,7 @@ void AllocateUnits(const ECSEngine::EntityTemplate* temp, ECSEngine::EntityWorld
 void StressTestDebug(const ECSEngine::EntityTemplate* temp, ECSEngine::EntityWorld& world, ECSEngine::Rendering::MeshHandle& handle, std::vector<ECSEngine::EntityId>& entities)
 {
     ImGui::Begin("Stress test");
-    int realVal = entities.size();
+    int realVal = (int)entities.size();
     ImGui::InputInt("Current number of entities", &realVal, 1, 100, ImGuiInputTextFlags_ReadOnly);
     float frameTime = ECSEngine::TimeManager::FrameDeltaTime();
     ImGui::InputFloat("Frame Time", &frameTime, 1, 100, "%.5f", ImGuiInputTextFlags_ReadOnly);
