@@ -23,7 +23,7 @@ public:
     void Init(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
     void Deinit();
 
-    const EntityId& UnitId() { return FUnitId; }
+    const EntityId& UnitId() const { return FUnitId; }
 
 protected:
     virtual void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);

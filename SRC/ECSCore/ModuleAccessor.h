@@ -64,6 +64,8 @@ public:
         return FController->crend();
     }
 
+    u32 GetSize() { return FController->GetSize(); }
+
 private:
     ModuleController<T>* FController;
 };
