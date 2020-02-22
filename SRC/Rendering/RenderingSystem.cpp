@@ -13,7 +13,6 @@
 #include "RenderingCore/Mesh.h"
 #include "RenderingCore/MeshManager.h"
 #include "bx/bx.h"
-#include "bx/math.h"
 
 namespace ECSEngine
 {
@@ -29,12 +28,14 @@ RenderingSystem::~RenderingSystem()
 {
 }
 bgfx::ProgramHandle kProgram;
+bgfx::ProgramHandle kProgramInstancing;
 bgfx::UniformHandle kUniform;
 void RenderingSystem::VirtualInit()
 {
     parent_type::VirtualInit();
 
     kProgram = ECSEngine::Rendering::LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "VertexColor");
+    kProgramInstancing = ECSEngine::Rendering::LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "VertexColorInstancing");
 
     kUniform = bgfx::createUniform("u_color", bgfx::UniformType::Vec4);
 }
@@ -50,40 +51,90 @@ void RenderingSystem::VirtualUpdate()
     const float timepoint = TimeManager::DurationSinceStartRealTime();
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
-    const bx::Vec3 at = { 0.0f, 0.0f, 0.0f };
-    const bx::Vec3 eye = { 0.0f, 0.0f, -5.0f };
-    float view[16];
-    bx::mtxLookAt(view, eye, at);
-    float proj[16];
-    bx::mtxProj(proj, 60.0f, float(windowSize.x) / float(windowSize.y), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
-    bgfx::setViewTransform(0, view, proj);
+    const glm::vec3 at = { 0.0f, 0.0f, 0.0f };
+    const glm::vec3 eye = { 0.0f, 0.0f, -5.0f };
+    glm::mat4 view = glm::lookAt(eye, at, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 proj = glm::perspective(glm::radians(60.0f), float(windowSize.x) / float(windowSize.y), 0.1f, 100.0f);
+    bgfx::setViewTransform(0, &view[0][0], &proj[0][0]);
 
     const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
     float uniformVal[4] = { sinTime, sinTime, sinTime, sinTime };
     bgfx::setUniform(kUniform, &uniformVal);
 
-    foreachitem(apparenceModule, apparenceController)
+    if (!Rendering::BGFXRenderer::Instance().IsInstancingEnabled())
     {
-        const EntityId& unitId = apparenceModule.UnitId();
-        Rendering::MeshHandle meshHandle = apparenceModule.GetMeshHandle();
+        foreachitem(apparenceModule, apparenceController)
+        {
+            const EntityId& unitId = apparenceModule.UnitId();
+            Rendering::MeshHandle meshHandle = apparenceModule.GetMeshHandle();
 
-        Rendering::IMesh* mesh = Rendering::MeshManager::Instance().GetMesh(meshHandle);
+            Rendering::IMesh* mesh = Rendering::MeshManager::Instance().GetMesh(meshHandle);
 
-        bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
-        bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
+            bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
+            bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
 
-        const PositionModule* positionModule = positionController[unitId];
-        AssertRelease(positionModule != nullptr);
+            const PositionModule* positionModule = positionController[unitId];
+            AssertRelease(positionModule != nullptr);
 
-        const OrientationModule* orientationModule = orientationController[unitId];
-        AssertRelease(orientationModule != nullptr);
-        float mtx[16];
-        const glm::aligned_vec3 position = positionModule->GetPosition3D();
-        const glm::vec3 yawPitchRoll = orientationModule->GetOrientationAsYawPitchRoll();
-        bx::mtxSRT(mtx, 0.1f, 0.1f, 0.1f, yawPitchRoll.x, yawPitchRoll.y, yawPitchRoll.z, position.x, position.y, position.z);
-        /*bx::mtxRotateXY(mtx, timepoint, timepoint);*/
-        bgfx::setTransform(mtx);
-        bgfx::submit(0, kProgram);
+            const OrientationModule* orientationModule = orientationController[unitId];
+            AssertRelease(orientationModule != nullptr);
+            glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
+            mtx = mtx * glm::scale(glm::vec3(0.1f, 0.1f, 0.1f)) * (glm::mat4)orientationModule->GetOrientation();
+
+            bgfx::setTransform(&mtx[0][0]);
+            bgfx::submit(0, kProgram);
+        }
+    }
+    else
+    {
+        // 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
+        const uint16_t instanceStride = 64;
+        // 11x11 cubes
+        const uint32_t numInstances = apparenceController.GetSize();
+
+        if (numInstances == bgfx::getAvailInstanceDataBuffer(numInstances, instanceStride))
+        {
+            bgfx::InstanceDataBuffer idb;
+            bgfx::allocInstanceDataBuffer(&idb, numInstances, instanceStride);
+
+            uint8_t* data = idb.data;
+
+            u32 i = 0;
+
+            foreachitem(apparenceModule, apparenceController)
+            {
+                const EntityId& unitId = apparenceModule.UnitId();
+                if (i == 0)
+                {
+                    Rendering::MeshHandle meshHandle = apparenceModule.GetMeshHandle();
+
+                    Rendering::IMesh* mesh = Rendering::MeshManager::Instance().GetMesh(meshHandle);
+
+                    bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
+                    bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
+                }
+
+                const PositionModule* positionModule = positionController[unitId];
+                AssertRelease(positionModule != nullptr);
+
+                const OrientationModule* orientationModule = orientationController[unitId];
+                AssertRelease(orientationModule != nullptr);
+                glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
+                mtx = mtx * glm::scale(glm::vec3(0.1f, 0.1f, 0.1f)) * (glm::mat4)orientationModule->GetOrientation();
+                memcpy(data, &mtx, sizeof(mtx));
+                data += instanceStride;
+                ++i;
+            }
+
+            // Set instance data buffer.
+            bgfx::setInstanceDataBuffer(&idb);
+
+            // Set render states.
+            bgfx::setState(BGFX_STATE_DEFAULT);
+
+            // Submit primitive for rendering to view 0.
+            bgfx::submit(0, kProgramInstancing);
+        }
     }
 }
 
@@ -91,6 +142,7 @@ void RenderingSystem::VirtualDestroy()
 {
     parent_type::VirtualDestroy();
     bgfx::destroy(kUniform);
+    bgfx::destroy(kProgramInstancing);
     bgfx::destroy(kProgram);
 }
 
