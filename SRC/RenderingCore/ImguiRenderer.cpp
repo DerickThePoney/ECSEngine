@@ -3,6 +3,9 @@
 #include "ImguiRenderer.h"
 
 #include "BGFXRenderingUtils.h"
+#include "Common/Resource.h"
+#include "Common/ResourceCache.h"
+#include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
 #include "GLFWDisplayWindowHandler.h"
 #include "bx/math.h"
@@ -85,6 +88,14 @@ void ImguiRenderer::Init()
     uint8_t* data;
     int32_t width;
     int32_t height;
+
+    ECSEngine::ResourceCache* cache = ECSEngine::GlobalResourceCache::Instance().FCache;
+    ECSEngine::Resource shaderResource("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\Fonts\\kenvector_future.ttf");
+    std::shared_ptr<ECSEngine::ResourceHandle> shaderDataHandle = cache->GetResourceHandle(&shaderResource);
+    ImFontConfig config;
+    config.FontDataOwnedByAtlas = false;
+    config.MergeMode = false;
+    io.Fonts->AddFontFromMemoryTTF(shaderDataHandle->WritableBuffer(), shaderDataHandle->Size(), 16, &config);
 
     io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
