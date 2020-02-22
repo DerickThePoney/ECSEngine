@@ -61,5 +61,12 @@ void BGFXRenderer::Resize(u32 width, u32 height)
     bgfx::setViewRect(0, 0, 0, width, height);
 }
 
+bool BGFXRenderer::IsInstancingEnabled()
+{
+    // Get renderer capabilities info.
+    const bgfx::Caps* caps = bgfx::getCaps();
+    return !(0 == (BGFX_CAPS_INSTANCING & caps->supported));
+}
+
 } // namespace Rendering
 } // namespace ECSEngine

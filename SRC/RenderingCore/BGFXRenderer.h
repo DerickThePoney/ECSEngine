@@ -16,6 +16,8 @@ public:
     void Shutdown();
 
     void Resize(u32 width, u32 height);
+
+    bool IsInstancingEnabled();
 };
 
 } // namespace Rendering
