@@ -22,3 +22,6 @@
 [submodule "External/imgui/imgui"]
 	path = External/imgui/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "External/cereal"]
+	path = External/cereal
+	url = https://github.com/USCiLab/cereal.git
