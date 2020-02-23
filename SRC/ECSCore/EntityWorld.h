@@ -33,6 +33,8 @@ public:
 
     const u8 WorldID() const { return FWorldID; }
 
+    const EntityTemplate* GetTemplateForEntity(const EntityId& parId);
+
 private:
     IModuleController** FControllers;
     std::vector<Entity> FEntities;

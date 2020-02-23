@@ -8,7 +8,7 @@ class EntityTemplate;
 class Entity
 {
 public:
-    Entity(const EntityId& parId = EntityId(-1, -1), const EntityTemplate* parTemplate = nullptr);
+    Entity(const EntityId& parId = EntityId(), const EntityTemplate* parTemplate = nullptr);
     ~Entity();
 
     const EntityId& GetEntityId() const { return Fid; }
@@ -25,6 +25,8 @@ public:
         AssertRelease(FTemplate != nullptr);
         return FTemplate->HasModule(parModuleId);
     }
+
+    const EntityTemplate* GetTemplate() const { return FTemplate; }
 
 private:
     EntityId Fid;

@@ -88,15 +88,9 @@ EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(const EntityTemplat
     {
         if (parTemplate->HasModule(i))
         {
-            FControllers[i]->AllocateForEntity(newID);
-        }
-    }
-
-    for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
-    {
-        if (parTemplate->HasModule(i))
-        {
-            FControllers[i]->GetModulePtrForEntity(newID)->Init(newID, parParameterContainer);
+            const ModuleTemplate* modTemp = parTemplate->GetModuleTemplate(i);
+            AssertRelease(modTemp != nullptr);
+            modTemp->CreateInstance(newID, parParameterContainer);
         }
     }
 
@@ -128,6 +122,14 @@ void EntityWorld::DestroyEntity(const EntityId& parId)
             FControllers[i]->DeallocateForEntity(parId);
         }
     }
+    FEntities[parId.GetSequentialId()] = Entity();
+}
+
+const EntityTemplate* EntityWorld::GetTemplateForEntity(const EntityId& parId)
+{
+    AssertRelease(FAllocatedEntityIds.find(parId) != FAllocatedEntityIds.end());
+
+    return FEntities[parId.GetSequentialId()].GetTemplate();
 }
 
 } // namespace ECSEngine

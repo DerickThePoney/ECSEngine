@@ -2,10 +2,19 @@
 
 #include "OrientationModule.h"
 
+#include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
+#include "ECSCore/ModuleUtils.h"
 
 namespace ECSEngine
 {
+
+IMPLEMENT_MODULE_TEMPLATE(OrientationModule, OrientationModuleTemplate);
+
+Module* OrientationModuleTemplate::CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const
+{
+    return NewModule<OrientationModule>(parUnitId, parParameters);
+}
 
 void OrientationModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
