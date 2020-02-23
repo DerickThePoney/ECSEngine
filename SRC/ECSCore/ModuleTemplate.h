@@ -13,9 +13,9 @@ class ModuleTemplate
 {
     friend class EntityTemplate;
 
-protected:
+public:
     ModuleTemplate();
-    ~ModuleTemplate();
+    virtual ~ModuleTemplate();
 
     void Init(const EntityTemplate* parTemplate);
 

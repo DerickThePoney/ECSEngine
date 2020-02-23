@@ -2,7 +2,9 @@
 
 #include "ModuleTemplate.h"
 
-ECSEngine::ModuleTemplate::ModuleTemplate()
+namespace ECSEngine
+{
+ModuleTemplate::ModuleTemplate()
     : FTemplate(nullptr)
 #ifdef PERFORM_SECURITY_CHECKS
     , FHasBeenInit(false)
@@ -10,14 +12,15 @@ ECSEngine::ModuleTemplate::ModuleTemplate()
 {
 }
 
-ECSEngine::ModuleTemplate::~ModuleTemplate()
+ModuleTemplate::~ModuleTemplate()
 {
 }
 
-void ECSEngine::ModuleTemplate::Init(const EntityTemplate* parTemplate)
+void ModuleTemplate::Init(const EntityTemplate* parTemplate)
 {
     FTemplate = parTemplate;
 #ifdef PERFORM_SECURITY_CHECKS
     FHasBeenInit = true;
 #endif
 }
+} // namespace ECSEngine

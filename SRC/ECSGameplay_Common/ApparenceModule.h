@@ -19,6 +19,8 @@ public:
     {
     }
 
+    virtual ~ApparenceModuleTemplate() {}
+
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 };
 
