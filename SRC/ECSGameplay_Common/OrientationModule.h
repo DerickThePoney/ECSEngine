@@ -18,6 +18,7 @@ public:
         : ModuleTemplate()
     {
     }
+    virtual ~OrientationModuleTemplate() {}
 
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 };

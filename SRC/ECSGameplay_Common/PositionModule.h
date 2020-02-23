@@ -14,6 +14,7 @@ public:
         : ModuleTemplate()
     {
     }
+    virtual ~PositionModuleTemplate() {}
 
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 };
