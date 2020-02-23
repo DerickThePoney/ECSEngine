@@ -4,6 +4,12 @@
 
 namespace ECSEngine
 {
+namespace EntityTemplateManagerMethods
+{
+bool RegisterTemplateFactory(const u32 parId, ModuleTemplate* (*parFactory)());
+ModuleTemplate* CreateModuleTemplate(const u32 parId);
+} // namespace EntityTemplateManagerMethods
+
 class EntityTemplateManager final : public Singleton<EntityTemplateManager>
 {
 public:

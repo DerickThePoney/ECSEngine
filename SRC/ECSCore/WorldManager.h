@@ -1,16 +1,9 @@
 #pragma once
 #include "Common/Singleton.h"
 #include "EntityWorld.h"
+#include "WorldIds.h"
 namespace ECSEngine
 {
-namespace Worlds
-{
-enum Type
-{
-    STANDARD,
-    LENGTH
-};
-}
 
 class WorldManager final : public Singleton<WorldManager>
 {

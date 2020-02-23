@@ -1,4 +1,5 @@
 #pragma once
+#include "WorldIds.h"
 namespace ECSEngine
 {
 #pragma pack(1)
@@ -24,6 +25,7 @@ public:
     explicit EntityId(u8 parWorldId = 0xFF, u32 parId = 0xFFFFFF);
 
     const u8 GetWorldId() const { return FId.GetWorldId(); }
+    const Worlds::Type GetWorld() const { return (Worlds::Type)GetWorldId(); }
     const u32 GetSequentialId() const { return FId.GetSequentialId(); }
     bool Valid() const { return FId.GetWorldId() != 0xFF && FId.GetSequentialId() != 0xFFFFFF; }
 

@@ -2,6 +2,7 @@
 
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFileDirectoryView.h"
+#include "Common/RingBuffer.h"
 #include "Common/TimeManager.h"
 #include "Common/Timer.h"
 #include "ECSCore/EntityTemplate.h"
@@ -95,13 +96,19 @@ void AllocateUnits(const ECSEngine::EntityTemplate* temp, ECSEngine::EntityWorld
     }
 }
 
-void StressTestDebug(const ECSEngine::EntityTemplate* temp, ECSEngine::EntityWorld& world, ECSEngine::Rendering::MeshHandle& handle, std::vector<ECSEngine::EntityId>& entities)
+void StressTestDebug(const ECSEngine::EntityTemplate* temp,
+      ECSEngine::RingBuffer<float, 100>& frameTimeBuffer,
+      ECSEngine::EntityWorld& world,
+      ECSEngine::Rendering::MeshHandle& handle,
+      std::vector<ECSEngine::EntityId>& entities)
 {
     ImGui::Begin("Stress test");
     int realVal = (int)entities.size();
     ImGui::InputInt("Current number of entities", &realVal, 1, 100, ImGuiInputTextFlags_ReadOnly);
     float frameTime = ECSEngine::TimeManager::FrameDeltaTime();
+    frameTimeBuffer.Push((frameTime == 0.0f) ? frameTime : 1.f / frameTime);
     ImGui::InputFloat("Frame Time", &frameTime, 1, 100, "%.5f", ImGuiInputTextFlags_ReadOnly);
+    ImGui::PlotHistogram("FPS", frameTimeBuffer.data(), frameTimeBuffer.GetSize(), frameTimeBuffer.GetWriteHeadPosition(), "", 0.0f, 150.0f, ImVec2(0.0f, 45.0f));
     if (ImGui::Button("Add 900 units"))
     {
         AllocateUnits(temp, world, handle, entities);
@@ -136,6 +143,7 @@ int main(int argc, char** argv)
     newTemplate->SetHasModule<ECSEngine::ApparenceModule>();
     newTemplate->SetHasModule<ECSEngine::PositionModule>();
     newTemplate->SetHasModule<ECSEngine::OrientationModule>();
+    newTemplate->Initialise();
 
     // init rendering
     ECSEngine::Rendering::GLFWDisplayWindowHandler::CreateIFP();
@@ -164,6 +172,8 @@ int main(int argc, char** argv)
     ECSEngine::OrientationSystem orientationSystem;
     orientationSystem.Init();
 
+    ECSEngine::RingBuffer<float, 100> frameTimeBuffer;
+
     // main loop
     while (!ECSEngine::Rendering::GLFWDisplayWindowHandler::Instance().ShouldClose())
     {
@@ -173,7 +183,7 @@ int main(int argc, char** argv)
 
         // Updates
         ImGui::ShowDemoWindow();
-        StressTestDebug(newTemplate, world, handle, entities);
+        StressTestDebug(newTemplate, frameTimeBuffer, world, handle, entities);
 
         orientationSystem.Update();
 

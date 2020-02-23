@@ -1,8 +1,23 @@
 #pragma once
 #include "ECSCore/Module.h"
+#include "ECSCore/ModuleTemplate.h"
 
 namespace ECSEngine
 {
+
+class PositionModuleTemplate : public ModuleTemplate
+{
+    DECLARE_MODULE_TEMPLATE(PositionModule);
+
+public:
+    PositionModuleTemplate()
+        : ModuleTemplate()
+    {
+    }
+
+    virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
+};
+
 class PositionModule final : public Module
 {
     DECLARE_MODULE(PositionModule);

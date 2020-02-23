@@ -57,7 +57,7 @@ void BGFXRenderer::RenderFrame()
 
 void BGFXRenderer::Resize(u32 width, u32 height)
 {
-    bgfx::reset(width, height);
+    bgfx::reset(width, height, BGFX_RESET_VSYNC);
     bgfx::setViewRect(0, 0, 0, width, height);
 }
 

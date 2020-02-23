@@ -2,10 +2,18 @@
 
 #include "ApparenceModule.h"
 
+#include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
+#include "ECSCore/ModuleUtils.h"
 
 namespace ECSEngine
 {
+IMPLEMENT_MODULE_TEMPLATE(ApparenceModule, ApparenceModuleTemplate);
+
+Module* ApparenceModuleTemplate::CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const
+{
+    return NewModule<ApparenceModule>(parUnitId, parParameters);
+}
 
 ApparenceModule::ApparenceModule()
     : Module()
@@ -18,6 +26,8 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
     parent_type::VirtualInit(parUnitId, parParameters);
     FMeshHandle = parParameters.Get<ModuleParameters::Mesh>();
     // FProgram = parParameters.Get<ModuleParameters::Material>();
+
+    const ApparenceModuleTemplate* temp = Template<ApparenceModuleTemplate>();
 }
 
 void ApparenceModule::VirtualDeinit()
