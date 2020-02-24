@@ -26,6 +26,8 @@ public:
     i32 Preload(std::string parPattern, void (*parProgressCallback)(i32, bool&));
     void Flush();
 
+    const std::string& GetBasePath() const;
+
 private:
     std::shared_ptr<ResourceHandle> Find(Resource* parResource);
     void Update(std::shared_ptr<ResourceHandle> parHandle);

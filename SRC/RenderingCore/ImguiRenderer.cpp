@@ -72,10 +72,10 @@ void ImguiRenderer::Init()
     // setupStyle(true);
 
     bgfx::RendererType::Enum type = bgfx::getRendererType();
-    FProgam = LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "ImGUI", "ocornut_imgui");
+    FProgam = LoadProgram("Shaders\\Perso\\", "ImGUI", "ocornut_imgui");
 
     FImageLodEnabledUniform = bgfx::createUniform("u_imageLodEnabled", bgfx::UniformType::Vec4);
-    FImageProgram = LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "ImGUI", "imgui_image");
+    FImageProgram = LoadProgram("Shaders\\Perso\\", "ImGUI", "imgui_image");
 
     FVertexLayout.begin()
           .add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
@@ -90,7 +90,7 @@ void ImguiRenderer::Init()
     int32_t height;
 
     ECSEngine::ResourceCache* cache = ECSEngine::GlobalResourceCache::Instance().FCache;
-    ECSEngine::Resource shaderResource("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\Fonts\\kenvector_future.ttf");
+    ECSEngine::Resource shaderResource("Fonts\\kenvector_future.ttf");
     std::shared_ptr<ECSEngine::ResourceHandle> shaderDataHandle = cache->GetResourceHandle(&shaderResource);
     ImFontConfig config;
     config.FontDataOwnedByAtlas = false;

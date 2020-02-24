@@ -6,6 +6,9 @@
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
 
+CEREAL_REGISTER_TYPE(ECSEngine::PositionModuleTemplate);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::PositionModuleTemplate)
+
 namespace ECSEngine
 {
 

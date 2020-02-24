@@ -30,7 +30,7 @@ u32 ResourceFileDirectoryView::GetRawResource(const Resource& r, c8* buffer)
 {
     auto itFind = FPathToFilename.find(r.FName);
     AlwaysCheckedAssert(itFind != FPathToFilename.end());
-    std::ifstream ifs(r.FName, std::ios::binary);
+    std::ifstream ifs(FPath + "\\" + r.FName, std::ios::binary);
     AssertRelease(ifs.good());
     ifs.read(buffer, itFind->second.FFilesize);
     return itFind->second.FFilesize;
@@ -64,15 +64,18 @@ void ResourceFileDirectoryView::ListResources()
     std::filesystem::recursive_directory_iterator itDir(FPath);
     std::filesystem::recursive_directory_iterator itEnd;
 
+    const std::filesystem::path basePath(FPath);
+
     for (; itDir != itEnd; ++itDir)
     {
         if (itDir->is_regular_file())
         {
-            const std::filesystem::path path = itDir->path();
-            std::string filepath = itDir->path().string();
+            const std::filesystem::path absolute = itDir->path();
+            const std::filesystem::path path = std::filesystem::relative(absolute, FPath);
+            std::string filepath = path.string();
             std::transform(filepath.begin(), filepath.end(), filepath.begin(), [](unsigned char c) { return std::tolower(c); });
             AlwaysCheckedAssert(FPathToFilename.find(filepath) == FPathToFilename.end());
-            FilesystemRecord record{ path.filename().string(), static_cast<u32>(std::filesystem::file_size(path)) };
+            FilesystemRecord record{ path.filename().string(), static_cast<u32>(std::filesystem::file_size(absolute)) };
             FPathToFilename[filepath] = record;
         }
     }

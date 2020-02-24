@@ -67,6 +67,12 @@ std::shared_ptr<ResourceHandle> ResourceCache::GetResourceHandle(Resource* parRe
     return handle;
 }
 
+const std::string& ResourceCache::GetBasePath() const
+{
+    AssertRelease(FFileSystem != nullptr);
+    return FFileSystem->GetBasePathName();
+}
+
 std::shared_ptr<ECSEngine::ResourceHandle> ResourceCache::Find(Resource* parResource)
 {
     auto itFind = FResources.find(parResource->FName);

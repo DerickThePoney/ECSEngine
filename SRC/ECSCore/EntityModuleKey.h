@@ -38,6 +38,12 @@ public:
         FKey &= (1 << parModuleId);
     }
 
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(FKey);
+    }
+
 private:
     u32 FKey;
 };

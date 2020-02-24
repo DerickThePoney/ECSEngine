@@ -34,8 +34,8 @@ void RenderingSystem::VirtualInit()
 {
     parent_type::VirtualInit();
 
-    kProgram = ECSEngine::Rendering::LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "VertexColor");
-    kProgramInstancing = ECSEngine::Rendering::LoadProgram("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\shaders\\Perso\\", "VertexColorInstancing");
+    kProgram = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColor");
+    kProgramInstancing = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColorInstancing");
 
     kUniform = bgfx::createUniform("u_color", bgfx::UniformType::Vec4);
 }

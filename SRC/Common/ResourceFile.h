@@ -12,5 +12,7 @@ public:
     virtual u32 GetNumResources() const = 0;
     virtual std::string GetResourceName(i32 num) const = 0;
     virtual ~IResourceFile() {}
+
+    virtual const std::string& GetBasePathName() const = 0;
 };
 } // namespace ECSEngine

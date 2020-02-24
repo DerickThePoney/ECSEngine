@@ -15,6 +15,12 @@ class ModuleTemplate
 
 public:
     ModuleTemplate();
+    ModuleTemplate(const ModuleTemplate& other) = default;
+    ModuleTemplate(ModuleTemplate&& other) = default;
+
+    ModuleTemplate& operator=(const ModuleTemplate& other) = default;
+    ModuleTemplate& operator=(ModuleTemplate&& other) = default;
+
     virtual ~ModuleTemplate();
 
     void Init(const EntityTemplate* parTemplate);
@@ -24,9 +30,16 @@ public:
         AssertRelease(IsInitialised());
         return FTemplate;
     }
+    virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const
+    {
+        AssertNotReached();
+        return nullptr;
+    };
 
-public:
-    virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const = 0;
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+    }
 
 protected:
 #ifdef PERFORM_SECURITY_CHECKS

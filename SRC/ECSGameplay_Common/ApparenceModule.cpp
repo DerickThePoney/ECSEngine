@@ -6,6 +6,8 @@
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
 
+CEREAL_REGISTER_TYPE(ECSEngine::ApparenceModuleTemplate);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::ApparenceModuleTemplate)
 namespace ECSEngine
 {
 IMPLEMENT_MODULE_TEMPLATE(ApparenceModule, ApparenceModuleTemplate);

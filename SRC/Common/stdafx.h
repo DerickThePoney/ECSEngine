@@ -8,6 +8,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <fstream>
 #include <Windows.h>
 #include <vector>
 #include <unordered_map>
@@ -29,7 +30,10 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_INLINE
-#ifdef _DEBUG
+
+#define GLM_PRINT_EXTENSIONS 0
+
+#if defined(_DEBUG) && GLM_PRINT_EXTENSIONS
 #define GLM_FORCE_MESSAGES
 #endif
 #include <glm/glm.hpp>
@@ -37,6 +41,20 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/ext/vector_uint2.hpp>
 #include <glm/gtc/quaternion.hpp>
+
+#include <cereal/archives/json.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/map.hpp>
+#include <cereal/access.hpp>
+#include <cereal/types/polymorphic.hpp>
+
+#define PROPERTY(P) cereal::make_nvp(#P, F##P)
+#define NAMEDPROPERTY(N, P) cereal::make_nvp(N, P)
+
+#define SERIALIZE()                                                                                                                                                                \
+    template<class Archive>                                                                                                                                                        \
+    void serialize(Archive& ar)
 
 #include "Types.h"
 
