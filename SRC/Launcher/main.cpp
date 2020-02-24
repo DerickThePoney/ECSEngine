@@ -116,6 +116,34 @@ void StressTestDebug(const ECSEngine::EntityTemplate* temp,
     ImGui::End();
 }
 
+void SaveAndReloadTest()
+{
+    ImGui::Begin("Save and Reload test");
+
+    if (ImGui::Button("Save entities"))
+    {
+        std::ofstream ofstr(ECSEngine::GlobalResourceCache::Instance().FCache->GetBasePath() + "\\Configuration\\EntityTemplates.json");
+
+        cereal::JSONOutputArchive archive(ofstr);
+
+        archive(NAMEDPROPERTY("EntityTemplatesList", ECSEngine::EntityTemplateManager::Instance()));
+    }
+
+    if (ImGui::Button("Load Entities"))
+    {
+        std::ifstream ifstr(ECSEngine::GlobalResourceCache::Instance().FCache->GetBasePath() + "\\Configuration\\EntityTemplates.json");
+
+        cereal::JSONInputArchive archive(ifstr);
+
+        ECSEngine::EntityTemplateManager::Destroy();
+        ECSEngine::EntityTemplateManager::CreateIFP();
+
+        archive(NAMEDPROPERTY("EntityTemplatesList", ECSEngine::EntityTemplateManager::Instance()));
+    }
+
+    ImGui::End();
+}
+
 int main(int argc, char** argv)
 {
     ECSEngine::TimeManager::Start();
@@ -139,11 +167,27 @@ int main(int argc, char** argv)
 
     ECSEngine::EntityTemplateManager::CreateIFP();
     AssertRelease(ECSEngine::EntityTemplateManager::HasInstance());
-    ECSEngine::EntityTemplate* newTemplate = ECSEngine::EntityTemplateManager::Instance().CreateNewEntityTemplate();
-    newTemplate->SetHasModule<ECSEngine::ApparenceModule>();
-    newTemplate->SetHasModule<ECSEngine::PositionModule>();
-    newTemplate->SetHasModule<ECSEngine::OrientationModule>();
-    newTemplate->Initialise();
+    {
+        std::ifstream ifstr(ECSEngine::GlobalResourceCache::Instance().FCache->GetBasePath() + "\\Configuration\\EntityTemplates.json");
+
+        try
+        {
+            cereal::JSONInputArchive archive(ifstr);
+            archive(NAMEDPROPERTY("EntityTemplatesList", ECSEngine::EntityTemplateManager::Instance()));
+        }
+        catch (std::exception e)
+        {
+            ECSEngine::EntityTemplateManager::Destroy();
+            ECSEngine::EntityTemplateManager::CreateIFP();
+            ECSEngine::EntityTemplate* newTemplate = ECSEngine::EntityTemplateManager::Instance().CreateNewEntityTemplate();
+            newTemplate->SetHasModule<ECSEngine::ApparenceModule>();
+            newTemplate->SetHasModule<ECSEngine::PositionModule>();
+            newTemplate->SetHasModule<ECSEngine::OrientationModule>();
+            newTemplate->Initialise();
+        }
+    }
+
+    const ECSEngine::EntityTemplate* newTemplate = ECSEngine::EntityTemplateManager::Instance().GetEntityTemplate(0);
 
     // init rendering
     ECSEngine::Rendering::GLFWDisplayWindowHandler::CreateIFP();
@@ -184,6 +228,7 @@ int main(int argc, char** argv)
         // Updates
         ImGui::ShowDemoWindow();
         StressTestDebug(newTemplate, frameTimeBuffer, world, handle, entities);
+        SaveAndReloadTest();
 
         orientationSystem.Update();
 

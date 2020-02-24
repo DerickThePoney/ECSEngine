@@ -21,6 +21,8 @@ public:
     u32 GetNumResources() const override;
     std::string GetResourceName(i32 num) const override;
 
+    const std::string& GetBasePathName() const override { return FPath; }
+
 private:
     void ListResources();
 

@@ -17,10 +17,26 @@ public:
         : Singleton<EntityTemplateManager>()
     {
     }
+
+    ~EntityTemplateManager();
+
     EntityTemplate* CreateNewEntityTemplate();
     const EntityTemplate* GetEntityTemplate(u32 parIndex);
 
+    template<class Archive>
+    void save(Archive& ar) const
+    {
+        ar(PROPERTY(EntityTemplates));
+    }
+
+    template<class Archive>
+    void load(Archive& ar)
+    {
+        ar(PROPERTY(EntityTemplates));
+        foreachitem(temp, FEntityTemplates) temp->Initialise();
+    }
+
 private:
-    std::vector<EntityTemplate> FEntityTemplates;
+    std::vector<std::shared_ptr<EntityTemplate>> FEntityTemplates;
 };
 } // namespace ECSEngine

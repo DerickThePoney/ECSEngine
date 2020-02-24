@@ -12,10 +12,17 @@ void EntityTemplate::Initialise()
     {
         if (HasModule(i))
         {
-            ModuleTemplate* modTemp = EntityTemplateManagerMethods::CreateModuleTemplate(i);
-            AssertRelease(modTemp != nullptr);
-            modTemp->Init(this);
-            FModuleTemplates[i] = modTemp;
+            auto itFind = FModuleTemplates.find(i);
+            if (itFind == FModuleTemplates.end())
+            {
+                auto& it = FModuleTemplates.emplace(i, EntityTemplateManagerMethods::CreateModuleTemplate(i));
+                AssertRelease(it.first->second != nullptr);
+                it.first->second->Init(this);
+            }
+            else
+            {
+                itFind->second->Init(this);
+            }
         }
     }
 

@@ -7,9 +7,19 @@ namespace ECSEngine
 {
 class EntityTemplate
 {
-    friend class EntityTemplateManager;
-
 public:
+    EntityTemplate()
+        : FWorld(Worlds::STANDARD)
+#ifdef PERFORM_SECURITY_CHECKS
+        , FHasBeenInit(false)
+#endif
+    {
+    }
+
+    EntityTemplate(const EntityTemplate& other) = delete;
+    EntityTemplate& operator=(const EntityTemplate& other) = delete;
+    ~EntityTemplate() {}
+
     template<typename T>
     const bool HasModule() const
     {
@@ -26,8 +36,6 @@ public:
 
     const void SetHasModule(const u32 parModuleId) { return FKey.SetHasModule(parModuleId); }
 
-    ~EntityTemplate() {}
-
     void Initialise();
 
     const Worlds::Type& GetWorldId() const { return FWorld; }
@@ -37,26 +45,23 @@ public:
         auto it = FModuleTemplates.find(parId);
         if (it == FModuleTemplates.end())
             return nullptr;
-        return it->second;
+        return it->second.get();
     }
 
 #ifdef PERFORM_SECURITY_CHECKS
     bool IsInitialised() const { return FHasBeenInit; }
 #endif
 
-private:
-    EntityTemplate()
-        : FWorld(Worlds::STANDARD)
-#ifdef PERFORM_SECURITY_CHECKS
-        , FHasBeenInit(false)
-#endif
+    template<class Archive>
+    void serialize(Archive& ar)
     {
+        ar(PROPERTY(World), PROPERTY(Key), NAMEDPROPERTY("ModuleTemplatesList", FModuleTemplates));
     }
 
 private:
     Worlds::Type FWorld;
     EntityModuleKey FKey;
-    std::map<u32, ModuleTemplate*> FModuleTemplates;
+    std::map<u32, std::unique_ptr<ModuleTemplate>> FModuleTemplates;
 
 #ifdef PERFORM_SECURITY_CHECKS
     bool FHasBeenInit;
