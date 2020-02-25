@@ -39,9 +39,15 @@ public:
     }
 
     template<class Archive>
-    void serialize(Archive& ar)
+    u32 save_minimal(Archive const&) const
     {
-        ar(FKey);
+        return FKey;
+    }
+
+    template<class Archive>
+    void load_minimal(Archive const&, const u32& value)
+    {
+        FKey = value;
     }
 
 private:
