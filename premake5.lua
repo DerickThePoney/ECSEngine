@@ -23,6 +23,8 @@ include("PremakeScripts/renderingcore.lua")
 
 include("PremakeScripts/rendering.lua")
 
+include("PremakeScripts/application.lua")
+
 include("PremakeScripts/ecscore.lua")
 
 include("PremakeScripts/ecsgameplay_common.lua")

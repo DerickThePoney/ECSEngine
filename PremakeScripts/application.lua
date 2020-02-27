@@ -1,11 +1,11 @@
 -- ecsbase.lua
 
-project "ECSCore"
+project "Application"
    language "C++"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "on"
    kind "StaticLib"
-   local srcfiles = "../SRC/ECSCore/"
+   local srcfiles = "../SRC/Application/"
 
    vpaths { 
       ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
@@ -15,7 +15,7 @@ project "ECSCore"
    pchheader "stdafx.h"
    pchsource(srcfiles.."stdafx.cpp")
 
-   links { "Application" }
+   links { "Common" }
 
    includedirs { "../SRC"}
 

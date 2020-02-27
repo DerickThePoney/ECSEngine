@@ -92,7 +92,7 @@ void RenderingSystem::VirtualUpdate()
         // 11x11 cubes
         const uint32_t numInstances = apparenceController.GetSize();
 
-        if (numInstances == bgfx::getAvailInstanceDataBuffer(numInstances, instanceStride))
+        if (numInstances > 0 && numInstances == bgfx::getAvailInstanceDataBuffer(numInstances, instanceStride))
         {
             bgfx::InstanceDataBuffer idb;
             bgfx::allocInstanceDataBuffer(&idb, numInstances, instanceStride);
