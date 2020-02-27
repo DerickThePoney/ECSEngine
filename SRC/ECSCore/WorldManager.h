@@ -12,7 +12,7 @@ public:
     virtual ~WorldManager();
 
     void Init();
-    void Destroy();
+    void Shutdown();
 
     EntityWorld& GetWorld(Worlds::Type parWorld);
     EntityWorld* GetWorldIFP(Worlds::Type parWorld);

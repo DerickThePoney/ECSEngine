@@ -14,6 +14,7 @@ WorldManager::WorldManager()
 
 WorldManager::~WorldManager()
 {
+    Shutdown();
 }
 
 void WorldManager::Init()
@@ -22,7 +23,7 @@ void WorldManager::Init()
     CreateWorld(FWorlds.at(Worlds::STANDARD));
 }
 
-void WorldManager::Destroy()
+void WorldManager::Shutdown()
 {
     FWorlds.clear();
 }
