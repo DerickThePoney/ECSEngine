@@ -28,6 +28,8 @@ public:
 
     const std::string& GetBasePath() const;
 
+    const IResourceFile* GetFileSystem() const { return FFileSystem; }
+
 private:
     std::shared_ptr<ResourceHandle> Find(Resource* parResource);
     void Update(std::shared_ptr<ResourceHandle> parHandle);

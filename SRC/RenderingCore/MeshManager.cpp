@@ -9,6 +9,14 @@ namespace ECSEngine
 {
 namespace Rendering
 {
+namespace MeshHelpers
+{
+template<typename VertexLayout>
+IMesh* CreateIMesh(const VertexLayout& parLayout)
+{
+    return new Mesh<VertexLayout>();
+}
+} // namespace MeshHelpers
 
 MeshManager::MeshManager()
     : Singleton()
@@ -24,12 +32,12 @@ MeshManager::~MeshManager()
     }
 }
 
-MeshHandle MeshManager::CreateMesh(const void* parVertexData, const u32 parVertexDataSizeInBytes, const void* parIndexData, const u32 parIndexDataSizeInBytes)
+const MeshHandle MeshManager::CreateMesh(const void* parVertexData, const u32 parVertexDataSizeInBytes, const void* parIndexData, const u32 parIndexDataSizeInBytes)
 {
-    MeshHandle handle(FMeshes.size());
+    MeshHandle handle((u32)FMeshes.size());
     using VertexLayout = ECSEngine::Rendering::VertexPositionColorN<1>;
 
-    IMesh* mesh = new Mesh<VertexLayout>();
+    IMesh* mesh = MeshHelpers::CreateIMesh(VertexLayout());
 
     mesh->SetRawVertexData(parVertexData, parVertexDataSizeInBytes, true);
     mesh->SetRawIndexData(parIndexData, parIndexDataSizeInBytes, true);
@@ -37,6 +45,12 @@ MeshHandle MeshManager::CreateMesh(const void* parVertexData, const u32 parVerte
     FMeshes.push_back(mesh);
 
     return handle;
+}
+
+const MeshHandle MeshManager::CreateMesh(const std::string& parFilename)
+{
+    AssertNotReached();
+    return MeshHandle();
 }
 
 IMesh* MeshManager::GetMesh(const MeshHandle& meshHandle) const

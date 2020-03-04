@@ -14,4 +14,6 @@ project "Imgui"
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h"}
 
+   includedirs { "../SRC"}
+
    dofile("projectsconfigs.lua")

@@ -9,24 +9,31 @@ workspace "ECSEngine"
     system "Windows"
     architecture "x64"
 
-   -- Get that C++14 goodness
+   -- Get that C++17 goodness
    cppdialect  "C++17"
 
    -- TODO
    -- prebuildcommands {"premake5.exe --file=..\\premake5.lua vs2019"}
 
-include("PremakeScripts/common.lua")
+group "Core"
+    include("PremakeScripts/common.lua")
+    include("PremakeScripts/ecscore.lua")
+    include("PremakeScripts/application.lua")
+group "" -- end of "Dependensies"
 
-include("PremakeScripts/imgui.lua")
+group "Rendering"
+    include("PremakeScripts/imgui.lua")
+    include("PremakeScripts/renderingcore.lua")
+    include("PremakeScripts/rendering.lua")
+group ""
 
-include("PremakeScripts/renderingcore.lua")
 
-include("PremakeScripts/rendering.lua")
+group "Gameplay"
+    include("PremakeScripts/ecsgameplay_common.lua")
+group ""
 
-include("PremakeScripts/application.lua")
-
-include("PremakeScripts/ecscore.lua")
-
-include("PremakeScripts/ecsgameplay_common.lua")
+group "Tools"
+    include("PremakeScripts/meshandmaterialbuilder.lua")
+group ""
 
 include("PremakeScripts/launcher.lua")
