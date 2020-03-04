@@ -25,3 +25,6 @@
 [submodule "External/cereal"]
 	path = External/cereal
 	url = https://github.com/USCiLab/cereal.git
+[submodule "External/assimp"]
+	path = External/assimp
+	url = https://github.com/assimp/assimp.git

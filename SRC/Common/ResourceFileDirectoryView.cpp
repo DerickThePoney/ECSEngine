@@ -3,6 +3,7 @@
 #include "ResourceFileDirectoryView.h"
 
 #include "Resource.h"
+#include "StringUtilities.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -80,4 +81,23 @@ void ResourceFileDirectoryView::ListResources()
         }
     }
 }
+
+void ResourceFileDirectoryView::ListResourceFiles(const std::string& parWildcardPattern, std::vector<std::string>& parOutFileList) const
+{
+    foreachitemconst(strFileRecord, FPathToFilename)
+    {
+        if (StringUtilities::WildcardMatch(parWildcardPattern.c_str(), strFileRecord.second.FFilename.c_str()))
+        {
+            parOutFileList.push_back(strFileRecord.first);
+        }
+    }
+}
+
+bool ResourceFileDirectoryView::FileExists(const std::string& parFileName) const
+{
+    std::string lowerCaseFilename = parFileName;
+    std::transform(lowerCaseFilename.begin(), lowerCaseFilename.end(), lowerCaseFilename.begin(), [](unsigned char c) { return std::tolower(c); });
+    return FPathToFilename.find(lowerCaseFilename) != FPathToFilename.end();
+}
+
 } // namespace ECSEngine
