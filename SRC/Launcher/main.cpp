@@ -21,7 +21,7 @@ int main(int argc, char** argv)
         {
             app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>("D:\\Programmation\\GameEngine\\ECSEngine\\Assets");
             app.AddNewLoader<ECSEngine::ECSLoader>("\\Configuration\\EntityTemplates.json");
-            app.AddNewLoader<ECSEngine::RenderingLoader>();
+            app.AddNewLoader<ECSEngine::RenderingLoader>("Base Application");
             app.SetGameplayUpdater_StealOwnership(new ECSEngine::ApplicationUpdaterWrapper());
 
             {
