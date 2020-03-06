@@ -15,6 +15,7 @@ bool RenderingLoader::VirtualInitialise()
     ILoader::VirtualInitialise();
 
     Rendering::GLFWDisplayWindowHandler::CreateIFP();
+    Rendering::GLFWDisplayWindowHandler::Instance().SetName(FApplicationName);
     Rendering::GLFWDisplayWindowHandler::Instance().Init();
 
     Rendering::BGFXRenderer::CreateIFP();

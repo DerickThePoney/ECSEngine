@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     try
     {
         app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>("D:\\Programmation\\GameEngine\\ECSEngine\\Assets");
-        app.AddNewLoader<ECSEngine::RenderingLoader>();
+        app.AddNewLoader<ECSEngine::RenderingLoader>("MeshMaterialApplication");
         app.SetGameplayUpdater_StealOwnership(new ECSEngine::MeshMaterialApplicationUpdaterWrapper());
 
         app.Initialise();
