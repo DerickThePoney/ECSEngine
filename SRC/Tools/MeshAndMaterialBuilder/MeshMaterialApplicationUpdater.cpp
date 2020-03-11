@@ -3,18 +3,16 @@
 #include "MeshMaterialApplicationUpdater.h"
 
 #include "Common/Logger.h"
+#include "Common/MeshStreamingData.h"
+#include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
+#include "Common/ResourceHandle.h"
 #include "Common/RingBuffer.h"
 #include "Common/TimeManager.h"
 #include "Common/Timer.h"
-#include "RenderingCore/BGFXRenderer.h"
-#include "RenderingCore/GLFWDisplayWindowHandler.h"
-#include "RenderingCore/ImguiRenderer.h"
-#include "RenderingCore/MeshManager.h"
-
-#define WITH_ASSETS_GENERATION
-#include "RenderingCore/MeshFileStreaming.h"
+#include "Tools/AssimpWrapper/AssimpMeshDataLoading.h"
+#include "assimp/scene.h"
 
 namespace ECSEngine
 {
@@ -83,8 +81,7 @@ MeshMaterialApplicationUpdater::MeshMaterialApplicationUpdater()
 
 void MeshMaterialApplicationUpdater::Initialise()
 {
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*", FMeshFiles);
+    GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.fbx", FMeshFiles);
 }
 
 void MeshMaterialApplicationUpdater::Shutdown()
@@ -93,90 +90,64 @@ void MeshMaterialApplicationUpdater::Shutdown()
 
 bool MeshMaterialApplicationUpdater::CheckShouldFinish()
 {
-    return Rendering::GLFWDisplayWindowHandler::Instance().ShouldClose() || FShouldClose;
+    return FShouldClose;
 }
 
 void MeshMaterialApplicationUpdater::StartUpdate()
 {
-    Rendering::ImGUI::NewFrame();
 }
 
 void MeshMaterialApplicationUpdater::Update()
 {
-    glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
-    ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(windowSize);
-    ImGui::Begin("DataInfo", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+    static size_t i = 0;
 
-    ImGui::LabelText("", "Number of files found: %d", FMeshFiles.size());
+    if (i < FMeshFiles.size())
+    {
+        const std::string& meshFile = FMeshFiles[i++];
+        LOG_WARNING(meshFile);
 
-    const glm::vec2 currentWindowSize = ImGui::GetWindowSize();
-    const glm::vec2 loggerSize = currentWindowSize - 50.0f;
-    ImGui::SetCursorPosX(((currentWindowSize - loggerSize) * 0.5f).x);
+        Resource meshResource(meshFile);
 
-    ImGui::BeginChildFrame(ImGui::GetID("Test"), loggerSize);
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::LabelText("", "Test");
-    ImGui::EndChildFrame();
+        std::shared_ptr<ResourceHandle> meshResourceHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&meshResource);
 
-    ImGui::End();
+        AssimpLoading::GenerateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + meshFile, meshResourceHandle->Buffer(), meshResourceHandle->Size());
+
+        std::ifstream ifstr("test", std::ifstream::binary);
+        AssertRelease(ifstr.good());
+        Rendering::MeshFileHeader fileHeader;
+        ifstr.read((c8*)&fileHeader, sizeof(fileHeader));
+
+        std::vector<glm::vec3> vertices;
+        std::vector<std::vector<u32>> colors;
+        std::vector<u32> indices;
+        vertices.resize(fileHeader.NbVertices);
+        colors.resize(fileHeader.NbColorChannels);
+        forrange(i, 0, fileHeader.NbColorChannels) colors[i].resize(fileHeader.NbVertices);
+        indices.resize(fileHeader.NbIndices);
+
+        forrange(i, 0, fileHeader.NbVertices)
+        {
+            ifstr.read((c8*)&vertices[i].x, 4);
+            ifstr.read((c8*)&vertices[i].y, 4);
+            ifstr.read((c8*)&vertices[i].z, 4);
+            forrange(j, 0, fileHeader.NbColorChannels) { ifstr.read((c8*)&colors[j][i], 4); }
+        }
+
+        ifstr.read((c8*)indices.data(), 4u * fileHeader.NbIndices);
+    }
+    else
+    {
+        FShouldClose = true;
+    }
 }
 
 void MeshMaterialApplicationUpdater::Render()
 {
-    Rendering::ImGUI::Render();
-
-    Rendering::BGFXRenderer::Instance().RenderFrame();
 }
 
 void MeshMaterialApplicationUpdater::EndUpdate()
 {
-    Rendering::GLFWDisplayWindowHandler::Instance().PollEvents();
 }
 
 MeshMaterialApplicationUpdaterWrapper::MeshMaterialApplicationUpdaterWrapper()
