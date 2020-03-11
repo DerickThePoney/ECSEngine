@@ -2,6 +2,7 @@
 
 #include "CommonLoaders.h"
 
+#include "Common/Logger.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFileDirectoryView.h"
 #include "Common/TimeManager.h"
@@ -36,6 +37,9 @@ bool LoaderInitialiseCommonResources::VirtualInitialise()
 {
     ILoader::VirtualInitialise();
 
+    // Logger
+    Logger::InitLogger();
+
     // Time
     TimeManager::Start();
 
@@ -57,6 +61,7 @@ void LoaderInitialiseCommonResources::VirtualShutdown()
     ILoader::VirtualShutdown();
     GlobalResourceCache::Destroy();
     TimeManager::End();
+    ECSEngine::Logger::ShutdownLogger();
 }
 
 } // namespace ECSEngine

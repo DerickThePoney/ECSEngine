@@ -26,3 +26,4 @@ filter "configurations:Final"
   defines { "NDEBUG" , "ABSOLUTELY_NOT_ASSERT"}
   optimize "On"
   symbols "On"
+  disablewarnings{"4390"}

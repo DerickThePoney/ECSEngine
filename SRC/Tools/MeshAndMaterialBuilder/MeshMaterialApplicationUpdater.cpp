@@ -2,6 +2,7 @@
 
 #include "MeshMaterialApplicationUpdater.h"
 
+#include "Common/Logger.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
 #include "Common/RingBuffer.h"
