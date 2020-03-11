@@ -1,25 +1,22 @@
 #pragma once
+#include "assimp/scene.h"
 
 namespace ECSEngine
 {
 namespace Rendering
 {
-struct MeshData
-{
-};
 
-#ifdef WITH_ASSETS_GENERATION
 class MeshFileWriter
 {
 public:
     MeshFileWriter(const std::string& parFilename);
     ~MeshFileWriter();
 
-    void operator<<(const void* parMeshData);
+    void MeshFileWriter::operator<<(const aiScene* parMeshData);
 
 private:
     std::ofstream FOutputStream;
 };
-#endif
+
 } // namespace Rendering
 } // namespace ECSEngine

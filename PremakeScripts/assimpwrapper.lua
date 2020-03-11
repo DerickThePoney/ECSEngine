@@ -1,11 +1,11 @@
--- MeshAndMaterialBuilder.lua
+-- assimpwrapper.lua
 
-project "MeshAndMaterialBuilder"
+project "AssimpWrapper"
    language "C++"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "on"
-   kind "ConsoleApp"
-   local srcfiles = "../SRC/Tools/MeshAndMaterialBuilder/"
+   kind "StaticLib"
+   local srcfiles = "../SRC/Tools/AssimpWrapper/"
 
    vpaths { 
       ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
@@ -15,17 +15,19 @@ project "MeshAndMaterialBuilder"
 
    pchheader "stdafx.h"
    pchsource(srcfiles.."stdafx.cpp")
-   
+
    includedirs { "../External/assimp/include","../External/assimp/BUILD/include"}
    includedirs { "../SRC"}
-
-   links{"Application", "AssimpWrapper"}
 
    dofile("projectsconfigs.lua")
 
    filter "configurations:Debug"
      postbuildcommands {"{COPY} ../External/assimp/BUILD/code/Debug/*.dll %{cfg.targetdir}"}
      postbuildcommands {"{COPY} ../External/assimp/BUILD/code/Debug/*.pdb %{cfg.targetdir}"}
+     libdirs {"../External/assimp/BUILD/code/Debug"}
+     links {"assimp-vc142-mtd"} -- , "IrrXMLd", "zlibstaticd"
 
    filter "configurations:not Debug"
      postbuildcommands {"{COPY} ../External/assimp/BUILD/code/Release/*.dll %{cfg.targetdir}"}
+     libdirs {"../External/assimp/BUILD/code/Release"}
+     links {"assimp-vc142-mt"}

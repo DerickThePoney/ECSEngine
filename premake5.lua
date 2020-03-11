@@ -37,6 +37,7 @@ group "ImGuiTools"
 group ""
 
 group "Tools"
+    include("PremakeScripts/assimpwrapper.lua")
     include("PremakeScripts/meshandmaterialbuilder.lua")
 group ""
 
