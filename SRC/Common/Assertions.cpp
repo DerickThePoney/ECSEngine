@@ -2,6 +2,7 @@
 
 #include "Assertions.h"
 
+#include "Logger.h"
 #include "dbghelp.h"
 
 #include <boost/stacktrace.hpp>
@@ -25,6 +26,7 @@ void AssertImplementation::Assert(const char* msg, const char* additionalMessage
     sstr << boost::stacktrace::stacktrace() << "\n";
 
     OutputDebugStringA(sstr.str().c_str());
+    LOG_ERROR(sstr.str());
 
     __debugbreak();
 }

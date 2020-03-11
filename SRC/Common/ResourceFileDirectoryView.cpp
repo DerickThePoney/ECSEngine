@@ -2,6 +2,7 @@
 
 #include "ResourceFileDirectoryView.h"
 
+#include "Logger.h"
 #include "Resource.h"
 #include "StringUtilities.h"
 
@@ -23,6 +24,9 @@ ResourceFileDirectoryView::~ResourceFileDirectoryView()
 
 bool ResourceFileDirectoryView::Open()
 {
+    std::stringstream sstr;
+    sstr << "OpeningResourceDirectory : " << FPath;
+    LOG_GAMEPLAY(sstr.str());
     ListResources();
     return true;
 }

@@ -1,4 +1,4 @@
--- ecsgameplay_base.lua
+-- rendering.lua
 
 project "Rendering"
    language "C++"
