@@ -237,11 +237,9 @@ void NewFrame()
     io.DeltaTime = ECSEngine::TimeManager::FrameDeltaTime();
     if (io.DeltaTime == 0.0f)
         io.DeltaTime = 1.f / 60.f;
-    glm::uvec2 winSize = GLFWDisplayWindowHandler::Instance().GetSize();
-    io.DisplaySize.x = (float)winSize.x; // set the current display width
-    io.DisplaySize.y = (float)winSize.y; // set the current display height here
+    io.DisplaySize = GLFWDisplayWindowHandler::Instance().GetSize();
 
-    if (winSize.x > 0 && winSize.y > 0)
+    if (io.DisplaySize.x > 0 && io.DisplaySize.y > 0)
         io.DisplayFramebufferScale = ImVec2((float)1.0f, (float)1.0f);
 
     GLFWDisplayWindowHandler::Instance().UpdateMousePosAndButtonsForImGUI(io);
