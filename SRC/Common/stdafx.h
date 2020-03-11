@@ -1,7 +1,6 @@
 #pragma once
-#ifdef _DEBUG
-#define _ITERATOR_DEBUG_LEVEL 2
-#endif
+
+#define _CRT_SECURE_NO_WARNINGS
 
 // clang-format off
 #include <iostream>
