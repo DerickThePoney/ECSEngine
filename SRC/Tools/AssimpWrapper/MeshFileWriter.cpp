@@ -41,6 +41,12 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
 
     fileHeader.NbColorChannels = mesh->GetNumColorChannels();
     fileHeader.HasColors = fileHeader.NbColorChannels != 0;
+    fileHeader.NbUVs = 0; // A IMPLEMENTER mesh->GetNumUVChannels();
+    fileHeader.HasUVs = fileHeader.NbUVs != 0;
+
+    fileHeader.HasNormals = false; // A IMPLEMENTER mesh->HasNormals();
+    fileHeader.HasTangents = mesh->HasTangentsAndBitangents();
+    fileHeader.HasBinormals = fileHeader.HasTangents;
 
     fileHeader.VertexSizeInOctet += fileHeader.NbColorChannels * sizeof(u32);
 

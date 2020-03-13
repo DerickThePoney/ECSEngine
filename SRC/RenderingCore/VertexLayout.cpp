@@ -2,26 +2,19 @@
 
 #include "VertexLayout.h"
 
+//#include "MeshFileStreaming.h"
 #include "bgfx/bgfx.h"
 
 namespace ECSEngine
 {
 namespace Rendering
 {
+VertexLayoutHash VertexPosition::LayoutHash = VertexLayoutHash(true, 0, 0, false, false, false);
 
-bgfx::VertexLayout VextexPosition::GetVertexLayout() const
+bgfx::VertexLayout VertexPosition::GetVertexLayout() const
 {
     bgfx::VertexLayout pcvDecl;
     pcvDecl.begin().add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
-
-    return pcvDecl;
-}
-
-bgfx::VertexLayout VextexPositionColor::GetVertexLayout() const
-{
-    bgfx::VertexLayout pcvDecl;
-    pcvDecl.begin().add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
-    pcvDecl.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true).end();
 
     return pcvDecl;
 }
