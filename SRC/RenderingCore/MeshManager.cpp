@@ -3,20 +3,14 @@
 #include "MeshManager.h"
 
 #include "Mesh.h"
+#include "MeshFileReader.h"
+#include "MeshUtils.h"
 #include "VertexLayout.h"
 
 namespace ECSEngine
 {
 namespace Rendering
 {
-namespace MeshHelpers
-{
-template<typename VertexLayout>
-IMesh* CreateIMesh(const VertexLayout& parLayout)
-{
-    return new Mesh<VertexLayout>();
-}
-} // namespace MeshHelpers
 
 MeshManager::MeshManager()
     : Singleton()
@@ -49,8 +43,15 @@ const MeshHandle MeshManager::CreateMesh(const void* parVertexData, const u32 pa
 
 const MeshHandle MeshManager::CreateMesh(const std::string& parFilename)
 {
-    AssertNotReached();
-    return MeshHandle();
+    MeshFileReader reader(parFilename);
+    IMesh* mesh = nullptr;
+
+    reader >> mesh;
+
+    AssertRelease(mesh != nullptr);
+    MeshHandle handle((u32)FMeshes.size());
+    FMeshes.push_back(mesh);
+    return handle;
 }
 
 IMesh* MeshManager::GetMesh(const MeshHandle& meshHandle) const
