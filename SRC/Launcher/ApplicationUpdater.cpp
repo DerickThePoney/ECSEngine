@@ -3,7 +3,9 @@
 #include "ApplicationUpdater.h"
 
 #include "Common/MeshHandle.h"
+#include "Common/Resource.h"
 #include "Common/ResourceCache.h"
+#include "Common/ResourceFile.h"
 #include "Common/RingBuffer.h"
 #include "Common/TimeManager.h"
 #include "Common/Timer.h"
@@ -145,10 +147,13 @@ void ApplicationUpdater::Initialise()
     renderSystem.Init();
     orientationSystem.Init();
 
-    FMeshHandle = Rendering::MeshManager::Instance().CreateMesh(cubeVertices, sizeof(cubeVertices), cubeTriList, sizeof(cubeTriList));
+    std::vector<std::string> meshFiles;
+    GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.fbx.gen", meshFiles);
+
+    FMeshHandle = Rendering::MeshManager::Instance().CreateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + meshFiles[0]);
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(0);
 
-    AllocateUnits(FTemplate, WorldManager::Instance().GetWorld(Worlds::STANDARD), FMeshHandle, FEntities);
+    forrange(i, 0, 56) { AllocateUnits(FTemplate, WorldManager::Instance().GetWorld(Worlds::STANDARD), FMeshHandle, FEntities); }
 }
 
 void ApplicationUpdater::Shutdown()
