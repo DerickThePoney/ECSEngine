@@ -5,6 +5,17 @@ namespace ECSEngine
 {
 namespace Rendering
 {
+template<int N>
+VertexLayoutHash VertexPositionColorN<N>::LayoutHash = VertexLayoutHash(true, N, 0, false, false, false);
+// template<int N>
+// void VertexPositionColorN<N>::FillMeshFileHeader(MeshFileHeader& parMeshFileHeader)
+//{
+//    static_assert(N > 0 && N <= 4, "N doit être compris entre 1 et 4");
+//    parMeshFileHeader.HasPositions = true;
+//    parMeshFileHeader.HasColors = true;
+//    parMeshFileHeader.NbColorChannels = N;
+//    parMeshFileHeader.VertexSizeInOctet = sizeof(this);
+//}
 
 template<int N>
 bgfx::VertexLayout VertexPositionColorN<N>::GetVertexLayout() const

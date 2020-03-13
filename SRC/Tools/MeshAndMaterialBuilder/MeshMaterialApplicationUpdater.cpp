@@ -113,10 +113,12 @@ void MeshMaterialApplicationUpdater::Update()
 
         AssimpLoading::GenerateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + meshFile, meshResourceHandle->Buffer(), meshResourceHandle->Size());
 
-        std::ifstream ifstr("test", std::ifstream::binary);
+        std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + meshFile + ".gen", std::ifstream::binary);
         AssertRelease(ifstr.good());
         Rendering::MeshFileHeader fileHeader;
         ifstr.read((c8*)&fileHeader, sizeof(fileHeader));
+
+        Rendering::VertexLayoutHash hash(fileHeader);
 
         std::vector<glm::vec3> vertices;
         std::vector<std::vector<u32>> colors;
