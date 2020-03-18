@@ -244,6 +244,7 @@ void NewFrame()
 
     GLFWDisplayWindowHandler::Instance().UpdateMousePosAndButtonsForImGUI(io);
     GLFWDisplayWindowHandler::Instance().UpdateMouseCursorForImGUI(io);
+    GLFWDisplayWindowHandler::Instance().UpdateJoysticks(io);
 
     //// Update game controllers (if enabled and available)
     // ImGui_ImplGlfw_UpdateGamepads();

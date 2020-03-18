@@ -41,6 +41,7 @@ public:
 
     void UpdateMousePosAndButtonsForImGUI(ImGuiIO& io);
     void UpdateMouseCursorForImGUI(ImGuiIO& io);
+    void UpdateJoysticks(ImGuiIO& io);
 
 private:
     std::string FName;

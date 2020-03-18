@@ -9,6 +9,7 @@
 //clang-format on
 
 #include "BGFXRenderer.h"
+#include "Common/InputManager.h"
 
 namespace ECSEngine
 {
@@ -30,6 +31,8 @@ void WindowScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheelH += (float)xoffset;
     io.MouseWheel += (float)yoffset;
+
+    Input::SetMouseScrollDelta(glm::vec2((float)xoffset, (float)yoffset));
 }
 
 void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -49,6 +52,8 @@ void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, in
 #else
     io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 #endif
+
+    Input::SetKeyboardButtonState(key, action == GLFW_PRESS || action == GLFW_REPEAT, io.KeyShift, io.KeyCtrl, io.KeyAlt);
 }
 
 void WindowCharCallback(GLFWwindow* window, unsigned int c)
@@ -56,7 +61,68 @@ void WindowCharCallback(GLFWwindow* window, unsigned int c)
     ImGuiIO& io = ImGui::GetIO();
     io.AddInputCharacter(c);
 }
+
+void WindowMousePosCallback(GLFWwindow* window, double xpos, double ypos)
+{
+    Input::SetMousePosition(glm::vec2((float)xpos, (float)ypos));
+}
+
+void WindowMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    Input::SetMouseButtonState(button, action == GLFW_PRESS);
+}
+
+void WindowJoystickCallback(int jid, int event)
+{
+    if (event == GLFW_CONNECTED)
+    {
+        std::cout << glfwGetJoystickName(jid) << " is connected with id " << jid << std::endl;
+
+        Input::GamepadIsConnected(jid, glfwGetJoystickName(jid));
+    }
+    else if (event == GLFW_DISCONNECTED)
+    {
+        const char* joystickName = glfwGetJoystickName(jid);
+        if (joystickName != nullptr)
+        {
+            std::cout << joystickName;
+        }
+        std::cout << " is disconnected with id " << jid << std::endl;
+
+        Input::GamepadIsDisconnected(jid);
+    }
+}
+
+void InitJoysticks()
+{
+    forrange(i, GLFW_JOYSTICK_1, GLFW_JOYSTICK_LAST + 1)
+    {
+        int present = glfwJoystickPresent(i);
+        if (present == GLFW_TRUE && glfwJoystickIsGamepad(i) == GLFW_TRUE)
+        {
+            std::cout << "Joystick " << i << " is present : " << glfwGetJoystickName(i) << std::endl;
+
+            Input::GamepadIsConnected(i, glfwGetJoystickName(i));
+        }
+    }
+}
+
+void UpdateGamepads()
+{
+    forrange(i, GLFW_JOYSTICK_1, GLFW_JOYSTICK_LAST + 1)
+    {
+        int present = glfwJoystickPresent(i);
+        if (present == GLFW_TRUE && glfwJoystickIsGamepad(i) == GLFW_TRUE)
+        {
+            GLFWgamepadstate state;
+            glfwGetGamepadState(i, &state);
+            Input::SetGamepadState(i, state.buttons, state.axes);
+        }
+    }
+}
+
 } // namespace
+
 GLFWDisplayWindowHandler::GLFWDisplayWindowHandler()
     : FWindow(nullptr)
     , FWidth(800)
@@ -85,14 +151,26 @@ void GLFWDisplayWindowHandler::Init()
 
     glfwSetWindowSizeCallback(FWindow, &WindowSizeCallback);
 
-    /*glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);*/
+    glfwSetMouseButtonCallback(FWindow, &WindowMouseButtonCallback);
     glfwSetScrollCallback(FWindow, &WindowScrollCallback);
     glfwSetKeyCallback(FWindow, &WindowKeyCallback);
     glfwSetCharCallback(FWindow, &WindowCharCallback);
+    glfwSetCursorPosCallback(FWindow, &WindowMousePosCallback);
+
+    glfwSetJoystickCallback(&WindowJoystickCallback);
+
+    // Init input manager
+    double mouse_x, mouse_y;
+    glfwGetCursorPos(FWindow, &mouse_x, &mouse_y);
+
+    Input::Initialise(GLFW_KEY_LAST, glm::vec2((float)mouse_x, (float)mouse_y), GLFW_MOUSE_BUTTON_LAST);
+
+    InitJoysticks();
 }
 
 void GLFWDisplayWindowHandler::Shutdown()
 {
+    Input::Shutdown();
     AlwaysCheckedAssert(FWindow != nullptr);
     if (FWindow != nullptr)
     {
@@ -245,6 +323,11 @@ void GLFWDisplayWindowHandler::UpdateMouseCursorForImGUI(ImGuiIO& io)
         glfwSetCursor(FWindow, FMouseCursors[imgui_cursor] ? FMouseCursors[imgui_cursor] : FMouseCursors[ImGuiMouseCursor_Arrow]);
         glfwSetInputMode(FWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
+}
+
+void GLFWDisplayWindowHandler::UpdateJoysticks(ImGuiIO& io)
+{
+    UpdateGamepads();
 }
 
 } // namespace Rendering
