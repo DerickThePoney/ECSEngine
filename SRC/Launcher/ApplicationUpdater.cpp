@@ -2,6 +2,7 @@
 
 #include "ApplicationUpdater.h"
 
+#include "Common/InputManager.h"
 #include "Common/MeshHandle.h"
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
@@ -13,6 +14,7 @@
 #include "ECSCore/ModuleParameters.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/GLFWWrapper.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/MeshManager.h"
 
@@ -113,6 +115,64 @@ void StressTestDebug(const EntityTemplate* temp, RingBuffer<float, 100>& frameTi
     ImGui::End();
 }
 
+void InputDebug()
+{
+    ImGui::Begin("Input Debug");
+    glm::vec2 mousePos = Input::GetMousePosition();
+    glm::vec2 mouseScroll = Input::GetMouseScrollDelta();
+
+    ImGui::InputFloat2("Mouse position", (float*)&mousePos, 3, ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputFloat2("Mouse scroll", (float*)&mouseScroll, 3, ImGuiInputTextFlags_ReadOnly);
+
+    forrange(i, 0, 7)
+    {
+        bool mouseButtonState = Input::GetMouseButtonState(i);
+        ImGui::Checkbox("Mouse button", &mouseButtonState);
+    }
+
+    ImGui::Separator();
+
+    bool keyboardButtonState = Input::IsShiftDown();
+    ImGui::Checkbox("Shift", &keyboardButtonState);
+    keyboardButtonState = Input::IsAltDown();
+    ImGui::Checkbox("Alt", &keyboardButtonState);
+    keyboardButtonState = Input::IsCtrlDown();
+    ImGui::Checkbox("Ctrl", &keyboardButtonState);
+
+    forrange(i, InputKeyNames::INPUT_KEY_COMMA, InputKeyNames::INPUT_KEY_RIGHT_BRACKET)
+    {
+        keyboardButtonState = Input::GetButtonDown((InputKeyNames::Type)i);
+        ImGui::Checkbox(GLFWWrapper::GetKeyName((InputKeyNames::Type)i), &keyboardButtonState);
+
+        if ((i - InputKeyNames::INPUT_KEY_A) % 5 != 0 || i == InputKeyNames::INPUT_KEY_A)
+        {
+            ImGui::SameLine();
+        }
+    }
+
+    ImGui::Separator();
+    forrange(i, 0, 16)
+    {
+        if (Input::IsGamepadConnected(i))
+        {
+            ImGui::Text(Input::GetGamepadName(i));
+
+            forrange(j, 0, GamepadButtons::GAMEPAD_BUTTON_LAST)
+            {
+                bool isPressed = Input::GetGamepadButtonDown(i, (GamepadButtons::Type)j);
+                ImGui::Checkbox(GamepadButtons::ToString((GamepadButtons::Type)j), &isPressed);
+            }
+
+            forrange(j, 0, GamepadAxes::GAMEPAD_AXIS_LAST)
+            {
+                float value = Input::GetGamepadAxisValue(i, (GamepadAxes::Type)j);
+                ImGui::InputFloat(GamepadAxes::ToString((GamepadAxes::Type)j), &value, ImGuiInputTextFlags_ReadOnly);
+            }
+        }
+    }
+    ImGui::End();
+}
+
 void SaveAndReloadTest()
 {
     ImGui::Begin("Save and Reload test");
@@ -150,10 +210,10 @@ void ApplicationUpdater::Initialise()
     std::vector<std::string> meshFiles;
     GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.fbx.gen", meshFiles);
 
-    FMeshHandle = Rendering::MeshManager::Instance().CreateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + meshFiles[0]);
+    FMeshHandle = Rendering::MeshManager::Instance().CreateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + meshFiles[1]);
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(0);
 
-    forrange(i, 0, 56) { AllocateUnits(FTemplate, WorldManager::Instance().GetWorld(Worlds::STANDARD), FMeshHandle, FEntities); }
+    AllocateUnits(FTemplate, WorldManager::Instance().GetWorld(Worlds::STANDARD), FMeshHandle, FEntities);
 }
 
 void ApplicationUpdater::Shutdown()
@@ -173,6 +233,8 @@ void ApplicationUpdater::StartUpdate()
 {
     TimeManager::NewFrame();
 
+    Input::NewFrame();
+
     Rendering::ImGUI::NewFrame();
 }
 
@@ -182,6 +244,7 @@ void ApplicationUpdater::Update()
     ImGui::ShowDemoWindow();
     StressTestDebug(FTemplate, FFrameTimeBuffer, WorldManager::Instance().GetWorld(Worlds::STANDARD), FMeshHandle, FEntities);
     SaveAndReloadTest();
+    InputDebug();
 
     orientationSystem.Update();
 }
