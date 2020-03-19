@@ -2,6 +2,7 @@
 
 #include "CommonLoaders.h"
 
+#include "Common/CameraManager.h"
 #include "Common/Logger.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFileDirectoryView.h"
@@ -53,12 +54,15 @@ bool LoaderInitialiseCommonResources::VirtualInitialise()
         return false;
     }
 
+    // CameraManager
+    CameraManager::CreateIFP();
     return true;
 }
 
 void LoaderInitialiseCommonResources::VirtualShutdown()
 {
     ILoader::VirtualShutdown();
+    CameraManager::Destroy();
     GlobalResourceCache::Destroy();
     TimeManager::End();
     ECSEngine::Logger::ShutdownLogger();

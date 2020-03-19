@@ -32,4 +32,22 @@ const glm::vec3 OrientationModule::GetOrientationAsYawPitchRoll() const
     return glm::vec3(glm::yaw(FOrientation), glm::pitch(FOrientation), glm::roll(FOrientation));
 }
 
+const glm::vec3 OrientationModule::Forward() const
+{
+    glm::mat4 rotationMatrix(FOrientation);
+    return glm::vec3(rotationMatrix[0]);
+}
+
+const glm::vec3 OrientationModule::Right() const
+{
+    glm::mat4 rotationMatrix(FOrientation);
+    return glm::vec3(rotationMatrix[1]);
+}
+
+const glm::vec3 OrientationModule::Up() const
+{
+    glm::mat4 rotationMatrix(FOrientation);
+    return glm::vec3(rotationMatrix[2]);
+}
+
 } // namespace ECSEngine
