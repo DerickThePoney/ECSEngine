@@ -30,5 +30,4 @@ void EntityTemplate::Initialise()
     FHasBeenInit = true;
 #endif
 }
-
 } // namespace ECSEngine

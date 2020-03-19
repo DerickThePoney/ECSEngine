@@ -10,6 +10,7 @@ class EntityTemplate
 public:
     EntityTemplate()
         : FWorld(Worlds::STANDARD)
+        , FName("Default")
 #ifdef PERFORM_SECURITY_CHECKS
         , FHasBeenInit(false)
 #endif
@@ -48,6 +49,8 @@ public:
         return it->second.get();
     }
 
+    const std::string& GetName() const { return FName; }
+
 #ifdef PERFORM_SECURITY_CHECKS
     bool IsInitialised() const { return FHasBeenInit; }
 #endif
@@ -55,7 +58,7 @@ public:
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(PROPERTY(World), PROPERTY(Key), NAMEDPROPERTY("ModuleTemplatesList", FModuleTemplates));
+        ar(PROPERTY(Name), PROPERTY(World), PROPERTY(Key), NAMEDPROPERTY("ModuleTemplatesList", FModuleTemplates));
     }
 
 private:
@@ -63,6 +66,7 @@ private:
     EntityModuleKey FKey;
     std::map<u32, std::unique_ptr<ModuleTemplate>> FModuleTemplates;
 
+    std::string FName;
 #ifdef PERFORM_SECURITY_CHECKS
     bool FHasBeenInit;
 #endif

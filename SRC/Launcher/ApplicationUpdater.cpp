@@ -247,6 +247,8 @@ void ApplicationUpdater::Update()
     SaveAndReloadTest();
     InputDebug();
 
+    ImGUITools::DrawEntityTemplatesEditor();
+
     orientationSystem.Update();
 }
 
