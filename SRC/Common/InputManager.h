@@ -4,6 +4,7 @@
 
 namespace ECSEngine
 {
+using PointerEventDelegate = dlgt::delegate<bool (*)(const glm::vec2&)>;
 
 namespace GamepadButtons
 {
@@ -44,7 +45,7 @@ const char* ToString(const Type parValue);
 namespace Input
 {
 void Initialise(const u32 parNbKeyboardKeys, const glm::vec2& parMousePosition, const u32 parNbMouseButtons);
-void NewFrame();
+void EndFrame();
 void Shutdown();
 
 void SetMousePosition(const glm::vec2& parMousePosition);
@@ -53,10 +54,13 @@ void SetMouseButtonState(int button, bool value);
 void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtrlDown, bool isAltDown);
 
 const glm::vec2& GetMousePosition();
+const glm::vec2 GetMousePositionDelta();
 const glm::vec2& GetMouseScrollDelta();
 bool GetMouseButtonState(int button);
+bool GetMouseButtonHasChanged(int button);
 
 bool GetButtonDown(int button);
+bool GetButtonHasChanged(int button);
 
 bool IsShiftDown();
 bool IsCtrlDown();
@@ -71,7 +75,13 @@ const char* GetGamepadName(const int parGamepadId);
 void SetGamepadState(const int parGamepadId, const uc8* parButtonsState, const float* parAxesStates);
 
 bool GetGamepadButtonDown(const int parGamepadId, GamepadButtons::Type parGamepadButton);
+bool GetGamepadButtonHasChanged(const int parGamepadId, GamepadButtons::Type parGamepadButton);
 float GetGamepadAxisValue(const int parGamepadId, GamepadAxes::Type parGamepadAxis);
+float GetGamepadAxisValueDelta(const int parGamepadId, GamepadAxes::Type parGamepadAxis);
+bool GetGamepadAxisValueHasChanged(const int parGamepadId, GamepadAxes::Type parGamepadAxis);
+
+void RegisterForPointerEvents(PointerEventDelegate& parPointerEventDelegate);
+void UnregisterForPointerEvents(PointerEventDelegate& parPointerEventDelegate);
 } // namespace Input
 
 } // namespace ECSEngine

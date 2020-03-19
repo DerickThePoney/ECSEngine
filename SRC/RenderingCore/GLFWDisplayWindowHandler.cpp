@@ -97,12 +97,12 @@ void InitJoysticks()
 {
     forrange(i, GLFW_JOYSTICK_1, GLFW_JOYSTICK_LAST + 1)
     {
-        int present = glfwJoystickPresent(i);
-        if (present == GLFW_TRUE && glfwJoystickIsGamepad(i) == GLFW_TRUE)
+        int present = glfwJoystickPresent((int)i);
+        if (present == GLFW_TRUE && glfwJoystickIsGamepad((int)i) == GLFW_TRUE)
         {
-            std::cout << "Joystick " << i << " is present : " << glfwGetJoystickName(i) << std::endl;
+            std::cout << "Joystick " << i << " is present : " << glfwGetJoystickName((int)i) << std::endl;
 
-            Input::GamepadIsConnected(i, glfwGetJoystickName(i));
+            Input::GamepadIsConnected((int)i, glfwGetJoystickName((int)i));
         }
     }
 }
@@ -111,12 +111,12 @@ void UpdateGamepads()
 {
     forrange(i, GLFW_JOYSTICK_1, GLFW_JOYSTICK_LAST + 1)
     {
-        int present = glfwJoystickPresent(i);
-        if (present == GLFW_TRUE && glfwJoystickIsGamepad(i) == GLFW_TRUE)
+        int present = glfwJoystickPresent((int)i);
+        if (present == GLFW_TRUE && glfwJoystickIsGamepad((int)i) == GLFW_TRUE)
         {
             GLFWgamepadstate state;
-            glfwGetGamepadState(i, &state);
-            Input::SetGamepadState(i, state.buttons, state.axes);
+            glfwGetGamepadState((int)i, &state);
+            Input::SetGamepadState((int)i, state.buttons, state.axes);
         }
     }
 }

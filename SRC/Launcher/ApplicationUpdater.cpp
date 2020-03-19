@@ -12,6 +12,7 @@
 #include "Common/Timer.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
+#include "ImGuiTools/EntityTemplatesEditor.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/GLFWWrapper.h"
@@ -119,14 +120,16 @@ void InputDebug()
 {
     ImGui::Begin("Input Debug");
     glm::vec2 mousePos = Input::GetMousePosition();
+    glm::vec2 mousePosDelta = Input::GetMousePositionDelta();
     glm::vec2 mouseScroll = Input::GetMouseScrollDelta();
 
     ImGui::InputFloat2("Mouse position", (float*)&mousePos, 3, ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputFloat2("Mouse delta", (float*)&mousePosDelta, 3, ImGuiInputTextFlags_ReadOnly);
     ImGui::InputFloat2("Mouse scroll", (float*)&mouseScroll, 3, ImGuiInputTextFlags_ReadOnly);
 
     forrange(i, 0, 7)
     {
-        bool mouseButtonState = Input::GetMouseButtonState(i);
+        bool mouseButtonState = Input::GetMouseButtonState((int)i);
         ImGui::Checkbox("Mouse button", &mouseButtonState);
     }
 
@@ -153,19 +156,19 @@ void InputDebug()
     ImGui::Separator();
     forrange(i, 0, 16)
     {
-        if (Input::IsGamepadConnected(i))
+        if (Input::IsGamepadConnected((int)i))
         {
-            ImGui::Text(Input::GetGamepadName(i));
+            ImGui::Text(Input::GetGamepadName((int)i));
 
             forrange(j, 0, GamepadButtons::GAMEPAD_BUTTON_LAST)
             {
-                bool isPressed = Input::GetGamepadButtonDown(i, (GamepadButtons::Type)j);
+                bool isPressed = Input::GetGamepadButtonDown((int)i, (GamepadButtons::Type)j);
                 ImGui::Checkbox(GamepadButtons::ToString((GamepadButtons::Type)j), &isPressed);
             }
 
             forrange(j, 0, GamepadAxes::GAMEPAD_AXIS_LAST)
             {
-                float value = Input::GetGamepadAxisValue(i, (GamepadAxes::Type)j);
+                float value = Input::GetGamepadAxisValue((int)i, (GamepadAxes::Type)j);
                 ImGui::InputFloat(GamepadAxes::ToString((GamepadAxes::Type)j), &value, ImGuiInputTextFlags_ReadOnly);
             }
         }
@@ -233,8 +236,6 @@ void ApplicationUpdater::StartUpdate()
 {
     TimeManager::NewFrame();
 
-    Input::NewFrame();
-
     Rendering::ImGUI::NewFrame();
 }
 
@@ -260,6 +261,7 @@ void ApplicationUpdater::Render()
 
 void ApplicationUpdater::EndUpdate()
 {
+    Input::EndFrame();
     Rendering::GLFWDisplayWindowHandler::Instance().PollEvents();
 }
 

@@ -45,6 +45,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/map.hpp>
+#include <cereal/types/string.hpp>
 #include <cereal/access.hpp>
 #include <cereal/types/polymorphic.hpp>
 
@@ -60,6 +61,8 @@
 #include <xmmintrin.h>
 
 #include "Assertions.h"
+
+#include "delegate.h"
 
 // void* operator new(size_t s, void* where, size_t limit) noexcept;
 //

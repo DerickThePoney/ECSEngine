@@ -28,3 +28,6 @@
 [submodule "External/assimp"]
 	path = External/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "External/delegates"]
+	path = External/delegates
+	url = https://github.com/marcmo/delegates.git
