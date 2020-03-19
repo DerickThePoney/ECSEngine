@@ -23,6 +23,8 @@ public:
     EntityTemplate* CreateNewEntityTemplate();
     const EntityTemplate* GetEntityTemplate(u32 parIndex);
 
+    const u32 GetEntityTemplatesNumber() { return (u32)FEntityTemplates.size(); }
+
     template<class Archive>
     void save(Archive& ar) const
     {
