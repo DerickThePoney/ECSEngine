@@ -2,6 +2,7 @@
 
 #include "RenderingSystem.h"
 
+#include "Common/CameraManager.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
@@ -38,6 +39,16 @@ void RenderingSystem::VirtualInit()
     kProgramInstancing = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColorInstancing");
 
     kUniform = bgfx::createUniform("u_color", bgfx::UniformType::Vec4);
+    const glm::vec3 at = { 0.0f, 0.0f, 0.0f };
+    const glm::vec3 eye = { 0.0f, 0.0f, -5.0f };
+
+    glm::quat orientation = glm::quatLookAt(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f));
+
+    u32 CamId = CameraManager::Instance().CreateCamera();
+    c = CameraManager::Instance().GetCamera(CamId);
+    AlwaysCheckedAssert(!c.expired());
+    std::shared_ptr<Camera> cshared = c.lock();
+    cshared->Init(eye, orientation, glm::radians(60.0f), 0.1f, 100.0f);
 }
 
 void RenderingSystem::VirtualUpdate()
@@ -53,8 +64,12 @@ void RenderingSystem::VirtualUpdate()
 
     const glm::vec3 at = { 0.0f, 0.0f, 0.0f };
     const glm::vec3 eye = { 0.0f, 0.0f, -5.0f };
-    glm::mat4 view = glm::lookAt(eye, at, glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 proj = glm::perspective(glm::radians(60.0f), float(windowSize.x) / float(windowSize.y), 0.1f, 100.0f);
+    AlwaysCheckedAssert(!c.expired());
+    std::shared_ptr<Camera> cshared = c.lock();
+    cshared->SetPosition(glm::vec3(glm::cos(timepoint / 10.f), glm::sin(timepoint / 10.f), -5.0f));
+
+    glm::mat4 view = cshared->GetWorldViewMatrix();
+    glm::mat4 proj = cshared->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
     bgfx::setViewTransform(0, &view[0][0], &proj[0][0]);
 
     const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);

@@ -40,6 +40,10 @@ public:
     const glm::vec3 GetOrientationAsYawPitchRoll() const;
     void SetOrientation(const glm::quat& parOrientation) { FOrientation = parOrientation; }
 
+    const glm::vec3 Forward() const;
+    const glm::vec3 Right() const;
+    const glm::vec3 Up() const;
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
 
