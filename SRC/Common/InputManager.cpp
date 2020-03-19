@@ -66,7 +66,7 @@ public:
     ~InputManager();
 
     void Initialise(const u32 parNbKeyboardKeys, const glm::vec2& parMousePosition, const u32 parNbMouseButtons);
-    void NewFrame();
+    void EndFrame();
     void Shutdown();
 
     void SetMousePosition(const glm::vec2& parMousePosition);
@@ -75,17 +75,28 @@ public:
     void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtrlDown, bool isAltDown);
 
     const glm::vec2& GetMousePosition() { return FMouse.MousePosition; }
+    const glm::vec2 GetMousePositionDelta() { return FMouse.MousePosition - FMouse.PreviousMousePosition; }
     const glm::vec2& GetMouseScrollDelta() { return FMouse.MouseScrollDelta; }
     bool GetMouseButtonState(int button)
     {
         AssertRelease(button < FMouse.MouseButtons.ThisFrameValues.size());
         return FMouse.MouseButtons.ThisFrameValues[button];
     }
+    bool GetMouseButtonHasChanged(int button)
+    {
+        AssertRelease(button < FMouse.MouseButtons.ThisFrameValues.size());
+        return FMouse.MouseButtons.ThisFrameValues[button] != FMouse.MouseButtons.PreviousFrameValues[button];
+    }
 
     bool GetButtonDown(int button)
     {
         AssertRelease(button < FKeyboardState.KeyStates.ThisFrameValues.size());
         return FKeyboardState.KeyStates.ThisFrameValues[button];
+    }
+    bool GetButtonHasChanged(int button)
+    {
+        AssertRelease(button < FKeyboardState.KeyStates.ThisFrameValues.size());
+        return FKeyboardState.KeyStates.ThisFrameValues[button] != FKeyboardState.KeyStates.PreviousFrameValues[button];
     }
 
     bool IsShiftDown() { return FKeyboardState.IsShiftDown; }
@@ -100,7 +111,10 @@ public:
     void SetGamepadState(const int parGamepadId, const uc8* parButtonsState, const float* parAxesStates);
 
     bool GetGamepadButtonDown(const int parGamepadId, GamepadButtons::Type parGamepadButton);
+    bool GetGamepadButtonHasChanged(const int parGamepadId, GamepadButtons::Type parGamepadButton);
     float GetGamepadAxisValue(const int parGamepadId, GamepadAxes::Type parGamepadAxis);
+    float GetGamepadAxisValueDelta(const int parGamepadId, GamepadAxes::Type parGamepadAxis);
+    bool GetGamepadAxisValueHasChanged(const int parGamepadId, GamepadAxes::Type parGamepadAxis);
 
 private:
     struct ButtonsState
@@ -166,9 +180,9 @@ void Initialise(const u32 parNbKeyboardKeys, const glm::vec2& parMousePosition, 
     InputManager::Instance().Initialise(parNbKeyboardKeys, parMousePosition, parNbMouseButtons);
 }
 
-void NewFrame()
+void EndFrame()
 {
-    InputManager::Instance().NewFrame();
+    InputManager::Instance().EndFrame();
 }
 
 void Shutdown()
@@ -202,6 +216,11 @@ const glm::vec2& GetMousePosition()
     return InputManager::Instance().GetMousePosition();
 }
 
+const glm::vec2 GetMousePositionDelta()
+{
+    return InputManager::Instance().GetMousePositionDelta();
+}
+
 const glm::vec2& GetMouseScrollDelta()
 {
     return InputManager::Instance().GetMouseScrollDelta();
@@ -212,9 +231,19 @@ bool GetMouseButtonState(int button)
     return InputManager::Instance().GetMouseButtonState(button);
 }
 
+bool GetMouseButtonHasChanged(int button)
+{
+    return InputManager::Instance().GetMouseButtonHasChanged(button);
+}
+
 bool GetButtonDown(int button)
 {
     return InputManager::Instance().GetButtonDown(button);
+}
+
+bool GetButtonHasChanged(int button)
+{
+    return InputManager::Instance().GetButtonHasChanged(button);
 }
 
 bool IsShiftDown()
@@ -263,9 +292,24 @@ bool GetGamepadButtonDown(const int parGamepadId, GamepadButtons::Type parGamepa
     return InputManager::Instance().GetGamepadButtonDown(parGamepadId, parGamepadButton);
 }
 
+bool GetGamepadButtonHasChanged(const int parGamepadId, GamepadButtons::Type parGamepadButton)
+{
+    return InputManager::Instance().GetGamepadButtonHasChanged(parGamepadId, parGamepadButton);
+}
+
 float GetGamepadAxisValue(const int parGamepadId, GamepadAxes::Type parGamepadAxis)
 {
     return InputManager::Instance().GetGamepadAxisValue(parGamepadId, parGamepadAxis);
+}
+
+float GetGamepadAxisValueDelta(const int parGamepadId, GamepadAxes::Type parGamepadAxis)
+{
+    return InputManager::Instance().GetGamepadAxisValueDelta(parGamepadId, parGamepadAxis);
+}
+
+bool GetGamepadAxisValueHasChanged(const int parGamepadId, GamepadAxes::Type parGamepadAxis)
+{
+    return InputManager::Instance().GetGamepadAxisValueHasChanged(parGamepadId, parGamepadAxis);
 }
 
 } // namespace Input
@@ -285,7 +329,7 @@ void InputManager::Initialise(const u32 parNbKeyboardKeys, const glm::vec2& parM
     FMouse.Initialise(parMousePosition, parNbMouseButtons);
 }
 
-void InputManager::NewFrame()
+void InputManager::EndFrame()
 {
     // TODO --> Get events to fire
 
@@ -321,6 +365,7 @@ void InputManager::SetKeyboardButtonState(int button, bool value, bool isShiftDo
 {
     if (button == -1)
         return;
+
     AssertRelease(button < FKeyboardState.KeyStates.ThisFrameValues.size());
     FKeyboardState.KeyStates.ThisFrameValues[button] = value;
     FKeyboardState.IsShiftDown = isShiftDown;
@@ -359,11 +404,25 @@ bool InputManager::GetGamepadButtonDown(const int parGamepadId, GamepadButtons::
     return g.GamepadButtonsStates.ThisFrameValues[parGamepadButton];
 }
 
+bool InputManager::GetGamepadButtonHasChanged(const int parGamepadId, GamepadButtons::Type parGamepadButton)
+{
+    AssertRelease(FGamepads.find(parGamepadId) != FGamepads.end());
+    Gamepad& g = FGamepads.at(parGamepadId);
+    return g.GamepadButtonsStates.ThisFrameValues[parGamepadButton] != g.GamepadButtonsStates.PreviousFrameValues[parGamepadButton];
+}
+
 float InputManager::GetGamepadAxisValue(const int parGamepadId, GamepadAxes::Type parGamepadAxis)
 {
     AssertRelease(FGamepads.find(parGamepadId) != FGamepads.end());
     Gamepad& g = FGamepads.at(parGamepadId);
     return g.AxesStates.ThisFrameValues[parGamepadAxis];
+}
+
+bool InputManager::GetGamepadAxisValueHasChanged(const int parGamepadId, GamepadAxes::Type parGamepadAxis)
+{
+    AssertRelease(FGamepads.find(parGamepadId) != FGamepads.end());
+    Gamepad& g = FGamepads.at(parGamepadId);
+    return g.AxesStates.ThisFrameValues[parGamepadAxis] != g.AxesStates.PreviousFrameValues[parGamepadAxis];
 }
 
 bool InputManager::IsGamepadConnected(const int parGamepadId)
@@ -376,6 +435,13 @@ const char* InputManager::GetGamepadName(const int parGamepadId)
     AssertRelease(FGamepads.find(parGamepadId) != FGamepads.end());
     Gamepad& g = FGamepads.at(parGamepadId);
     return g.Name;
+}
+
+float InputManager::GetGamepadAxisValueDelta(const int parGamepadId, GamepadAxes::Type parGamepadAxis)
+{
+    AssertRelease(FGamepads.find(parGamepadId) != FGamepads.end());
+    Gamepad& g = FGamepads.at(parGamepadId);
+    return g.AxesStates.ThisFrameValues[parGamepadAxis] - g.AxesStates.PreviousFrameValues[parGamepadAxis];
 }
 
 void InputManager::ButtonsState::Initialise(const u32 parNbKeys)
