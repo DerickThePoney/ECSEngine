@@ -11,7 +11,7 @@ class ParameterContainer;
 
 class OrientationModuleTemplate : public ModuleTemplate
 {
-    DECLARE_MODULE_TEMPLATE(PositionModule);
+    DECLARE_MODULE_TEMPLATE(OrientationModule);
 
 public:
     OrientationModuleTemplate()
@@ -21,6 +21,9 @@ public:
     virtual ~OrientationModuleTemplate() {}
 
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
+
+protected:
+    virtual void VirtualDrawEditor() override;
 };
 
 class OrientationModule final : public Module

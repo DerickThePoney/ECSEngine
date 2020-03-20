@@ -29,13 +29,26 @@ public:
     void SetHasModule()
     {
         static_assert(ModuleTraits<T>::GetModuleId() < sizeof(FKey) * 8, "You should consider removing modules or increasing the size of the entity module key");
-        FKey |= (1 << ModuleTraits<T>::GetModuleId());
+        SetHasModule(ModuleTraits<T>::GetModuleId());
+    }
+
+    template<typename T>
+    void RemoveModule()
+    {
+        static_assert(ModuleTraits<T>::GetModuleId() < sizeof(FKey) * 8, "You should consider removing modules or increasing the size of the entity module key");
+        RemoveModule(ModuleTraits<T>::GetModuleId());
     }
 
     void SetHasModule(const u32 parModuleId)
     {
         AssertRelease(parModuleId < ModulePoolSize);
-        FKey &= (1 << parModuleId);
+        FKey |= (1 << parModuleId);
+    }
+
+    void RemoveModule(const u32 parModuleId)
+    {
+        AssertRelease(parModuleId < ModulePoolSize);
+        FKey &= ~(1 << parModuleId);
     }
 
     template<class Archive>

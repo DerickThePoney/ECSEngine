@@ -6,23 +6,18 @@
 
 namespace ECSEngine
 {
+
+EntityTemplate::~EntityTemplate()
+{
+}
+
 void EntityTemplate::Initialise()
 {
     for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
     {
         if (HasModule(i))
         {
-            auto itFind = FModuleTemplates.find(i);
-            if (itFind == FModuleTemplates.end())
-            {
-                auto& it = FModuleTemplates.emplace(i, EntityTemplateManagerMethods::CreateModuleTemplate(i));
-                AssertRelease(it.first->second != nullptr);
-                it.first->second->Init(this);
-            }
-            else
-            {
-                itFind->second->Init(this);
-            }
+            AddModule(i);
         }
     }
 
@@ -30,4 +25,46 @@ void EntityTemplate::Initialise()
     FHasBeenInit = true;
 #endif
 }
+
+void EntityTemplate::AddModule(const u32 parId)
+{
+    auto itFind = FModuleTemplates.find(parId);
+    if (itFind == FModuleTemplates.end())
+    {
+        auto& it = FModuleTemplates.emplace(parId, EntityTemplateManagerMethods::CreateModuleTemplate(parId));
+        AssertRelease(it.first->second != nullptr);
+        it.first->second->Init(this);
+    }
+    else
+    {
+        itFind->second->Init(this);
+    }
+}
+
+void EntityTemplate::DrawEditor()
+{
+    ImGui::TextColored(glm::vec4(0.8f, 0.8f, 0.8f, 1.0f), "Entity template name:");
+    ImGui::SameLine(0.0f, 5.0f);
+
+    char text[256];
+    sprintf(text, "%s", FName.c_str());
+    ImGui::InputText("", text, 256);
+    FName = std::string(text);
+
+    std::vector<u32> modulesToRemove;
+    foreachitem(itModulesTemplates, FModuleTemplates)
+    {
+        if (itModulesTemplates.second->DrawEditor())
+        {
+            modulesToRemove.push_back(itModulesTemplates.first);
+        }
+    }
+
+    foreachitemconst(id, modulesToRemove)
+    {
+        FModuleTemplates.erase(id);
+        RemoveModule(id);
+    }
+}
+
 } // namespace ECSEngine

@@ -12,7 +12,7 @@ class ParameterContainer;
 
 namespace ECSEngine
 {
-class EntityTemplate;
+class ModuleTemplate;
 class Module
 {
 public:
@@ -21,7 +21,7 @@ protected:
     virtual ~Module() {}
 
 public:
-    void Init(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
+    void Init(const ModuleTemplate* parTemplate, const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
     void Deinit();
 
     virtual u32 GetModuleId() const
@@ -46,7 +46,7 @@ private:
     bool FVirtualDeinitCalled = false;
 #endif
 
-    const EntityTemplate* FDescriptor;
+    const ModuleTemplate* FTemplate;
 };
 
 #define DECLARE_MODULE(TYPE)                                                                                                                                                       \

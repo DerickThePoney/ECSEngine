@@ -16,7 +16,11 @@ IMPLEMENT_MODULE_TEMPLATE(OrientationModule, OrientationModuleTemplate);
 
 Module* OrientationModuleTemplate::CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const
 {
-    return NewModule<OrientationModule>(parUnitId, parParameters);
+    return NewModule<OrientationModule>(this, parUnitId, parParameters);
+}
+
+void OrientationModuleTemplate::VirtualDrawEditor()
+{
 }
 
 void OrientationModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)

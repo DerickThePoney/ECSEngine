@@ -8,6 +8,7 @@ namespace EntityTemplateManagerMethods
 {
 bool RegisterTemplateFactory(const u32 parId, ModuleTemplate* (*parFactory)());
 ModuleTemplate* CreateModuleTemplate(const u32 parId);
+const std::map<u32, std::string>& GetModuleList();
 } // namespace EntityTemplateManagerMethods
 
 class EntityTemplateManager final : public Singleton<EntityTemplateManager>
@@ -21,7 +22,8 @@ public:
     ~EntityTemplateManager();
 
     EntityTemplate* CreateNewEntityTemplate();
-    const EntityTemplate* GetEntityTemplate(u32 parIndex);
+    const EntityTemplate* GetEntityTemplate(u32 parIndex) const;
+    EntityTemplate* GetEntityTemplateForWriting(u32 parIndex);
 
     const u32 GetEntityTemplatesNumber() { return (u32)FEntityTemplates.size(); }
 

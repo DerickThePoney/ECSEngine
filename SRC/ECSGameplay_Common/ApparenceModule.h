@@ -11,7 +11,7 @@ class MeshHandle;
 }
 class ApparenceModuleTemplate : public ModuleTemplate
 {
-    DECLARE_MODULE_TEMPLATE(PositionModule);
+    DECLARE_MODULE_TEMPLATE(ApparenceModule);
 
 public:
     ApparenceModuleTemplate()
@@ -22,6 +22,20 @@ public:
     virtual ~ApparenceModuleTemplate() {}
 
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
+
+    const std::string& GetMeshFileName() const { return FMeshFileName; }
+
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(PROPERTY(MeshFileName));
+    }
+
+protected:
+    virtual void VirtualDrawEditor() override;
+
+private:
+    std::string FMeshFileName;
 };
 
 class ApparenceModule final : public Module
