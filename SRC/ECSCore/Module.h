@@ -12,6 +12,7 @@ class ParameterContainer;
 
 namespace ECSEngine
 {
+class EntityTemplate;
 class Module
 {
 public:
@@ -44,6 +45,8 @@ private:
     bool FVirtualInitCalled = false;
     bool FVirtualDeinitCalled = false;
 #endif
+
+    const EntityTemplate* FDescriptor;
 };
 
 #define DECLARE_MODULE(TYPE)                                                                                                                                                       \

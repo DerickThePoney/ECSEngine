@@ -18,6 +18,6 @@ project "ECSGameplay_Common"
 
    links { "ECSCore"}
 
-   includedirs { "../SRC"}
+   includedirs { "../SRC", "../External/imgui"}
 
    dofile("projectsconfigs.lua")

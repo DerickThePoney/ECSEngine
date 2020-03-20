@@ -17,6 +17,6 @@ project "ECSCore"
 
    links { "Application" }
 
-   includedirs { "../SRC"}
+   includedirs { "../SRC",  "../External/imgui"}
 
    dofile("projectsconfigs.lua")
