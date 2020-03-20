@@ -9,11 +9,13 @@ Module::Module()
 {
 }
 
-void Module::Init(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
+void Module::Init(const ModuleTemplate* parTemplate, const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualInitCalled = false;
 #endif
+
+    FTemplate = parTemplate;
 
     VirtualInit(parUnitId, parParameters);
 

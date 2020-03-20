@@ -9,14 +9,14 @@
 namespace ECSEngine
 {
 template<typename T>
-Module* NewModule(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
+Module* NewModule(const ModuleTemplate* parTemplate, const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
     EntityWorld& world = WorldManager::Instance().GetWorld(parUnitId.GetWorld());
     IModuleController* controller = world.GetControllerIFP<T>();
     AssertRelease(controller != nullptr);
     controller->AllocateForEntity(parUnitId);
     Module* mod = controller->GetModulePtrForEntity(parUnitId);
-    mod->Init(parUnitId, parParameters);
+    mod->Init(parTemplate, parUnitId, parParameters);
     return mod;
 }
 } // namespace ECSEngine

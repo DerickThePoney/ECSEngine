@@ -16,7 +16,11 @@ IMPLEMENT_MODULE_TEMPLATE(PositionModule, PositionModuleTemplate);
 
 Module* PositionModuleTemplate::CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const
 {
-    return NewModule<PositionModule>(parUnitId, parParameters);
+    return NewModule<PositionModule>(this, parUnitId, parParameters);
+}
+
+void PositionModuleTemplate::VirtualDrawEditor()
+{
 }
 
 void PositionModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)

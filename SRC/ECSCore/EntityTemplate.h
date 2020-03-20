@@ -19,7 +19,7 @@ public:
 
     EntityTemplate(const EntityTemplate& other) = delete;
     EntityTemplate& operator=(const EntityTemplate& other) = delete;
-    ~EntityTemplate() {}
+    ~EntityTemplate();
 
     template<typename T>
     const bool HasModule() const
@@ -33,11 +33,18 @@ public:
     void SetHasModule()
     {
         FKey.SetHasModule<T>();
+        AddModule(ModuleTraits<T>::GetModuleId());
     }
 
-    const void SetHasModule(const u32 parModuleId) { return FKey.SetHasModule(parModuleId); }
+    const void SetHasModule(const u32 parModuleId)
+    {
+        FKey.SetHasModule(parModuleId);
+        AddModule(parModuleId);
+    }
 
     void Initialise();
+
+    void AddModule(const u32 parId);
 
     const Worlds::Type& GetWorldId() const { return FWorld; }
 
@@ -60,6 +67,17 @@ public:
     {
         ar(PROPERTY(Name), PROPERTY(World), PROPERTY(Key), NAMEDPROPERTY("ModuleTemplatesList", FModuleTemplates));
     }
+
+    void DrawEditor();
+
+private:
+    template<typename T>
+    void RemoveModule()
+    {
+        FKey.RemoveModule<T>();
+    }
+
+    const void RemoveModule(const u32 parModuleId) { return FKey.RemoveModule(parModuleId); }
 
 private:
     Worlds::Type FWorld;

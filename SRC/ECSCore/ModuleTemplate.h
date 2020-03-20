@@ -23,6 +23,8 @@ public:
 
     virtual ~ModuleTemplate();
 
+    virtual const std::string GetName() const = 0;
+
     void Init(const EntityTemplate* parTemplate);
 
     const EntityTemplate* GetTemplate() const
@@ -41,7 +43,11 @@ public:
     {
     }
 
+    bool DrawEditor();
+
 protected:
+    virtual void VirtualDrawEditor() = 0;
+
 #ifdef PERFORM_SECURITY_CHECKS
     bool IsInitialised() const { return FHasBeenInit; }
 #endif
@@ -56,7 +62,9 @@ private:
 
 #define DECLARE_MODULE_TEMPLATE(TYPE)                                                                                                                                              \
 public:                                                                                                                                                                            \
-    using parent_type = ModuleTemplate;
+    using parent_type = ModuleTemplate;                                                                                                                                            \
+    const std::string GetName() const override { return #TYPE; }                                                                                                                   \
+    static const std::string StaticGetName() { return #TYPE; }
 
 #define IMPLEMENT_MODULE_TEMPLATE(TYPE, TEMPLATE)                                                                                                                                  \
     ModuleTemplate* CreateTemplate##TEMPLATE() { return new TEMPLATE; }                                                                                                            \

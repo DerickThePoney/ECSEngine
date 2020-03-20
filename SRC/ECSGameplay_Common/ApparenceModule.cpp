@@ -5,6 +5,7 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
+#include "ECSCore/PropertyDrawer.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::ApparenceModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::ApparenceModuleTemplate)
@@ -14,7 +15,12 @@ IMPLEMENT_MODULE_TEMPLATE(ApparenceModule, ApparenceModuleTemplate);
 
 Module* ApparenceModuleTemplate::CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const
 {
-    return NewModule<ApparenceModule>(parUnitId, parParameters);
+    return NewModule<ApparenceModule>(this, parUnitId, parParameters);
+}
+
+void ApparenceModuleTemplate::VirtualDrawEditor()
+{
+    PROPERTY_STRING("MeshFile", FMeshFileName, true, "*.fbx");
 }
 
 ApparenceModule::ApparenceModule()

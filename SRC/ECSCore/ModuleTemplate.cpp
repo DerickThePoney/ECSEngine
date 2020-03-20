@@ -23,4 +23,20 @@ void ModuleTemplate::Init(const EntityTemplate* parTemplate)
     FHasBeenInit = true;
 #endif
 }
+
+bool ModuleTemplate::DrawEditor()
+{
+    static bool open = false;
+    if (ImGui::CollapsingHeader(GetName().c_str(), ImGuiTreeNodeFlags_CollapsingHeader))
+    {
+        if (ImGui::Button("Delete module"))
+        {
+            return true;
+        }
+        VirtualDrawEditor();
+    }
+
+    return false;
+}
+
 } // namespace ECSEngine
