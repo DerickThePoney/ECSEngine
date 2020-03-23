@@ -17,7 +17,13 @@ void DrawEditorMenu()
 
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("Save", "CTRL+S"))
+            if (ImGui::MenuItem("Add template", "Ctrl+N"))
+            {
+                EntityTemplateManager::Instance().CreateNewEntityTemplate();
+            }
+
+            ImGui::Separator();
+            if (ImGui::MenuItem("Save", "Ctrl+S"))
             {
                 std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\Configuration\\EntityTemplates.json");
 
