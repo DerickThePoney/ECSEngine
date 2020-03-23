@@ -2,6 +2,7 @@
 
 namespace ECSEngine
 {
+class Resource;
 namespace Rendering
 {
 
@@ -10,13 +11,11 @@ class IMesh;
 class MeshFileReader
 {
 public:
-    MeshFileReader(const std::string& parFilename);
+    MeshFileReader();
     ~MeshFileReader();
 
-    void operator>>(IMesh*& parMesh);
-
-private:
-    std::ifstream FInputFile;
+    void ReadMesh(IMesh*& parMesh, const std::string& parFilename);
+    void ReadMesh(IMesh*& parMesh, Resource& parResource);
 };
 
 } // namespace Rendering

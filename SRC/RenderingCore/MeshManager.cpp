@@ -2,6 +2,7 @@
 
 #include "MeshManager.h"
 
+#include "Common/Resource.h"
 #include "Mesh.h"
 #include "MeshFileReader.h"
 #include "MeshUtils.h"
@@ -43,15 +44,48 @@ const MeshHandle MeshManager::CreateMesh(const void* parVertexData, const u32 pa
 
 const MeshHandle MeshManager::CreateMesh(const std::string& parFilename)
 {
-    MeshFileReader reader(parFilename);
-    IMesh* mesh = nullptr;
+    auto itFind = FFileToMesh.find(parFilename);
 
-    reader >> mesh;
+    if (itFind != FFileToMesh.end())
+    {
+        return MeshHandle(itFind->second);
+    }
+    else
+    {
+        MeshFileReader reader;
+        IMesh* mesh = nullptr;
 
-    AssertRelease(mesh != nullptr);
-    MeshHandle handle((u32)FMeshes.size());
-    FMeshes.push_back(mesh);
-    return handle;
+        reader.ReadMesh(mesh, parFilename);
+
+        AssertRelease(mesh != nullptr);
+        MeshHandle handle((u32)FMeshes.size());
+        FMeshes.push_back(mesh);
+        FFileToMesh[parFilename] = handle.GetMeshId();
+        return handle;
+    }
+}
+
+const MeshHandle MeshManager::CreateMesh(Resource& parResource)
+{
+    auto itFind = FFileToMesh.find(parResource.FName);
+
+    if (itFind != FFileToMesh.end())
+    {
+        return MeshHandle(itFind->second);
+    }
+    else
+    {
+        MeshFileReader reader;
+        IMesh* mesh = nullptr;
+
+        reader.ReadMesh(mesh, parResource);
+
+        AssertRelease(mesh != nullptr);
+        MeshHandle handle((u32)FMeshes.size());
+        FMeshes.push_back(mesh);
+        FFileToMesh[parResource.FName] = handle.GetMeshId();
+        return handle;
+    }
 }
 
 IMesh* MeshManager::GetMesh(const MeshHandle& meshHandle) const

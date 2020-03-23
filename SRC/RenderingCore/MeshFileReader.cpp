@@ -3,6 +3,9 @@
 #include "MeshFileReader.h"
 
 #include "Common/MeshStreamingData.h"
+#include "Common/Resource.h"
+#include "Common/ResourceCache.h"
+#include "Common/ResourceHandle.h"
 #include "Mesh.h"
 #include "MeshUtils.h"
 #include "VertexLayout.h"
@@ -11,21 +14,12 @@ namespace ECSEngine
 namespace Rendering
 {
 
-MeshFileReader::MeshFileReader(const std::string& parFilename)
+namespace
 {
-    FInputFile.open(parFilename.c_str(), std::ifstream::binary);
-    AssertRelease(FInputFile.good());
-}
-
-MeshFileReader::~MeshFileReader()
-{
-    FInputFile.close();
-}
-
-void MeshFileReader::operator>>(IMesh*& parMesh)
+void ReadMeshImplementation(IMesh*& parMesh, std::istream& parStream)
 {
     MeshFileHeader fileHeader;
-    FInputFile.read((c8*)&fileHeader, sizeof(MeshFileHeader));
+    parStream.read((c8*)&fileHeader, sizeof(MeshFileHeader));
 
     using VertexLayout = VertexPositionColorN<1>;
 
@@ -36,13 +30,13 @@ void MeshFileReader::operator>>(IMesh*& parMesh)
     indices.resize(fileHeader.NbIndices);
     forrange(i, 0, fileHeader.NbVertices)
     {
-        FInputFile.read((c8*)&vertices[i].FPosition.x, 4);
-        FInputFile.read((c8*)&vertices[i].FPosition.y, 4);
-        FInputFile.read((c8*)&vertices[i].FPosition.z, 4);
-        forrange(j, 0, fileHeader.NbColorChannels) { FInputFile.read((c8*)&vertices[i].FColor[j], 4); }
+        parStream.read((c8*)&vertices[i].FPosition.x, 4);
+        parStream.read((c8*)&vertices[i].FPosition.y, 4);
+        parStream.read((c8*)&vertices[i].FPosition.z, 4);
+        forrange(j, 0, fileHeader.NbColorChannels) { parStream.read((c8*)&vertices[i].FColor[j], 4); }
     }
 
-    FInputFile.read((c8*)indices.data(), 4u * fileHeader.NbIndices);
+    parStream.read((c8*)indices.data(), 4u * fileHeader.NbIndices);
 
     VertexLayoutHash hash(fileHeader);
     parMesh = MeshHelpers::CreateIMesh(hash);
@@ -51,6 +45,31 @@ void MeshFileReader::operator>>(IMesh*& parMesh)
 
     parMesh->SetRawVertexData(vertices.data(), fileHeader.NbVertices * fileHeader.VertexSizeInOctet);
     parMesh->SetRawIndexData(indices.data(), fileHeader.NbIndices * 4u);
+}
+} // namespace
+
+MeshFileReader::MeshFileReader()
+{
+}
+
+MeshFileReader::~MeshFileReader()
+{
+}
+
+void MeshFileReader::ReadMesh(IMesh*& parMesh, const std::string& parFilename)
+{
+    std::ifstream ifstr(parFilename.c_str(), std::ifstream::binary);
+    AssertRelease(ifstr.good());
+    ReadMeshImplementation(parMesh, ifstr);
+}
+
+void MeshFileReader::ReadMesh(IMesh*& parMesh, Resource& parResource)
+{
+    std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&parResource);
+
+    ResourceBuffer buff = handle->GetResourceBuffer();
+    std::istream sstr(&buff, std::istream::binary);
+    ReadMeshImplementation(parMesh, sstr);
 }
 
 } // namespace Rendering

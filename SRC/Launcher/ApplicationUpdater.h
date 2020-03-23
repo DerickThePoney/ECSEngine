@@ -37,7 +37,6 @@ private:
 
     // temp data
     const EntityTemplate* FTemplate;
-    Rendering::MeshHandle FMeshHandle;
     std::vector<ECSEngine::EntityId> FEntities;
     RingBuffer<float, 100> FFrameTimeBuffer;
 };

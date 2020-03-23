@@ -2,10 +2,12 @@
 
 #include "ApparenceModule.h"
 
+#include "Common/Resource.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
 #include "ECSCore/PropertyDrawer.h"
+#include "RenderingCore/MeshManager.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::ApparenceModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::ApparenceModuleTemplate)
@@ -20,7 +22,7 @@ Module* ApparenceModuleTemplate::CreateInstance(const EntityId& parUnitId, const
 
 void ApparenceModuleTemplate::VirtualDrawEditor()
 {
-    PROPERTY_STRING("MeshFile", FMeshFileName, true, "*.fbx");
+    PROPERTY_STRING("MeshFile", FMeshFileName, true, "*.fbx.gen");
 }
 
 ApparenceModule::ApparenceModule()
@@ -32,7 +34,7 @@ ApparenceModule::ApparenceModule()
 void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
     parent_type::VirtualInit(parUnitId, parParameters);
-    FMeshHandle = parParameters.Get<ModuleParameters::Mesh>();
+    FMeshHandle = Rendering::MeshManager::Instance().CreateMesh(Resource(Template<ApparenceModuleTemplate>()->GetMeshFileName()));
     // FProgram = parParameters.Get<ModuleParameters::Material>();
 
     const ApparenceModuleTemplate* temp = Template<ApparenceModuleTemplate>();

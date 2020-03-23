@@ -4,6 +4,12 @@
 namespace ECSEngine
 {
 class ResourceCache;
+
+struct ResourceBuffer : public std::streambuf
+{
+    ResourceBuffer(char* begin, u32 size) { this->setg(begin, begin, begin + size); }
+};
+
 class ResourceHandle
 {
 public:
@@ -13,6 +19,7 @@ public:
     const Resource& GetResource() const { return FResource; }
     const u32 Size() const { return FSize; }
     const c8* Buffer() const { return FBuffer; }
+    ResourceBuffer GetResourceBuffer() { return ResourceBuffer(FBuffer, FSize); }
 
     c8* WritableBuffer() { return FBuffer; }
 

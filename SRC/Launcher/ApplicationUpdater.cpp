@@ -81,7 +81,7 @@ static const u32 cubeTriList[] = {
 
 namespace
 {
-void AllocateUnits(const EntityTemplate* temp, EntityWorld& world, Rendering::MeshHandle& handle, std::vector<EntityId>& entities)
+void AllocateUnits(const EntityTemplate* temp, EntityWorld& world, std::vector<EntityId>& entities)
 {
     TScopedTimer st("Allocate 900 Units");
     entities.reserve(entities.size() + 900);
@@ -90,7 +90,6 @@ void AllocateUnits(const EntityTemplate* temp, EntityWorld& world, Rendering::Me
         for (int j = -4; j < 5; ++j)
         {
             ModuleParameters::ParameterContainer container;
-            container.Set<ModuleParameters::Mesh>(handle);
             container.Set<ModuleParameters::Position>(glm::vec3((float)i, (float)j, 0.f));
 
             EntityId unitId = world.CreateEntityFromTemplateReturnEntityId(temp, container);
@@ -100,7 +99,7 @@ void AllocateUnits(const EntityTemplate* temp, EntityWorld& world, Rendering::Me
     }
 }
 
-void StressTestDebug(const EntityTemplate* temp, RingBuffer<float, 100>& frameTimeBuffer, EntityWorld& world, Rendering::MeshHandle& handle, std::vector<EntityId>& entities)
+void StressTestDebug(const EntityTemplate* temp, RingBuffer<float, 100>& frameTimeBuffer, EntityWorld& world, std::vector<EntityId>& entities)
 {
     ImGui::Begin("Stress test");
     int realVal = (int)entities.size();
@@ -111,7 +110,7 @@ void StressTestDebug(const EntityTemplate* temp, RingBuffer<float, 100>& frameTi
     ImGui::PlotHistogram("FPS", frameTimeBuffer.data(), frameTimeBuffer.GetSize(), frameTimeBuffer.GetWriteHeadPosition(), "", 0.0f, 150.0f, ImVec2(0.0f, 45.0f));
     if (ImGui::Button("Add 900 units"))
     {
-        AllocateUnits(temp, world, handle, entities);
+        AllocateUnits(temp, world, entities);
     }
     ImGui::End();
 }
@@ -210,13 +209,9 @@ void ApplicationUpdater::Initialise()
     renderSystem.Init();
     orientationSystem.Init();
 
-    std::vector<std::string> meshFiles;
-    GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.fbx.gen", meshFiles);
-
-    FMeshHandle = Rendering::MeshManager::Instance().CreateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + meshFiles[1]);
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(0);
 
-    AllocateUnits(FTemplate, WorldManager::Instance().GetWorld(Worlds::STANDARD), FMeshHandle, FEntities);
+    AllocateUnits(FTemplate, WorldManager::Instance().GetWorld(Worlds::STANDARD), FEntities);
 }
 
 void ApplicationUpdater::Shutdown()
@@ -243,7 +238,7 @@ void ApplicationUpdater::Update()
 {
     // Updates
     ImGui::ShowDemoWindow();
-    StressTestDebug(FTemplate, FFrameTimeBuffer, WorldManager::Instance().GetWorld(Worlds::STANDARD), FMeshHandle, FEntities);
+    StressTestDebug(FTemplate, FFrameTimeBuffer, WorldManager::Instance().GetWorld(Worlds::STANDARD), FEntities);
     SaveAndReloadTest();
     InputDebug();
 
