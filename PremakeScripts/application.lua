@@ -17,6 +17,6 @@ project "Application"
 
    links { "Common" }
 
-   includedirs { "../SRC"}
+   includedirs { "../SRC", "../External/imgui"}
 
    dofile("projectsconfigs.lua")
