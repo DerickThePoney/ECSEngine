@@ -16,4 +16,6 @@ project "Common"
    pchheader "stdafx.h"
    pchsource(srcfiles.."stdafx.cpp")
 
+   includedirs { "../External/imgui" }
+
    dofile("projectsconfigs.lua")
