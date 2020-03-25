@@ -16,6 +16,18 @@ const EntityTemplate* EntityTemplateManager::GetEntityTemplate(u32 parIndex) con
     return FEntityTemplates[parIndex].get();
 }
 
+const ECSEngine::EntityTemplate* EntityTemplateManager::GetEntityTemplate(const std::string& parTemplateName) const
+{
+    foreachitemconst(entityTemplate, FEntityTemplates)
+    {
+        if (entityTemplate->GetName() == parTemplateName)
+        {
+            return entityTemplate.get();
+        }
+    }
+    return nullptr;
+}
+
 EntityTemplate* EntityTemplateManager::GetEntityTemplateForWriting(u32 parIndex)
 {
     AssertRelease(parIndex < FEntityTemplates.size());

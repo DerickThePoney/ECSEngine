@@ -33,6 +33,6 @@ public:
 private:
     std::string FName;
 
-    std::map<u32, std::vector<std::unique_ptr<BaseSceneItem>>> FSceneItems;
+    std::map<u32, std::vector<std::shared_ptr<BaseSceneItem>>> FSceneItems;
 };
 } // namespace ECSEngine

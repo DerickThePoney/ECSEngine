@@ -2,11 +2,11 @@
 
 #include "ApparenceModule.h"
 
+#include "Application/PropertyDrawer.h"
 #include "Common/Resource.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
-#include "ECSCore/PropertyDrawer.h"
 #include "RenderingCore/MeshManager.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::ApparenceModuleTemplate);
@@ -22,7 +22,7 @@ Module* ApparenceModuleTemplate::CreateInstance(const EntityId& parUnitId, const
 
 void ApparenceModuleTemplate::VirtualDrawEditor()
 {
-    PROPERTY_STRING("MeshFile", FMeshFileName, true, "*.fbx.gen");
+    EDITOR_PROPERTY_STRING("MeshFile", FMeshFileName, true, "*.fbx.gen");
 }
 
 ApparenceModule::ApparenceModule()

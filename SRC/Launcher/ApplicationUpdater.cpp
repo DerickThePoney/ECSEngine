@@ -10,6 +10,7 @@
 #include "Common/RingBuffer.h"
 #include "Common/TimeManager.h"
 #include "Common/Timer.h"
+#include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ImGuiTools/EntityTemplatesEditor.h"
@@ -92,8 +93,7 @@ void AllocateUnits(const EntityTemplate* temp, EntityWorld& world, std::vector<E
             ModuleParameters::ParameterContainer container;
             container.Set<ModuleParameters::Position>(glm::vec3((float)i, (float)j, 0.f));
 
-            EntityId unitId = world.CreateEntityFromTemplateReturnEntityId(temp, container);
-            AssertRelease(unitId.Valid());
+            EntityId unitId = EntityFactory::CreateEntity(temp, container);
             entities.push_back(unitId);
         }
     }
