@@ -30,6 +30,9 @@ public:
     bool IsStarted() const;
     bool IsFinished() const;
 
+    void DrawEditor();
+    bool ShouldShowEditor() const { return FShowEditor; }
+
     template<class Archive>
     void serialize(Archive& ar)
     {
@@ -44,11 +47,15 @@ protected:
     virtual void VirtualUpdate();
     virtual void VirtualFinish();
 
+    virtual void VirtualDrawEditor();
+
 private:
     std::string FName;
 
     bool FStarted;
     bool FFinished;
+
+    bool FShowEditor;
 
 #ifdef PERFORM_SECURITY_CHECKS
     bool FVirtualInitialiseCalled;
@@ -57,6 +64,8 @@ private:
     bool FVirtualStartCalled;
     bool FVirtualUpdateCalled;
     bool FVirtualFinishCalled;
+
+    bool FVirtualDrawEditorCalled;
 #endif
 };
 

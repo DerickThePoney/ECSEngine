@@ -27,8 +27,15 @@ void OrientationModule::VirtualInit(const EntityId& parUnitId, const ModuleParam
 {
     parent_type::VirtualInit(parUnitId, parParameters);
 
-    const glm::vec3 yawPitchRoll = parParameters.Get_IFP<ModuleParameters::Orientation>(glm::vec3(0.0f));
-    FOrientation = glm::quat(yawPitchRoll);
+    if (parParameters.HasParameter<ModuleParameters::YawPitchRoll>())
+    {
+        const glm::vec3 yawPitchRoll = parParameters.Get_IFP<ModuleParameters::YawPitchRoll>(glm::vec3(0.0f));
+        FOrientation = glm::quat(yawPitchRoll);
+    }
+    else if (parParameters.HasParameter<ModuleParameters::Orientation>())
+    {
+        FOrientation = parParameters.Get_IFP<ModuleParameters::Orientation>(glm::quat());
+    }
 }
 
 const glm::vec3 OrientationModule::GetOrientationAsYawPitchRoll() const

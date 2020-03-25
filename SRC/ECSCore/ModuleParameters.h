@@ -186,6 +186,22 @@ public:
             return parDefault;
     }
 
+    template<int ID>
+    bool HasParameter() const
+    {
+        static_assert(ID != 0, "ParameterContainer::Set : Id ne doit pas être 0, c'est dummy !");
+        std::vector<ModuleParameter>::const_iterator it;
+        for (it = FDataList.begin(); it != FDataList.end(); ++it)
+        {
+            if (it->GetId() == ID)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 private:
     std::vector<ModuleParameter> FDataList;
 };

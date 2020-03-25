@@ -2,6 +2,8 @@
 
 #include "SceneActions.h"
 
+#include "PropertyDrawer.h"
+
 namespace ECSEngine
 {
 
@@ -9,12 +11,14 @@ ISceneAction::ISceneAction(const std::string& parFName /*= "Dummy"*/)
     : FName(parFName)
     , FStarted(false)
     , FFinished(false)
+    , FShowEditor(false)
 #ifdef PERFORM_SECURITY_CHECKS
     , FVirtualInitialiseCalled(false)
     , FVirtualShutdownCalled(false)
     , FVirtualStartCalled(false)
     , FVirtualUpdateCalled(false)
     , FVirtualFinishCalled(false)
+    , FVirtualDrawEditorCalled(false)
 #endif
 {
 }
@@ -83,6 +87,17 @@ bool ISceneAction::IsFinished() const
     return FFinished;
 }
 
+void ISceneAction::DrawEditor()
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    FVirtualDrawEditorCalled = false;
+#endif
+
+    VirtualDrawEditor();
+
+    AlwaysCheckedAssertMsg(FVirtualDrawEditorCalled, "Un appel à VirtualDrawEditor du parent à été oublié");
+}
+
 void ISceneAction::VirtualInitialise()
 {
 #ifdef PERFORM_SECURITY_CHECKS
@@ -122,6 +137,20 @@ void ISceneAction::VirtualFinish()
     FFinished = true;
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualFinishCalled = true;
+#endif
+}
+
+void ISceneAction::VirtualDrawEditor()
+{
+    ImGui::CollapsingHeader(FName.c_str(), &FShowEditor);
+
+    if (FShowEditor)
+    {
+        EDITOR_PROPERTY_STRING("Scene action name", FName, false, "");
+    }
+
+#ifdef PERFORM_SECURITY_CHECKS
+    FVirtualDrawEditorCalled = true;
 #endif
 }
 

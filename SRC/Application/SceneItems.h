@@ -22,6 +22,8 @@ public:
 
     void DrawEditor();
 
+    bool ShouldShowItem() const { return FShowItem; }
+
     const std::string& GetName() const { return FName; }
     const glm::vec3& GetPosition() const { return FPosition; }
     const glm::quat& GetOrientation() const { return FOrientation; }

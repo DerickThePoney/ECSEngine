@@ -2,6 +2,8 @@
 
 #include "SceneItems.h"
 
+#include "PropertyDrawer.h"
+
 namespace ECSEngine
 {
 
@@ -47,8 +49,10 @@ bool BaseSceneItem::VirtualDrawEditor()
 
     if (FShowItem)
     {
-        ImGui::InputFloat3("Position", (float*)&FPosition);
-        ImGui::InputFloat4("Orientation", (float*)&FOrientation);
+        EDITOR_PROPERTY_STRING("Scene item name", FName, false, "");
+
+        EDITOR_PROPERTY_SIMPLE("Position", FPosition);
+        EDITOR_PROPERTY_SIMPLE("Orientation", FOrientation);
         ImGui::Separator();
     }
 
