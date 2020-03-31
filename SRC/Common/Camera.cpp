@@ -39,7 +39,7 @@ glm::mat4 Camera::GetProjectionMatrix(const float parAspectRatio)
 
 glm::mat4 Camera::GetWorldViewMatrix()
 {
-    return glm::translate(FPosition) * glm::mat4(FOrientation);
+    return glm::mat4(FOrientation) * glm::inverse(glm::translate(FPosition));
 }
 
 } // namespace ECSEngine
