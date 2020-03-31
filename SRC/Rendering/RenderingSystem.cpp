@@ -39,16 +39,17 @@ void RenderingSystem::VirtualInit()
     kProgramInstancing = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColorInstancing");
 
     kUniform = bgfx::createUniform("u_color", bgfx::UniformType::Vec4);
-    const glm::vec3 at = { 0.0f, 0.0f, 0.0f };
-    const glm::vec3 eye = { 0.0f, 0.0f, -5.0f };
+    const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
+    const glm::vec3 eye = { 0.0f, 5.0f, 0.0f };
 
-    glm::quat orientation = glm::quatLookAt(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f));
+    glm::quat orientation = glm::quat_cast(glm::lookAt(eye, at, glm::vec3(0.f, 1.f, 0.f)));
+    // orientation = orientation * glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
     u32 CamId = CameraManager::Instance().CreateCamera();
     c = CameraManager::Instance().GetCamera(CamId);
     AlwaysCheckedAssert(!c.expired());
     std::shared_ptr<Camera> cshared = c.lock();
-    cshared->Init(eye, orientation, glm::radians(60.0f), 0.1f, 100.0f);
+    cshared->Init(eye, orientation, glm::radians(60.0f), 0.1f, 50.0f);
 }
 
 void RenderingSystem::VirtualUpdate()
@@ -62,11 +63,12 @@ void RenderingSystem::VirtualUpdate()
     const float timepoint = TimeManager::DurationSinceStartRealTime();
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
-    const glm::vec3 at = { 0.0f, 0.0f, 0.0f };
-    const glm::vec3 eye = { 0.0f, 0.0f, -5.0f };
     AlwaysCheckedAssert(!c.expired());
     std::shared_ptr<Camera> cshared = c.lock();
-    cshared->SetPosition(glm::vec3(glm::cos(timepoint / 10.f), glm::sin(timepoint / 10.f), -5.0f));
+    //    cshared->SetPosition(glm::vec3(glm::cos(timepoint / 10.f), glm::sin(timepoint / 10.f), -5.0f));
+
+    const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
+    const glm::vec3 eye = { 0.0f, 5.0f, 0.0f };
 
     glm::mat4 view = cshared->GetWorldViewMatrix();
     glm::mat4 proj = cshared->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
@@ -76,7 +78,7 @@ void RenderingSystem::VirtualUpdate()
     float uniformVal[4] = { sinTime, sinTime, sinTime, sinTime };
     bgfx::setUniform(kUniform, &uniformVal);
 
-    if (!Rendering::BGFXRenderer::Instance().IsInstancingEnabled())
+    if (1) //! Rendering::BGFXRenderer::Instance().IsInstancingEnabled())
     {
         foreachitem(apparenceModule, apparenceController)
         {
@@ -94,7 +96,7 @@ void RenderingSystem::VirtualUpdate()
             const OrientationModule* orientationModule = orientationController[unitId];
             AssertRelease(orientationModule != nullptr);
             glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
-            mtx = mtx * glm::scale(glm::vec3(0.1f, 0.1f, 0.1f)) * (glm::mat4)orientationModule->GetOrientation();
+            mtx = mtx * glm::scale(glm::vec3(0.5f)) * (glm::mat4)orientationModule->GetOrientation();
 
             bgfx::setTransform(&mtx[0][0]);
             bgfx::submit(0, kProgram);

@@ -127,7 +127,7 @@ void ISceneAction::VirtualUpdate()
     AlwaysCheckedAssert(FStarted && !FFinished);
 
 #ifdef PERFORM_SECURITY_CHECKS
-    FVirtualFinishCalled = true;
+    FVirtualUpdateCalled = true;
 #endif
 }
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "SceneActions.h"
 #include "SceneItems.h"
 
 namespace ECSEngine
@@ -34,5 +35,8 @@ private:
     std::string FName;
 
     std::map<u32, std::vector<std::shared_ptr<BaseSceneItem>>> FSceneItems;
+
+    std::vector<ISceneAction*> FActions;
+    u32 FCurrentAction = 0;
 };
 } // namespace ECSEngine

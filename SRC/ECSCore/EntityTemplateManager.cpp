@@ -18,9 +18,14 @@ const EntityTemplate* EntityTemplateManager::GetEntityTemplate(u32 parIndex) con
 
 const ECSEngine::EntityTemplate* EntityTemplateManager::GetEntityTemplate(const std::string& parTemplateName) const
 {
+    std::string lowered(parTemplateName.size(), ' ');
+    std::transform(parTemplateName.begin(), parTemplateName.end(), lowered.begin(), [](uc8 c) { return std::tolower(c); });
     foreachitemconst(entityTemplate, FEntityTemplates)
     {
-        if (entityTemplate->GetName() == parTemplateName)
+        const std::string& templateName = entityTemplate->GetName();
+        std::string loweredTemplate(templateName.size(), ' ');
+        std::transform(templateName.begin(), templateName.end(), loweredTemplate.begin(), [](uc8 c) { return std::tolower(c); });
+        if (loweredTemplate == lowered)
         {
             return entityTemplate.get();
         }

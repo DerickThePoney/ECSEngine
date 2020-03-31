@@ -16,7 +16,7 @@ class BaseSceneItem;
 class SpawnEntitySceneAction : public ISceneAction
 {
 public:
-    SpawnEntitySceneAction();
+    SpawnEntitySceneAction(const std::string& parFName = "Dummy");
     virtual ~SpawnEntitySceneAction();
 
 protected:
@@ -27,8 +27,11 @@ protected:
     virtual void VirtualDrawEditor() override;
 
 public:
-    const BaseSceneItem* GetSceneItem() const { return FSceneItem.get(); }
-    void SetSceneItem(const BaseSceneItem* parSceneItem) { FSceneItem.reset(parSceneItem); }
+    const BaseSceneItem* GetSceneItem() const { return FSceneItem; }
+    const std::string& GetEntityTemplateName() const { return FEntityTemplateName; }
+
+    void SetEntityTemplateName(const std::string& parName) { FEntityTemplateName = parName; }
+    void SetSceneItem(const BaseSceneItem* parSceneItem) { FSceneItem = parSceneItem; }
 
     template<class Archive>
     void serialize(Archive& ar)
@@ -39,6 +42,6 @@ public:
 private:
     std::string FEntityTemplateName = "Entity template name";
     const EntityTemplate* FTemplate = nullptr;
-    std::shared_ptr<const BaseSceneItem> FSceneItem = nullptr;
+    const BaseSceneItem* FSceneItem = nullptr;
 };
 } // namespace ECSEngine
