@@ -1,5 +1,6 @@
 #pragma once
 #include "Application/IGameplayUpdater.h"
+#include "Application/Scene.h"
 #include "Common/MeshHandle.h"
 #include "Common/RingBuffer.h"
 #include "ECSCore/EntityId.h"
@@ -39,6 +40,8 @@ private:
     const EntityTemplate* FTemplate;
     std::vector<ECSEngine::EntityId> FEntities;
     RingBuffer<float, 100> FFrameTimeBuffer;
+
+    Scene scene;
 };
 
 class ApplicationUpdaterWrapper final : public IGameplayUpdater

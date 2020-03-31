@@ -14,7 +14,7 @@ void GenerateMesh(const std::string& parFileName, const char* parMeshFileBuffer,
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFileFromMemory(
-          parMeshFileBuffer, parSize, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes | aiProcess_FindDegenerates);
+          parMeshFileBuffer, parSize, aiProcess_MakeLeftHanded | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes | aiProcess_FindDegenerates);
     AssertRelease(scene != nullptr);
 
     ECSEngine::Rendering::MeshFileWriter writer(parFileName + ".gen");

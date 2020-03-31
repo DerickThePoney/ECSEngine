@@ -12,6 +12,8 @@ namespace ECSEngine
 /*************************************************************/
 class ISceneAction
 {
+    friend class Scene;
+
 protected:
     ISceneAction(const std::string& parFName = "Dummy");
     virtual ~ISceneAction();

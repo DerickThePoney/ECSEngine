@@ -108,10 +108,10 @@ void StressTestDebug(const EntityTemplate* temp, RingBuffer<float, 100>& frameTi
     frameTimeBuffer.Push((frameTime == 0.0f) ? frameTime : 1.f / frameTime);
     ImGui::InputFloat("Frame Time", &frameTime, 1, 100, "%.5f", ImGuiInputTextFlags_ReadOnly);
     ImGui::PlotHistogram("FPS", frameTimeBuffer.data(), frameTimeBuffer.GetSize(), frameTimeBuffer.GetWriteHeadPosition(), "", 0.0f, 150.0f, ImVec2(0.0f, 45.0f));
-    if (ImGui::Button("Add 900 units"))
+    /*if (ImGui::Button("Add 900 units"))
     {
         AllocateUnits(temp, world, entities);
-    }
+    }*/
     ImGui::End();
 }
 
@@ -211,11 +211,15 @@ void ApplicationUpdater::Initialise()
 
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(0);
 
-    AllocateUnits(FTemplate, WorldManager::Instance().GetWorld(Worlds::STANDARD), FEntities);
+    scene.Initialise();
+
+    // AllocateUnits(FTemplate, WorldManager::Instance().GetWorld(Worlds::STANDARD), FEntities);
 }
 
 void ApplicationUpdater::Shutdown()
 {
+    scene.Destroy();
+
     foreachitem(id, FEntities) { WorldManager::Instance().GetWorld(Worlds::STANDARD).DestroyEntity(id); }
 
     orientationSystem.Destroy();
@@ -242,9 +246,11 @@ void ApplicationUpdater::Update()
     SaveAndReloadTest();
     InputDebug();
 
-    ImGUITools::DrawEntityTemplatesEditor();
+    scene.Update();
 
-    orientationSystem.Update();
+    // ImGUITools::DrawEntityTemplatesEditor();
+
+    // orientationSystem.Update();
 }
 
 void ApplicationUpdater::Render()

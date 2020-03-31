@@ -11,7 +11,8 @@
 namespace ECSEngine
 {
 
-SpawnEntitySceneAction::SpawnEntitySceneAction()
+SpawnEntitySceneAction::SpawnEntitySceneAction(const std::string& parFName)
+    : ISceneAction(parFName)
 {
 }
 
@@ -24,11 +25,14 @@ void SpawnEntitySceneAction::VirtualInitialise()
     ISceneAction::VirtualInitialise();
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateName);
     AssertRelease(FTemplate != nullptr);
+    AssertRelease(FSceneItem != nullptr);
 }
 
 void SpawnEntitySceneAction::VirtualStart()
 {
     ISceneAction::VirtualStart();
+
+    AssertRelease(FSceneItem != nullptr);
 
     ModuleParameters::ParameterContainer container;
     container.Set<ModuleParameters::Position>(FSceneItem->GetPosition());
