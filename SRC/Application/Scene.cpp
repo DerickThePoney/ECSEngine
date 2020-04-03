@@ -3,6 +3,7 @@
 #include "Scene.h"
 
 #include "ECSCore/ECSCoreSceneActions.h"
+#include "ImGuiTools/SceneEditor.h" // TOREMOVE
 #include "SceneItems.h"
 
 namespace ECSEngine
@@ -51,6 +52,7 @@ void Scene::Destroy()
 
 void Scene::OnDrawEditor()
 {
+    ImGUITools::DrawSceneEditor();
 }
 
 void Scene::Update()
