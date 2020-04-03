@@ -31,13 +31,13 @@ private:
 };
 
 template<class T, int ChunkSize, bool IsFixed>
-class ObjectPoolAllocator
+class ModulePoolAllocator
 {
     using pointer_type = T*;
 
 public:
-    ObjectPoolAllocator();
-    ~ObjectPoolAllocator();
+    ModulePoolAllocator();
+    ~ModulePoolAllocator();
     void AllocateAtIndex(u32 parIndex);
     void DeallocateAtIndex(u32 parIndex);
 
@@ -53,7 +53,7 @@ private:
 };
 
 template<class T, int ChunkSize, bool IsFixed>
-void ECSEngine::ObjectPoolAllocator<T, ChunkSize, IsFixed>::AllocateNewChunk()
+void ECSEngine::ModulePoolAllocator<T, ChunkSize, IsFixed>::AllocateNewChunk()
 {
     AssertRelease(!IsFixed || FSize == 0);
     FChunks.push_back(ModuleDataChunk<T, ChunkSize>());
@@ -61,7 +61,7 @@ void ECSEngine::ObjectPoolAllocator<T, ChunkSize, IsFixed>::AllocateNewChunk()
 }
 
 template<class T, int ChunkSize, bool IsFixed>
-T* ObjectPoolAllocator<T, ChunkSize, IsFixed>::GetAtIndex(u32 parIndex)
+T* ModulePoolAllocator<T, ChunkSize, IsFixed>::GetAtIndex(u32 parIndex)
 {
     AssertRelease(parIndex < FSize);
     const u32 chunkIndex = parIndex / ChunkSize;
@@ -70,7 +70,7 @@ T* ObjectPoolAllocator<T, ChunkSize, IsFixed>::GetAtIndex(u32 parIndex)
 }
 
 template<class T, int ChunkSize, bool IsFixed>
-ObjectPoolAllocator<T, ChunkSize, IsFixed>::~ObjectPoolAllocator()
+ModulePoolAllocator<T, ChunkSize, IsFixed>::~ModulePoolAllocator()
 {
     AlwaysCheckedAssert(FAllocatedIndexes.empty());
     for (auto it = FAllocatedIndexes.begin(); it != FAllocatedIndexes.end(); ++it)
@@ -82,7 +82,7 @@ ObjectPoolAllocator<T, ChunkSize, IsFixed>::~ObjectPoolAllocator()
 }
 
 template<class T, int ChunkSize, bool IsFixed>
-void ObjectPoolAllocator<T, ChunkSize, IsFixed>::DeallocateAtIndex(u32 parIndex)
+void ModulePoolAllocator<T, ChunkSize, IsFixed>::DeallocateAtIndex(u32 parIndex)
 {
     AssertRelease(parIndex < FSize);
     AssertRelease(FAllocatedIndexes.find(parIndex) != FAllocatedIndexes.end());
@@ -97,7 +97,7 @@ void ObjectPoolAllocator<T, ChunkSize, IsFixed>::DeallocateAtIndex(u32 parIndex)
 }
 
 template<class T, int ChunkSize, bool IsFixed>
-void ObjectPoolAllocator<T, ChunkSize, IsFixed>::AllocateAtIndex(u32 parIndex)
+void ModulePoolAllocator<T, ChunkSize, IsFixed>::AllocateAtIndex(u32 parIndex)
 {
     if (!IsFixed && parIndex >= FSize)
         AllocateNewChunk();
@@ -114,7 +114,7 @@ void ObjectPoolAllocator<T, ChunkSize, IsFixed>::AllocateAtIndex(u32 parIndex)
 }
 
 template<class T, int ChunkSize, bool IsFixed>
-ObjectPoolAllocator<T, ChunkSize, IsFixed>::ObjectPoolAllocator()
+ModulePoolAllocator<T, ChunkSize, IsFixed>::ModulePoolAllocator()
     : FSize(0)
     , FAllocatedIndexes()
 {
@@ -123,26 +123,4 @@ ObjectPoolAllocator<T, ChunkSize, IsFixed>::ObjectPoolAllocator()
     // memset(FChunk, 0xCD, sizeof(ModuleData<T>) * ChunkSize);
 #endif // PERFORM_SECURITY_CHECKS
 }
-
-#define STATIC_POOL_DECLARE(TYPE, SIZE, ISFIXED) static ECSEngine::PoolAllocator<TYPE, SIZE, ISFIXED> FPool;
-
-#define POOL_NEW_DECLARE void* operator new(size_t size);
-#define POOL_DELETE_DECLARE void operator delete(void*);
-#define POOL_ARRAY_ALLOCATIONS_DELETE                                                                                                                                              \
-    void* operator new[](size_t size) = delete;                                                                                                                                    \
-    void operator delete[](void*);
-
-#define DECLARE_POOL_ALLOCATED(TYPE, SIZE)                                                                                                                                         \
-    STATIC_POOL_DECLARE(TYPE, SIZE, true);                                                                                                                                         \
-    POOL_NEW_DECLARE;                                                                                                                                                              \
-    POOL_DELETE_DECLARE;                                                                                                                                                           \
-    POOL_ARRAY_ALLOCATIONS_DELETE;
-
-#define STATIC_POOL_IMPLEMENT(TYPE, SIZE, ISFIXED) ECSEngine::PoolAllocator<TYPE, SIZE, ISFIXED> TYPE::FPool = ECSEngine::PoolAllocator<TYPE, SIZE, ISFIXED>();
-
-#define POOL_NEW_IMPLEMENT                                                                                                                                                         \
-    (TYPE) void* operator new(size_t size) {}
-#define POOL_DELETE_IMPLEMENT                                                                                                                                                      \
-    (TYPE) void operator delete(void*) {}
-
 } // namespace ECSEngine
