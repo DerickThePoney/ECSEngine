@@ -11,7 +11,7 @@ class MeshHandle;
 }
 class ApparenceModuleTemplate : public ModuleTemplate
 {
-    DECLARE_MODULE_TEMPLATE(ApparenceModule);
+    DECLARE_MODULE_TEMPLATE(ApparenceModule, ApparenceModuleTemplate);
 
 public:
     ApparenceModuleTemplate()

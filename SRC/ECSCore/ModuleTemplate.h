@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Common/PoolAllocator.h"
 namespace ECSEngine
 {
 namespace ModuleParameters
@@ -60,13 +60,16 @@ private:
 #endif
 };
 
-#define DECLARE_MODULE_TEMPLATE(TYPE)                                                                                                                                              \
+#define DECLARE_MODULE_TEMPLATE(TYPE, TEMPLATE)                                                                                                                                    \
+    DECLARE_POOL_ALLOCATED(TEMPLATE);                                                                                                                                              \
+                                                                                                                                                                                   \
 public:                                                                                                                                                                            \
     using parent_type = ModuleTemplate;                                                                                                                                            \
     const std::string GetName() const override { return #TYPE; }                                                                                                                   \
     static const std::string StaticGetName() { return #TYPE; }
 
 #define IMPLEMENT_MODULE_TEMPLATE(TYPE, TEMPLATE)                                                                                                                                  \
+    IMPLEMENT_POOL_ALLOCATED(TEMPLATE);                                                                                                                                            \
     ModuleTemplate* CreateTemplate##TEMPLATE() { return new TEMPLATE; }                                                                                                            \
     static bool registered##TEMPLATE = EntityTemplateManagerMethods::RegisterTemplateFactory(ModuleTraits<TYPE>::GetModuleId(), &CreateTemplate##TEMPLATE);
 } // namespace ECSEngine

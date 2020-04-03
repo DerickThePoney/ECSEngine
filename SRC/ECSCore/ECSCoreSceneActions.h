@@ -1,5 +1,6 @@
 #pragma once
 #include "Application/SceneActions.h"
+#include "Common/PoolAllocator.h"
 
 namespace ECSEngine
 {
@@ -15,6 +16,8 @@ class EntityTemplate;
 class BaseSceneItem;
 class SpawnEntitySceneAction : public ISceneAction
 {
+    DECLARE_POOL_ALLOCATED(SpawnEntitySceneAction);
+
 public:
     SpawnEntitySceneAction(const std::string& parFName = "Dummy");
     virtual ~SpawnEntitySceneAction();

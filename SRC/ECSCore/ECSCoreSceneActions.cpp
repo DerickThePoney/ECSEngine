@@ -10,6 +10,7 @@
 
 namespace ECSEngine
 {
+IMPLEMENT_POOL_ALLOCATED(SpawnEntitySceneAction);
 
 SpawnEntitySceneAction::SpawnEntitySceneAction(const std::string& parFName)
     : ISceneAction(parFName)

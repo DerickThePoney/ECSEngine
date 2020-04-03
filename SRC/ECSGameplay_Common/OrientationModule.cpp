@@ -11,7 +11,6 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::Orien
 
 namespace ECSEngine
 {
-
 IMPLEMENT_MODULE_TEMPLATE(OrientationModule, OrientationModuleTemplate);
 
 Module* OrientationModuleTemplate::CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const
