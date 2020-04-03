@@ -3,6 +3,6 @@ namespace ECSEngine
 {
 namespace ImGUITools
 {
-void DrawEntityTemplatesEditor();
+void DrawEntityTemplatesEditor(bool* parOutOpen = nullptr);
 }
 } // namespace ECSEngine

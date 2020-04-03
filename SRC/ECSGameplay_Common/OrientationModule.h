@@ -11,7 +11,7 @@ class ParameterContainer;
 
 class OrientationModuleTemplate : public ModuleTemplate
 {
-    DECLARE_MODULE_TEMPLATE(OrientationModule);
+    DECLARE_MODULE_TEMPLATE(OrientationModule, OrientationModuleTemplate);
 
 public:
     OrientationModuleTemplate()

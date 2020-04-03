@@ -37,8 +37,10 @@ void DrawEditorMenu()
     }
 }
 
-void DrawEntityTemplatesEditor()
+void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/)
 {
+    if (!*parOutOpen)
+        return;
     AssertRelease(EntityTemplateManager::HasInstance());
     const u32 templatesToDraw = EntityTemplateManager::Instance().GetEntityTemplatesNumber();
 
@@ -46,7 +48,7 @@ void DrawEntityTemplatesEditor()
     ImGui::SetNextWindowSize(windowSize);
     ImGui::SetNextWindowPos(glm::vec2(0.0f));
 
-    ImGui::Begin("Entity templates editor", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
+    ImGui::Begin("Entity templates editor", parOutOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
     DrawEditorMenu();
     const glm::vec2 currentWindowSize = ImGui::GetContentRegionAvail();
     const glm::vec2 utilityPlace = currentWindowSize - 50.0f;
@@ -57,7 +59,7 @@ void DrawEntityTemplatesEditor()
     static u32 selected = -1;
     forrange(i, 0, templatesToDraw)
     {
-        const EntityTemplate* et = EntityTemplateManager::Instance().GetEntityTemplate(i);
+        const EntityTemplate* et = EntityTemplateManager::Instance().GetEntityTemplate((u32)i);
         if (ImGui::Selectable(et->GetName().c_str(), selected == i))
             selected = (u32)i;
     }

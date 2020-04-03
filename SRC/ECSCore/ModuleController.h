@@ -1,6 +1,6 @@
 #pragma once
 #include "Common/Constants.h"
-#include "Common/ObjectPoolAllocator.h"
+#include "Common/ModulePoolAllocator.h"
 #include "EntityId.h"
 
 namespace ECSEngine
@@ -204,7 +204,7 @@ public:
     u32 GetSize() { return (u32)FAllocatedModules.size(); }
 
 private:
-    ObjectPoolAllocator<Mod, ModulePoolSize, false> FAllocator;
+    ModulePoolAllocator<Mod, ModulePoolSize, false> FAllocator;
     std::set<EntityId> FAllocatedModules;
     std::atomic_bool FLock;
 };

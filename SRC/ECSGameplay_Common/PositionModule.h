@@ -7,7 +7,7 @@ namespace ECSEngine
 
 class PositionModuleTemplate : public ModuleTemplate
 {
-    DECLARE_MODULE_TEMPLATE(PositionModule);
+    DECLARE_MODULE_TEMPLATE(PositionModule, PositionModuleTemplate);
 
 public:
     PositionModuleTemplate()
