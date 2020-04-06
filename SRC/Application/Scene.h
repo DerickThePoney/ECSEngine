@@ -8,7 +8,7 @@ class Scene
 {
 public:
     Scene();
-    ~Scene();
+    virtual ~Scene();
 
     const std::string& GetName() const { return FName; }
     void SetName(const std::string& parName) { FName = parName; }
@@ -18,25 +18,27 @@ public:
     void AddSceneItem(const u32 parSceneItemTypeId);
     void RemoveSceneItem(const u32 parId);
 
-    void Initialise();
-    void Destroy();
+    virtual void Initialise();
+    virtual void Destroy();
 
-    void OnDrawEditor();
-    void Update();
-    void Render();
+    virtual void Update();
+    virtual void Render();
+
+    std::vector<std::shared_ptr<BaseSceneItem>>& GetSceneItems() { return FSceneItems; }
 
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(PROPERTY(Name), PROPERTY(SceneItems));
+        ar(PROPERTY(Name));
+        ar(PROPERTY(SceneItems));
     }
 
 private:
     std::string FName;
 
-    std::map<u32, std::vector<std::shared_ptr<BaseSceneItem>>> FSceneItems;
+    std::vector<std::shared_ptr<BaseSceneItem>> FSceneItems;
 
-    std::vector<ISceneAction*> FActions;
+    std::vector<std::unique_ptr<ISceneAction>> FActions;
     u32 FCurrentAction = 0;
 };
 } // namespace ECSEngine
