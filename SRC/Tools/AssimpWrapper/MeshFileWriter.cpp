@@ -34,55 +34,79 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
 
     fileHeader.MajorVersion = MagicStuff::MajorVersion;
     fileHeader.MinorVersion = MagicStuff::MinorVersion;
-    const aiMesh* mesh = parMeshData->mMeshes[0];
-    fileHeader.HasPositions = mesh->HasPositions();
+    const aiMesh* mesh0 = parMeshData->mMeshes[0];
+    fileHeader.HasPositions = mesh0->HasPositions();
     if (fileHeader.HasPositions)
         fileHeader.VertexSizeInOctet += 3 * sizeof(float);
 
-    fileHeader.NbColorChannels = mesh->GetNumColorChannels();
+    fileHeader.NbColorChannels = mesh0->GetNumColorChannels();
     fileHeader.HasColors = fileHeader.NbColorChannels != 0;
     fileHeader.NbUVs = 0; // A IMPLEMENTER mesh->GetNumUVChannels();
     fileHeader.HasUVs = fileHeader.NbUVs != 0;
 
     fileHeader.HasNormals = false; // A IMPLEMENTER mesh->HasNormals();
-    fileHeader.HasTangents = mesh->HasTangentsAndBitangents();
+    fileHeader.HasTangents = mesh0->HasTangentsAndBitangents();
     fileHeader.HasBinormals = fileHeader.HasTangents;
 
     fileHeader.VertexSizeInOctet += fileHeader.NbColorChannels * sizeof(u32);
 
-    fileHeader.NbVertices = mesh->mNumVertices;
-
     fileHeader.NbIndices = 0;
-    forrange(i, 0, mesh->mNumFaces)
+    forrange(i, 0, parMeshData->mNumMeshes)
     {
-        const aiFace& face = mesh->mFaces[i];
-        fileHeader.NbIndices += face.mNumIndices;
+        const aiMesh* mesh = parMeshData->mMeshes[i];
+        fileHeader.NbVertices += mesh->mNumVertices;
+
+        forrange(j, 0, mesh->mNumFaces)
+        {
+            const aiFace& face = mesh->mFaces[j];
+            fileHeader.NbIndices += face.mNumIndices;
+        }
     }
 
     FOutputStream.write((c8*)&fileHeader, sizeof(MeshFileHeader));
     static_assert(sizeof(ai_real) == 4, "la taille des reels assimp est != 4");
-    forrange(i, 0, fileHeader.NbVertices)
+    u32 k = 0;
+    forrange(i, 0, parMeshData->mNumMeshes)
     {
-        FOutputStream.write((c8*)&mesh->mVertices[i].x, 4);
-        FOutputStream.write((c8*)&mesh->mVertices[i].y, 4);
-        FOutputStream.write((c8*)&mesh->mVertices[i].z, 4);
-        forrange(j, 0, fileHeader.NbColorChannels)
+        const aiMesh* mesh = parMeshData->mMeshes[i];
+
+        forrange(l, 0, mesh->mNumVertices)
         {
-            u32 r, g, b, a;
-            r = (u32)(mesh->mColors[j][i].r * 255.f) & 0xFF;
-            g = (u32)(mesh->mColors[j][i].g * 255.f) & 0xFF;
-            b = (u32)(mesh->mColors[j][i].b * 255.f) & 0xFF;
-            a = (u32)(mesh->mColors[j][i].a * 255.f) & 0xFF;
-            u32 color32 = (a << 24) | (b << 16) | (g << 8) | r;
-            FOutputStream.write((c8*)&color32, 4);
+            FOutputStream.write((c8*)&mesh->mVertices[l].x, 4);
+            FOutputStream.write((c8*)&mesh->mVertices[l].y, 4);
+            FOutputStream.write((c8*)&mesh->mVertices[l].z, 4);
+            forrange(j, 0, fileHeader.NbColorChannels)
+            {
+                u32 r, g, b, a;
+                r = (u32)(mesh->mColors[j][l].r * 255.f) & 0xFF;
+                g = (u32)(mesh->mColors[j][l].g * 255.f) & 0xFF;
+                b = (u32)(mesh->mColors[j][l].b * 255.f) & 0xFF;
+                a = (u32)(mesh->mColors[j][l].a * 255.f) & 0xFF;
+                u32 color32 = (a << 24) | (b << 16) | (g << 8) | r;
+                FOutputStream.write((c8*)&color32, 4);
+            }
+            k++;
         }
     }
 
-    forrange(i, 0, mesh->mNumFaces)
+    AssertRelease(k == fileHeader.NbVertices);
+
+    u32 vertexOffset = 0;
+    std::vector<u32> indices;
+    indices.reserve(fileHeader.NbIndices);
+    forrange(j, 0, parMeshData->mNumMeshes)
     {
-        const aiFace& face = mesh->mFaces[i];
-        FOutputStream.write((c8*)face.mIndices, 4u * face.mNumIndices);
+        const aiMesh* mesh = parMeshData->mMeshes[j];
+        forrange(i, 0, mesh->mNumFaces)
+        {
+
+            const aiFace& face = mesh->mFaces[i];
+            forrange(k, 0, face.mNumIndices) { indices.push_back(face.mIndices[k] + vertexOffset); }
+        }
+        vertexOffset += mesh->mNumVertices;
     }
+
+    FOutputStream.write((c8*)indices.data(), 4u * fileHeader.NbIndices);
 
     /*   FOutputStream.write((c8*)vertexData, fileHeader.VertexSizeInOctet * fileHeader.NbVertices);
        FOutputStream.write((c8*)indexData, fileHeader.IndexSizeInOctets * fileHeader.NbIndices);*/
