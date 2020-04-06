@@ -6,6 +6,7 @@
 
 namespace ECSEngine
 {
+IMPLEMENT_POOL_ALLOCATED(BaseSceneItem);
 
 BaseSceneItem::BaseSceneItem()
     : FName("Scene Item")
@@ -19,7 +20,7 @@ BaseSceneItem::BaseSceneItem()
 }
 
 BaseSceneItem::BaseSceneItem(const std::string& parName)
-    : FName("Scene Item")
+    : FName(parName)
     , FPosition(glm::vec3(0.f))
     , FOrientation(glm::quat())
     , FShowItem(false)
@@ -44,9 +45,9 @@ void BaseSceneItem::DrawEditor()
 bool BaseSceneItem::VirtualDrawEditor()
 {
     ImGui::PushID(ImGui::GetID(this));
-    ImGui::CollapsingHeader(FName.c_str(), &FShowItem);
-    ImGui::PopID();
-
+    FShowItem = ImGui::CollapsingHeader("", ImGuiTreeNodeFlags_CollapsingHeader);
+    ImGui::SameLine();
+    ImGui::Text("%s", FName.c_str());
     if (FShowItem)
     {
         EDITOR_PROPERTY_STRING("Scene item name", FName, false, "");
@@ -55,6 +56,7 @@ bool BaseSceneItem::VirtualDrawEditor()
         EDITOR_PROPERTY_SIMPLE("Orientation", FOrientation);
         ImGui::Separator();
     }
+    ImGui::PopID();
 
     FVirtualDrawEditorHasBeenCalled = true;
     return FShowItem;
