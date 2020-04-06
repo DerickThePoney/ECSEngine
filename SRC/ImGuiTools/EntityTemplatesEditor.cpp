@@ -37,16 +37,16 @@ void DrawEditorMenu()
     }
 }
 
-void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/)
+void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/, const float parMenuBarHeight /*= 0.0f*/)
 {
     if (!*parOutOpen)
         return;
     AssertRelease(EntityTemplateManager::HasInstance());
     const u32 templatesToDraw = EntityTemplateManager::Instance().GetEntityTemplatesNumber();
 
-    glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    ImGui::SetNextWindowSize(windowSize);
-    ImGui::SetNextWindowPos(glm::vec2(0.0f));
+    glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    ImGui::SetNextWindowSize(windowSize * glm::vec2(1.0f, 1.0f - (parMenuBarHeight / windowSize.y)));
+    ImGui::SetNextWindowPos(glm::vec2(0.0f, parMenuBarHeight));
 
     ImGui::Begin("Entity templates editor", parOutOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
     DrawEditorMenu();
@@ -90,7 +90,7 @@ void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/)
             ImGui::EndCombo();
         }
         ImGui::SameLine();
-        if (ImGui::Button("Add module"))
+        if (ImGui::Button("Add module") && selectedModule != -1)
         {
             if (!et->HasModule(selectedModule))
             {
