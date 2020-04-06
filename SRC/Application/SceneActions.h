@@ -14,7 +14,7 @@ class ISceneAction
 {
     friend class Scene;
 
-protected:
+public:
     ISceneAction(const std::string& parFName = "Dummy");
     virtual ~ISceneAction();
 

@@ -2,21 +2,133 @@
 
 #include "SceneEditor.h"
 
+#include "Application/EditorScene.h"
+#include "Application/PropertyDrawer.h"
+#include "Application/Scene.h"
+#include "Common/Logger.h"
+#include "Common/ResourceCache.h"
+#include "Common/Singleton.h"
+#include "EntityTemplatesEditor.h"
+#include "LoggerGUI.h"
+#include "RenderingCore/GLFWDisplayWindowHandler.h"
+
 namespace ECSEngine
 {
 namespace ImGUITools
 {
 namespace
 {
-void MainMenuBar()
+void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene& parOutIOScene)
 {
     ImGui::BeginMainMenuBar();
+    parOutMenuBarHeight = ImGui::GetWindowSize();
+    if (ImGui::BeginMenu("File"))
+    {
+        ImGui::MenuItem("Open scene", NULL, &parOutIOScene.openScene);
+        ImGui::MenuItem("Save scene", NULL, &parOutIOScene.saveScene);
+        ImGui::Separator();
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Show"))
+    {
+        ImGui::MenuItem("Scene items", NULL, &options.showSceneItemsList);
+        ImGui::MenuItem("Scene actions", NULL, &options.showActionManager);
+        ImGui::Separator();
+        ImGui::MenuItem("Scene templates", NULL, &options.showEntityTemplateEditor);
+        ImGui::Separator();
+        ImGui::MenuItem("Scene logger", NULL, &options.showLogger);
+
+        ImGui::EndMenu();
+    }
     ImGui::EndMainMenuBar();
 }
-} // namespace
-void DrawSceneEditor()
+
+void SceneItemsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2& menuBarHeight)
 {
-    MainMenuBar();
+    const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const float menuBarProportion = menuBarHeight.y / (float)windowSize.y;
+    const glm::vec2 sceneItemsSize = windowSize * glm::vec2(0.25f, 1.f - menuBarProportion);
+    ImGui::SetNextWindowSize(sceneItemsSize);
+    ImGui::SetNextWindowPos(glm::vec2(0.0f, menuBarHeight.y));
+    ImGui::Begin("Scene items", &options.showSceneItemsList, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+    if (parScene != nullptr)
+    {
+        std::string sceneName = parScene->GetName();
+        EDITOR_PROPERTY_STRING("Scene Name", sceneName, false, "");
+        parScene->SetName(sceneName);
+
+        if (ImGui::Button("Add Scene item"))
+        {
+            parScene->AddSceneItem(SceneItemTraits<BaseSceneItem>::GetSceneItemTypeId());
+        }
+
+        const glm::vec2 contentRegion = ImGui::GetContentRegionAvail();
+        const glm::vec2 listSize = contentRegion - glm::vec2(10.0f, 0.0f);
+        const float xCursor = ((contentRegion - listSize) * 0.5f).x;
+
+        ImGui::SetCursorPosX(xCursor);
+
+        ImGui::BeginChildFrame(ImGui::GetID("Scene items list"), listSize);
+
+        std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItems();
+        u32 i = 0;
+
+        std::vector<std::shared_ptr<BaseSceneItem>>::iterator itToErase = sceneItems.end();
+        for (auto sceneItem = sceneItems.begin(); sceneItem != sceneItems.end(); ++sceneItem)
+        {
+            ImGui::PushID(i);
+            if (ImGui::Button("X"))
+            {
+                itToErase = sceneItem;
+            }
+            ImGui::SameLine();
+            (*sceneItem)->DrawEditor();
+            ImGui::PopID();
+            i++;
+        }
+        if (itToErase != sceneItems.end())
+        {
+            sceneItems.erase(itToErase);
+        }
+
+        ImGui::EndChildFrame();
+    }
+    ImGui::End();
+}
+} // namespace
+
+void DrawSceneEditorMainMenu(Scene* parScene, WindowsToShow& parOutWindowsToShow, IOScene& parOutIOScene)
+{
+
+    glm::vec2 menuBarHeight;
+    MainMenuBar(parOutWindowsToShow, menuBarHeight, parOutIOScene);
+
+    if (parOutWindowsToShow.showSceneItemsList)
+        SceneItemsWindow(parScene, parOutWindowsToShow, menuBarHeight);
+
+    if (parOutWindowsToShow.showEntityTemplateEditor)
+        DrawEntityTemplatesEditor(&parOutWindowsToShow.showEntityTemplateEditor, menuBarHeight.y);
+
+    if (parOutWindowsToShow.showLogger)
+        DrawLogger(Logger::GetLoggedMessages(), true);
+}
+
+const std::string ChooseScene(bool& isOk, bool& isCancel)
+{
+    ImGui::Begin("Choose Scene...", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+    static std::string sceneToChoose;
+    EDITOR_PROPERTY_STRING("Scene to open", sceneToChoose, true, "*.scene");
+    ImGui::SameLine();
+    if (ImGui::Button("Ok"))
+        isOk = true;
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel"))
+        isCancel = true;
+    ImGui::End();
+
+    return sceneToChoose;
 }
 
 } // namespace ImGUITools
