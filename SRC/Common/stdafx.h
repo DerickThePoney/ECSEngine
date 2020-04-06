@@ -56,6 +56,8 @@
     template<class Archive>                                                                                                                                                        \
     void serialize(Archive& ar)
 
+#include "GLMSerialization.h"
+
 #include "Types.h"
 
 #include <xmmintrin.h>
