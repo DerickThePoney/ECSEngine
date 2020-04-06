@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/PoolAllocator.h"
 #include "SceneItemsIds.h"
 
 // TODO
@@ -8,10 +9,12 @@ namespace ECSEngine
 {
 #define DECLARE_SCENE_ITEM(TYPE)                                                                                                                                                   \
 public:                                                                                                                                                                            \
-    u32 GetSceneItemTypeId() const override { return SceneItemTraits<BaseSceneItem>::GetSceneItemTypeId(); }
+    u32 GetSceneItemTypeId() const override { return SceneItemTraits<TYPE>::GetSceneItemTypeId(); }
 
 class BaseSceneItem
 {
+    DECLARE_POOL_ALLOCATED(BaseSceneItem);
+
 public:
     BaseSceneItem();
     BaseSceneItem(const std::string& parName);
