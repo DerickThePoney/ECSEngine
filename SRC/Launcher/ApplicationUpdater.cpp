@@ -247,7 +247,6 @@ void ApplicationUpdater::Update()
     InputDebug();
 
     scene.Update();
-    scene.OnDrawEditor();
 
     // ImGUITools::DrawEntityTemplatesEditor();
 
