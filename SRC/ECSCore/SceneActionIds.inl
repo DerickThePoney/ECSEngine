@@ -1,0 +1,1 @@
+DECLARE_SCENE_ACTION(SpawnEntitySceneAction)

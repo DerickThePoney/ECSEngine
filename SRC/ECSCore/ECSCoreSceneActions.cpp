@@ -8,9 +8,12 @@
 #include "EntityTemplateManager.h"
 #include "ModuleParameters.h"
 
+CEREAL_REGISTER_TYPE(ECSEngine::SpawnEntitySceneAction);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ISceneAction, ECSEngine::SpawnEntitySceneAction)
+
 namespace ECSEngine
 {
-IMPLEMENT_POOL_ALLOCATED(SpawnEntitySceneAction);
+IMPLEMENT_SCENE_ACTION(SpawnEntitySceneAction);
 
 SpawnEntitySceneAction::SpawnEntitySceneAction(const std::string& parFName)
     : ISceneAction(parFName)
@@ -21,12 +24,10 @@ SpawnEntitySceneAction::~SpawnEntitySceneAction()
 {
 }
 
-void SpawnEntitySceneAction::VirtualInitialise()
+void SpawnEntitySceneAction::VirtualInitialise(const Scene* parScene)
 {
-    ISceneAction::VirtualInitialise();
+    ISceneAction::VirtualInitialise(parScene);
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateName);
-    AssertRelease(FTemplate != nullptr);
-    AssertRelease(FSceneItem != nullptr);
 }
 
 void SpawnEntitySceneAction::VirtualStart()
@@ -34,6 +35,7 @@ void SpawnEntitySceneAction::VirtualStart()
     ISceneAction::VirtualStart();
 
     AssertRelease(FSceneItem != nullptr);
+    AssertRelease(FTemplate != nullptr);
 
     ModuleParameters::ParameterContainer container;
     container.Set<ModuleParameters::Position>(FSceneItem->GetPosition());
@@ -50,6 +52,12 @@ void SpawnEntitySceneAction::VirtualDrawEditor()
     {
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Entity to spawn", FTemplate, FEntityTemplateName);
     }
+}
+
+void SpawnEntitySceneAction::SetSceneItem(const BaseSceneItem* parSceneItem)
+{
+    FSceneItem = parSceneItem;
+    FSceneItemID = parSceneItem->GetSceneItemTypeId();
 }
 
 } // namespace ECSEngine

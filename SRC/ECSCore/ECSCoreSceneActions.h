@@ -7,23 +7,19 @@ namespace ECSEngine
 /*************************************************************/
 /*            SpawnEntitySceneAction                         */
 /*************************************************************/
-// TODO:
-//    - Ajouter les membres de classe (en gros template + BaseSceneItem ref) + serialization
-//    - Initialise -> Vérifier que le template existe
-//    - Start -> spawn + finish
 
 class EntityTemplate;
 class BaseSceneItem;
 class SpawnEntitySceneAction : public ISceneAction
 {
-    DECLARE_POOL_ALLOCATED(SpawnEntitySceneAction);
+    DECLARE_SCENE_ACTION(SpawnEntitySceneAction);
 
 public:
     SpawnEntitySceneAction(const std::string& parFName = "Dummy");
     virtual ~SpawnEntitySceneAction();
 
 protected:
-    virtual void VirtualInitialise() override;
+    virtual void VirtualInitialise(const Scene* parScene) override;
 
     virtual void VirtualStart() override;
 
@@ -34,16 +30,17 @@ public:
     const std::string& GetEntityTemplateName() const { return FEntityTemplateName; }
 
     void SetEntityTemplateName(const std::string& parName) { FEntityTemplateName = parName; }
-    void SetSceneItem(const BaseSceneItem* parSceneItem) { FSceneItem = parSceneItem; }
+    void SetSceneItem(const BaseSceneItem* parSceneItem);
 
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(cereal::base_class<ISceneAction>(this), PROPERTY(EntityTemplateName), PROPERTY(SceneItem));
+        ar(cereal::base_class<ISceneAction>(this), PROPERTY(EntityTemplateName), PROPERTY(SceneItemID));
     }
 
 private:
     std::string FEntityTemplateName = "Entity template name";
+    u32 FSceneItemID = -1;
     const EntityTemplate* FTemplate = nullptr;
     const BaseSceneItem* FSceneItem = nullptr;
 };

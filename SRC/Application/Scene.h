@@ -25,12 +25,16 @@ public:
     virtual void Render();
 
     std::vector<std::shared_ptr<BaseSceneItem>>& GetSceneItems() { return FSceneItems; }
+    std::vector<std::shared_ptr<ISceneAction>>& GetSceneActions() { return FActions; }
+
+    void AddSceneActionStealOwnership(ISceneAction* parAction);
 
     template<class Archive>
     void serialize(Archive& ar)
     {
         ar(PROPERTY(Name));
         ar(PROPERTY(SceneItems));
+        ar(PROPERTY(Actions));
     }
 
 private:
@@ -38,7 +42,7 @@ private:
 
     std::vector<std::shared_ptr<BaseSceneItem>> FSceneItems;
 
-    std::vector<std::unique_ptr<ISceneAction>> FActions;
+    std::vector<std::shared_ptr<ISceneAction>> FActions;
     u32 FCurrentAction = 0;
 };
 } // namespace ECSEngine

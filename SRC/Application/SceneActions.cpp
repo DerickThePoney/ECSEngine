@@ -9,6 +9,7 @@ namespace ECSEngine
 
 ISceneAction::ISceneAction(const std::string& parFName /*= "Dummy"*/)
     : FName(parFName)
+    , FScene(nullptr)
     , FStarted(false)
     , FFinished(false)
     , FShowEditor(false)
@@ -27,12 +28,12 @@ ISceneAction::~ISceneAction()
 {
 }
 
-void ISceneAction::Initialise()
+void ISceneAction::Initialise(const Scene* parScene)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualInitialiseCalled = false;
 #endif
-    VirtualInitialise();
+    VirtualInitialise(parScene);
 
     AlwaysCheckedAssertMsg(FVirtualInitialiseCalled, "Un appel à VirtualInitialise du parent à été oublié");
 }
@@ -92,14 +93,16 @@ void ISceneAction::DrawEditor()
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualDrawEditorCalled = false;
 #endif
-
+    ImGui::PushID(ImGui::GetID(this));
     VirtualDrawEditor();
+    ImGui::PopID();
 
     AlwaysCheckedAssertMsg(FVirtualDrawEditorCalled, "Un appel à VirtualDrawEditor du parent à été oublié");
 }
 
-void ISceneAction::VirtualInitialise()
+void ISceneAction::VirtualInitialise(const Scene* parScene)
 {
+    FScene = parScene;
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualInitialiseCalled = true;
 #endif
@@ -116,6 +119,7 @@ void ISceneAction::VirtualStart()
 {
     AlwaysCheckedAssert(!FStarted);
     AlwaysCheckedAssert(!FFinished);
+    AssertRelease(FScene != nullptr);
     FStarted = true;
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualStartCalled = true;
@@ -142,7 +146,9 @@ void ISceneAction::VirtualFinish()
 
 void ISceneAction::VirtualDrawEditor()
 {
-    ImGui::CollapsingHeader(FName.c_str(), &FShowEditor);
+    FShowEditor = ImGui::CollapsingHeader("", ImGuiTreeNodeFlags_CollapsingHeader);
+    ImGui::SameLine();
+    ImGui::Text("%s", FName.c_str());
 
     if (FShowEditor)
     {
