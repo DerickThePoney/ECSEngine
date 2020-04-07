@@ -8,6 +8,7 @@
 #include "Common/Logger.h"
 #include "Common/ResourceCache.h"
 #include "Common/Singleton.h"
+#include "ECSCore/ECSCoreSceneActions.h"
 #include "EntityTemplatesEditor.h"
 #include "LoggerGUI.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -97,6 +98,65 @@ void SceneItemsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2& 
     }
     ImGui::End();
 }
+
+void SceneActionsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2& menuBarHeight)
+{
+    const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const float menuBarProportion = menuBarHeight.y / (float)windowSize.y;
+    const glm::vec2 sceneActionsSize = windowSize * glm::vec2(0.25f, 1.f - menuBarProportion);
+    ImGui::SetNextWindowSize(sceneActionsSize);
+    ImGui::SetNextWindowPos(glm::vec2(windowSize.x - sceneActionsSize.x, menuBarHeight.y));
+    ImGui::Begin("Scene actions", &options.showActionManager, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    if (parScene != nullptr)
+    {
+        std::vector<std::shared_ptr<ISceneAction>>& sceneActions = parScene->GetSceneActions();
+        u32 i = 0;
+
+        std::vector<std::shared_ptr<ISceneAction>>::iterator itToErase = sceneActions.end();
+        for (auto sceneAction = sceneActions.begin(); sceneAction != sceneActions.end(); ++sceneAction)
+        {
+            ImGui::PushID(i);
+            if (ImGui::Button("X"))
+            {
+                itToErase = sceneAction;
+            }
+            ImGui::SameLine();
+            (*sceneAction)->DrawEditor();
+            ImGui::PopID();
+            i++;
+        }
+        if (itToErase != sceneActions.end())
+        {
+            sceneActions.erase(itToErase);
+        }
+
+        const std::map<u32, std::string> actionList = SceneActionManagement::GetSceneActionsList();
+        static u32 selectedAction = -1;
+        if (ImGui::BeginCombo("##ActionsList", (selectedAction != -1) ? actionList.at(selectedAction).c_str() : ""))
+        {
+            foreachitemconst(action, actionList)
+            {
+                bool is_selected = (selectedAction == action.first);
+                if (ImGui::Selectable(action.second.c_str(), is_selected))
+                    selectedAction = action.first;
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus(); // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+            }
+            ImGui::EndCombo();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Add action") && selectedAction != -1)
+        {
+            auto action = actionList.find(selectedAction);
+            AssertRelease(action != actionList.end());
+            ISceneAction* newAction = SceneActionManagement::CreateSceneAction(selectedAction);
+            AssertRelease(newAction != nullptr);
+            newAction->SetName("New action");
+            parScene->AddSceneActionStealOwnership(newAction);
+        }
+    }
+    ImGui::End();
+}
 } // namespace
 
 void DrawSceneEditorMainMenu(Scene* parScene, WindowsToShow& parOutWindowsToShow, IOScene& parOutIOScene)
@@ -107,6 +167,9 @@ void DrawSceneEditorMainMenu(Scene* parScene, WindowsToShow& parOutWindowsToShow
 
     if (parOutWindowsToShow.showSceneItemsList)
         SceneItemsWindow(parScene, parOutWindowsToShow, menuBarHeight);
+
+    if (parOutWindowsToShow.showActionManager)
+        SceneActionsWindow(parScene, parOutWindowsToShow, menuBarHeight);
 
     if (parOutWindowsToShow.showEntityTemplateEditor)
         DrawEntityTemplatesEditor(&parOutWindowsToShow.showEntityTemplateEditor, menuBarHeight.y);

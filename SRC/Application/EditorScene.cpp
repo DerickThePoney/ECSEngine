@@ -73,6 +73,8 @@ void EditorScene::Update()
             FCurrentScene = new Scene();
             archive(*FCurrentScene);
             FIOScene.openScene = false;
+
+            FCurrentScene->Initialise();
         }
         else if (isCancel)
         {

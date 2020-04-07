@@ -3,7 +3,6 @@
 #include "Scene.h"
 
 #include "ECSCore/ECSCoreSceneActions.h"
-#include "ImGuiTools/SceneEditor.h" // TOREMOVE
 #include "SceneItems.h"
 
 namespace ECSEngine
@@ -28,8 +27,8 @@ void Scene::AddSceneItem(const u32 parSceneItemTypeId)
 void Scene::Initialise()
 {
     FCurrentAction = 0;
-
-    foreachitem(action, FActions) action->Initialise();
+    // FActions.push_back(std::unique_ptr<SpawnEntitySceneAction>(new SpawnEntitySceneAction));
+    foreachitem(action, FActions) action->Initialise(this);
 }
 
 void Scene::Destroy()
@@ -62,6 +61,13 @@ void Scene::Update()
 
 void Scene::Render()
 {
+}
+
+void Scene::AddSceneActionStealOwnership(ISceneAction* parAction)
+{
+    AssertRelease(parAction != nullptr);
+    parAction->Initialise(this);
+    FActions.push_back(std::unique_ptr<ISceneAction>(parAction));
 }
 
 } // namespace ECSEngine
