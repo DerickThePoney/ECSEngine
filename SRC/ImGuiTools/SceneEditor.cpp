@@ -25,6 +25,7 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
     parOutMenuBarHeight = ImGui::GetWindowSize();
     if (ImGui::BeginMenu("File"))
     {
+        ImGui::MenuItem("New scene", NULL, &parOutIOScene.newScene);
         ImGui::MenuItem("Open scene", NULL, &parOutIOScene.openScene);
         ImGui::MenuItem("Save scene", NULL, &parOutIOScene.saveScene);
         ImGui::Separator();
@@ -176,6 +177,22 @@ void DrawSceneEditorMainMenu(Scene* parScene, WindowsToShow& parOutWindowsToShow
 
     if (parOutWindowsToShow.showLogger)
         DrawLogger(Logger::GetLoggedMessages(), true);
+}
+
+const std::string NewScene(bool& isOk, bool& isCancel)
+{
+    ImGui::Begin("Choose Scene Name...", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+    static std::string sceneToChoose;
+    EDITOR_PROPERTY_STRING("Scene to open", sceneToChoose, false, "*.scene");
+    ImGui::SameLine();
+    if (ImGui::Button("Ok"))
+        isOk = true;
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel"))
+        isCancel = true;
+    ImGui::End();
+
+    return sceneToChoose;
 }
 
 const std::string ChooseScene(bool& isOk, bool& isCancel)
