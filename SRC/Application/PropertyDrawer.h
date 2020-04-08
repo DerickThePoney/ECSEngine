@@ -1,6 +1,8 @@
 #pragma once
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
+#include "Scene.h"
+#include "SceneItems.h"
 
 namespace ECSEngine
 {
@@ -127,4 +129,70 @@ void MakeSimpleProperty(const std::string& parName, T* parProperty)
         PropertyDrawer<std::string> drawer(NAME, &PROPERTY);                                                                                                                       \
         drawer.ShowProperty(IS_FILE, PATTERN);                                                                                                                                     \
     }
+
+template<>
+class PropertyDrawer<const BaseSceneItem*>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, const BaseSceneItem** parProperty, u32* parIdProperty, const Scene* parScene)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FIdProperty(parIdProperty)
+        , FScene(parScene)
+    {
+        AssertRelease(FScene != nullptr);
+    }
+
+    void ShowProperty()
+    {
+        const std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = FScene->GetSceneItems();
+        u32 selected = -1;
+
+        if (*FIdProperty < sceneItems.size())
+        {
+            forrange(i, 0, sceneItems.size())
+            {
+                AssertRelease(sceneItems[i] != nullptr);
+                if (sceneItems[i]->Id() == (*FIdProperty))
+                {
+                    selected = (u32)i;
+                    break;
+                }
+            }
+        }
+
+        if (ImGui::BeginCombo(FName.c_str(), (selected == -1) ? "No associated item" : sceneItems[selected]->GetName().c_str()))
+        {
+            forrange(i, 0, sceneItems.size())
+            {
+                bool is_selected = (selected == (u32)i);
+                if (ImGui::Selectable(sceneItems[i]->GetName().c_str(), is_selected))
+                    selected = (u32)i;
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+                ImGui::EndCombo();
+            }
+        }
+
+        if (selected != -1)
+        {
+            *FProperty = sceneItems[selected].get();
+            AssertRelease(*FProperty != nullptr);
+            *FIdProperty = (*FProperty)->Id();
+        }
+    }
+
+private:
+    std::string FName;
+    const BaseSceneItem** FProperty = nullptr;
+    u32* FIdProperty = nullptr;
+    const Scene* const FScene;
+};
+
+#define EDITOR_PROPERTY_SCENE_ITEM(NAME, PROPERTY, NAME_PROPERTY, SCENE)                                                                                                           \
+    {                                                                                                                                                                              \
+        PropertyDrawer<const BaseSceneItem*> drawer(NAME, &PROPERTY, &NAME_PROPERTY, SCENE);                                                                                       \
+        drawer.ShowProperty();                                                                                                                                                     \
+    }
+
 } // namespace ECSEngine

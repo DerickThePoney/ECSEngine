@@ -74,7 +74,7 @@ void SceneItemsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2& 
 
         ImGui::BeginChildFrame(ImGui::GetID("Scene items list"), listSize);
 
-        std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItems();
+        std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItemsForWriting();
         u32 i = 0;
 
         std::vector<std::shared_ptr<BaseSceneItem>>::iterator itToErase = sceneItems.end();
@@ -92,7 +92,7 @@ void SceneItemsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2& 
         }
         if (itToErase != sceneItems.end())
         {
-            sceneItems.erase(itToErase);
+            parScene->RemoveSceneItem(itToErase);
         }
 
         ImGui::EndChildFrame();
@@ -110,7 +110,7 @@ void SceneActionsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2
     ImGui::Begin("Scene actions", &options.showActionManager, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     if (parScene != nullptr)
     {
-        std::vector<std::shared_ptr<ISceneAction>>& sceneActions = parScene->GetSceneActions();
+        std::vector<std::shared_ptr<ISceneAction>>& sceneActions = parScene->GetSceneActionsForWriting();
         u32 i = 0;
 
         std::vector<std::shared_ptr<ISceneAction>>::iterator itToErase = sceneActions.end();

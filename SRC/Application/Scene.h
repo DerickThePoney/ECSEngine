@@ -17,7 +17,7 @@ public:
     const size_t& GetSceneId() const { return std::hash<std::string>().operator()(FName); } // FNV 1a
 
     void AddSceneItem(const u32 parSceneItemTypeId);
-    void RemoveSceneItem(const u32 parId);
+    void RemoveSceneItem(const std::vector<std::shared_ptr<BaseSceneItem>>::iterator parWhere);
 
     virtual void Initialise();
     virtual void Destroy();
@@ -25,8 +25,11 @@ public:
     virtual void Update();
     virtual void Render();
 
-    std::vector<std::shared_ptr<BaseSceneItem>>& GetSceneItems() { return FSceneItems; }
-    std::vector<std::shared_ptr<ISceneAction>>& GetSceneActions() { return FActions; }
+    const std::vector<std::shared_ptr<BaseSceneItem>>& GetSceneItems() const { return FSceneItems; }
+    const std::vector<std::shared_ptr<ISceneAction>>& GetSceneActions() const { return FActions; }
+
+    std::vector<std::shared_ptr<BaseSceneItem>>& GetSceneItemsForWriting() { return FSceneItems; }
+    std::vector<std::shared_ptr<ISceneAction>>& GetSceneActionsForWriting() { return FActions; }
 
     void AddSceneActionStealOwnership(ISceneAction* parAction);
 
@@ -37,6 +40,8 @@ public:
         ar(PROPERTY(SceneItemsIdGenerator));
         ar(PROPERTY(SceneItems));
         ar(PROPERTY(Actions));
+
+        foreachitem(action, FActions) action->SetScene(this);
     }
 
 private:

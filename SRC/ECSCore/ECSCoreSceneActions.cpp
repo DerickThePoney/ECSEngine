@@ -28,6 +28,12 @@ void SpawnEntitySceneAction::VirtualInitialise(const Scene* parScene)
 {
     ISceneAction::VirtualInitialise(parScene);
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateName);
+    auto sceneItems = GetScene()->GetSceneItems();
+    if (FSceneItemID < sceneItems.size())
+    {
+        FSceneItem = sceneItems[FSceneItemID].get();
+        AssertRelease(FSceneItem != nullptr);
+    }
 }
 
 void SpawnEntitySceneAction::VirtualStart()
@@ -51,6 +57,7 @@ void SpawnEntitySceneAction::VirtualDrawEditor()
     if (ShouldShowEditor())
     {
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Entity to spawn", FTemplate, FEntityTemplateName);
+        EDITOR_PROPERTY_SCENE_ITEM("Scene item", FSceneItem, FSceneItemID, GetScene());
     }
 }
 
