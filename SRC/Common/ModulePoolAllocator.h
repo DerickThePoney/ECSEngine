@@ -49,14 +49,14 @@ private:
 private:
     u32 FSize;
     std::set<u32> FAllocatedIndexes;
-    std::vector<ModuleDataChunk<T, ChunkSize>> FChunks;
+    std::vector<ModuleDataChunk<T, ChunkSize>*> FChunks;
 };
 
 template<class T, int ChunkSize, bool IsFixed>
 void ECSEngine::ModulePoolAllocator<T, ChunkSize, IsFixed>::AllocateNewChunk()
 {
     AssertRelease(!IsFixed || FSize == 0);
-    FChunks.push_back(ModuleDataChunk<T, ChunkSize>());
+    FChunks.push_back(new ModuleDataChunk<T, ChunkSize>());
     FSize += ChunkSize;
 }
 
@@ -66,7 +66,7 @@ T* ModulePoolAllocator<T, ChunkSize, IsFixed>::GetAtIndex(u32 parIndex)
     AssertRelease(parIndex < FSize);
     const u32 chunkIndex = parIndex / ChunkSize;
     const u32 indexInChunk = parIndex % ChunkSize;
-    return FChunks[chunkIndex].AsPtr(indexInChunk);
+    return FChunks[chunkIndex]->AsPtr(indexInChunk);
 }
 
 template<class T, int ChunkSize, bool IsFixed>
@@ -77,7 +77,8 @@ ModulePoolAllocator<T, ChunkSize, IsFixed>::~ModulePoolAllocator()
     {
         const u32 chunkIndex = *it / ChunkSize;
         const u32 indexInChunk = *it % ChunkSize;
-        FChunks[chunkIndex].AsPtr(indexInChunk)->~T();
+        FChunks[chunkIndex]->AsPtr(indexInChunk)->~T();
+        delete FChunks[chunkIndex];
     }
 }
 
@@ -88,7 +89,7 @@ void ModulePoolAllocator<T, ChunkSize, IsFixed>::DeallocateAtIndex(u32 parIndex)
     AssertRelease(FAllocatedIndexes.find(parIndex) != FAllocatedIndexes.end());
     const u32 chunkIndex = parIndex / ChunkSize;
     const u32 indexInChunk = parIndex % ChunkSize;
-    FChunks[chunkIndex].AsPtr(indexInChunk)->~T();
+    FChunks[chunkIndex]->AsPtr(indexInChunk)->~T();
 #ifdef PERFORM_SECURITY_CHECKS
     // memset(&FChunk[parIndex], 0xCD, sizeof(T));
 #endif // PERFORM_SECURITY_CHECKS
@@ -108,7 +109,7 @@ void ModulePoolAllocator<T, ChunkSize, IsFixed>::AllocateAtIndex(u32 parIndex)
     const u32 chunkIndex = parIndex / ChunkSize;
     const u32 indexInChunk = parIndex % ChunkSize;
 
-    pointer_type ptr = FChunks[chunkIndex].AsPtr(indexInChunk);
+    pointer_type ptr = FChunks[chunkIndex]->AsPtr(indexInChunk);
     new (ptr) T;
     FAllocatedIndexes.insert(parIndex);
 }
