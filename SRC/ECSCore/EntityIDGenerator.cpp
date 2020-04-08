@@ -8,29 +8,22 @@ namespace ECSEngine
 {
 
 EntityIDGenerator::EntityIDGenerator(u32 parWorldID)
-    : FAssociatedWorldID(parWorldID)
-    , FNextIncrementalId(0)
+    : IdGenerator()
+    , FAssociatedWorldID(parWorldID)
 {
 }
 
 EntityIDGenerator::EntityIDGenerator(EntityIDGenerator&& other)
 {
     FAssociatedWorldID = other.FAssociatedWorldID;
-    FNextIncrementalId = other.FNextIncrementalId;
-    FReusableIds = std::move(other.FReusableIds);
 
     other.FAssociatedWorldID = -1;
-    other.FNextIncrementalId = -1;
 }
 
 void EntityIDGenerator::operator=(EntityIDGenerator&& other) noexcept
 {
     FAssociatedWorldID = other.FAssociatedWorldID;
-    FNextIncrementalId = other.FNextIncrementalId;
-    FReusableIds = std::move(other.FReusableIds);
-
     other.FAssociatedWorldID = -1;
-    other.FNextIncrementalId = -1;
 }
 
 EntityIDGenerator::~EntityIDGenerator()
@@ -40,19 +33,14 @@ EntityIDGenerator::~EntityIDGenerator()
 EntityId EntityIDGenerator::GetNextEntityId()
 {
     AssertRelease(FAssociatedWorldID != -1);
-    if (FReusableIds.empty())
-        return EntityId(FAssociatedWorldID, FNextIncrementalId++);
-
-    EntityId id(FAssociatedWorldID, FReusableIds.front());
-    FReusableIds.pop();
-    return id;
+    return EntityId(FAssociatedWorldID, GetNextId());
 }
 
 void EntityIDGenerator::ReleaseEntityId(const EntityId& parId)
 {
     AssertRelease(FAssociatedWorldID != -1);
     AlwaysCheckedAssert(parId.GetWorldId() == FAssociatedWorldID);
-    FReusableIds.push(parId.GetSequentialId());
+    ReleaseId(parId.GetSequentialId());
 }
 
 } // namespace ECSEngine

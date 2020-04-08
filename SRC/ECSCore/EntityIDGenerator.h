@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/IdGenerator.h"
 
 namespace ECSEngine
 {
@@ -7,7 +8,7 @@ class EntityId;
 
 namespace ECSEngine
 {
-class EntityIDGenerator
+class EntityIDGenerator : public IdGenerator
 {
 public:
     EntityIDGenerator(u32 parWorldID = -1);
@@ -27,7 +28,5 @@ public:
 
 private:
     u32 FAssociatedWorldID;
-    u32 FNextIncrementalId;
-    std::queue<u32> FReusableIds;
 };
 } // namespace ECSEngine
