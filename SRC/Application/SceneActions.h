@@ -30,6 +30,7 @@ public:
     void SetName(const std::string& parName) { FName = parName; }
 
     const Scene* GetScene() const { return FScene; }
+    void SetScene(const Scene* parScene) { FScene = parScene; }
 
     void Initialise(const Scene* parScene);
     void Shutdown();

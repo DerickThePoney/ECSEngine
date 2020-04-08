@@ -13,6 +13,7 @@ public:
     PropertyDrawer(const std::string& parPropertyName, const EntityTemplate** parProperty, std::string* parNameProperty)
         : FName(parPropertyName)
         , FProperty(parProperty)
+        , FNameProperty(parNameProperty)
     {
     }
 
@@ -53,6 +54,7 @@ public:
         {
             *FProperty = EntityTemplateManager::Instance().GetEntityTemplate((u32)selected);
             AssertRelease(*FProperty != nullptr);
+            *FNameProperty = (*FProperty)->GetName();
         }
     }
 
@@ -67,4 +69,5 @@ private:
         PropertyDrawer<const EntityTemplate*> drawer(NAME, &PROPERTY, &NAME_PROPERTY);                                                                                             \
         drawer.ShowProperty();                                                                                                                                                     \
     }
+
 } // namespace ECSEngine

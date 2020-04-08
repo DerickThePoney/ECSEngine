@@ -25,6 +25,14 @@ void Scene::AddSceneItem(const u32 parSceneItemTypeId)
     sceneItem->SetOrientation(glm::quatLookAt(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 }
 
+void Scene::RemoveSceneItem(const std::vector<std::shared_ptr<BaseSceneItem>>::iterator parWhere)
+{
+    AssertRelease(parWhere != FSceneItems.end());
+    const u32 id = (*parWhere)->Id();
+    FSceneItemsIdGenerator.ReleaseId(id);
+    FSceneItems.erase(parWhere);
+}
+
 void Scene::Initialise()
 {
     FCurrentAction = 0;
