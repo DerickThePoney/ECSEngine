@@ -18,7 +18,7 @@ class BaseSceneItem : public RefCountedObject
 
 public:
     BaseSceneItem();
-    BaseSceneItem(const std::string& parName);
+    BaseSceneItem(const std::string& parName, const u32 parId);
 
     virtual ~BaseSceneItem() {}
 
@@ -31,6 +31,7 @@ public:
     const std::string& GetName() const { return FName; }
     const glm::vec3& GetPosition() const { return FPosition; }
     const glm::quat& GetOrientation() const { return FOrientation; }
+    const u32 Id() const { return FId; }
 
     void SetName(const std::string& parName) { FName = parName; }
     void SetPosition(const glm::vec3& parPosition) { FPosition = parPosition; }
@@ -39,7 +40,7 @@ public:
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(PROPERTY(Name), PROPERTY(Position), PROPERTY(Orientation));
+        ar(PROPERTY(Name), PROPERTY(Id), PROPERTY(Position), PROPERTY(Orientation));
     }
 
 protected:
@@ -50,6 +51,7 @@ private:
     glm::vec3 FPosition;
     glm::quat FOrientation;
 
+    u32 FId;
     bool FShowItem;
 
 #ifdef PERFORM_SECURITY_CHECKS

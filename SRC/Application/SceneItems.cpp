@@ -12,6 +12,7 @@ BaseSceneItem::BaseSceneItem()
     : FName("Scene Item")
     , FPosition(glm::vec3(0.f))
     , FOrientation(glm::quat())
+    , FId(-1)
     , FShowItem(false)
 #ifdef PERFORM_SECURITY_CHECKS
     , FVirtualDrawEditorHasBeenCalled(false)
@@ -19,10 +20,11 @@ BaseSceneItem::BaseSceneItem()
 {
 }
 
-BaseSceneItem::BaseSceneItem(const std::string& parName)
+BaseSceneItem::BaseSceneItem(const std::string& parName, const u32 parId)
     : FName(parName)
     , FPosition(glm::vec3(0.f))
     , FOrientation(glm::quat())
+    , FId(parId)
     , FShowItem(false)
 #ifdef PERFORM_SECURITY_CHECKS
     , FVirtualDrawEditorHasBeenCalled(false)

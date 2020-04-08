@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/IdGenerator.h"
 #include "SceneActions.h"
 #include "SceneItems.h"
 
@@ -33,6 +34,7 @@ public:
     void serialize(Archive& ar)
     {
         ar(PROPERTY(Name));
+        ar(PROPERTY(SceneItemsIdGenerator));
         ar(PROPERTY(SceneItems));
         ar(PROPERTY(Actions));
     }
@@ -40,6 +42,7 @@ public:
 private:
     std::string FName;
 
+    IdGenerator FSceneItemsIdGenerator;
     std::vector<std::shared_ptr<BaseSceneItem>> FSceneItems;
 
     std::vector<std::shared_ptr<ISceneAction>> FActions;
