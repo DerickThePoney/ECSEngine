@@ -5,7 +5,7 @@
 namespace ECSEngine
 {
 #ifdef PERFORM_SECURITY_CHECKS
-IMPLEMENT_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(ReferenceCounter, 8192);
+IMPLEMENT_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(ReferenceCounter, 64);
 ReferenceCounter::ReferenceCounter()
 {
 }

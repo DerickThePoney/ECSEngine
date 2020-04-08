@@ -6,7 +6,7 @@ namespace ECSEngine
 #ifdef PERFORM_SECURITY_CHECKS
 class ReferenceCounter
 {
-    DECLARE_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(ReferenceCounter, 8192);
+    DECLARE_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(ReferenceCounter, 64);
 
 public:
     ReferenceCounter();
