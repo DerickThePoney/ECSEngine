@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/PoolAllocator.h"
+#include "Common/RefCountedObject.h"
 #include "SceneItemsIds.h"
 
 // TODO
@@ -11,7 +12,7 @@ namespace ECSEngine
 public:                                                                                                                                                                            \
     u32 GetSceneItemTypeId() const override { return SceneItemTraits<TYPE>::GetSceneItemTypeId(); }
 
-class BaseSceneItem
+class BaseSceneItem : public RefCountedObject
 {
     DECLARE_POOL_ALLOCATED(BaseSceneItem);
 

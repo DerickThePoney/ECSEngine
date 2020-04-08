@@ -58,7 +58,9 @@ bool BaseSceneItem::VirtualDrawEditor()
     }
     ImGui::PopID();
 
+#ifdef PERFORM_SECURITY_CHECKS
     FVirtualDrawEditorHasBeenCalled = true;
+#endif
     return FShowItem;
 }
 
