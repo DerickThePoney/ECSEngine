@@ -20,7 +20,7 @@ public:
     const ReferenceCounter* const GetReferenceCounter() const { return FRefCounter; }
 
 private:
-    ReferenceCounter* FRefCounter;
+    ReferenceCounter* FRefCounter = nullptr;
 #endif
 };
 

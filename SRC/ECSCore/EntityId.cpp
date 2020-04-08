@@ -4,7 +4,8 @@
 namespace ECSEngine
 {
 EntityId::EntityId(u8 parWorldId, u32 parId)
-    : FId(parWorldId, parId)
+    : RefCountedObject()
+    , FId(parWorldId, parId)
 {
 }
 } // namespace ECSEngine
