@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/RefCountedObject.h"
 #include "WorldIds.h"
 namespace ECSEngine
 {
@@ -19,7 +20,7 @@ private:
     u32 FId;
 };
 
-class EntityId
+class EntityId : public RefCountedObject
 {
 public:
     explicit EntityId(u8 parWorldId = 0xFF, u32 parId = 0xFFFFFF);

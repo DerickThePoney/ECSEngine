@@ -122,6 +122,9 @@ void EntityWorld::DestroyEntity(const EntityId& parId)
             FControllers[i]->DeallocateForEntity(parId);
         }
     }
+
+    AssertReleaseMsg(entity.GetEntityId().GetReferenceCounter()->GetRefCounts() == 1, "An EntityId object still references this id, not good, not good at all");
+
     FEntities[parId.GetSequentialId()] = Entity();
 }
 
