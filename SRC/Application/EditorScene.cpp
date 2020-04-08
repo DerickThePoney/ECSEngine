@@ -39,6 +39,34 @@ void EditorScene::Update()
     if (!FIOScene.openScene)
         ImGUITools::DrawSceneEditorMainMenu(FCurrentScene, FWindows, FIOScene);
 
+    if (FIOScene.newScene)
+    {
+        bool isDone = false;
+        bool isCancel = false;
+        const std::string sceneToChoose = ImGUITools::NewScene(isDone, isCancel);
+
+        AlwaysCheckedAssert(!(isDone && isCancel));
+        AlwaysCheckedAssert(!sceneToChoose.empty());
+
+        if (isDone)
+        {
+            if (FCurrentScene != nullptr)
+            {
+                FCurrentScene->Destroy();
+                FCurrentScene = nullptr;
+            }
+
+            FCurrentScene = new Scene();
+            FCurrentScene->SetName(sceneToChoose);
+            FCurrentScene->Initialise();
+            FIOScene.newScene = false;
+        }
+        else if (isCancel)
+        {
+            FIOScene.newScene = false;
+        }
+    }
+
     if (FCurrentScene != nullptr && FIOScene.saveScene)
     {
         std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "/Scenes/" + FCurrentScene->GetName() + ".scene");
@@ -50,11 +78,6 @@ void EditorScene::Update()
 
     if (FIOScene.openScene)
     {
-        if (FCurrentScene != nullptr)
-        {
-            FCurrentScene->Destroy();
-            FCurrentScene = nullptr;
-        }
 
         bool isDone = false;
         bool isCancel = false;
@@ -64,6 +87,12 @@ void EditorScene::Update()
 
         if (isDone)
         {
+            if (FCurrentScene != nullptr)
+            {
+                FCurrentScene->Destroy();
+                FCurrentScene = nullptr;
+            }
+
             Resource res(sceneToChoose);
             std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
             ResourceBuffer buff = handle->GetResourceBuffer();

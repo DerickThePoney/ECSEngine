@@ -13,6 +13,7 @@ struct WindowsToShow
 
 struct IOScene
 {
+    bool newScene = false;
     bool openScene = false;
     bool saveScene = false;
 };
