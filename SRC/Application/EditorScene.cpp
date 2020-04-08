@@ -46,10 +46,10 @@ void EditorScene::Update()
         const std::string sceneToChoose = ImGUITools::NewScene(isDone, isCancel);
 
         AlwaysCheckedAssert(!(isDone && isCancel));
-        AlwaysCheckedAssert(!sceneToChoose.empty());
 
         if (isDone)
         {
+            AlwaysCheckedAssert(!sceneToChoose.empty());
             if (FCurrentScene != nullptr)
             {
                 FCurrentScene->Destroy();

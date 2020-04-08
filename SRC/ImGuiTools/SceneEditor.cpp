@@ -131,6 +131,8 @@ void SceneActionsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2
             sceneActions.erase(itToErase);
         }
 
+        ImGui::Separator();
+
         const std::map<u32, std::string> actionList = SceneActionManagement::GetSceneActionsList();
         static u32 selectedAction = -1;
         if (ImGui::BeginCombo("##ActionsList", (selectedAction != -1) ? actionList.at(selectedAction).c_str() : ""))
