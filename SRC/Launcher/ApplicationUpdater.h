@@ -2,7 +2,7 @@
 #include "Application/EditorScene.h"
 #include "Application/IGameplayUpdater.h"
 #include "Application/Scene.h"
-#include "Common/MeshHandle.h"
+#include "Common/RenderingHandles.h"
 #include "Common/RingBuffer.h"
 #include "ECSCore/EntityId.h"
 #include "ECSGameplay_Common/OrientationSystem.h"
