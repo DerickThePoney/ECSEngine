@@ -118,14 +118,14 @@ void MeshMaterialApplicationUpdater::Update()
         Rendering::MeshFileHeader fileHeader;
         ifstr.read((c8*)&fileHeader, sizeof(fileHeader));
 
-        Rendering::VertexLayoutHash hash(fileHeader);
+        Rendering::VertexLayoutHash hash(fileHeader.layout);
 
         std::vector<glm::vec3> vertices;
         std::vector<std::vector<u32>> colors;
         std::vector<u32> indices;
         vertices.resize(fileHeader.NbVertices);
-        colors.resize(fileHeader.NbColorChannels);
-        forrange(i, 0, fileHeader.NbColorChannels) colors[i].resize(fileHeader.NbVertices);
+        colors.resize(fileHeader.layout.NbColorChannels);
+        forrange(i, 0, fileHeader.layout.NbColorChannels) colors[i].resize(fileHeader.NbVertices);
         indices.resize(fileHeader.NbIndices);
 
         forrange(i, 0, fileHeader.NbVertices)
@@ -133,7 +133,7 @@ void MeshMaterialApplicationUpdater::Update()
             ifstr.read((c8*)&vertices[i].x, 4);
             ifstr.read((c8*)&vertices[i].y, 4);
             ifstr.read((c8*)&vertices[i].z, 4);
-            forrange(j, 0, fileHeader.NbColorChannels) { ifstr.read((c8*)&colors[j][i], 4); }
+            forrange(j, 0, fileHeader.layout.NbColorChannels) { ifstr.read((c8*)&colors[j][i], 4); }
         }
 
         ifstr.read((c8*)indices.data(), 4u * fileHeader.NbIndices);

@@ -11,17 +11,17 @@ VertexLayoutHash::VertexLayoutHash()
 {
 }
 
-VertexLayoutHash::VertexLayoutHash(const MeshFileHeader& parMeshFileHeader)
+VertexLayoutHash::VertexLayoutHash(const MeshLayoutDescription& parMeshLayoutDescription)
     : hash(0)
 {
-    SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, parMeshFileHeader.HasPositions);
-    SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, parMeshFileHeader.HasColors);
-    SetColorsNb(parMeshFileHeader.NbColorChannels);
-    SetValue(VERTEX_LAYOUT_PARAMS::HAS_UVS, parMeshFileHeader.HasUVs);
-    SetUVsNb(parMeshFileHeader.NbUVs);
-    SetValue(VERTEX_LAYOUT_PARAMS::HAS_NORMALS, parMeshFileHeader.HasNormals);
-    SetValue(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, parMeshFileHeader.HasTangents);
-    SetValue(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS, parMeshFileHeader.HasBinormals);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, parMeshLayoutDescription.HasPositions);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, parMeshLayoutDescription.HasColors);
+    SetColorsNb(parMeshLayoutDescription.NbColorChannels);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_UVS, parMeshLayoutDescription.HasUVs);
+    SetUVsNb(parMeshLayoutDescription.NbUVs);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_NORMALS, parMeshLayoutDescription.HasNormals);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, parMeshLayoutDescription.HasTangents);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS, parMeshLayoutDescription.HasBinormals);
 }
 
 VertexLayoutHash::VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbUvs, bool parNormals, bool parTangents, bool parBinormals)
