@@ -1,0 +1,67 @@
+#pragma once
+
+namespace ECSEngine
+{
+namespace Rendering
+{
+namespace HandlesId
+{
+constexpr u32 InvalidMeshIdHandle = (u32)-1;
+constexpr u32 InvalidMaterialInstanceHandle = (u32)-1;
+} // namespace HandlesId
+
+class MeshHandle
+{
+public:
+    MeshHandle(u32 parMeshId = HandlesId::InvalidMeshIdHandle);
+
+    const u32 GetMeshId() const { return FMeshId; }
+    bool IsValid() const;
+
+    bool operator<(const MeshHandle& parOther) { return FMeshId < parOther.FMeshId; }
+
+    operator u32() const { return FMeshId; }
+
+private:
+    u32 FMeshId;
+};
+
+class MaterialInstanceHandle
+{
+public:
+    MaterialInstanceHandle(u32 parMaterialId = HandlesId::InvalidMaterialInstanceHandle);
+
+    const u32 GetMaterialId() const { return FMaterialInstanceId; }
+    bool IsValid() const;
+
+    bool operator<(const MaterialInstanceHandle& parOther) const { return FMaterialInstanceId < parOther.FMaterialInstanceId; }
+
+    operator u32() const { return FMaterialInstanceId; }
+
+private:
+    u32 FMaterialInstanceId;
+};
+} // namespace Rendering
+} // namespace ECSEngine
+
+namespace std
+{
+template<>
+struct hash<ECSEngine::Rendering::MeshHandle>
+{
+    std::size_t operator()(const ECSEngine::Rendering::MeshHandle& parHandle) const noexcept
+    {
+        static hash<u32> hash;
+        return hash((u32)parHandle);
+    }
+};
+template<>
+struct hash<ECSEngine::Rendering::MaterialInstanceHandle>
+{
+    std::size_t operator()(const ECSEngine::Rendering::MaterialInstanceHandle& parHandle) const noexcept
+    {
+        static hash<u32> hash;
+        return hash((u32)parHandle);
+    }
+};
+} // namespace std
