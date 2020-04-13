@@ -11,6 +11,8 @@
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/BGFXRenderingUtils.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/Material.h"
+#include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/Mesh.h"
 #include "RenderingCore/MeshManager.h"
 #include "bx/bx.h"
@@ -28,22 +30,20 @@ RenderingSystem::RenderingSystem()
 RenderingSystem::~RenderingSystem()
 {
 }
-bgfx::ProgramHandle kProgram;
+Rendering::MaterialInstanceHandle kHandle;
 bgfx::ProgramHandle kProgramInstancing;
-bgfx::UniformHandle kUniform;
+const std::string& uniformName = "u_color";
 void RenderingSystem::VirtualInit()
 {
     parent_type::VirtualInit();
 
-    kProgram = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColor");
+    kHandle = Rendering::MaterialManager::Instance().CreateMaterialInstance("materials\\vertexcolormaterial.material");
     kProgramInstancing = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColorInstancing");
 
-    kUniform = bgfx::createUniform("u_color", bgfx::UniformType::Vec4);
     const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
     const glm::vec3 eye = { 0.0f, 5.0f, 0.0f };
 
     glm::quat orientation = glm::quat_cast(glm::lookAt(eye, at, glm::vec3(0.f, 1.f, 0.f)));
-    // orientation = orientation * glm::angleAxis(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
     u32 CamId = CameraManager::Instance().CreateCamera();
     c = CameraManager::Instance().GetCamera(CamId);
@@ -65,7 +65,6 @@ void RenderingSystem::VirtualUpdate()
 
     AlwaysCheckedAssert(!c.expired());
     std::shared_ptr<Camera> cshared = c.lock();
-    //    cshared->SetPosition(glm::vec3(glm::cos(timepoint / 10.f), glm::sin(timepoint / 10.f), -5.0f));
 
     const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
     const glm::vec3 eye = { 0.0f, 5.0f, 0.0f };
@@ -75,8 +74,8 @@ void RenderingSystem::VirtualUpdate()
     bgfx::setViewTransform(0, &view[0][0], &proj[0][0]);
 
     const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
-    float uniformVal[4] = { sinTime, sinTime, sinTime, sinTime };
-    bgfx::setUniform(kUniform, &uniformVal);
+    glm::vec4 uniformVal = glm::vec4(sinTime, sinTime, sinTime, sinTime);
+    Rendering::MaterialManager::Instance().SetVec4Uniform(uniformName, uniformVal);
 
     if (1) //! Rendering::BGFXRenderer::Instance().IsInstancingEnabled())
     {
@@ -99,7 +98,11 @@ void RenderingSystem::VirtualUpdate()
             mtx = mtx * glm::scale(glm::vec3(0.5f)) * (glm::mat4)orientationModule->GetOrientation();
 
             bgfx::setTransform(&mtx[0][0]);
-            bgfx::submit(0, kProgram);
+
+            const Rendering::MaterialInstance* instance = Rendering::MaterialManager::Instance().GetMaterialInstance(kHandle);
+            AssertRelease(instance != nullptr);
+
+            bgfx::submit(0, instance->GetProgram()->ProgramHandle());
         }
     }
     else
@@ -158,9 +161,7 @@ void RenderingSystem::VirtualUpdate()
 void RenderingSystem::VirtualDestroy()
 {
     parent_type::VirtualDestroy();
-    bgfx::destroy(kUniform);
     bgfx::destroy(kProgramInstancing);
-    bgfx::destroy(kProgram);
 }
 
 } // namespace ECSEngine
