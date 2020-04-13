@@ -53,6 +53,24 @@
 
 #define PROPERTY(P) cereal::make_nvp(#P, F##P)
 #define NAMEDPROPERTY(N, P) cereal::make_nvp(N, P)
+#define PROPERTYFIELD(P, DEFAULT)                                                                                                                                                  \
+    try                                                                                                                                                                            \
+    {                                                                                                                                                                              \
+        ar(PROPERTY(P));                                                                                                                                                           \
+    }                                                                                                                                                                              \
+    catch (std::exception e)                                                                                                                                                       \
+    {                                                                                                                                                                              \
+        F##P = DEFAULT;                                                                                                                                                            \
+    }
+#define NAMEDPROPERTYFIELD(N, P, DEFAULT)                                                                                                                                          \
+    try                                                                                                                                                                            \
+    {                                                                                                                                                                              \
+        ar(NAMEDPROPERTY(N, P));                                                                                                                                                   \
+    }                                                                                                                                                                              \
+    catch (std::exception e)                                                                                                                                                       \
+    {                                                                                                                                                                              \
+        P = DEFAULT;                                                                                                                                                               \
+    }
 
 #define SERIALIZE()                                                                                                                                                                \
     template<class Archive>                                                                                                                                                        \
