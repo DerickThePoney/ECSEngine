@@ -4,7 +4,6 @@
 
 namespace ECSEngine
 {
-#ifdef PERFORM_SECURITY_CHECKS
 IMPLEMENT_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(ReferenceCounter, ReferenceCounterPoolSize);
 ReferenceCounter::ReferenceCounter()
 {
@@ -29,5 +28,4 @@ i32 ReferenceCounter::GetRefCounts() const
 {
     return FRefCounts;
 }
-#endif
 } // namespace ECSEngine

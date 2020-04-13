@@ -16,12 +16,11 @@ public:
     void operator=(const RefCountedObject& other);
     void operator=(RefCountedObject&& other);
 
-#ifdef PERFORM_SECURITY_CHECKS
+    ReferenceCounter* const GetReferenceCounterForWriting() const { return FRefCounter; }
     const ReferenceCounter* const GetReferenceCounter() const { return FRefCounter; }
 
 private:
     ReferenceCounter* FRefCounter = nullptr;
-#endif
 };
 
 } // namespace ECSEngine
