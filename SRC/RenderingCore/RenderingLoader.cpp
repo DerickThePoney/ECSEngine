@@ -5,6 +5,7 @@
 #include "BGFXRenderer.h"
 #include "GLFWDisplayWindowHandler.h"
 #include "ImguiRenderer.h"
+#include "MaterialManager.h"
 #include "MeshManager.h"
 
 namespace ECSEngine
@@ -22,6 +23,10 @@ bool RenderingLoader::VirtualInitialise()
     Rendering::BGFXRenderer& rendererInstance = Rendering::BGFXRenderer::Instance();
     rendererInstance.Init();
 
+    Rendering::MaterialManager::CreateIFP();
+    AssertRelease(Rendering::MaterialManager::HasInstance());
+    Rendering::MaterialManager::Instance().Initialise();
+
     Rendering::ImGUI::Init();
 
     Rendering::MeshManager::CreateIFP();
@@ -36,6 +41,10 @@ void RenderingLoader::VirtualShutdown()
     Rendering::MeshManager::Destroy();
 
     Rendering::ImGUI::Shutdown();
+
+    AssertRelease(Rendering::MaterialManager::HasInstance());
+    Rendering::MaterialManager::Instance().Shutdown();
+    Rendering::MaterialManager::Destroy();
 
     Rendering::BGFXRenderer::Instance().Shutdown();
     Rendering::BGFXRenderer::Destroy();
