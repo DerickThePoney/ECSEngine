@@ -3,7 +3,7 @@
 #include "ApplicationUpdater.h"
 
 #include "Common/InputManager.h"
-#include "Common/MeshHandle.h"
+#include "Common/RenderingHandles.h"
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"

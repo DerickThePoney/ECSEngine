@@ -1,5 +1,5 @@
 #pragma once
-#include "Common/MeshHandle.h"
+#include "Common/RenderingHandles.h"
 #include "Common/Singleton.h"
 
 namespace ECSEngine

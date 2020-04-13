@@ -1,5 +1,5 @@
 #ifdef DECLARING_PARAMETERS
-#include "Common/MeshHandle.h"
+#include "Common/RenderingHandles.h"
 namespace ECSEngine
 {
 namespace Rendering
