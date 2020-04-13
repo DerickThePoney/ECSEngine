@@ -35,20 +35,20 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
     fileHeader.MajorVersion = MagicStuff::MajorVersion;
     fileHeader.MinorVersion = MagicStuff::MinorVersion;
     const aiMesh* mesh0 = parMeshData->mMeshes[0];
-    fileHeader.HasPositions = mesh0->HasPositions();
-    if (fileHeader.HasPositions)
+    fileHeader.layout.HasPositions = mesh0->HasPositions();
+    if (fileHeader.layout.HasPositions)
         fileHeader.VertexSizeInOctet += 3 * sizeof(float);
 
-    fileHeader.NbColorChannels = mesh0->GetNumColorChannels();
-    fileHeader.HasColors = fileHeader.NbColorChannels != 0;
-    fileHeader.NbUVs = 0; // A IMPLEMENTER mesh->GetNumUVChannels();
-    fileHeader.HasUVs = fileHeader.NbUVs != 0;
+    fileHeader.layout.NbColorChannels = mesh0->GetNumColorChannels();
+    fileHeader.layout.HasColors = fileHeader.layout.NbColorChannels != 0;
+    fileHeader.layout.NbUVs = 0; // A IMPLEMENTER mesh->GetNumUVChannels();
+    fileHeader.layout.HasUVs = fileHeader.layout.NbUVs != 0;
 
-    fileHeader.HasNormals = false; // A IMPLEMENTER mesh->HasNormals();
-    fileHeader.HasTangents = mesh0->HasTangentsAndBitangents();
-    fileHeader.HasBinormals = fileHeader.HasTangents;
+    fileHeader.layout.HasNormals = false; // A IMPLEMENTER mesh->HasNormals();
+    fileHeader.layout.HasTangents = mesh0->HasTangentsAndBitangents();
+    fileHeader.layout.HasBinormals = fileHeader.layout.HasTangents;
 
-    fileHeader.VertexSizeInOctet += fileHeader.NbColorChannels * sizeof(u32);
+    fileHeader.VertexSizeInOctet += fileHeader.layout.NbColorChannels * sizeof(u32);
 
     fileHeader.NbIndices = 0;
     forrange(i, 0, parMeshData->mNumMeshes)
@@ -75,7 +75,7 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
             FOutputStream.write((c8*)&mesh->mVertices[l].x, 4);
             FOutputStream.write((c8*)&mesh->mVertices[l].y, 4);
             FOutputStream.write((c8*)&mesh->mVertices[l].z, 4);
-            forrange(j, 0, fileHeader.NbColorChannels)
+            forrange(j, 0, fileHeader.layout.NbColorChannels)
             {
                 u32 r, g, b, a;
                 r = (u32)(mesh->mColors[j][l].r * 255.f) & 0xFF;

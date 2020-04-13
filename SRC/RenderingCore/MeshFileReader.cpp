@@ -33,12 +33,12 @@ void ReadMeshImplementation(IMesh*& parMesh, std::istream& parStream)
         parStream.read((c8*)&vertices[i].FPosition.x, 4);
         parStream.read((c8*)&vertices[i].FPosition.y, 4);
         parStream.read((c8*)&vertices[i].FPosition.z, 4);
-        forrange(j, 0, fileHeader.NbColorChannels) { parStream.read((c8*)&vertices[i].FColor[j], 4); }
+        forrange(j, 0, fileHeader.layout.NbColorChannels) { parStream.read((c8*)&vertices[i].FColor[j], 4); }
     }
 
     parStream.read((c8*)indices.data(), 4u * fileHeader.NbIndices);
 
-    VertexLayoutHash hash(fileHeader);
+    VertexLayoutHash hash(fileHeader.layout);
     parMesh = MeshHelpers::CreateIMesh(hash);
 
     AssertRelease(parMesh != nullptr);

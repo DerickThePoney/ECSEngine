@@ -26,12 +26,12 @@ using hash_storage_type = u16;
 
 static_assert(sizeof(hash_storage_type) == hashSizeByte);
 
-struct MeshFileHeader;
+struct MeshLayoutDescription;
 struct VertexLayoutHash
 {
 
     VertexLayoutHash();
-    VertexLayoutHash(const MeshFileHeader& parMeshFileHeader);
+    VertexLayoutHash(const MeshLayoutDescription& parMeshLayoutDescription);
     VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbUvs, bool parNormals, bool parTangents, bool parBinormals);
 
     VertexLayoutHash(const VertexLayoutHash& parOther);
@@ -52,13 +52,8 @@ struct VertexLayoutHash
 };
 
 #pragma pack(push, r1, 1)
-struct MeshFileHeader
+struct MeshLayoutDescription
 {
-    u32 MajorVersion = 0;
-    u32 MinorVersion = 0;
-
-    u32 NbVertices = 0;
-    u32 VertexSizeInOctet = 0;
     bool HasPositions = false;
     bool HasColors = false;
     u32 NbColorChannels = 0;
@@ -67,6 +62,29 @@ struct MeshFileHeader
     bool HasNormals = false;
     bool HasTangents = false;
     bool HasBinormals = false;
+
+    SERIALIZE()
+    {
+        NAMEDPROPERTYFIELD("HasPositions", HasPositions, true);
+        NAMEDPROPERTYFIELD("HasColors", HasColors, false);
+        NAMEDPROPERTYFIELD("NbColorChannels", NbColorChannels, 0);
+        NAMEDPROPERTYFIELD("HasUVs", HasUVs, false);
+        NAMEDPROPERTYFIELD("NbUVs", NbUVs, 0);
+        NAMEDPROPERTYFIELD("HasNormals", HasNormals, false);
+        NAMEDPROPERTYFIELD("HasBinormals", HasTangents, false);
+        NAMEDPROPERTYFIELD("HasBinormals", HasBinormals, false);
+    }
+};
+
+struct MeshFileHeader
+{
+    u32 MajorVersion = 0;
+    u32 MinorVersion = 0;
+
+    u32 NbVertices = 0;
+    u32 VertexSizeInOctet = 0;
+
+    MeshLayoutDescription layout;
 
     u32 NbIndices = 0;
 };
