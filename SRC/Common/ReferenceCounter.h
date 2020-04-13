@@ -3,7 +3,6 @@
 
 namespace ECSEngine
 {
-#ifdef PERFORM_SECURITY_CHECKS
 constexpr u32 ReferenceCounterPoolSize = 8192;
 class ReferenceCounter
 {
@@ -26,5 +25,4 @@ public:
 private:
     i32 FRefCounts = 0;
 };
-#endif
 } // namespace ECSEngine

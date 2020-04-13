@@ -6,29 +6,25 @@ namespace ECSEngine
 {
 
 RefCountedObject::RefCountedObject()
-#ifdef PERFORM_SECURITY_CHECKS
     : FRefCounter(new ReferenceCounter())
-#endif
 {
-#ifdef PERFORM_SECURITY_CHECKS
     AssertRelease(FRefCounter != nullptr);
     FRefCounter->IncrementRefCounter();
-#endif
 }
 RefCountedObject::~RefCountedObject()
 {
-#ifdef PERFORM_SECURITY_CHECKS
     AssertRelease(FRefCounter != nullptr);
     if (FRefCounter->GetRefCounts() == 1)
+    {
         delete FRefCounter;
+        FRefCounter = nullptr;
+    }
     else
         FRefCounter->DecrementRefCounter();
-#endif
 }
 
 RefCountedObject::RefCountedObject(const RefCountedObject& other)
 {
-#ifdef PERFORM_SECURITY_CHECKS
     if (FRefCounter != nullptr)
     {
         if (FRefCounter->GetRefCounts() < 1)
@@ -39,12 +35,10 @@ RefCountedObject::RefCountedObject(const RefCountedObject& other)
     FRefCounter = other.FRefCounter;
     AssertRelease(FRefCounter != nullptr);
     FRefCounter->IncrementRefCounter();
-#endif
 }
 
 RefCountedObject::RefCountedObject(RefCountedObject&& other)
 {
-#ifdef PERFORM_SECURITY_CHECKS
     if (FRefCounter != nullptr)
     {
         if (FRefCounter->GetRefCounts() < 1)
@@ -56,12 +50,10 @@ RefCountedObject::RefCountedObject(RefCountedObject&& other)
     FRefCounter = other.FRefCounter;
     AssertRelease(FRefCounter != nullptr);
     other.FRefCounter = nullptr;
-#endif
 }
 
 void RefCountedObject::operator=(RefCountedObject&& other)
 {
-#ifdef PERFORM_SECURITY_CHECKS
     if (FRefCounter != nullptr)
     {
         if (FRefCounter->GetRefCounts() < 1)
@@ -73,12 +65,10 @@ void RefCountedObject::operator=(RefCountedObject&& other)
     FRefCounter = other.FRefCounter;
     AssertRelease(FRefCounter != nullptr);
     other.FRefCounter = nullptr;
-#endif
 }
 
 void RefCountedObject::operator=(const RefCountedObject& other)
 {
-#ifdef PERFORM_SECURITY_CHECKS
     if (FRefCounter != nullptr)
     {
         if (FRefCounter->GetRefCounts() < 1)
@@ -89,7 +79,6 @@ void RefCountedObject::operator=(const RefCountedObject& other)
     FRefCounter = other.FRefCounter;
     AssertRelease(FRefCounter != nullptr);
     FRefCounter->IncrementRefCounter();
-#endif
 }
 
 } // namespace ECSEngine
