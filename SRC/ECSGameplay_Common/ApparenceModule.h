@@ -24,11 +24,13 @@ public:
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
     const std::string& GetMeshFileName() const { return FMeshFileName; }
+    const std::string& GetMaterialFileName() const { return FMaterialFileName; }
 
     template<class Archive>
     void serialize(Archive& ar)
     {
         ar(PROPERTY(MeshFileName));
+        PROPERTYFIELD(MaterialFileName, "");
     }
 
 protected:
@@ -36,6 +38,7 @@ protected:
 
 private:
     std::string FMeshFileName;
+    std::string FMaterialFileName;
 };
 
 class ApparenceModule final : public Module
@@ -47,7 +50,7 @@ public:
     ~ApparenceModule() {}
 
     const Rendering::MeshHandle& GetMeshHandle() const;
-    // bgfx::ProgramHandle GetProgramHandle() const { return FProgram; }
+    const Rendering::MaterialInstanceHandle& GetMaterialHandle() const;
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
@@ -56,5 +59,6 @@ protected:
 private:
     // bgfx::ProgramHandle FProgram;
     Rendering::MeshHandle FMeshHandle;
+    Rendering::MaterialInstanceHandle FMaterialHandle;
 };
 } // namespace ECSEngine

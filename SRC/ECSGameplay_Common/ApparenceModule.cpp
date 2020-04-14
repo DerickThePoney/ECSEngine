@@ -7,6 +7,7 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
+#include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::ApparenceModuleTemplate);
@@ -27,7 +28,6 @@ void ApparenceModuleTemplate::VirtualDrawEditor()
 
 ApparenceModule::ApparenceModule()
     : Module()
-//, FProgram()
 {
 }
 
@@ -35,7 +35,10 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
 {
     parent_type::VirtualInit(parUnitId, parParameters);
     FMeshHandle = Rendering::MeshManager::Instance().CreateMesh(Resource(Template<ApparenceModuleTemplate>()->GetMeshFileName()));
-    // FProgram = parParameters.Get<ModuleParameters::Material>();
+    FMaterialHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(Template<ApparenceModuleTemplate>()->GetMaterialFileName());
+
+    AssertRelease(FMeshHandle.IsValid());
+    AssertRelease(FMaterialHandle.IsValid());
 
     const ApparenceModuleTemplate* temp = Template<ApparenceModuleTemplate>();
 }
@@ -48,6 +51,11 @@ void ApparenceModule::VirtualDeinit()
 const Rendering::MeshHandle& ApparenceModule::GetMeshHandle() const
 {
     return FMeshHandle;
+}
+
+const Rendering::MaterialInstanceHandle& ApparenceModule::GetMaterialHandle() const
+{
+    return FMaterialHandle;
 }
 
 } // namespace ECSEngine
