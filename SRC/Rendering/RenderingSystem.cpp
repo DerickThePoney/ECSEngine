@@ -37,7 +37,7 @@ void RenderingSystem::VirtualInit()
 {
     parent_type::VirtualInit();
 
-    kHandle = Rendering::MaterialManager::Instance().CreateMaterialInstance("materials\\vertexcolormaterial.material");
+    kHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
     kProgramInstancing = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColorInstancing");
 
     const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
@@ -75,7 +75,7 @@ void RenderingSystem::VirtualUpdate()
 
     const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
     glm::vec4 uniformVal = glm::vec4(sinTime, sinTime, sinTime, sinTime);
-    Rendering::MaterialManager::Instance().SetVec4Uniform(uniformName, uniformVal);
+    Rendering::MaterialManager::SetVec4Uniform(uniformName, uniformVal);
 
     if (1) //! Rendering::BGFXRenderer::Instance().IsInstancingEnabled())
     {
@@ -99,7 +99,7 @@ void RenderingSystem::VirtualUpdate()
 
             bgfx::setTransform(&mtx[0][0]);
 
-            const Rendering::MaterialInstance* instance = Rendering::MaterialManager::Instance().GetMaterialInstance(kHandle);
+            const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(kHandle);
             AssertRelease(instance != nullptr);
 
             bgfx::submit(0, instance->GetProgram()->ProgramHandle());

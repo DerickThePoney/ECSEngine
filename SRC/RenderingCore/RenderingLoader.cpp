@@ -23,9 +23,7 @@ bool RenderingLoader::VirtualInitialise()
     Rendering::BGFXRenderer& rendererInstance = Rendering::BGFXRenderer::Instance();
     rendererInstance.Init();
 
-    Rendering::MaterialManager::CreateIFP();
-    AssertRelease(Rendering::MaterialManager::HasInstance());
-    Rendering::MaterialManager::Instance().Initialise();
+    Rendering::MaterialManager::Initialise();
 
     Rendering::ImGUI::Init();
 
@@ -42,9 +40,7 @@ void RenderingLoader::VirtualShutdown()
 
     Rendering::ImGUI::Shutdown();
 
-    AssertRelease(Rendering::MaterialManager::HasInstance());
-    Rendering::MaterialManager::Instance().Shutdown();
-    Rendering::MaterialManager::Destroy();
+    Rendering::MaterialManager::Shutdown();
 
     Rendering::BGFXRenderer::Instance().Shutdown();
     Rendering::BGFXRenderer::Destroy();
