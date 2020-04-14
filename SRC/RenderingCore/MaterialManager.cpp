@@ -14,16 +14,49 @@ namespace ECSEngine
 namespace Rendering
 {
 
-MaterialManager::MaterialManager()
+class MaterialManagerSingleton final : public Singleton<MaterialManagerSingleton>
+{
+public:
+    MaterialManagerSingleton();
+    ~MaterialManagerSingleton();
+
+    void Initialise();
+    void Shutdown();
+
+    const MaterialInstanceHandle CreateMaterialInstanceIFN(const std::string& parMaterialFilename);
+
+    const bgfx::UniformHandle& GetUniform(const std::string& parName, bgfx::UniformType::Enum parType) const;
+    const MaterialInstance* GetMaterialInstance(const MaterialInstanceHandle& parHandle) const;
+
+    void SetSamplerUniform(const std::string& parUniformName) const;
+    void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue) const;
+    void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue) const;
+    void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue) const;
+
+private:
+    std::unordered_map<std::string, u32> FFileToMaterialDescriptor;
+    std::vector<MaterialDescriptor*> FMaterialDescriptors;
+
+    std::unordered_map<std::string, u32> FFileToProgramDescriptor;
+    std::vector<ProgramDescriptor*> FProgramDescriptors;
+    std::vector<Program*> FPrograms;
+
+    std::unordered_map<std::string, std::pair<bgfx::UniformHandle, bgfx::UniformType::Enum>> FUniformMap;
+
+    std::unordered_map<std::string, std::list<MaterialInstanceHandle>> FMaterialDescriptorToMaterialInstance;
+    std::unordered_map<MaterialInstanceHandle, MaterialInstance*> FMaterialInstances;
+};
+
+MaterialManagerSingleton::MaterialManagerSingleton()
     : Singleton()
 {
 }
 
-MaterialManager::~MaterialManager()
+MaterialManagerSingleton::~MaterialManagerSingleton()
 {
 }
 
-void MaterialManager::Initialise()
+void MaterialManagerSingleton::Initialise()
 {
     LOG_RENDERING("Initialising materials");
 
@@ -109,7 +142,7 @@ void MaterialManager::Initialise()
     }
 }
 
-void MaterialManager::Shutdown()
+void MaterialManagerSingleton::Shutdown()
 {
     LOG_RENDERING("Finalizing materials");
 
@@ -127,8 +160,15 @@ void MaterialManager::Shutdown()
     FFileToMaterialDescriptor.clear();
 }
 
-const MaterialInstanceHandle MaterialManager::CreateMaterialInstance(const std::string& parMaterialFilename)
+const MaterialInstanceHandle MaterialManagerSingleton::CreateMaterialInstanceIFN(const std::string& parMaterialFilename)
 {
+    // TODO CHECK IF MULTIPLE INSTANCE HANDLES ARE NEEDED IE --> SAME DESCRIPTOR, SAME PROGRAM, NO INSTANCING? OR JUST DO THE CHECK LATER ON, INSTANCES SEEM CHEAP?
+    auto itFind = FMaterialDescriptorToMaterialInstance.find(parMaterialFilename);
+    if (itFind != FMaterialDescriptorToMaterialInstance.end())
+    {
+        return *(itFind->second.begin());
+    }
+
     AssertRelease(FFileToMaterialDescriptor.find(parMaterialFilename) != FFileToMaterialDescriptor.end());
     const u32 materialId = FFileToMaterialDescriptor.at(parMaterialFilename);
     AssertRelease(materialId < (u32)FMaterialDescriptors.size());
@@ -146,16 +186,18 @@ const MaterialInstanceHandle MaterialManager::CreateMaterialInstance(const std::
     MaterialInstanceHandle handle((u32)FMaterialInstances.size());
     FMaterialInstances[handle] = instance;
 
+    FMaterialDescriptorToMaterialInstance[parMaterialFilename].push_back(handle);
+
     return handle;
 }
 
-const MaterialInstance* MaterialManager::GetMaterialInstance(const MaterialInstanceHandle& parHandle) const
+const MaterialInstance* MaterialManagerSingleton::GetMaterialInstance(const MaterialInstanceHandle& parHandle) const
 {
     AssertRelease(FMaterialInstances.find(parHandle) != FMaterialInstances.end());
     return FMaterialInstances.at(parHandle);
 }
 
-const bgfx::UniformHandle& MaterialManager::GetUniform(const std::string& parName, bgfx::UniformType::Enum parType) const
+const bgfx::UniformHandle& MaterialManagerSingleton::GetUniform(const std::string& parName, bgfx::UniformType::Enum parType) const
 {
     auto itFind = FUniformMap.find(parName);
     AssertRelease(itFind != FUniformMap.end());
@@ -164,31 +206,88 @@ const bgfx::UniformHandle& MaterialManager::GetUniform(const std::string& parNam
     return itFind->second.first;
 }
 
-void MaterialManager::SetSamplerUniform(const std::string& parUniformName) const
+void MaterialManagerSingleton::SetSamplerUniform(const std::string& parUniformName) const
 {
     AssertNotReachedMsg("Not yet implemented");
 }
 
-void MaterialManager::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue) const
+void MaterialManagerSingleton::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue) const
 {
-    const bgfx::UniformHandle& handle = MaterialManager::Instance().GetUniform(parUniformName, bgfx::UniformType::Vec4);
+    const bgfx::UniformHandle& handle = MaterialManagerSingleton::Instance().GetUniform(parUniformName, bgfx::UniformType::Vec4);
     AssertRelease(bgfx::isValid(handle));
     bgfx::setUniform(handle, &parUniformValue[0]);
 }
 
-void MaterialManager::SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue) const
+void MaterialManagerSingleton::SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue) const
 {
     const bgfx::UniformHandle& handle = GetUniform(parUniformName, bgfx::UniformType::Mat3);
     AssertRelease(bgfx::isValid(handle));
     bgfx::setUniform(handle, &parUniformValue[0][0]);
 }
 
-void MaterialManager::SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue) const
+void MaterialManagerSingleton::SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue) const
 {
-    const bgfx::UniformHandle& handle = MaterialManager::Instance().GetUniform(parUniformName, bgfx::UniformType::Mat4);
+    const bgfx::UniformHandle& handle = MaterialManagerSingleton::Instance().GetUniform(parUniformName, bgfx::UniformType::Mat4);
     AssertRelease(bgfx::isValid(handle));
     bgfx::setUniform(handle, &parUniformValue[0][0]);
 }
+
+namespace MaterialManager
+{
+
+void Initialise()
+{
+    AssertRelease(!MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::CreateIFP();
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::Instance().Initialise();
+}
+
+void Shutdown()
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::Instance().Shutdown();
+    MaterialManagerSingleton::Destroy();
+    AssertRelease(!MaterialManagerSingleton::HasInstance());
+}
+
+const MaterialInstanceHandle CreateMaterialInstanceIFN(const std::string& parMaterialFilename)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    return MaterialManagerSingleton::Instance().CreateMaterialInstanceIFN(parMaterialFilename);
+}
+
+const MaterialInstance* GetMaterialInstance(const MaterialInstanceHandle& parHandle)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    return MaterialManagerSingleton::Instance().GetMaterialInstance(parHandle);
+}
+
+void SetSamplerUniform(const std::string& parUniformName)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::Instance().SetSamplerUniform(parUniformName);
+}
+
+void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::Instance().SetVec4Uniform(parUniformName, parUniformValue);
+}
+
+void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::Instance().SetMat3Uniform(parUniformName, parUniformValue);
+}
+
+void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::Instance().SetMat4Uniform(parUniformName, parUniformValue);
+}
+
+} // namespace MaterialManager
 
 } // namespace Rendering
 } // namespace ECSEngine

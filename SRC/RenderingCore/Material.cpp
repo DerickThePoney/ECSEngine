@@ -94,7 +94,7 @@ void MaterialInstance::SetSamplerUniform(const std::string& parUniformName)
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Sampler));
 #endif
-    MaterialManager::Instance().SetSamplerUniform(parUniformName);
+    MaterialManager::SetSamplerUniform(parUniformName);
 }
 
 void MaterialInstance::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue)
@@ -102,7 +102,7 @@ void MaterialInstance::SetVec4Uniform(const std::string& parUniformName, const g
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Vec4));
 #endif
-    MaterialManager::Instance().SetVec4Uniform(parUniformName, parUniformValue);
+    MaterialManager::SetVec4Uniform(parUniformName, parUniformValue);
 }
 
 void MaterialInstance::SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue)
@@ -110,7 +110,7 @@ void MaterialInstance::SetMat3Uniform(const std::string& parUniformName, const g
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Mat3));
 #endif
-    MaterialManager::Instance().SetMat3Uniform(parUniformName, parUniformValue);
+    MaterialManager::SetMat3Uniform(parUniformName, parUniformValue);
 }
 
 void MaterialInstance::SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue)
@@ -118,7 +118,7 @@ void MaterialInstance::SetMat4Uniform(const std::string& parUniformName, const g
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Mat4));
 #endif
-    MaterialManager::Instance().SetMat4Uniform(parUniformName, parUniformValue);
+    MaterialManager::SetMat4Uniform(parUniformName, parUniformValue);
 }
 
 } // namespace Rendering
