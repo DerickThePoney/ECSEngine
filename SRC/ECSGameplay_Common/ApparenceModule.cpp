@@ -24,6 +24,7 @@ Module* ApparenceModuleTemplate::CreateInstance(const EntityId& parUnitId, const
 void ApparenceModuleTemplate::VirtualDrawEditor()
 {
     EDITOR_PROPERTY_STRING("MeshFile", FMeshFileName, true, "*.fbx.gen");
+    EDITOR_PROPERTY_STRING("MaterialFile", FMaterialFileName, true, "*.material");
 }
 
 ApparenceModule::ApparenceModule()

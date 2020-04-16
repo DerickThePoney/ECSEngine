@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/Logger.h"
 #include "Common/RenderingHandles.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
