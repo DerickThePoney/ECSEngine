@@ -30,6 +30,8 @@ public:
     void Update() override;
     void Render() override;
 
+    const Scene* GetEditedScene() const { return FCurrentScene; }
+
 private:
     Scene* FCurrentScene;
     WindowsToShow FWindows;

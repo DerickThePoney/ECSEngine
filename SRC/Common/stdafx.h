@@ -58,7 +58,7 @@
     {                                                                                                                                                                              \
         ar(PROPERTY(P));                                                                                                                                                           \
     }                                                                                                                                                                              \
-    catch (std::exception e)                                                                                                                                                       \
+    catch (std::runtime_error e)                                                                                                                                                   \
     {                                                                                                                                                                              \
         F##P = DEFAULT;                                                                                                                                                            \
     }
@@ -67,7 +67,7 @@
     {                                                                                                                                                                              \
         ar(NAMEDPROPERTY(N, P));                                                                                                                                                   \
     }                                                                                                                                                                              \
-    catch (std::exception e)                                                                                                                                                       \
+    catch (std::runtime_error e)                                                                                                                                                   \
     {                                                                                                                                                                              \
         P = DEFAULT;                                                                                                                                                               \
     }

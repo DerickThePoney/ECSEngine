@@ -28,21 +28,8 @@ bool ECSLoader::VirtualInitialise()
     {
         std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + FEntityTemplatesFile);
 
-        try
-        {
-            cereal::JSONInputArchive archive(ifstr);
-            archive(NAMEDPROPERTY("EntityTemplatesList", EntityTemplateManager::Instance()));
-        }
-        catch (std::exception e)
-        {
-            EntityTemplateManager::Destroy();
-            EntityTemplateManager::CreateIFP();
-            EntityTemplate* newTemplate = EntityTemplateManager::Instance().CreateNewEntityTemplate();
-            newTemplate->SetHasModule<ApparenceModule>();
-            newTemplate->SetHasModule<PositionModule>();
-            newTemplate->SetHasModule<OrientationModule>();
-            newTemplate->Initialise();
-        }
+        cereal::JSONInputArchive archive(ifstr);
+        archive(NAMEDPROPERTY("EntityTemplatesList", EntityTemplateManager::Instance()));
     }
 
     return true;

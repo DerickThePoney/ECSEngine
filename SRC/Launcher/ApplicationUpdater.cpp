@@ -206,6 +206,7 @@ void SaveAndReloadTest()
 
 void ApplicationUpdater::Initialise()
 {
+    editorSceneRenderer.Initialise("meshes\\testobjects\\movehandle.fbx.gen", "materials\\vertexcolormaterial.material");
     renderSystem.Init();
     orientationSystem.Init();
 
@@ -224,6 +225,7 @@ void ApplicationUpdater::Shutdown()
 
     orientationSystem.Destroy();
     renderSystem.Destroy();
+    editorSceneRenderer.Shutdown();
 }
 
 bool ApplicationUpdater::CheckShouldFinish()
@@ -256,6 +258,10 @@ void ApplicationUpdater::Update()
 void ApplicationUpdater::Render()
 {
     renderSystem.Update();
+
+    const Scene* currentScene = scene.GetEditedScene();
+    if (currentScene != nullptr)
+        editorSceneRenderer.RenderScene(currentScene);
 
     Rendering::ImGUI::Render();
 
