@@ -10,6 +10,7 @@
 #include "ECSGameplay_Common/PositionModule.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/BGFXRenderingUtils.h"
+#include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/Material.h"
 #include "RenderingCore/MaterialManager.h"
@@ -56,6 +57,10 @@ void RenderingSystem::VirtualUpdate()
 {
     parent_type::VirtualUpdate();
 
+    Rendering::DrawCommandBuffer& commandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(0);
+
+    // commandBuffer.DrawAABB(kHandle, glm::vec3(-1), glm::vec3(1));
+
     ModuleAccessor<ApparenceModule> apparenceController;
     ModuleAccessor<PositionModule> positionController;
     ModuleAccessor<OrientationModule> orientationController;
@@ -71,7 +76,7 @@ void RenderingSystem::VirtualUpdate()
 
     glm::mat4 view = cshared->GetWorldViewMatrix();
     glm::mat4 proj = cshared->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
-    bgfx::setViewTransform(0, &view[0][0], &proj[0][0]);
+    commandBuffer.SetViewTranform(view, proj);
 
     const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
     glm::vec4 uniformVal = glm::vec4(sinTime, sinTime, sinTime, sinTime);
@@ -82,12 +87,8 @@ void RenderingSystem::VirtualUpdate()
         foreachitem(apparenceModule, apparenceController)
         {
             const EntityId& unitId = apparenceModule.UnitId();
-            Rendering::MeshHandle meshHandle = apparenceModule.GetMeshHandle();
-
-            Rendering::IMesh* mesh = Rendering::MeshManager::Instance().GetMesh(meshHandle);
-
-            bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
-            bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
+            const Rendering::MeshHandle& meshHandle = apparenceModule.GetMeshHandle();
+            const Rendering::MaterialInstanceHandle& materialHandle = apparenceModule.GetMaterialHandle();
 
             const PositionModule* positionModule = positionController[unitId];
             AssertRelease(positionModule != nullptr);
@@ -97,64 +98,59 @@ void RenderingSystem::VirtualUpdate()
             glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
             mtx = mtx * glm::scale(glm::vec3(0.5f)) * (glm::mat4)orientationModule->GetOrientation();
 
-            bgfx::setTransform(&mtx[0][0]);
-
-            const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(kHandle);
-            AssertRelease(instance != nullptr);
-
-            bgfx::submit(0, instance->GetProgram()->ProgramHandle());
+            commandBuffer.DrawMesh(meshHandle, materialHandle, mtx);
         }
     }
     else
     {
-        // 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
-        const uint16_t instanceStride = 64;
-        // 11x11 cubes
-        const uint32_t numInstances = apparenceController.GetSize();
+        //// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
+        // const uint16_t instanceStride = 64;
+        //// 11x11 cubes
+        // const uint32_t numInstances = apparenceController.GetSize();
 
-        if (numInstances > 0 && numInstances == bgfx::getAvailInstanceDataBuffer(numInstances, instanceStride))
-        {
-            bgfx::InstanceDataBuffer idb;
-            bgfx::allocInstanceDataBuffer(&idb, numInstances, instanceStride);
+        // if (numInstances > 0 && numInstances == bgfx::getAvailInstanceDataBuffer(numInstances, instanceStride))
+        //{
+        //    bgfx::InstanceDataBuffer idb;
+        //    bgfx::allocInstanceDataBuffer(&idb, numInstances, instanceStride);
 
-            uint8_t* data = idb.data;
+        //    uint8_t* data = idb.data;
 
-            u32 i = 0;
+        //    u32 i = 0;
 
-            foreachitem(apparenceModule, apparenceController)
-            {
-                const EntityId& unitId = apparenceModule.UnitId();
-                if (i == 0)
-                {
-                    Rendering::MeshHandle meshHandle = apparenceModule.GetMeshHandle();
+        //    foreachitem(apparenceModule, apparenceController)
+        //    {
+        //        const EntityId& unitId = apparenceModule.UnitId();
+        //        if (i == 0)
+        //        {
+        //            Rendering::MeshHandle meshHandle = apparenceModule.GetMeshHandle();
 
-                    Rendering::IMesh* mesh = Rendering::MeshManager::Instance().GetMesh(meshHandle);
+        //            Rendering::IMesh* mesh = Rendering::MeshManager::Instance().GetMesh(meshHandle);
 
-                    bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
-                    bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
-                }
+        //            bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
+        //            bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
+        //        }
 
-                const PositionModule* positionModule = positionController[unitId];
-                AssertRelease(positionModule != nullptr);
+        //        const PositionModule* positionModule = positionController[unitId];
+        //        AssertRelease(positionModule != nullptr);
 
-                const OrientationModule* orientationModule = orientationController[unitId];
-                AssertRelease(orientationModule != nullptr);
-                glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
-                mtx = mtx * glm::scale(glm::vec3(0.1f, 0.1f, 0.1f)) * (glm::mat4)orientationModule->GetOrientation();
-                memcpy(data, &mtx, sizeof(mtx));
-                data += instanceStride;
-                ++i;
-            }
+        //        const OrientationModule* orientationModule = orientationController[unitId];
+        //        AssertRelease(orientationModule != nullptr);
+        //        glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
+        //        mtx = mtx * glm::scale(glm::vec3(0.1f, 0.1f, 0.1f)) * (glm::mat4)orientationModule->GetOrientation();
+        //        memcpy(data, &mtx, sizeof(mtx));
+        //        data += instanceStride;
+        //        ++i;
+        //    }
 
-            // Set instance data buffer.
-            bgfx::setInstanceDataBuffer(&idb);
+        //    // Set instance data buffer.
+        //    bgfx::setInstanceDataBuffer(&idb);
 
-            // Set render states.
-            bgfx::setState(BGFX_STATE_DEFAULT);
+        //    // Set render states.
+        //    bgfx::setState(BGFX_STATE_DEFAULT);
 
-            // Submit primitive for rendering to view 0.
-            bgfx::submit(0, kProgramInstancing);
-        }
+        //    // Submit primitive for rendering to view 0.
+        //    bgfx::submit(0, kProgramInstancing);
+        //}
     }
 }
 

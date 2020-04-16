@@ -6,6 +6,7 @@
 #include "Common/RingBuffer.h"
 #include "ECSCore/EntityId.h"
 #include "ECSGameplay_Common/OrientationSystem.h"
+#include "Rendering/EditorSceneRenderer.h"
 #include "Rendering/RenderingSystem.h"
 
 namespace ECSEngine
@@ -36,6 +37,7 @@ public:
 private:
     OrientationSystem orientationSystem;
     RenderingSystem renderSystem;
+    EditorSceneRenderer editorSceneRenderer;
 
     // temp data
     const EntityTemplate* FTemplate;

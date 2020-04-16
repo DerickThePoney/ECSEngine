@@ -44,25 +44,8 @@ const MeshHandle MeshManager::CreateMesh(const void* parVertexData, const u32 pa
 
 const MeshHandle MeshManager::CreateMesh(const std::string& parFilename)
 {
-    auto itFind = FFileToMesh.find(parFilename);
-
-    if (itFind != FFileToMesh.end())
-    {
-        return MeshHandle(itFind->second);
-    }
-    else
-    {
-        MeshFileReader reader;
-        IMesh* mesh = nullptr;
-
-        reader.ReadMesh(mesh, parFilename);
-
-        AssertRelease(mesh != nullptr);
-        MeshHandle handle((u32)FMeshes.size());
-        FMeshes.push_back(mesh);
-        FFileToMesh[parFilename] = handle.GetMeshId();
-        return handle;
-    }
+    Resource res(parFilename);
+    return CreateMesh(res);
 }
 
 const MeshHandle MeshManager::CreateMesh(Resource& parResource)

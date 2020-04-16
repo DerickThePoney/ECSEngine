@@ -49,7 +49,9 @@ private:
             }
         }
 
-        if (ImGui::BeginCombo("##PropertyCombo", (selected == -1) ? "" : fileList[selected].c_str()))
+        ImGui::Text(FName.c_str());
+        ImGui::SameLine();
+        if (ImGui::BeginCombo(("##PropertyCombo" + FName).c_str(), (selected == -1) ? "" : fileList[selected].c_str()))
         {
             forrange(i, 0, fileList.size())
             {
@@ -72,7 +74,7 @@ private:
         ImGui::SameLine();
         char buff[1024];
         sprintf(buff, "%s", FProperty->c_str());
-        ImGui::InputText("##PropertyEdit", buff, 256);
+        ImGui::InputText(("##PropertyEdit" + FName).c_str(), buff, 256);
         *FProperty = std::string(buff);
     }
 
@@ -161,7 +163,9 @@ public:
             }
         }
 
-        if (ImGui::BeginCombo(FName.c_str(), (selected == -1) ? "No associated item" : sceneItems[selected]->GetName().c_str()))
+        ImGui::Text(FName.c_str());
+        ImGui::SameLine();
+        if (ImGui::BeginCombo(("##SceneItemCombo" + FName).c_str(), (selected == -1) ? "No associated item" : sceneItems[selected]->GetName().c_str()))
         {
             forrange(i, 0, sceneItems.size())
             {

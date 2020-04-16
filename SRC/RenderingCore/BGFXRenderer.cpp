@@ -2,6 +2,7 @@
 
 #include "BGFXRenderer.h"
 
+#include "DrawCommands.h"
 #include "GLFWDisplayWindowHandler.h"
 
 #include <bgfx/bgfx.h>
@@ -49,10 +50,17 @@ void BGFXRenderer::Shutdown()
 }
 void BGFXRenderer::RenderFrame()
 {
+    std::vector<DrawCommandBuffer*>& commandBuffers = FCommandBuffers[0];
+
+    foreachitem(commandBuffer, commandBuffers) { commandBuffer->Submit(); }
+
     // Set view 0 default viewport.
     bgfx::touch(0);
 
     bgfx::frame();
+
+    foreachitem(commandBuffer, commandBuffers) { delete commandBuffer; }
+    commandBuffers.clear();
 }
 
 void BGFXRenderer::Resize(u32 width, u32 height)
@@ -66,6 +74,15 @@ bool BGFXRenderer::IsInstancingEnabled()
     // Get renderer capabilities info.
     const bgfx::Caps* caps = bgfx::getCaps();
     return !(0 == (BGFX_CAPS_INSTANCING & caps->supported));
+}
+
+DrawCommandBuffer& BGFXRenderer::CreateCommandBuffer(u16 parViewId /*= 0*/)
+{
+    DrawCommandBuffer* buffer = new DrawCommandBuffer();
+
+    FCommandBuffers[parViewId].push_back(buffer);
+
+    return *buffer;
 }
 
 } // namespace Rendering

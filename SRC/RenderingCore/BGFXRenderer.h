@@ -5,6 +5,7 @@ namespace ECSEngine
 {
 namespace Rendering
 {
+class DrawCommandBuffer;
 class BGFXRenderer final : public Singleton<BGFXRenderer>
 {
 public:
@@ -18,6 +19,11 @@ public:
     void Resize(u32 width, u32 height);
 
     bool IsInstancingEnabled();
+
+    DrawCommandBuffer& CreateCommandBuffer(u16 parViewId = 0);
+
+private:
+    std::map<u16, std::vector<DrawCommandBuffer*>> FCommandBuffers;
 };
 
 } // namespace Rendering
