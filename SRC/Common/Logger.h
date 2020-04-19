@@ -9,6 +9,7 @@ enum Type
     RENDERING,
     GAMEPLAY,
     UI,
+    INPUT,
     DEBUG_MESSAGE,
     WARNING_MESSAGE,
     ERROR_MESSAGE,
@@ -44,6 +45,7 @@ const std::vector<MessageRecord>& GetLoggedMessages();
 #define LOG_RENDERING(MSG) Logger::LogMessage(ELoggingCategory::RENDERING, MSG)
 #define LOG_GAMEPLAY(MSG) Logger::LogMessage(ELoggingCategory::GAMEPLAY, MSG)
 #define LOG_UI(MSG) Logger::LogMessage(ELoggingCategory::UI, MSG)
+#define LOG_INPUT(MSG) Logger::LogMessage(ELoggingCategory::INPUT, MSG)
 #define LOG_DEBUG(MSG) Logger::LogMessage(ELoggingCategory::DEBUG_MESSAGE, MSG)
 #define LOG_WARNING(MSG) Logger::LogMessage(ELoggingCategory::WARNING_MESSAGE, MSG)
 #define LOG_ERROR(MSG) Logger::LogMessage(ELoggingCategory::ERROR_MESSAGE, MSG)

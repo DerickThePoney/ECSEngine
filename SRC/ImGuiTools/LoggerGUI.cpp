@@ -11,11 +11,11 @@ namespace ImGUITools
 
 void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow)
 {
-    static bool showMessages[ELoggingCategory::LENGTH] = { true, true, true, true, true, true };
+    static bool showMessages[ELoggingCategory::LENGTH] = { true, true, true, true, true, true, true };
     static glm::vec4 colors[ELoggingCategory::LENGTH] = {
 
         glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
-        glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f)
+        glm::vec4(0.7f, 0.7f, 0.7f, 1.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f)
 
     };
 
@@ -35,7 +35,7 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
     ImGui::NextColumn();
     ImGui::Separator();
 
-    forrange(i, 0, parRecords.size())
+    reverseforrange(i, 0, parRecords.size())
     {
         if (!showMessages[parRecords[i].Category])
             continue;

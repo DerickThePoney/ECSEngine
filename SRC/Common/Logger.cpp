@@ -46,6 +46,9 @@ const char* GetName(Type parValue)
     case ECSEngine::ELoggingCategory::UI:
         return "UI";
         break;
+    case ECSEngine::ELoggingCategory::INPUT:
+        return "Input";
+        break;
     case ECSEngine::ELoggingCategory::DEBUG_MESSAGE:
         return "Debug";
         break;
