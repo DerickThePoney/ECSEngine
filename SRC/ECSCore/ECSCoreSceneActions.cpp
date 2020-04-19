@@ -9,14 +9,14 @@
 #include "ModuleParameters.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::SpawnEntitySceneAction);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ISceneAction, ECSEngine::SpawnEntitySceneAction)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionWithBaseSceneItem, ECSEngine::SpawnEntitySceneAction)
 
 namespace ECSEngine
 {
 IMPLEMENT_SCENE_ACTION(SpawnEntitySceneAction);
 
 SpawnEntitySceneAction::SpawnEntitySceneAction(const std::string& parFName)
-    : ISceneAction(parFName)
+    : SceneActionWithBaseSceneItem(parFName)
 {
 }
 
@@ -26,19 +26,13 @@ SpawnEntitySceneAction::~SpawnEntitySceneAction()
 
 void SpawnEntitySceneAction::VirtualInitialise(const Scene* parScene)
 {
-    ISceneAction::VirtualInitialise(parScene);
+    SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateName);
-    auto sceneItems = GetScene()->GetSceneItems();
-    if (FSceneItemID < sceneItems.size())
-    {
-        FSceneItem = sceneItems[FSceneItemID].get();
-        AssertRelease(FSceneItem != nullptr);
-    }
 }
 
 void SpawnEntitySceneAction::VirtualStart()
 {
-    ISceneAction::VirtualStart();
+    SceneActionWithBaseSceneItem::VirtualStart();
 
     AssertRelease(FSceneItem != nullptr);
     AssertRelease(FTemplate != nullptr);
@@ -52,19 +46,12 @@ void SpawnEntitySceneAction::VirtualStart()
 
 void SpawnEntitySceneAction::VirtualDrawEditor()
 {
-    ISceneAction::VirtualDrawEditor();
+    SceneActionWithBaseSceneItem::VirtualDrawEditor();
 
     if (ShouldShowEditor())
     {
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Entity to spawn", FTemplate, FEntityTemplateName);
-        EDITOR_PROPERTY_SCENE_ITEM("Scene item", FSceneItem, FSceneItemID, GetScene());
     }
-}
-
-void SpawnEntitySceneAction::SetSceneItem(const BaseSceneItem* parSceneItem)
-{
-    FSceneItem = parSceneItem;
-    FSceneItemID = parSceneItem->GetSceneItemTypeId();
 }
 
 } // namespace ECSEngine
