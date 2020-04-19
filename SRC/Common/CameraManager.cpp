@@ -32,18 +32,17 @@ u32 CameraManager::CreateCameraIFN(const std::string& parName)
 void CameraManager::DestroyCamera(u32 parCameraId)
 {
     AssertRelease(FCameras.size() > parCameraId);
-    AssertRelease(FCameras[parCameraId] != nullptr);
     FCameras[parCameraId] = nullptr;
 }
 
-std::weak_ptr<Camera> CameraManager::GetCamera(u32 parCameraId)
+Camera* CameraManager::GetCamera(u32 parCameraId)
 {
     AssertRelease(FCameras.size() > parCameraId);
     AssertRelease(FCameras[parCameraId] != nullptr);
-    return FCameras[parCameraId];
+    return FCameras[parCameraId].get();
 }
 
-std::weak_ptr<Camera> CameraManager::GetCamera(const std::string& parName)
+Camera* CameraManager::GetCamera(const std::string& parName)
 {
     AlwaysCheckedAssertMsg(FCameraNameToCameraId.find(parName) != FCameraNameToCameraId.end(), "A camera can't be found!");
     const u32 camId = FCameraNameToCameraId[parName];

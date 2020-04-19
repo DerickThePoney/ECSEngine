@@ -46,11 +46,10 @@ void RenderingSystem::VirtualInit()
 
     glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 0, 1.0f));
 
-    u32 CamId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
-    c = CameraManager::Instance().GetCamera(CamId);
-    AlwaysCheckedAssert(!c.expired());
-    std::shared_ptr<Camera> cshared = c.lock();
-    cshared->Init(worldWiewMatrix, glm::radians(60.0f), 0.1f, 300.0f);
+    CamId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+    Camera* c = CameraManager::Instance().GetCamera(CamId);
+    AssertRelease(c != nullptr);
+    c->Init(worldWiewMatrix, glm::radians(60.0f), 0.1f, 300.0f);
 }
 
 void RenderingSystem::VirtualUpdate()
@@ -59,8 +58,6 @@ void RenderingSystem::VirtualUpdate()
 
     Rendering::DrawCommandBuffer& commandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(0);
 
-    // commandBuffer.DrawAABB(kHandle, glm::vec3(-1), glm::vec3(1));
-
     ModuleAccessor<ApparenceModule> apparenceController;
     ModuleAccessor<PositionModule> positionController;
     ModuleAccessor<OrientationModule> orientationController;
@@ -68,14 +65,13 @@ void RenderingSystem::VirtualUpdate()
     const float timepoint = TimeManager::DurationSinceStartRealTime();
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
-    AlwaysCheckedAssert(!c.expired());
-    std::shared_ptr<Camera> cshared = c.lock();
-
+    Camera* c = CameraManager::Instance().GetCamera(CamId);
+    AssertRelease(c != nullptr);
     const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
     const glm::vec3 eye = { 0.0f, 5.0f, 0.0f };
 
-    glm::mat4 view = cshared->GetWorldViewMatrix();
-    glm::mat4 proj = cshared->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
+    glm::mat4 view = c->GetWorldViewMatrix();
+    glm::mat4 proj = c->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
     commandBuffer.SetViewTranform(view, proj);
 
     const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);

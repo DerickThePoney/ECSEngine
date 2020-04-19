@@ -3,8 +3,10 @@
 #include "EditorSceneRenderer.h"
 
 #include "Application/Scene.h"
+#include "Common/CameraManager.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
 
@@ -25,15 +27,23 @@ void EditorSceneRenderer::Initialise(const std::string& parHandleFileName, const
     AssertRelease(FHandleMesh.IsValid());
     FHandleMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN(parHandleMaterial);
     AssertRelease(FHandleMaterial.IsValid());
+
+    FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
 }
 
 void EditorSceneRenderer::Shutdown()
 {
+    CameraManager::Instance().DestroyCamera(FCameraId);
 }
 
 void EditorSceneRenderer::RenderScene(const Scene* parScene)
 {
     Rendering::DrawCommandBuffer& commandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(0);
+    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+
+    Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
+    AssertRelease(camera != nullptr);
+    commandBuffer.SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y)));
 
     AssertRelease(parScene != nullptr);
     const std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItems();
