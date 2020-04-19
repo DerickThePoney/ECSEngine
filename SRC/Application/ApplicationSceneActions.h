@@ -22,8 +22,6 @@ public:
 protected:
     virtual void VirtualInitialise(const Scene* parScene) override;
 
-    virtual void VirtualStart() override;
-
     virtual void VirtualDrawEditor() override;
 
 public:
@@ -36,5 +34,36 @@ public:
 protected:
     const BaseSceneItem* FSceneItem = nullptr;
     u32 FSceneItemID = -1;
+};
+
+/*************************************************************/
+/*            SceneActionCreateMainCamera                    */
+/*************************************************************/
+class SceneActionCreateMainCamera : public SceneActionWithBaseSceneItem
+{
+    DECLARE_SCENE_ACTION(SceneActionCreateMainCamera);
+
+public:
+    SceneActionCreateMainCamera(const std::string& parFName = "Dummy");
+    virtual ~SceneActionCreateMainCamera();
+
+protected:
+    virtual void VirtualInitialise(const Scene* parScene) override;
+
+    virtual void VirtualStart() override;
+
+    virtual void VirtualDrawEditor() override;
+
+public:
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(cereal::base_class<SceneActionWithBaseSceneItem>(this), PROPERTY(Fov), PROPERTY(NearPlane), PROPERTY(FarPlane));
+    }
+
+private:
+    float FFov = 60.0f;
+    float FNearPlane = 0.1f;
+    float FFarPlane = 100.0f;
 };
 } // namespace ECSEngine
