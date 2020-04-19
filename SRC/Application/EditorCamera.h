@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/InputCommands.h"
 
 namespace ECSEngine
 {
@@ -14,7 +15,17 @@ public:
     void Shutdown();
 
 private:
+    KeyboardCommand FForward;
+    KeyboardCommand FBackward;
+    KeyboardCommand FLeft;
+    KeyboardCommand FRight;
+    KeyboardCommand FUp;
+    KeyboardCommand FDown;
+
     u32 FCameraId;
-    std::weak_ptr<Camera> FCamera;
+
+    float FForwardSpeed = 100.0f;
+    float FLateralSpeed = 50.0f;
+    float FRotationSpeed = 45.0f;
 };
 } // namespace ECSEngine
