@@ -206,6 +206,8 @@ void DrawMeshCommand::SubmitCommand() const
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
 
+    bgfx::setState(BGFX_STATE_DEFAULT);
+
     bgfx::submit(0, instance->GetProgram()->ProgramHandle());
 }
 
