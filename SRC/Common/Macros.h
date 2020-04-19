@@ -40,6 +40,7 @@ ReverseWrapper<T> reverse(T&& container)
 } // namespace ECSEngine
 
 #define forrange(VAR, START, END) for (size_t VAR = START; VAR < END; ++VAR)
+#define reverseforrange(VAR, START, END) for (size_t VAR = END - 1, STOP = END; STOP != START; --VAR, --STOP)
 
 #define foreachitem(VAR, CONTAINER) for (auto& VAR : CONTAINER)
 
