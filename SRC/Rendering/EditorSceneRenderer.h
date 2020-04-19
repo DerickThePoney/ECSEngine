@@ -4,6 +4,7 @@
 namespace ECSEngine
 {
 class Scene;
+class Camera;
 class EditorSceneRenderer
 {
 public:
@@ -18,5 +19,6 @@ public:
 private:
     Rendering::MeshHandle FHandleMesh;
     Rendering::MaterialInstanceHandle FHandleMaterial;
+    u32 FCameraId;
 };
 } // namespace ECSEngine

@@ -17,6 +17,6 @@ protected:
     void VirtualUpdate() override;
     void VirtualDestroy() override;
 
-    std::weak_ptr<Camera> c;
+    u32 CamId;
 };
 } // namespace ECSEngine
