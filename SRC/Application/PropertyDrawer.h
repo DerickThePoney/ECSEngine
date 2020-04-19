@@ -87,9 +87,12 @@ template<>
 class PropertyDrawer<glm::vec3>
 {
 public:
-    PropertyDrawer(const std::string& parPropertyName, glm::vec3* parProperty)
+    PropertyDrawer(const std::string& parPropertyName, glm::vec3* parProperty, bool parUseLimits, glm::vec3 parMin, glm::vec3 parMax)
         : FName(parPropertyName)
         , FProperty(parProperty)
+        , FUseLimits(parUseLimits)
+        , FMin(parMin)
+        , FMax(parMax)
     {
     }
 
@@ -98,6 +101,9 @@ public:
 private:
     std::string FName;
     glm::vec3* FProperty = nullptr;
+    bool FUseLimits;
+    glm::vec3 FMin;
+    glm::vec3 FMax;
 };
 
 template<>
@@ -117,14 +123,51 @@ private:
     glm::quat* FProperty = nullptr;
 };
 
+template<>
+class PropertyDrawer<float>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, float* parProperty, bool parUseLimits, float parMin, float parMax)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FUseLimits(parUseLimits)
+        , FMin(parMin)
+        , FMax(parMax)
+    {
+    }
+
+    void ShowProperty()
+    {
+        if (FUseLimits)
+            ImGui::SliderFloat(FName.c_str(), FProperty, FMin, FMax);
+        else
+            ImGui::InputFloat4(FName.c_str(), (float*)FProperty);
+    }
+
+private:
+    std::string FName;
+    float* FProperty = nullptr;
+    bool FUseLimits;
+    float FMin;
+    float FMax;
+};
+
 template<typename T>
 void MakeSimpleProperty(const std::string& parName, T* parProperty)
 {
-    PropertyDrawer<T> drawer(parName, parProperty);
+    PropertyDrawer<T> drawer(parName, parProperty, false, T(-1), T(-1));
+    drawer.ShowProperty();
+}
+
+template<typename T>
+void MakePropertyWithLimits(const std::string& parName, T* parProperty, const T& parMin, const T& parMax)
+{
+    PropertyDrawer<T> drawer(parName, parProperty, true, parMin, parMax);
     drawer.ShowProperty();
 }
 
 #define EDITOR_PROPERTY_SIMPLE(NAME, PROPERTY) MakeSimpleProperty(NAME, &PROPERTY);
+#define EDITOR_PROPERTY_WITH_LIMITS(NAME, PROPERTY, MIN, MAX) MakePropertyWithLimits(NAME, &PROPERTY, MIN, MAX);
 
 #define EDITOR_PROPERTY_STRING(NAME, PROPERTY, IS_FILE, PATTERN)                                                                                                                   \
     {                                                                                                                                                                              \
@@ -174,8 +217,8 @@ public:
                     selected = (u32)i;
                 if (is_selected)
                     ImGui::SetItemDefaultFocus();
-                ImGui::EndCombo();
             }
+            ImGui::EndCombo();
         }
 
         if (selected != -1)

@@ -2,6 +2,7 @@
 
 #include "SceneActionManagement.h"
 
+#include "ApplicationSceneActions.h"
 #include "Common/Singleton.h"
 #include "ECSCore/ECSCoreSceneActions.h"
 

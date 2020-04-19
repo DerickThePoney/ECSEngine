@@ -8,6 +8,9 @@
 CEREAL_REGISTER_TYPE(ECSEngine::SceneActionWithBaseSceneItem);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ISceneAction, ECSEngine::SceneActionWithBaseSceneItem)
 
+CEREAL_REGISTER_TYPE(ECSEngine::SceneActionCreateMainCamera);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionWithBaseSceneItem, ECSEngine::SceneActionCreateMainCamera)
+
 namespace ECSEngine
 {
 
@@ -40,11 +43,6 @@ void SceneActionWithBaseSceneItem::VirtualInitialise(const Scene* parScene)
     }
 }
 
-void SceneActionWithBaseSceneItem::VirtualStart()
-{
-    ISceneAction::VirtualStart();
-}
-
 void SceneActionWithBaseSceneItem::VirtualDrawEditor()
 {
     ISceneAction::VirtualDrawEditor();
@@ -52,6 +50,43 @@ void SceneActionWithBaseSceneItem::VirtualDrawEditor()
     if (ShouldShowEditor())
     {
         EDITOR_PROPERTY_SCENE_ITEM("Scene item", FSceneItem, FSceneItemID, GetScene());
+    }
+}
+
+/*************************************************************/
+/*            SceneActionCreateMainCamera                    */
+/*************************************************************/
+
+IMPLEMENT_SCENE_ACTION(SceneActionCreateMainCamera);
+
+SceneActionCreateMainCamera::SceneActionCreateMainCamera(const std::string& parFName)
+    : SceneActionWithBaseSceneItem(parFName)
+{
+}
+
+SceneActionCreateMainCamera::~SceneActionCreateMainCamera()
+{
+}
+
+void SceneActionCreateMainCamera::VirtualInitialise(const Scene* parScene)
+{
+    SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
+}
+
+void SceneActionCreateMainCamera::VirtualStart()
+{
+    SceneActionWithBaseSceneItem::VirtualStart();
+}
+
+void SceneActionCreateMainCamera::VirtualDrawEditor()
+{
+    SceneActionWithBaseSceneItem::VirtualDrawEditor();
+
+    if (ShouldShowEditor())
+    {
+        EDITOR_PROPERTY_WITH_LIMITS("FoV", FFov, 0.0f, 180.0f);
+        EDITOR_PROPERTY_WITH_LIMITS("Near Plane", FNearPlane, 0.0f, FFarPlane);
+        EDITOR_PROPERTY_WITH_LIMITS("Far Plane", FFarPlane, FNearPlane, 10000.0f);
     }
 }
 
