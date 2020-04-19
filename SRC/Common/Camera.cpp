@@ -6,27 +6,24 @@ namespace ECSEngine
 {
 
 Camera::Camera()
-    : FPosition(glm::vec3(0.0f))
-    , FOrientation(glm::quat())
+    : FWorldViewMatrix(glm::identity<glm::mat4>())
     , FFov(glm::radians(50.0f))
     , FFarPlane(150.0f)
     , FNearPlane(0.1f)
 {
 }
 
-Camera::Camera(const glm::vec3& parPosition, const glm::quat& parOrientation, const float parFov, const float parNearPlane, const float parFarPlane)
-    : FPosition(parPosition)
-    , FOrientation(parOrientation)
+Camera::Camera(const glm::mat4& parWorldViewMatrix, const float parFov, const float parNearPlane, const float parFarPlane)
+    : FWorldViewMatrix(parWorldViewMatrix)
     , FFov(parFov)
     , FFarPlane(parNearPlane)
     , FNearPlane(parFarPlane)
 {
 }
 
-void Camera::Init(const glm::vec3& parPosition, const glm::quat& parOrientation, const float parFov, const float parNearPlane, const float parFarPlane)
+void Camera::Init(const glm::mat4& parWorldViewMatrix, const float parFov, const float parNearPlane, const float parFarPlane)
 {
-    FPosition = parPosition;
-    FOrientation = parOrientation;
+    FWorldViewMatrix = parWorldViewMatrix;
     FFov = parFov;
     FFarPlane = parNearPlane;
     FNearPlane = parFarPlane;
@@ -39,7 +36,7 @@ glm::mat4 Camera::GetProjectionMatrix(const float parAspectRatio)
 
 glm::mat4 Camera::GetWorldViewMatrix()
 {
-    return glm::mat4(FOrientation) * glm::inverse(glm::translate(FPosition));
+    return FWorldViewMatrix;
 }
 
 } // namespace ECSEngine

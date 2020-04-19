@@ -43,8 +43,8 @@ void EditorSceneRenderer::RenderScene(const Scene* parScene)
         const glm::vec3& position = sceneItem->GetPosition();
         commandBuffer.DrawAABB(FHandleMaterial, position - glm::vec3(1.0f), position + glm::vec3(1.0f));
 
-        glm::mat4 mtx = glm::translate(position);
-        mtx = mtx * glm::scale(glm::vec3(0.5f)) * (glm::mat4)sceneItem->GetOrientation();
+        glm::vec3 angles = sceneItem->GetEulerAngles();
+        glm::mat4 mtx = glm::translate(position) * glm::eulerAngleXYZ(angles.x, angles.y, angles.z);
 
         commandBuffer.DrawMesh(FHandleMesh, FHandleMaterial, mtx);
     }

@@ -42,15 +42,15 @@ void RenderingSystem::VirtualInit()
     kProgramInstancing = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColorInstancing");
 
     const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
-    const glm::vec3 eye = { 0.0f, 5.0f, 0.0f };
+    const glm::vec3 eye = { 0.0f, 50.0f, 0.0f };
 
-    glm::quat orientation = glm::quat_cast(glm::lookAt(eye, at, glm::vec3(0.f, 1.f, 0.f)));
+    glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 0, 1.0f));
 
     u32 CamId = CameraManager::Instance().CreateCamera();
     c = CameraManager::Instance().GetCamera(CamId);
     AlwaysCheckedAssert(!c.expired());
     std::shared_ptr<Camera> cshared = c.lock();
-    cshared->Init(eye, orientation, glm::radians(60.0f), 0.1f, 50.0f);
+    cshared->Init(worldWiewMatrix, glm::radians(60.0f), 0.1f, 300.0f);
 }
 
 void RenderingSystem::VirtualUpdate()
@@ -96,7 +96,7 @@ void RenderingSystem::VirtualUpdate()
             const OrientationModule* orientationModule = orientationController[unitId];
             AssertRelease(orientationModule != nullptr);
             glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
-            mtx = mtx * glm::scale(glm::vec3(0.5f)) * (glm::mat4)orientationModule->GetOrientation();
+            mtx = mtx * (glm::mat4)orientationModule->GetOrientation();
 
             commandBuffer.DrawMesh(meshHandle, materialHandle, mtx);
         }

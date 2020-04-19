@@ -45,7 +45,7 @@ void SpawnEntitySceneAction::VirtualStart()
 
     ModuleParameters::ParameterContainer container;
     container.Set<ModuleParameters::Position>(FSceneItem->GetPosition());
-    container.Set<ModuleParameters::Orientation>(FSceneItem->GetOrientation());
+    // container.Set<ModuleParameters::Orientation>(FSceneItem->GetEulerAngles());
 
     EntityFactory::CreateEntity(FTemplate, container);
 }

@@ -30,17 +30,17 @@ public:
 
     const std::string& GetName() const { return FName; }
     const glm::vec3& GetPosition() const { return FPosition; }
-    const glm::quat& GetOrientation() const { return FOrientation; }
+    const glm::vec3& GetEulerAngles() const { return FEulerAngles; }
     const u32 Id() const { return FId; }
 
     void SetName(const std::string& parName) { FName = parName; }
     void SetPosition(const glm::vec3& parPosition) { FPosition = parPosition; }
-    void SetOrientation(const glm::quat& parOrientation) { FOrientation = parOrientation; }
+    void SetEulerAngles(const glm::vec3& parOrientation) { FEulerAngles = parOrientation; }
 
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(PROPERTY(Name), PROPERTY(Id), PROPERTY(Position), PROPERTY(Orientation));
+        ar(PROPERTY(Name), PROPERTY(Id), PROPERTY(Position), PROPERTY(EulerAngles));
     }
 
 protected:
@@ -49,7 +49,7 @@ protected:
 private:
     std::string FName;
     glm::vec3 FPosition;
-    glm::quat FOrientation;
+    glm::vec3 FEulerAngles;
 
     u32 FId;
     bool FShowItem;
