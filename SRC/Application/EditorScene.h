@@ -1,4 +1,5 @@
 #pragma once
+#include "EditorCamera.h"
 #include "Scene.h"
 
 namespace ECSEngine
@@ -36,5 +37,6 @@ private:
     Scene* FCurrentScene;
     WindowsToShow FWindows;
     IOScene FIOScene;
+    EditorCamera FEditorCamera;
 };
 } // namespace ECSEngine

@@ -24,8 +24,7 @@ EditorScene::~EditorScene()
 
 void EditorScene::Initialise()
 {
-    /*FCurrentScene = new Scene();
-    FCurrentScene->Initialise();*/
+    FEditorCamera.Initialise();
 }
 
 void EditorScene::Destroy()
@@ -36,6 +35,8 @@ void EditorScene::Destroy()
 
 void EditorScene::Update()
 {
+    FEditorCamera.Update();
+
     if (!FIOScene.openScene)
         ImGUITools::DrawSceneEditorMainMenu(FCurrentScene, FWindows, FIOScene);
 

@@ -21,6 +21,8 @@ public:
     void SetNear(const float parNear) { FNearPlane = parNear; }
     void SetFar(const float parFar) { FFarPlane = parFar; }
 
+    void Translate(const glm::vec3& parTranslation);
+
     glm::mat4 GetProjectionMatrix(const float parAspectRatio);
     glm::mat4 GetWorldViewMatrix();
 

@@ -29,6 +29,11 @@ void Camera::Init(const glm::mat4& parWorldViewMatrix, const float parFov, const
     FNearPlane = parFarPlane;
 }
 
+void Camera::Translate(const glm::vec3& parTranslation)
+{
+    FWorldViewMatrix = glm::translate(parTranslation) * FWorldViewMatrix;
+}
+
 glm::mat4 Camera::GetProjectionMatrix(const float parAspectRatio)
 {
     return glm::perspective(FFov, parAspectRatio, FNearPlane, FFarPlane);
