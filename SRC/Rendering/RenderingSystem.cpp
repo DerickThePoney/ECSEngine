@@ -46,7 +46,7 @@ void RenderingSystem::VirtualInit()
 
     glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 0, 1.0f));
 
-    u32 CamId = CameraManager::Instance().CreateCamera();
+    u32 CamId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
     c = CameraManager::Instance().GetCamera(CamId);
     AlwaysCheckedAssert(!c.expired());
     std::shared_ptr<Camera> cshared = c.lock();
