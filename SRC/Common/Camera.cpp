@@ -34,6 +34,11 @@ void Camera::Translate(const glm::vec3& parTranslation)
     FWorldViewMatrix = glm::translate(parTranslation) * FWorldViewMatrix;
 }
 
+void Camera::Rotate(const glm::mat4& parRotationMatrix)
+{
+    FWorldViewMatrix = glm::inverse(glm::inverse(FWorldViewMatrix) * parRotationMatrix);
+}
+
 glm::mat4 Camera::GetProjectionMatrix(const float parAspectRatio)
 {
     return glm::perspective(FFov, parAspectRatio, FNearPlane, FFarPlane);
