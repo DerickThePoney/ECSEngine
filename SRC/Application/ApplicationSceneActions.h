@@ -26,7 +26,7 @@ protected:
 
 public:
     template<class Archive>
-    void Serialize(Archive& ar)
+    void serialize(Archive& ar)
     {
         ar(cereal::base_class<ISceneAction>(this), PROPERTY(SceneItemID));
     }
@@ -54,14 +54,17 @@ protected:
 
     virtual void VirtualDrawEditor() override;
 
+    virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial) override;
+
 public:
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(cereal::base_class<SceneActionWithBaseSceneItem>(this), PROPERTY(Fov), PROPERTY(NearPlane), PROPERTY(FarPlane));
+        ar(cereal::base_class<SceneActionWithBaseSceneItem>(this), PROPERTY(CameraName), PROPERTY(Fov), PROPERTY(NearPlane), PROPERTY(FarPlane));
     }
 
 private:
+    std::string FCameraName = "GameplayCamera";
     float FFov = 60.0f;
     float FNearPlane = 0.1f;
     float FFarPlane = 100.0f;

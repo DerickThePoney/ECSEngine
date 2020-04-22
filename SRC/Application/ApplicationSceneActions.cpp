@@ -2,7 +2,10 @@
 
 #include "ApplicationSceneActions.h"
 
+#include "Common/RenderingHandles.h"
 #include "PropertyDrawer.h"
+#include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "Scene.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::SceneActionWithBaseSceneItem);
@@ -84,10 +87,29 @@ void SceneActionCreateMainCamera::VirtualDrawEditor()
 
     if (ShouldShowEditor())
     {
+        EDITOR_PROPERTY_STRING("Camera name", FCameraName, false, "");
         EDITOR_PROPERTY_WITH_LIMITS("FoV", FFov, 0.0f, 180.0f);
         EDITOR_PROPERTY_WITH_LIMITS("Near Plane", FNearPlane, 0.0f, FFarPlane);
         EDITOR_PROPERTY_WITH_LIMITS("Far Plane", FFarPlane, FNearPlane, 10000.0f);
     }
+}
+
+bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
+{
+    SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+
+    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(FFov), float(windowSize.x) / float(windowSize.y), FNearPlane, FFarPlane);
+    const BaseSceneItem* item = GetSceneItem();
+    if (item != nullptr)
+    {
+        const glm::vec3 eulerAngles = item->GetEulerAngles();
+        const glm::mat4 worldViewMatrix = glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z) * glm::translate(-item->GetPosition());
+
+        parCommandBuffer.DrawFrustum(parMaterial, worldViewMatrix, perspectiveMatrix, 0xFF00FF00);
+        return true;
+    }
+    return false;
 }
 
 } // namespace ECSEngine

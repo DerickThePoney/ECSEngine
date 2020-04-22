@@ -3,6 +3,7 @@
 #include "SceneActions.h"
 
 #include "PropertyDrawer.h"
+#include "RenderingCore/DrawCommands.h"
 
 namespace ECSEngine
 {
@@ -20,6 +21,7 @@ ISceneAction::ISceneAction(const std::string& parFName /*= "Dummy"*/)
     , FVirtualUpdateCalled(false)
     , FVirtualFinishCalled(false)
     , FVirtualDrawEditorCalled(false)
+    , FVirtualDrawInSceneEditorCalled(false)
 #endif
 {
 }
@@ -100,6 +102,16 @@ void ISceneAction::DrawEditor()
     AlwaysCheckedAssertMsg(FVirtualDrawEditorCalled, "Un appel à VirtualDrawEditor du parent à été oublié");
 }
 
+bool ISceneAction::DrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    FVirtualDrawEditorCalled = false;
+#endif
+    const bool res = VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+    AlwaysCheckedAssertMsg(FVirtualDrawInSceneEditorCalled, "Un appel à VirtualDrawInSceneEditor du parent à été oublié");
+    return res;
+}
+
 void ISceneAction::VirtualInitialise(const Scene* parScene)
 {
     FScene = parScene;
@@ -158,6 +170,14 @@ void ISceneAction::VirtualDrawEditor()
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualDrawEditorCalled = true;
 #endif
+}
+
+bool ISceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    FVirtualDrawInSceneEditorCalled = true;
+#endif
+    return false;
 }
 
 } // namespace ECSEngine
