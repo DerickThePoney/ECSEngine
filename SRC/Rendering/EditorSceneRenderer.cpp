@@ -58,6 +58,9 @@ void EditorSceneRenderer::RenderScene(const Scene* parScene)
 
         commandBuffer.DrawMesh(FHandleMesh, FHandleMaterial, mtx);
     }
+
+    std::vector<std::shared_ptr<ISceneAction>> sceneActions = parScene->GetSceneActions();
+    foreachitem(sceneAction, sceneActions) { sceneAction->DrawInSceneEditor(commandBuffer, FHandleMaterial); }
 }
 
 } // namespace ECSEngine

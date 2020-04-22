@@ -12,6 +12,13 @@ namespace ECSEngine
 /*                      ISceneAction                         */
 /*************************************************************/
 class Scene;
+
+namespace Rendering
+{
+class DrawCommandBuffer;
+class MaterialInstanceHandle;
+} // namespace Rendering
+
 class ISceneAction
 {
     friend class Scene;
@@ -44,6 +51,7 @@ public:
 
     void DrawEditor();
     bool ShouldShowEditor() const { return FShowEditor; }
+    bool DrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial);
 
     template<class Archive>
     void serialize(Archive& ar)
@@ -60,6 +68,7 @@ protected:
     virtual void VirtualFinish();
 
     virtual void VirtualDrawEditor();
+    virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial);
 
 private:
     std::string FName;
@@ -79,6 +88,7 @@ private:
     bool FVirtualFinishCalled;
 
     bool FVirtualDrawEditorCalled;
+    bool FVirtualDrawInSceneEditorCalled;
 #endif
 };
 
