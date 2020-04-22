@@ -59,6 +59,24 @@ const char* ToString(const Type parValue)
 
 } // namespace InputKeyNames
 
+namespace MouseButtons
+{
+#define DECLARE_ENUM(NAME, ID)                                                                                                                                                     \
+    {                                                                                                                                                                              \
+        (Type) ID, #NAME                                                                                                                                                           \
+    }
+std::map<Type, const char*> GMouseButtonsNames = {
+#include "MouseButtons.inl"
+};
+#undef DECLARE_ENUM
+const char* ToString(const Type parValue)
+{
+    AssertRelease(GMouseButtonsNames.find(parValue) != GMouseButtonsNames.end());
+    return GMouseButtonsNames[parValue];
+}
+
+} // namespace MouseButtons
+
 class InputManager final : public Singleton<InputManager>
 {
 public:

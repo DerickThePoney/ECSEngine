@@ -22,6 +22,8 @@ private:
     KeyboardCommand FUp;
     KeyboardCommand FDown;
 
+    MouseButtonCommand FMiddleMouseRotation;
+
     u32 FCameraId;
 
     float FForwardSpeed = 100.0f;

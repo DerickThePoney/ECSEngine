@@ -55,4 +55,35 @@ bool KeyboardCommand::Evaluate() const
     return buttonState && (ctrl == FControl) && (shift == FShift) && (alt == FAlt);
 }
 
+namespace
+{
+bool EvaluateMouseButton(const MouseButtons::Type parButton, const EInputType::Type parType)
+{
+    const bool buttonIsDown = Input::GetMouseButtonState(parButton);
+    switch (parType)
+    {
+    case EInputType::PRESSED:
+        return Input::GetMouseButtonHasChanged(parButton) && buttonIsDown;
+    case EInputType::RELEASED:
+        return Input::GetMouseButtonHasChanged(parButton) && !buttonIsDown;
+    case EInputType::REPEATED:
+        return buttonIsDown;
+    default:
+        AssertNotReached();
+        return false;
+        break;
+    }
+}
+} // namespace
+
+bool MouseButtonCommand::Evaluate() const
+{
+    const bool buttonState = EvaluateMouseButton(FMouseButton, FInputType);
+    const bool shift = Input::IsShiftDown();
+    const bool ctrl = Input::IsCtrlDown();
+    const bool alt = Input::IsAltDown();
+
+    return buttonState && (ctrl == FControl) && (shift == FShift) && (alt == FAlt);
+}
+
 } // namespace ECSEngine

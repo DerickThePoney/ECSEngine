@@ -42,6 +42,18 @@ enum Type
 const char* ToString(const Type parValue);
 } // namespace InputKeyNames
 
+namespace MouseButtons
+{
+#define DECLARE_ENUM(NAME, ID) NAME = ID
+enum Type
+{
+#include "MouseButtons.inl"
+};
+
+#undef DECLARE_ENUM
+const char* ToString(const Type parValue);
+} // namespace MouseButtons
+
 namespace Input
 {
 void Initialise(const u32 parNbKeyboardKeys, const glm::vec2& parMousePosition, const u32 parNbMouseButtons);
