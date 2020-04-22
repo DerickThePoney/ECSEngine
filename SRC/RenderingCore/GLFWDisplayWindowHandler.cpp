@@ -163,7 +163,7 @@ void GLFWDisplayWindowHandler::Init()
     double mouse_x, mouse_y;
     glfwGetCursorPos(FWindow, &mouse_x, &mouse_y);
 
-    Input::Initialise(GLFW_KEY_LAST, glm::vec2((float)mouse_x, (float)mouse_y), GLFW_MOUSE_BUTTON_LAST);
+    Input::Initialise(InputKeyNames::INPUT_KEY_LAST, glm::vec2((float)mouse_x, (float)mouse_y), MouseButtons::MOUSE_BUTTON_LAST);
 
     InitJoysticks();
 }
