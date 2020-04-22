@@ -90,12 +90,12 @@ void ImguiRenderer::Init()
     int32_t height;
 
     ECSEngine::ResourceCache* cache = ECSEngine::GlobalResourceCache::Instance().FCache;
-    ECSEngine::Resource shaderResource("Fonts\\kenvector_future.ttf");
+    ECSEngine::Resource shaderResource("Fonts\\OpenSans-Regular.ttf");
     std::shared_ptr<ECSEngine::ResourceHandle> shaderDataHandle = cache->GetResourceHandle(&shaderResource);
     ImFontConfig config;
     config.FontDataOwnedByAtlas = false;
     config.MergeMode = false;
-    io.Fonts->AddFontFromMemoryTTF(shaderDataHandle->WritableBuffer(), shaderDataHandle->Size(), 16, &config);
+    io.Fonts->AddFontFromMemoryTTF(shaderDataHandle->WritableBuffer(), shaderDataHandle->Size(), 20, &config);
 
     io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
