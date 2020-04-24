@@ -22,6 +22,7 @@ namespace ECSEngine
 {
 RenderingSystem::RenderingSystem()
     : parent_type()
+    , FDrawBuffer(nullptr)
 {
     RegisterDepency<ApparenceModule>(Worlds::STANDARD);
     RegisterDepency<PositionModule>(Worlds::STANDARD);
@@ -50,13 +51,16 @@ void RenderingSystem::VirtualInit()
     Camera* c = CameraManager::Instance().GetCamera(CamId);
     AssertRelease(c != nullptr);
     c->Init(worldWiewMatrix, glm::radians(60.0f), 0.1f, 100.0f);
+
+    FDrawBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(0);
 }
 
 void RenderingSystem::VirtualUpdate()
 {
     parent_type::VirtualUpdate();
 
-    Rendering::DrawCommandBuffer& commandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(0);
+    AssertRelease(FDrawBuffer != nullptr);
+    FDrawBuffer->clear();
 
     ModuleAccessor<ApparenceModule> apparenceController;
     ModuleAccessor<PositionModule> positionController;
@@ -72,7 +76,7 @@ void RenderingSystem::VirtualUpdate()
 
     glm::mat4 view = c->GetWorldViewMatrix();
     glm::mat4 proj = c->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
-    commandBuffer.SetViewTranform(view, proj);
+    FDrawBuffer->SetViewTranform(view, proj);
 
     const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
     glm::vec4 uniformVal = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -94,7 +98,7 @@ void RenderingSystem::VirtualUpdate()
             glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
             mtx = mtx * (glm::mat4)orientationModule->GetOrientation();
 
-            commandBuffer.DrawMesh(meshHandle, materialHandle, mtx);
+            FDrawBuffer->DrawMesh(meshHandle, materialHandle, mtx);
         }
     }
     else
@@ -148,11 +152,14 @@ void RenderingSystem::VirtualUpdate()
         //    bgfx::submit(0, kProgramInstancing);
         //}
     }
+
+    FDrawBuffer->Submit();
 }
 
 void RenderingSystem::VirtualDestroy()
 {
     parent_type::VirtualDestroy();
+    Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FDrawBuffer);
     bgfx::destroy(kProgramInstancing);
 }
 

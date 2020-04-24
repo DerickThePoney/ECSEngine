@@ -50,17 +50,10 @@ void BGFXRenderer::Shutdown()
 }
 void BGFXRenderer::RenderFrame()
 {
-    std::vector<DrawCommandBuffer*>& commandBuffers = FCommandBuffers[0];
-
-    foreachitem(commandBuffer, commandBuffers) { commandBuffer->Submit(); }
-
     // Set view 0 default viewport.
     bgfx::touch(0);
 
     bgfx::frame();
-
-    foreachitem(commandBuffer, commandBuffers) { delete commandBuffer; }
-    commandBuffers.clear();
 }
 
 void BGFXRenderer::Resize(u32 width, u32 height)
@@ -76,13 +69,16 @@ bool BGFXRenderer::IsInstancingEnabled()
     return !(0 == (BGFX_CAPS_INSTANCING & caps->supported));
 }
 
-DrawCommandBuffer& BGFXRenderer::CreateCommandBuffer(u16 parViewId /*= 0*/)
+DrawCommandBuffer* BGFXRenderer::CreateCommandBuffer(u16 parViewId /*= 0*/)
 {
     DrawCommandBuffer* buffer = new DrawCommandBuffer(parViewId);
 
-    FCommandBuffers[parViewId].push_back(buffer);
+    return buffer;
+}
 
-    return *buffer;
+void BGFXRenderer::ReleaseCommandBuffer(DrawCommandBuffer* buffer)
+{
+    delete buffer;
 }
 
 } // namespace Rendering

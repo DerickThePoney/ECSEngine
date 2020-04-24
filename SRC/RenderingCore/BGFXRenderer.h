@@ -20,10 +20,8 @@ public:
 
     bool IsInstancingEnabled();
 
-    DrawCommandBuffer& CreateCommandBuffer(u16 parViewId = 0);
-
-private:
-    std::map<u16, std::vector<DrawCommandBuffer*>> FCommandBuffers;
+    DrawCommandBuffer* CreateCommandBuffer(u16 parViewId = 0);
+    void ReleaseCommandBuffer(DrawCommandBuffer* buffer);
 };
 
 } // namespace Rendering

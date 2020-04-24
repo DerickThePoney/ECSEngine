@@ -43,6 +43,7 @@ public:
     void operator=(DrawCommandBuffer&& other) = delete;
 
     void reserve(u32 parSize);
+    void clear();
 
     void SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection);
     void DrawMesh(const MeshHandle& parMeshHandle, const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::mat4& parTransform = glm::identity<glm::mat4>());

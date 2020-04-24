@@ -4,6 +4,10 @@
 
 namespace ECSEngine
 {
+namespace Rendering
+{
+class DrawCommandBuffer;
+}
 class RenderingSystem final : public ModuleSystem
 {
     using parent_type = ModuleSystem;
@@ -17,6 +21,7 @@ protected:
     void VirtualUpdate() override;
     void VirtualDestroy() override;
 
+    Rendering::DrawCommandBuffer* FDrawBuffer;
     u32 CamId;
 };
 } // namespace ECSEngine
