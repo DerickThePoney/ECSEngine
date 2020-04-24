@@ -14,8 +14,15 @@ class MaterialInstanceHandle;
 class IDrawCommand
 {
 public:
+    IDrawCommand(const u16 parViewId)
+        : FViewId(parViewId)
+    {
+    }
     virtual ~IDrawCommand() {}
     virtual void SubmitCommand() const = 0;
+
+protected:
+    u16 FViewId;
 };
 
 //----------------------------------------------------------------
@@ -26,7 +33,7 @@ class DrawCommandBuffer
     DECLARE_POOL_ALLOCATED(DrawCommandBuffer);
 
 public:
-    DrawCommandBuffer();
+    DrawCommandBuffer(const u16 parViewId);
     ~DrawCommandBuffer();
 
     DrawCommandBuffer(const DrawCommandBuffer& other) = delete;
@@ -49,6 +56,8 @@ public:
 
 private:
     std::vector<std::unique_ptr<IDrawCommand>> FCommandVector;
+
+    u16 FViewId;
 };
 
 } // namespace Rendering
