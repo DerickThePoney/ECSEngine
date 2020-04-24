@@ -31,6 +31,11 @@ void OrientationModule::VirtualInit(const EntityId& parUnitId, const ModuleParam
         const glm::vec3 yawPitchRoll = parParameters.Get_IFP<ModuleParameters::YawPitchRoll>(glm::vec3(0.0f));
         FOrientation = glm::quat(yawPitchRoll);
     }
+    else if (parParameters.HasParameter<ModuleParameters::EulerAngles>())
+    {
+        const glm::vec3 euler = parParameters.Get_IFP<ModuleParameters::EulerAngles>(glm::vec3(0.0f));
+        FOrientation = glm::quat_cast(glm::eulerAngleXYZ(euler.x, euler.y, euler.z));
+    }
     else if (parParameters.HasParameter<ModuleParameters::Orientation>())
     {
         FOrientation = parParameters.Get_IFP<ModuleParameters::Orientation>(glm::quat());
