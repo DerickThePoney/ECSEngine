@@ -24,16 +24,16 @@ public:
     template<typename T>
     const bool HasModule() const
     {
-        return FKey.HasModule();
+        return FKey.HasModule<T>();
     }
 
     const bool HasModule(const u32 parModuleId) const { return FKey.HasModule(parModuleId); }
 
-    template<typename T>
+    template<typename Module>
     void SetHasModule()
     {
-        FKey.SetHasModule<T>();
-        AddModule(ModuleTraits<T>::GetModuleId());
+        FKey.SetHasModule<Module>();
+        AddModule(ModuleTraits<Module>::GetModuleId());
     }
 
     const void SetHasModule(const u32 parModuleId)
@@ -47,6 +47,12 @@ public:
     void AddModule(const u32 parId);
 
     const Worlds::Type& GetWorldId() const { return FWorld; }
+
+    template<typename Module>
+    const ModuleTemplate* GetModuleTemplate() const
+    {
+        return GetModuleTemplate(ModuleTraits<Module>::GetModuleId());
+    }
 
     const ModuleTemplate* GetModuleTemplate(const u32 parId) const
     {
