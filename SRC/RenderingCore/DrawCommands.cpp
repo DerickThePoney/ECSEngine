@@ -377,6 +377,11 @@ void DrawCommandBuffer::reserve(u32 parSize)
     FCommandVector.reserve(parSize);
 }
 
+void DrawCommandBuffer::clear()
+{
+    FCommandVector.clear();
+}
+
 void DrawCommandBuffer::SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetViewTranformCommand(FViewId, parViewTransform, parProjection)));

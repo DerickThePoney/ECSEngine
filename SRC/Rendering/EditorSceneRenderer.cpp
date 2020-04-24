@@ -29,21 +29,26 @@ void EditorSceneRenderer::Initialise(const std::string& parHandleFileName, const
     AssertRelease(FHandleMaterial.IsValid());
 
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
+
+    FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(0);
 }
 
 void EditorSceneRenderer::Shutdown()
 {
+    Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
     CameraManager::Instance().DestroyCamera(FCameraId);
 }
 
 void EditorSceneRenderer::RenderScene(const Scene* parScene)
 {
-    Rendering::DrawCommandBuffer& commandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(0);
+    AssertRelease(FDrawCommandBuffer != nullptr);
+    FDrawCommandBuffer->clear();
+
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
-    commandBuffer.SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y)));
+    FDrawCommandBuffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y)));
 
     AssertRelease(parScene != nullptr);
     const std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItems();
@@ -51,16 +56,18 @@ void EditorSceneRenderer::RenderScene(const Scene* parScene)
     foreachitemconst(sceneItem, sceneItems)
     {
         const glm::vec3& position = sceneItem->GetPosition();
-        commandBuffer.DrawAABB(FHandleMaterial, position - glm::vec3(1.0f), position + glm::vec3(1.0f));
+        FDrawCommandBuffer->DrawAABB(FHandleMaterial, position - glm::vec3(1.0f), position + glm::vec3(1.0f));
 
         glm::vec3 angles = sceneItem->GetEulerAngles();
         glm::mat4 mtx = glm::translate(position) * glm::eulerAngleXYZ(angles.x, angles.y, angles.z);
 
-        commandBuffer.DrawMesh(FHandleMesh, FHandleMaterial, mtx);
+        FDrawCommandBuffer->DrawMesh(FHandleMesh, FHandleMaterial, mtx);
     }
 
     std::vector<std::shared_ptr<ISceneAction>> sceneActions = parScene->GetSceneActions();
-    foreachitem(sceneAction, sceneActions) { sceneAction->DrawInSceneEditor(commandBuffer, FHandleMaterial); }
+    foreachitem(sceneAction, sceneActions) { sceneAction->DrawInSceneEditor(*FDrawCommandBuffer, FHandleMaterial); }
+
+    FDrawCommandBuffer->Submit();
 }
 
 } // namespace ECSEngine
