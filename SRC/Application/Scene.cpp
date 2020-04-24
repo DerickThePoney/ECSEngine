@@ -2,7 +2,7 @@
 
 #include "Scene.h"
 
-#include "ECSCore/ECSCoreSceneActions.h"
+#include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "SceneItems.h"
 
 namespace ECSEngine
