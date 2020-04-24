@@ -8,6 +8,7 @@
 #include "Mesh.h"
 #include "MeshManager.h"
 #include "MeshUtils.h"
+#include "RenderingState.h"
 #include "VertexLayout.h"
 
 #include <bx/bx.h>
@@ -24,7 +25,7 @@ class SetViewTranformCommand : public IDrawCommand
     DECLARE_POOL_ALLOCATED(SetViewTranformCommand);
 
 public:
-    SetViewTranformCommand(const glm::mat4& parViewTransform, const glm::mat4& parProjection);
+    SetViewTranformCommand(const u16 parViewId, const glm::mat4& parViewTransform, const glm::mat4& parProjection);
     virtual ~SetViewTranformCommand();
 
     virtual void SubmitCommand() const override;
@@ -35,8 +36,9 @@ private:
 };
 
 IMPLEMENT_POOL_ALLOCATED(SetViewTranformCommand);
-SetViewTranformCommand::SetViewTranformCommand(const glm::mat4& parViewTransform, const glm::mat4& parProjection)
-    : FViewTransform(parViewTransform)
+SetViewTranformCommand::SetViewTranformCommand(const u16 parViewId, const glm::mat4& parViewTransform, const glm::mat4& parProjection)
+    : IDrawCommand(parViewId)
+    , FViewTransform(parViewTransform)
     , FProjection(parProjection)
 {
 }
@@ -47,7 +49,7 @@ SetViewTranformCommand::~SetViewTranformCommand()
 
 void SetViewTranformCommand::SubmitCommand() const
 {
-    bgfx::setViewTransform(0, &FViewTransform[0][0], &FProjection[0][0]);
+    bgfx::setViewTransform(FViewId, &FViewTransform[0][0], &FProjection[0][0]);
 }
 
 //----------------------------------------------------------------
@@ -58,7 +60,11 @@ class DrawAABBCommand : public IDrawCommand
     DECLARE_POOL_ALLOCATED(DrawAABBCommand);
 
 public:
-    DrawAABBCommand(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor = 0xFFFFFFFF);
+    DrawAABBCommand(const u16 parViewId,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const glm::vec3& parMin,
+          const glm::vec3& parMax,
+          const u32 parColor = 0xFFFFFFFF);
     virtual ~DrawAABBCommand();
 
     virtual void SubmitCommand() const override;
@@ -70,8 +76,13 @@ private:
     const MaterialInstanceHandle& FMaterialInstanceHandle;
 };
 
-DrawAABBCommand::DrawAABBCommand(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor /*= 0xFFFFFFFF*/)
-    : FMaterialInstanceHandle(parMaterialInstanceHandle)
+DrawAABBCommand::DrawAABBCommand(const u16 parViewId,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::vec3& parMin,
+      const glm::vec3& parMax,
+      const u32 parColor /*= 0xFFFFFFFF*/)
+    : IDrawCommand(parViewId)
+    , FMaterialInstanceHandle(parMaterialInstanceHandle)
     , FColor(parColor)
     , FMin(parMin)
     , FMax(parMax)
@@ -143,7 +154,9 @@ void DrawAABBCommand::SubmitCommand() const
 
     bx::memCopy(indexBuffer.data, indices, 24 * sizeof(u16));
 
-    bgfx::setState(BGFX_STATE_DEFAULT | BGFX_STATE_PT_LINES);
+    RenderingState state;
+    state.PartiallyModifyState(BGFX_STATE_PT_LINES);
+    state.ApplyState();
 
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, 8, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, 24);
@@ -154,7 +167,7 @@ void DrawAABBCommand::SubmitCommand() const
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
 
-    bgfx::submit(0, instance->GetProgram()->ProgramHandle());
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
 }
 
 IMPLEMENT_POOL_ALLOCATED(DrawAABBCommand);
@@ -167,7 +180,8 @@ class DrawFrustumCommand : public IDrawCommand
     DECLARE_POOL_ALLOCATED(DrawFrustumCommand);
 
 public:
-    DrawFrustumCommand(const MaterialInstanceHandle& parMaterialInstanceHandle,
+    DrawFrustumCommand(const u16 parViewId,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
           const glm::mat4& parWorldViewTransform,
           const glm::mat4& parProjectionMatrix,
           const u32 parColor = 0xFFFFFFFF);
@@ -182,11 +196,13 @@ private:
     const MaterialInstanceHandle& FMaterialInstanceHandle;
 };
 
-DrawFrustumCommand::DrawFrustumCommand(const MaterialInstanceHandle& parMaterialInstanceHandle,
+DrawFrustumCommand::DrawFrustumCommand(const u16 parViewId,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
       const glm::mat4& parWorldViewTransform,
       const glm::mat4& parProjectionMatrix,
       const u32 parColor /*= 0xFFFFFFFF*/)
-    : FMaterialInstanceHandle(parMaterialInstanceHandle)
+    : IDrawCommand(parViewId)
+    , FMaterialInstanceHandle(parMaterialInstanceHandle)
     , FViewWorldTransform(glm::inverse(parWorldViewTransform))
     , FInverseProjectionMatrix(glm::inverse(parProjectionMatrix))
     , FColor(parColor)
@@ -265,7 +281,9 @@ void DrawFrustumCommand::SubmitCommand() const
 
     bx::memCopy(indexBuffer.data, indices, 24 * sizeof(u16));
 
-    bgfx::setState(BGFX_STATE_DEFAULT | BGFX_STATE_PT_LINES);
+    RenderingState state;
+    state.PartiallyModifyState(BGFX_STATE_PT_LINES);
+    state.ApplyState();
 
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, 8, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, 24);
@@ -276,7 +294,7 @@ void DrawFrustumCommand::SubmitCommand() const
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
 
-    bgfx::submit(0, instance->GetProgram()->ProgramHandle());
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
 }
 
 IMPLEMENT_POOL_ALLOCATED(DrawFrustumCommand);
@@ -289,7 +307,10 @@ class DrawMeshCommand : public IDrawCommand
     DECLARE_POOL_ALLOCATED(DrawMeshCommand);
 
 public:
-    DrawMeshCommand(const MeshHandle& parMeshHandle, const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::mat4& parTransform = glm::identity<glm::mat4>());
+    DrawMeshCommand(const u16 parViewId,
+          const MeshHandle& parMeshHandle,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const glm::mat4& parTransform = glm::identity<glm::mat4>());
     virtual ~DrawMeshCommand();
 
     virtual void SubmitCommand() const override;
@@ -301,10 +322,12 @@ private:
 };
 
 IMPLEMENT_POOL_ALLOCATED(DrawMeshCommand);
-DrawMeshCommand::DrawMeshCommand(const MeshHandle& parMeshHandle,
+DrawMeshCommand::DrawMeshCommand(const u16 parViewId,
+      const MeshHandle& parMeshHandle,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
       const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
-    : FMeshHandle(parMeshHandle)
+    : IDrawCommand(parViewId)
+    , FMeshHandle(parMeshHandle)
     , FMaterialInstanceHandle(parMaterialInstanceHandle)
     , FTransform(parTransform)
 {
@@ -329,9 +352,10 @@ void DrawMeshCommand::SubmitCommand() const
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
 
-    bgfx::setState(BGFX_STATE_DEFAULT);
+    RenderingState state;
+    state.ApplyState();
 
-    bgfx::submit(0, instance->GetProgram()->ProgramHandle());
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
 }
 
 //----------------------------------------------------------------
@@ -339,7 +363,8 @@ void DrawMeshCommand::SubmitCommand() const
 //----------------------------------------------------------------
 IMPLEMENT_POOL_ALLOCATED(DrawCommandBuffer);
 
-DrawCommandBuffer::DrawCommandBuffer()
+DrawCommandBuffer::DrawCommandBuffer(const u16 parViewId)
+    : FViewId(parViewId)
 {
 }
 
@@ -354,19 +379,19 @@ void DrawCommandBuffer::reserve(u32 parSize)
 
 void DrawCommandBuffer::SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetViewTranformCommand(parViewTransform, parProjection)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetViewTranformCommand(FViewId, parViewTransform, parProjection)));
 }
 
 void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
       const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawMeshCommand(parMeshHandle, parMaterialInstanceHandle, parTransform)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawMeshCommand(FViewId, parMeshHandle, parMaterialInstanceHandle, parTransform)));
 }
 
 void DrawCommandBuffer::DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor /*= 0xFFFFFFFF*/)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(parMaterialInstanceHandle, parMin, parMax, parColor)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, parColor)));
 }
 
 void DrawCommandBuffer::DrawFrustum(const MaterialInstanceHandle& parMaterialInstanceHandle,
@@ -374,7 +399,7 @@ void DrawCommandBuffer::DrawFrustum(const MaterialInstanceHandle& parMaterialIns
       const glm::mat4& parProjectionMatrix,
       const u32 parColor /*= 0xFFFFFFFF*/)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawFrustumCommand(parMaterialInstanceHandle, parWorldViewTransform, parProjectionMatrix, parColor)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawFrustumCommand(FViewId, parMaterialInstanceHandle, parWorldViewTransform, parProjectionMatrix, parColor)));
 }
 
 void DrawCommandBuffer::Submit()

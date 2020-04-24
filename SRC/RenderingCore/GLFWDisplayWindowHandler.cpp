@@ -125,8 +125,8 @@ void UpdateGamepads()
 
 GLFWDisplayWindowHandler::GLFWDisplayWindowHandler()
     : FWindow(nullptr)
-    , FWidth(800)
-    , FHeight(600)
+    , FWidth(1280)
+    , FHeight(720)
     , FName("DEFAULT_NAME_CHANGE_IT_OR DIE!!!")
 {
 }

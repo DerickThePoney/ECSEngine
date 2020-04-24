@@ -49,7 +49,7 @@ void RenderingSystem::VirtualInit()
     CamId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
     Camera* c = CameraManager::Instance().GetCamera(CamId);
     AssertRelease(c != nullptr);
-    c->Init(worldWiewMatrix, glm::radians(60.0f), 0.1f, 300.0f);
+    c->Init(worldWiewMatrix, glm::radians(60.0f), 0.1f, 100.0f);
 }
 
 void RenderingSystem::VirtualUpdate()
@@ -75,7 +75,7 @@ void RenderingSystem::VirtualUpdate()
     commandBuffer.SetViewTranform(view, proj);
 
     const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
-    glm::vec4 uniformVal = glm::vec4(sinTime, sinTime, sinTime, sinTime);
+    glm::vec4 uniformVal = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     Rendering::MaterialManager::SetVec4Uniform(uniformName, uniformVal);
 
     if (1) //! Rendering::BGFXRenderer::Instance().IsInstancingEnabled())
