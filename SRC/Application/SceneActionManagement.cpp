@@ -4,7 +4,7 @@
 
 #include "ApplicationSceneActions.h"
 #include "Common/Singleton.h"
-#include "ECSCore/ECSCoreSceneActions.h"
+#include "ECSGameplay_Common/GameplaySceneActions.h"
 
 namespace ECSEngine
 {
