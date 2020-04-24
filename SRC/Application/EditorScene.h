@@ -10,6 +10,8 @@ struct WindowsToShow
     bool showActionManager = true;
     bool showEntityTemplateEditor = false;
     bool showLogger = false;
+    bool showImGuiDemo = false;
+    bool showInputDebug = false;
 };
 
 struct IOScene

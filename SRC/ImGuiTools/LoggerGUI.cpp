@@ -9,7 +9,7 @@ namespace ECSEngine
 namespace ImGUITools
 {
 
-void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow)
+void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow, bool* open)
 {
     static bool showMessages[ELoggingCategory::LENGTH] = { true, true, true, true, true, true, true };
     static glm::vec4 colors[ELoggingCategory::LENGTH] = {
@@ -18,6 +18,9 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
         glm::vec4(0.7f, 0.7f, 0.7f, 1.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f)
 
     };
+
+    if (drawOwnWindow)
+        ImGui::Begin("Logger window", open);
 
     const glm::vec2 currentWindowSize = ImGui::GetWindowSize();
     const glm::vec2 loggerSize = currentWindowSize - 50.0f;
@@ -69,6 +72,9 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
     }
 
     ImGui::EndChild();
+
+    if (drawOwnWindow)
+        ImGui::End();
 }
 
 } // namespace ImGUITools
