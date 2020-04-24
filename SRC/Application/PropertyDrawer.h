@@ -139,9 +139,9 @@ public:
     void ShowProperty()
     {
         if (FUseLimits)
-            ImGui::SliderFloat(FName.c_str(), FProperty, FMin, FMax);
+            ImGui::DragFloat(FName.c_str(), FProperty, .5f, FMin, FMax);
         else
-            ImGui::InputFloat4(FName.c_str(), (float*)FProperty);
+            ImGui::InputFloat(FName.c_str(), (float*)FProperty);
     }
 
 private:

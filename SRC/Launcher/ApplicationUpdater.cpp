@@ -115,93 +115,6 @@ void StressTestDebug(const EntityTemplate* temp, RingBuffer<float, 100>& frameTi
     ImGui::End();
 }
 
-void InputDebug()
-{
-    ImGui::Begin("Input Debug");
-    glm::vec2 mousePos = Input::GetMousePosition();
-    glm::vec2 mousePosDelta = Input::GetMousePositionDelta();
-    glm::vec2 mouseScroll = Input::GetMouseScrollDelta();
-
-    ImGui::InputFloat2("Mouse position", (float*)&mousePos, 3, ImGuiInputTextFlags_ReadOnly);
-    ImGui::InputFloat2("Mouse delta", (float*)&mousePosDelta, 3, ImGuiInputTextFlags_ReadOnly);
-    ImGui::InputFloat2("Mouse scroll", (float*)&mouseScroll, 3, ImGuiInputTextFlags_ReadOnly);
-
-    forrange(i, 0, 7)
-    {
-        bool mouseButtonState = Input::GetMouseButtonState((int)i);
-        ImGui::Checkbox("Mouse button", &mouseButtonState);
-    }
-
-    ImGui::Separator();
-
-    bool keyboardButtonState = Input::IsShiftDown();
-    ImGui::Checkbox("Shift", &keyboardButtonState);
-    keyboardButtonState = Input::IsAltDown();
-    ImGui::Checkbox("Alt", &keyboardButtonState);
-    keyboardButtonState = Input::IsCtrlDown();
-    ImGui::Checkbox("Ctrl", &keyboardButtonState);
-
-    forrange(i, InputKeyNames::INPUT_KEY_COMMA, InputKeyNames::INPUT_KEY_RIGHT_BRACKET)
-    {
-        keyboardButtonState = Input::GetButtonDown((InputKeyNames::Type)i);
-        ImGui::Checkbox(GLFWWrapper::GetKeyName((InputKeyNames::Type)i), &keyboardButtonState);
-
-        if ((i - InputKeyNames::INPUT_KEY_A) % 5 != 0 || i == InputKeyNames::INPUT_KEY_A)
-        {
-            ImGui::SameLine();
-        }
-    }
-
-    ImGui::Separator();
-    forrange(i, 0, 16)
-    {
-        if (Input::IsGamepadConnected((int)i))
-        {
-            ImGui::Text(Input::GetGamepadName((int)i));
-
-            forrange(j, 0, GamepadButtons::GAMEPAD_BUTTON_LAST)
-            {
-                bool isPressed = Input::GetGamepadButtonDown((int)i, (GamepadButtons::Type)j);
-                ImGui::Checkbox(GamepadButtons::ToString((GamepadButtons::Type)j), &isPressed);
-            }
-
-            forrange(j, 0, GamepadAxes::GAMEPAD_AXIS_LAST)
-            {
-                float value = Input::GetGamepadAxisValue((int)i, (GamepadAxes::Type)j);
-                ImGui::InputFloat(GamepadAxes::ToString((GamepadAxes::Type)j), &value, ImGuiInputTextFlags_ReadOnly);
-            }
-        }
-    }
-    ImGui::End();
-}
-
-void SaveAndReloadTest()
-{
-    ImGui::Begin("Save and Reload test");
-
-    if (ImGui::Button("Save entities"))
-    {
-        std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\Configuration\\EntityTemplates.json");
-
-        cereal::JSONOutputArchive archive(ofstr);
-
-        archive(NAMEDPROPERTY("EntityTemplatesList", EntityTemplateManager::Instance()));
-    }
-
-    if (ImGui::Button("Load Entities"))
-    {
-        std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\Configuration\\EntityTemplates.json");
-
-        cereal::JSONInputArchive archive(ifstr);
-
-        EntityTemplateManager::Destroy();
-        EntityTemplateManager::CreateIFP();
-
-        archive(NAMEDPROPERTY("EntityTemplatesList", EntityTemplateManager::Instance()));
-    }
-
-    ImGui::End();
-}
 } // namespace
 
 void ApplicationUpdater::Initialise()
@@ -213,8 +126,6 @@ void ApplicationUpdater::Initialise()
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(0);
 
     scene.Initialise();
-
-    // AllocateUnits(FTemplate, WorldManager::Instance().GetWorld(Worlds::STANDARD), FEntities);
 }
 
 void ApplicationUpdater::Shutdown()
@@ -243,16 +154,9 @@ void ApplicationUpdater::StartUpdate()
 void ApplicationUpdater::Update()
 {
     // Updates
-    ImGui::ShowDemoWindow();
     StressTestDebug(FTemplate, FFrameTimeBuffer, WorldManager::Instance().GetWorld(Worlds::STANDARD), FEntities);
-    SaveAndReloadTest();
-    InputDebug();
 
     scene.Update();
-
-    // ImGUITools::DrawEntityTemplatesEditor();
-
-    // orientationSystem.Update();
 }
 
 void ApplicationUpdater::Render()

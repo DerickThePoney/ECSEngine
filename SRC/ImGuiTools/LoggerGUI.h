@@ -5,6 +5,6 @@ namespace ECSEngine
 {
 namespace ImGUITools
 {
-void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow);
+void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow, bool* open);
 }
 } // namespace ECSEngine

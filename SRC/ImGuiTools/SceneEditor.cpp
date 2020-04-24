@@ -8,8 +8,9 @@
 #include "Common/Logger.h"
 #include "Common/ResourceCache.h"
 #include "Common/Singleton.h"
-#include "ECSCore/ECSCoreSceneActions.h"
+#include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "EntityTemplatesEditor.h"
+#include "InputDebug.h"
 #include "LoggerGUI.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 
@@ -38,6 +39,13 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
         ImGui::MenuItem("Scene actions", NULL, &options.showActionManager);
         ImGui::Separator();
         ImGui::MenuItem("Scene templates", NULL, &options.showEntityTemplateEditor);
+        ImGui::Separator();
+        if (ImGui::BeginMenu("Debug windows"))
+        {
+            ImGui::MenuItem("Imgui Demo", NULL, &options.showImGuiDemo);
+            ImGui::MenuItem("Input debug", NULL, &options.showInputDebug);
+            ImGui::EndMenu();
+        }
         ImGui::Separator();
         ImGui::MenuItem("Scene logger", NULL, &options.showLogger);
 
@@ -213,14 +221,20 @@ void DrawSceneEditorMainMenu(Scene* parScene, WindowsToShow& parOutWindowsToShow
         DrawEntityTemplatesEditor(&parOutWindowsToShow.showEntityTemplateEditor, menuBarHeight.y);
 
     if (parOutWindowsToShow.showLogger)
-        DrawLogger(Logger::GetLoggedMessages(), true);
+        DrawLogger(Logger::GetLoggedMessages(), true, &parOutWindowsToShow.showLogger);
+
+    if (parOutWindowsToShow.showImGuiDemo)
+        ImGui::ShowDemoWindow(&parOutWindowsToShow.showImGuiDemo);
+
+    if (parOutWindowsToShow.showInputDebug)
+        InputDebug(&parOutWindowsToShow.showInputDebug);
 }
 
 const std::string NewScene(bool& isOk, bool& isCancel)
 {
     ImGui::Begin("Choose Scene Name...", NULL, ImGuiWindowFlags_AlwaysAutoResize);
     static std::string sceneToChoose;
-    EDITOR_PROPERTY_STRING("Scene to open", sceneToChoose, false, "*.scene");
+    EDITOR_PROPERTY_STRING("New scene name", sceneToChoose, false, "*.scene");
     ImGui::SameLine();
     if (ImGui::Button("Ok"))
         isOk = true;
