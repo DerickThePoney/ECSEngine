@@ -23,7 +23,7 @@ protected:
     virtual void VirtualStart() override;
 
     virtual void VirtualDrawEditor() override;
-    // virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial);
+    virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial);
 
 public:
     const std::string& GetEntityTemplateName() const { return FEntityTemplateName; }

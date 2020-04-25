@@ -47,6 +47,7 @@ public:
 
     void SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection);
     void DrawMesh(const MeshHandle& parMeshHandle, const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::mat4& parTransform = glm::identity<glm::mat4>());
+    void DrawMesh(const std::string& parMeshFilename, const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::mat4& parTransform = glm::identity<glm::mat4>());
     void DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor = 0xFFFFFFFF);
     void DrawFrustum(const MaterialInstanceHandle& parMaterialInstanceHandle,
           const glm::mat4& parWorldViewTransform,

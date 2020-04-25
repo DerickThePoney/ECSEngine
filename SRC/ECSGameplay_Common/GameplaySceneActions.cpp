@@ -57,29 +57,29 @@ void SpawnEntitySceneAction::VirtualDrawEditor()
     }
 }
 
-// bool SpawnEntitySceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
-//{
-//    SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
-//    const bool hasApparenceModule = FTemplate->HasModule<ApparenceModule>();
-//    if (!hasApparenceModule)
-//        return false;
-//
-//    const BaseSceneItem* item = GetSceneItem();
-//    if (item == nullptr)
-//        return false;
-//
-//    const ApparenceModuleTemplate* apparenceModuleTemplate = (ApparenceModuleTemplate*)FTemplate->GetModuleTemplate<ApparenceModule>();
-//    AssertRelease(apparenceModuleTemplate != nullptr);
-//    const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(apparenceModuleTemplate->GetMeshFileName());
-//    if (meshHandle.IsValid())
-//    {
-//        const glm::vec3 eulerAngles = item->GetEulerAngles();
-//        const glm::mat4 mtx = glm::translate(item->GetPosition()) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
-//
-//        parCommandBuffer.DrawMesh(meshHandle, parMaterial, mtx);
-//    }
-//
-//    return true;
-//}
+bool SpawnEntitySceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
+{
+    SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+    const bool hasApparenceModule = FTemplate->HasModule<ApparenceModule>();
+    if (!hasApparenceModule)
+        return false;
+
+    const BaseSceneItem* item = GetSceneItem();
+    if (item == nullptr)
+        return false;
+
+    const ApparenceModuleTemplate* apparenceModuleTemplate = (ApparenceModuleTemplate*)FTemplate->GetModuleTemplate<ApparenceModule>();
+    AssertRelease(apparenceModuleTemplate != nullptr);
+    const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(apparenceModuleTemplate->GetMeshFileName());
+    if (meshHandle.IsValid())
+    {
+        const glm::vec3 eulerAngles = item->GetEulerAngles();
+        const glm::mat4 mtx = glm::translate(item->GetPosition()) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+
+        parCommandBuffer.DrawMesh(meshHandle, parMaterial, mtx);
+    }
+
+    return true;
+}
 
 } // namespace ECSEngine
