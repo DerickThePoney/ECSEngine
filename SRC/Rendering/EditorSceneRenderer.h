@@ -4,7 +4,6 @@
 namespace ECSEngine
 {
 class Scene;
-class Camera;
 namespace Rendering
 {
 class DrawCommandBuffer;

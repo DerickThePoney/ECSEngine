@@ -30,7 +30,7 @@ void EditorSceneRenderer::Initialise(const std::string& parHandleFileName, const
 
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
 
-    FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(0);
+    FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
 }
 
 void EditorSceneRenderer::Shutdown()

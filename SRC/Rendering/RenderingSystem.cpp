@@ -23,6 +23,7 @@ namespace ECSEngine
 RenderingSystem::RenderingSystem()
     : parent_type()
     , FDrawBuffer(nullptr)
+    , FCamId(-1)
 {
     RegisterDepency<ApparenceModule>(Worlds::STANDARD);
     RegisterDepency<PositionModule>(Worlds::STANDARD);
@@ -47,12 +48,11 @@ void RenderingSystem::VirtualInit()
 
     glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 0, 1.0f));
 
-    CamId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
-    Camera* c = CameraManager::Instance().GetCamera(CamId);
+    FCamId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+    Camera* c = CameraManager::Instance().GetCamera(FCamId);
     AssertRelease(c != nullptr);
-    c->Init(worldWiewMatrix, glm::radians(60.0f), 0.1f, 100.0f);
 
-    FDrawBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(0);
+    FDrawBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
 }
 
 void RenderingSystem::VirtualUpdate()
@@ -69,10 +69,8 @@ void RenderingSystem::VirtualUpdate()
     const float timepoint = TimeManager::DurationSinceStartRealTime();
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
-    Camera* c = CameraManager::Instance().GetCamera(CamId);
+    Camera* c = CameraManager::Instance().GetCamera(FCamId);
     AssertRelease(c != nullptr);
-    const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
-    const glm::vec3 eye = { 0.0f, 5.0f, 0.0f };
 
     glm::mat4 view = c->GetWorldViewMatrix();
     glm::mat4 proj = c->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
