@@ -119,6 +119,7 @@ void StressTestDebug(const EntityTemplate* temp, RingBuffer<float, 100>& frameTi
 
 void ApplicationUpdater::Initialise()
 {
+    editorSceneObjectPickingRenderer.Initialise();
     editorSceneRenderer.Initialise("meshes\\testobjects\\movehandle.fbx.gen", "materials\\vertexcolormaterial.material");
     renderSystem.Init();
     orientationSystem.Init();
@@ -137,6 +138,7 @@ void ApplicationUpdater::Shutdown()
     orientationSystem.Destroy();
     renderSystem.Destroy();
     editorSceneRenderer.Shutdown();
+    editorSceneObjectPickingRenderer.Shutdown();
 }
 
 bool ApplicationUpdater::CheckShouldFinish()
@@ -165,7 +167,10 @@ void ApplicationUpdater::Render()
 
     const Scene* currentScene = scene.GetEditedScene();
     if (currentScene != nullptr)
+    {
+        editorSceneObjectPickingRenderer.RenderScene(currentScene);
         editorSceneRenderer.RenderScene(currentScene);
+    }
 
     Rendering::ImGUI::Render();
 
