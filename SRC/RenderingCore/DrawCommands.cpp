@@ -227,13 +227,13 @@ void DrawFrustumCommand::SubmitCommand() const
     bgfx::allocTransientBuffers(&vertexBuffer, layout, 8, &indexBuffer, 24);
 
     VertexPositionColorN<1> vertices[8];
-    vertices[0].FPosition = glm::vec3(-1.0f, -1.0f, -1.0f);
-    vertices[1].FPosition = glm::vec3(1.0f, -1.0f, -1.0f);
+    vertices[0].FPosition = glm::vec3(-1.0f, -1.0f, 0.0f);
+    vertices[1].FPosition = glm::vec3(1.0f, -1.0f, 0.0f);
     vertices[2].FPosition = glm::vec3(1.0f, -1.0f, 1.0f);
     vertices[3].FPosition = glm::vec3(-1.0f, -1.0f, 1.0f);
 
-    vertices[4].FPosition = glm::vec3(-1.0f, 1.0f, -1.0f);
-    vertices[5].FPosition = glm::vec3(1.0f, 1.0f, -1.0f);
+    vertices[4].FPosition = glm::vec3(-1.0f, 1.0f, 0.0f);
+    vertices[5].FPosition = glm::vec3(1.0f, 1.0f, 0.0f);
     vertices[6].FPosition = glm::vec3(1.0f, 1.0f, 1.0f);
     vertices[7].FPosition = glm::vec3(-1.0f, 1.0f, 1.0f);
 
@@ -317,8 +317,8 @@ public:
 
 private:
     glm::mat4 FTransform;
-    const MeshHandle& FMeshHandle;
-    const MaterialInstanceHandle& FMaterialInstanceHandle;
+    MeshHandle FMeshHandle;
+    MaterialInstanceHandle FMaterialInstanceHandle;
 };
 
 IMPLEMENT_POOL_ALLOCATED(DrawMeshCommand);
