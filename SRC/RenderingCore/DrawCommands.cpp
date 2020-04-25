@@ -64,6 +64,7 @@ public:
           const MaterialInstanceHandle& parMaterialInstanceHandle,
           const glm::vec3& parMin,
           const glm::vec3& parMax,
+          const bool parDrawAsCube,
           const u32 parColor = 0xFFFFFFFF);
     virtual ~DrawAABBCommand();
 
@@ -72,6 +73,7 @@ public:
 private:
     glm::vec3 FMin;
     glm::vec3 FMax;
+    bool FDrawAsCube;
     u32 FColor;
     const MaterialInstanceHandle& FMaterialInstanceHandle;
 };
@@ -80,12 +82,14 @@ DrawAABBCommand::DrawAABBCommand(const u16 parViewId,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
       const glm::vec3& parMin,
       const glm::vec3& parMax,
+      const bool parDrawAsCube,
       const u32 parColor /*= 0xFFFFFFFF*/)
     : IDrawCommand(parViewId)
     , FMaterialInstanceHandle(parMaterialInstanceHandle)
     , FColor(parColor)
     , FMin(parMin)
     , FMax(parMax)
+    , FDrawAsCube(parDrawAsCube)
 {
 }
 
@@ -101,10 +105,8 @@ void DrawAABBCommand::SubmitCommand() const
     const bgfx::VertexLayout layout = VertexPositionColorN<1>().GetVertexLayout();
     u32 availableVertices = bgfx::getAvailTransientVertexBuffer(8, layout);
     AssertRelease(availableVertices == 8);
-    u32 availableIndices = bgfx::getAvailTransientIndexBuffer(24);
-    AssertRelease(availableIndices == 24);
 
-    bgfx::allocTransientBuffers(&vertexBuffer, layout, 8, &indexBuffer, 24);
+    bgfx::allocTransientVertexBuffer(&vertexBuffer, 8, layout);
 
     VertexPositionColorN<1> vertices[8];
     forrange(i, 0, 8) { vertices[i].FColor[0] = FColor; }
@@ -121,45 +123,104 @@ void DrawAABBCommand::SubmitCommand() const
 
     bx::memCopy(vertexBuffer.data, vertices, sizeof(vertices));
 
-    u16 indices[24];
+    u32 nbIndices = 0;
 
-    u32 idx = 0;
+    if (FDrawAsCube)
+    {
+        nbIndices = bgfx::getAvailTransientIndexBuffer(36);
+        AssertRelease(nbIndices == 36);
 
-    indices[idx++] = 0;
-    indices[idx++] = 1;
-    indices[idx++] = 1;
-    indices[idx++] = 2;
-    indices[idx++] = 2;
-    indices[idx++] = 3;
-    indices[idx++] = 3;
-    indices[idx++] = 0;
+        bgfx::allocTransientIndexBuffer(&indexBuffer, 36);
 
-    indices[idx++] = 4;
-    indices[idx++] = 5;
-    indices[idx++] = 5;
-    indices[idx++] = 6;
-    indices[idx++] = 6;
-    indices[idx++] = 7;
-    indices[idx++] = 7;
-    indices[idx++] = 4;
+        u16 indices[36] = {
+            7,
+            6,
+            3,
+            6,
+            2,
+            3,
+            4,
+            0,
+            5,
+            5,
+            0,
+            1,
+            7,
+            3,
+            4,
+            4,
+            3,
+            0,
+            6,
+            5,
+            2,
+            5,
+            1,
+            2,
+            7,
+            4,
+            6,
+            4,
+            5,
+            6,
+            3,
+            2,
+            0,
+            0,
+            2,
+            1,
+        };
 
-    indices[idx++] = 0;
-    indices[idx++] = 4;
-    indices[idx++] = 1;
-    indices[idx++] = 5;
-    indices[idx++] = 2;
-    indices[idx++] = 6;
-    indices[idx++] = 3;
-    indices[idx++] = 7;
+        bx::memCopy(indexBuffer.data, indices, 36 * sizeof(u16));
+    }
+    else
+    {
+        nbIndices = bgfx::getAvailTransientIndexBuffer(24);
+        AssertRelease(nbIndices == 24);
 
-    bx::memCopy(indexBuffer.data, indices, 24 * sizeof(u16));
+        bgfx::allocTransientIndexBuffer(&indexBuffer, 24);
+
+        u16 indices[24];
+
+        u32 idx = 0;
+
+        indices[idx++] = 0;
+        indices[idx++] = 1;
+        indices[idx++] = 1;
+        indices[idx++] = 2;
+        indices[idx++] = 2;
+        indices[idx++] = 3;
+        indices[idx++] = 3;
+        indices[idx++] = 0;
+
+        indices[idx++] = 4;
+        indices[idx++] = 5;
+        indices[idx++] = 5;
+        indices[idx++] = 6;
+        indices[idx++] = 6;
+        indices[idx++] = 7;
+        indices[idx++] = 7;
+        indices[idx++] = 4;
+
+        indices[idx++] = 0;
+        indices[idx++] = 4;
+        indices[idx++] = 1;
+        indices[idx++] = 5;
+        indices[idx++] = 2;
+        indices[idx++] = 6;
+        indices[idx++] = 3;
+        indices[idx++] = 7;
+
+        bx::memCopy(indexBuffer.data, indices, 24 * sizeof(u16));
+    }
 
     RenderingState state;
-    state.PartiallyModifyState(BGFX_STATE_PT_LINES);
+    if (!FDrawAsCube)
+        state.PartiallyModifyState(BGFX_STATE_PT_LINES);
     state.ApplyState();
 
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, 8, vertexBuffer.layoutHandle);
-    bgfx::setIndexBuffer(&indexBuffer, 0, 24);
+    bgfx::setIndexBuffer(&indexBuffer, 0, nbIndices);
 
     glm::mat4 transform = glm::identity<glm::mat4>();
     bgfx::setTransform(&transform[0][0]);
@@ -396,7 +457,15 @@ void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
 
 void DrawCommandBuffer::DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor /*= 0xFFFFFFFF*/)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, parColor)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, false, parColor)));
+}
+
+void DrawCommandBuffer::DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::vec3& parMin,
+      const glm::vec3& parMax,
+      const u32 parColor /*= 0xFFFFFFFF*/)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, true, parColor)));
 }
 
 void DrawCommandBuffer::DrawFrustum(const MaterialInstanceHandle& parMaterialInstanceHandle,
