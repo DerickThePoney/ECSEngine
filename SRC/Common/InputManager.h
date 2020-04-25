@@ -4,7 +4,7 @@
 
 namespace ECSEngine
 {
-using PointerEventDelegate = dlgt::delegate<bool (*)(const glm::vec2&)>;
+using PointerEventDelegate = Delegate<bool (*)(const glm::vec2&)>;
 
 namespace GamepadButtons
 {

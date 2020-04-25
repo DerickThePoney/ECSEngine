@@ -4,7 +4,7 @@ targetdir ("../bin/%{cfg.platform}/%{cfg.buildcfg}")
 symbolspath '$(OutDir)$(TargetName).pdb'
 
 includedirs { "../External/glm", "D:/Applications/boost_1_70_0" }
-includedirs { "../External/brigand/brigand/include", "../External/cereal/include", "../External/delegates/include"}
+includedirs { "../External/brigand/brigand/include", "../External/cereal/include"}
 
 flags {"MultiProcessorCompile"}
 

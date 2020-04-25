@@ -85,7 +85,7 @@
 
 #include "Assertions.h"
 
-#include "delegate.h"
+#include "Delegate.h"
 
 // void* operator new(size_t s, void* where, size_t limit) noexcept;
 //
