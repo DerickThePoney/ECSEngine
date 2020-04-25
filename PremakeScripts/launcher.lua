@@ -15,7 +15,7 @@ project "Launcher"
    pchheader "stdafx.h"
    pchsource(srcfiles.."stdafx.cpp")
 
-   links { "ECSGameplay_Common", "Rendering", "ImGuiTools"}
+   links { "ECSGameplay_Common", "ImGuiTools"}
 
    postbuildcommands {"{COPY} ../External/glfw-3.3.bin.WIN64/lib-vc2019/*.dll %{cfg.targetdir}"}
 
