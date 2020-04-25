@@ -12,6 +12,7 @@ namespace ECSEngine
 namespace Rendering
 {
 BGFXRenderer::BGFXRenderer()
+    : FCurrentFrame(0)
 {
 }
 
@@ -53,7 +54,14 @@ void BGFXRenderer::RenderFrame()
     // Set view 0 default viewport.
     bgfx::touch(0);
 
-    bgfx::frame();
+    FCurrentFrame = bgfx::frame();
+
+    auto itObserversForThisFrame = FSpecificFrameObserver.find(FCurrentFrame);
+    if (itObserversForThisFrame != FSpecificFrameObserver.end())
+    {
+        foreachitem(observer, itObserversForThisFrame->second) { observer(); }
+        FSpecificFrameObserver.erase(FCurrentFrame);
+    }
 }
 
 void BGFXRenderer::Resize(u32 width, u32 height)
@@ -69,7 +77,7 @@ bool BGFXRenderer::IsInstancingEnabled()
     return !(0 == (BGFX_CAPS_INSTANCING & caps->supported));
 }
 
-DrawCommandBuffer* BGFXRenderer::CreateCommandBuffer(u16 parViewId /*= 0*/)
+DrawCommandBuffer* BGFXRenderer::CreateCommandBuffer(RenderPassId::Type parViewId /*= RenderPassId::GEOMETRY_PASS */)
 {
     DrawCommandBuffer* buffer = new DrawCommandBuffer(parViewId);
 
@@ -79,6 +87,11 @@ DrawCommandBuffer* BGFXRenderer::CreateCommandBuffer(u16 parViewId /*= 0*/)
 void BGFXRenderer::ReleaseCommandBuffer(DrawCommandBuffer* buffer)
 {
     delete buffer;
+}
+
+void BGFXRenderer::AddRequestOnSpecificFrame(const u32 parFrameNumber, const SpecificFrameObserver& parObserver)
+{
+    FSpecificFrameObserver[parFrameNumber].push_back(parObserver);
 }
 
 } // namespace Rendering

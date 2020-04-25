@@ -1,5 +1,6 @@
 #pragma once
 #include "Application/EditorScene.h"
+#include "Application/EditorSceneObjectsPicker.h"
 #include "Application/IGameplayUpdater.h"
 #include "Application/Scene.h"
 #include "Common/RenderingHandles.h"
@@ -8,6 +9,7 @@
 #include "ECSGameplay_Common/OrientationSystem.h"
 #include "Rendering/EditorSceneRenderer.h"
 #include "Rendering/RenderingSystem.h"
+#include "Rendering/SceneObjectsPickingRenderer.h"
 
 namespace ECSEngine
 {
@@ -38,6 +40,7 @@ private:
     OrientationSystem orientationSystem;
     RenderingSystem renderSystem;
     EditorSceneRenderer editorSceneRenderer;
+    SceneObjectsPickingRenderer editorSceneObjectPickingRenderer;
 
     // temp data
     const EntityTemplate* FTemplate;
