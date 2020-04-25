@@ -22,6 +22,6 @@ protected:
     void VirtualDestroy() override;
 
     Rendering::DrawCommandBuffer* FDrawBuffer;
-    u32 CamId;
+    u32 FCamId;
 };
 } // namespace ECSEngine
