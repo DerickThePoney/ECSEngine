@@ -16,8 +16,8 @@ Camera::Camera()
 Camera::Camera(const glm::mat4& parWorldViewMatrix, const float parFov, const float parNearPlane, const float parFarPlane)
     : FWorldViewMatrix(parWorldViewMatrix)
     , FFov(parFov)
-    , FFarPlane(parNearPlane)
-    , FNearPlane(parFarPlane)
+    , FNearPlane(parNearPlane)
+    , FFarPlane(parFarPlane)
 {
 }
 
