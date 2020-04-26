@@ -18,6 +18,8 @@ public:
     void Shutdown();
     void RenderScene(const Scene* parScene);
 
+    void DrawDebugData(bool* parOpen);
+
     void SetDataIsAvailable();
 
 private:
