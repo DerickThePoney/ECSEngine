@@ -118,6 +118,55 @@ void SceneObjectsPickingRenderer::RenderScene(const Scene* parScene)
         Rendering::BGFXRenderer::Instance().AddRequestOnSpecificFrame(availableAtFrame, DELEGATE(&SceneObjectsPickingRenderer::SetDataIsAvailable, *this));
 }
 
+void SceneObjectsPickingRenderer::DrawDebugData(bool* parOpen)
+{
+    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    ImGui::SetNextWindowPos(ImVec2(windowSize.x - windowSize.x / 5.0f - 10.0f, 10.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(windowSize.x / 5.0f, windowSize.y / 2.0f), ImGuiCond_FirstUseEver);
+    ImGui::Begin("Picking texture", parOpen, 0);
+
+    ImGui::Image(FPickingTexture, ImVec2(windowSize.x / 5.0f - 16.0f, windowSize.x / 5.0f - 16.0f));
+
+    if (FReadingAvailable)
+    {
+        std::map<u32, u32> mapIndexToNbHits;
+        for (u32 i = 0; i < PickTextureSize * PickTextureSize * 4; i += 4)
+        {
+            u32 index = (u32)FSelectionData[i] + ((u32)FSelectionData[i + 1] << 8) + ((u32)FSelectionData[i + 2] << 16);
+            if (index > 0)
+            {
+                if (mapIndexToNbHits.find(index - 1) != mapIndexToNbHits.end())
+                    mapIndexToNbHits[index - 1] += 1;
+                else
+                    mapIndexToNbHits[index - 1] = 1;
+            }
+        }
+
+        u32 nbHitsMax = 0;
+        u32 indexMaxHits = -1;
+        foreachitemconst(it, mapIndexToNbHits)
+        {
+            if (it.second > nbHitsMax)
+            {
+                nbHitsMax = it.second;
+                indexMaxHits = it.first;
+            }
+        }
+
+        if (indexMaxHits != -1)
+        {
+            ImGui::Text("Scene item with max hits: %d", indexMaxHits);
+            ImGui::Text("Nb hits: %d", nbHitsMax);
+        }
+        else
+        {
+            ImGui::Text("No hits");
+        }
+    }
+
+    ImGui::End();
+}
+
 void SceneObjectsPickingRenderer::SetDataIsAvailable()
 {
     FReadingAvailable = true;
