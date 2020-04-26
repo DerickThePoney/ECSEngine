@@ -20,6 +20,8 @@ public:
 
     void DrawDebugData(bool* parOpen);
 
+    std::pair<u32, u32> GetPickedItemAndHits(const float minProportion = 0.0f) const;
+
     void SetDataIsAvailable();
 
 private:
@@ -30,7 +32,9 @@ private:
 
     u8 FSelectionData[PickTextureSize * PickTextureSize * 4];
 
-    u32 FSelectionDataTimestamp;
+    float FSelectionFoV;
+    u32 FSelectedSceneItem;
+    u32 FSelectedSceneItemHits;
 
     bool FReadingData;
     bool FReadingAvailable;

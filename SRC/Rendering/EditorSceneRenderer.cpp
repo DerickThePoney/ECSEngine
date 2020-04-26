@@ -56,12 +56,25 @@ void EditorSceneRenderer::RenderScene(const Scene* parScene)
     foreachitemconst(sceneItem, sceneItems)
     {
         const glm::vec3& position = sceneItem->GetPosition();
-        FDrawCommandBuffer->DrawAABB(FHandleMaterial, position - glm::vec3(1.0f), position + glm::vec3(1.0f));
 
-        glm::vec3 angles = sceneItem->GetEulerAngles();
-        glm::mat4 mtx = glm::translate(position) * glm::eulerAngleXYZ(angles.x, angles.y, angles.z);
+        const bool isSelected = sceneItem->ItemSelected();
+        const bool isHovered = sceneItem->ItemHovered();
 
-        FDrawCommandBuffer->DrawMesh(FHandleMesh, FHandleMaterial, mtx);
+        u32 color = 0xFFFFFFFF;
+        if (isSelected)
+            color = 0xFF0000FF;
+        else if (isHovered)
+            color = 0xFFFF00FF;
+
+        FDrawCommandBuffer->DrawAABB(FHandleMaterial, position - glm::vec3(1.0f), position + glm::vec3(1.0f), color);
+
+        if (isSelected)
+        {
+            glm::vec3 angles = sceneItem->GetEulerAngles();
+            glm::mat4 mtx = glm::translate(position) * glm::eulerAngleXYZ(angles.x, angles.y, angles.z);
+
+            FDrawCommandBuffer->DrawMesh(FHandleMesh, FHandleMaterial, mtx);
+        }
     }
 
     std::vector<std::shared_ptr<ISceneAction>> sceneActions = parScene->GetSceneActions();

@@ -44,6 +44,8 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
         {
             ImGui::MenuItem("Imgui Demo", NULL, &options.showImGuiDemo);
             ImGui::MenuItem("Input debug", NULL, &options.showInputDebug);
+            ImGui::Separator();
+            ImGui::MenuItem("Picking debug", NULL, &options.showPickingDebug);
             ImGui::EndMenu();
         }
         ImGui::Separator();

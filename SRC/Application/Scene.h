@@ -25,6 +25,9 @@ public:
     virtual void Update();
     virtual void Render();
 
+    void SetItemHovered(const u32 parId);
+    void SetItemSelected(const u32 parId);
+
     const std::vector<std::shared_ptr<BaseSceneItem>>& GetSceneItems() const { return FSceneItems; }
     const std::vector<std::shared_ptr<ISceneAction>>& GetSceneActions() const { return FActions; }
 
