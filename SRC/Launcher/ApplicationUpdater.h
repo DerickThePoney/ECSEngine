@@ -1,6 +1,5 @@
 #pragma once
 #include "Application/EditorScene.h"
-#include "Application/EditorSceneObjectsPicker.h"
 #include "Application/IGameplayUpdater.h"
 #include "Application/Scene.h"
 #include "Common/RenderingHandles.h"

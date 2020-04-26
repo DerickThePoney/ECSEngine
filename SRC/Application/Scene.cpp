@@ -72,6 +72,16 @@ void Scene::Render()
 {
 }
 
+void Scene::SetItemHovered(const u32 parId)
+{
+    foreachitem(sceneItem, FSceneItems) { sceneItem->SetItemHovered(sceneItem->Id() == parId); }
+}
+
+void Scene::SetItemSelected(const u32 parId)
+{
+    foreachitem(sceneItem, FSceneItems) { sceneItem->SetItemSelected(sceneItem->Id() == parId); }
+}
+
 void Scene::AddSceneActionStealOwnership(ISceneAction* parAction)
 {
     AssertRelease(parAction != nullptr);

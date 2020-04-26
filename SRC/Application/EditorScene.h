@@ -12,6 +12,7 @@ struct WindowsToShow
     bool showLogger = false;
     bool showImGuiDemo = false;
     bool showInputDebug = false;
+    bool showPickingDebug = false;
 };
 
 struct IOScene
@@ -34,6 +35,9 @@ public:
     void Render() override;
 
     const Scene* GetEditedScene() const { return FCurrentScene; }
+    Scene* GetEditedScene() { return FCurrentScene; }
+
+    WindowsToShow& GetWindowsToShow() { return FWindows; }
 
 private:
     Scene* FCurrentScene;

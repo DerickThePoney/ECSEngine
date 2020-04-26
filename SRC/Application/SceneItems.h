@@ -37,6 +37,11 @@ public:
     void SetPosition(const glm::vec3& parPosition) { FPosition = parPosition; }
     void SetEulerAngles(const glm::vec3& parOrientation) { FEulerAngles = parOrientation; }
 
+    bool ItemSelected() const { return FItemSelected; }
+    bool ItemHovered() const { return FItemHovered; }
+    void SetItemSelected(bool parIsSelected) { FItemSelected = parIsSelected; }
+    void SetItemHovered(bool parIsHovered) { FItemHovered = parIsHovered; }
+
     template<class Archive>
     void serialize(Archive& ar)
     {
@@ -53,6 +58,9 @@ private:
 
     u32 FId;
     bool FShowItem;
+
+    bool FItemSelected;
+    bool FItemHovered;
 
 #ifdef PERFORM_SECURITY_CHECKS
     bool FVirtualDrawEditorHasBeenCalled;

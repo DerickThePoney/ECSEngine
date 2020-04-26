@@ -2,6 +2,7 @@
 
 #include "SceneObjectsPickingRenderer.h"
 
+#include "Application/PropertyDrawer.h"
 #include "Application/Scene.h"
 #include "Application/SceneItems.h"
 #include "Common/CameraManager.h"
@@ -10,12 +11,16 @@
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
+#include "RenderingCore/RenderingState.h"
 
 namespace ECSEngine
 {
 
 SceneObjectsPickingRenderer::SceneObjectsPickingRenderer()
     : FReadingAvailable(false)
+    , FSelectedSceneItem(-1)
+    , FSelectedSceneItemHits(0)
+    , FSelectionFoV(1.0f)
 {
 }
 
@@ -32,7 +37,7 @@ bgfx::FrameBufferHandle FPickingFramebuffer;
 void SceneObjectsPickingRenderer::Initialise()
 {
     bgfx::setViewName(Rendering::RenderPassId::SELECTION_PASS, "Picking pass");
-    bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 0.0f, 0);
+    bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 
     FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_PASS);
     FBlitCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_BLIT_PASS);
@@ -81,12 +86,13 @@ void SceneObjectsPickingRenderer::RenderScene(const Scene* parScene)
     bgfx::setViewRect(Rendering::RenderPassId::SELECTION_PASS, 0, 0, PickTextureSize, PickTextureSize);
 
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    const glm::mat4 invProjectionMatrix = glm::inverse(c->GetProjectionMatrix((float)windowSize.x / (float)windowSize.y));
+    const glm::mat4 projMatrix = c->GetProjectionMatrix((float)windowSize.x / (float)windowSize.y);
+    const glm::mat4 invProjectionMatrix = glm::inverse(projMatrix);
     const glm::mat4 viewWorldMatrix = glm::inverse(c->GetWorldViewMatrix());
 
     const glm::vec2 mousePosition = Input::GetMousePosition();
-    float mouseXNDC = (mousePosition.x / (float)windowSize.x) * 2.0f - 1.0f;
-    float mouseYNDC = ((windowSize.y - mousePosition.y) / (float)windowSize.y) * 2.0f - 1.0f;
+    const float mouseXNDC = (mousePosition.x / (float)windowSize.x) * 2.0f - 1.0f;
+    const float mouseYNDC = ((windowSize.y - mousePosition.y) / (float)windowSize.y) * 2.0f - 1.0f;
 
     const glm::vec4 pickEyeH = invProjectionMatrix * glm::vec4(mouseXNDC, mouseYNDC, 1.0f, 1.0f);
     const glm::vec4 pickAtH = invProjectionMatrix * glm::vec4(mouseXNDC, mouseYNDC, 0.0f, 1.0f);
@@ -94,17 +100,20 @@ void SceneObjectsPickingRenderer::RenderScene(const Scene* parScene)
     const glm::vec3 pickAt = viewWorldMatrix * pickAtH / pickAtH.w;
 
     const glm::mat4 pickView = glm::lookAt(pickEye, pickAt, glm::vec3(0.0f, 0.0f, 1.0f));
-    const glm::mat4 pickProj = glm::perspective(glm::radians(3.0f), 1.0f, 0.1f, 500.0f);
+    const glm::mat4 pickProj = glm::perspective(glm::radians(FSelectionFoV), 1.0f, 0.1f, 500.0f);
 
     bgfx::setViewTransform(Rendering::RenderPassId::SELECTION_PASS, &pickView[0][0], &pickProj[0][0]);
 
     AssertRelease(parScene != nullptr);
     const std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItems();
 
+    Rendering::RenderingState state;
+
     foreachitemconst(sceneItem, sceneItems)
     {
+        state.ApplyState();
         const glm::vec3& position = sceneItem->GetPosition();
-        const u32 sceneItemID = sceneItem->Id() + 1;
+        const u32 sceneItemID = (sceneItem->Id() + 1);
         const u32 color = 0xFF000000 | (sceneItemID & 0x00FFFFFF);
         FDrawCommandBuffer->DrawAABBAsCube(FDrawIdMaterial, position - glm::vec3(1.0f), position + glm::vec3(1.0f), color);
     }
@@ -116,6 +125,33 @@ void SceneObjectsPickingRenderer::RenderScene(const Scene* parScene)
     u32 availableAtFrame = bgfx::readTexture(FPickingBlitTexture, FSelectionData);
     if (!FReadingAvailable)
         Rendering::BGFXRenderer::Instance().AddRequestOnSpecificFrame(availableAtFrame, DELEGATE(&SceneObjectsPickingRenderer::SetDataIsAvailable, *this));
+
+    if (FReadingAvailable)
+    {
+        std::map<u32, u32> mapIndexToNbHits;
+        for (u32 i = 0; i < PickTextureSize * PickTextureSize * 4; i += 4)
+        {
+            u32 index = ((u32)FSelectionData[i] + ((u32)FSelectionData[i + 1] << 8) + ((u32)FSelectionData[i + 2] << 16));
+            if (index > 0)
+            {
+                if (mapIndexToNbHits.find(index - 1) != mapIndexToNbHits.end())
+                    mapIndexToNbHits[index - 1] += 1;
+                else
+                    mapIndexToNbHits[index - 1] = 1;
+            }
+        }
+
+        FSelectedSceneItemHits = 0;
+        FSelectedSceneItem = -1;
+        foreachitemconst(it, mapIndexToNbHits)
+        {
+            if (it.second > FSelectedSceneItemHits)
+            {
+                FSelectedSceneItemHits = it.second;
+                FSelectedSceneItem = it.first;
+            }
+        }
+    }
 }
 
 void SceneObjectsPickingRenderer::DrawDebugData(bool* parOpen)
@@ -127,44 +163,28 @@ void SceneObjectsPickingRenderer::DrawDebugData(bool* parOpen)
 
     ImGui::Image(FPickingTexture, ImVec2(windowSize.x / 5.0f - 16.0f, windowSize.x / 5.0f - 16.0f));
 
-    if (FReadingAvailable)
+    EDITOR_PROPERTY_WITH_LIMITS("Selection FoV", FSelectionFoV, 0.f, 180.f);
+
+    if (FSelectedSceneItem != -1)
     {
-        std::map<u32, u32> mapIndexToNbHits;
-        for (u32 i = 0; i < PickTextureSize * PickTextureSize * 4; i += 4)
-        {
-            u32 index = (u32)FSelectionData[i] + ((u32)FSelectionData[i + 1] << 8) + ((u32)FSelectionData[i + 2] << 16);
-            if (index > 0)
-            {
-                if (mapIndexToNbHits.find(index - 1) != mapIndexToNbHits.end())
-                    mapIndexToNbHits[index - 1] += 1;
-                else
-                    mapIndexToNbHits[index - 1] = 1;
-            }
-        }
-
-        u32 nbHitsMax = 0;
-        u32 indexMaxHits = -1;
-        foreachitemconst(it, mapIndexToNbHits)
-        {
-            if (it.second > nbHitsMax)
-            {
-                nbHitsMax = it.second;
-                indexMaxHits = it.first;
-            }
-        }
-
-        if (indexMaxHits != -1)
-        {
-            ImGui::Text("Scene item with max hits: %d", indexMaxHits);
-            ImGui::Text("Nb hits: %d", nbHitsMax);
-        }
-        else
-        {
-            ImGui::Text("No hits");
-        }
+        ImGui::Text("Scene item with max hits: %d", FSelectedSceneItem);
+        ImGui::Text("Nb hits: %d", FSelectedSceneItemHits);
+    }
+    else
+    {
+        ImGui::Text("No hits");
     }
 
     ImGui::End();
+}
+
+std::pair<u32, u32> SceneObjectsPickingRenderer::GetPickedItemAndHits(const float minProportion /*= 0.0f*/) const
+{
+    if (minProportion > 0.0f && FSelectedSceneItem != -1 && FSelectedSceneItemHits / (PickTextureSize * PickTextureSize) > minProportion)
+    {
+        return { FSelectedSceneItem, FSelectedSceneItemHits };
+    }
+    return { FSelectedSceneItem, 0 };
 }
 
 void SceneObjectsPickingRenderer::SetDataIsAvailable()

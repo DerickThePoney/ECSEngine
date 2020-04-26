@@ -14,6 +14,8 @@ BaseSceneItem::BaseSceneItem()
     , FEulerAngles(glm::vec3(0.f))
     , FId(-1)
     , FShowItem(false)
+    , FItemHovered(false)
+    , FItemSelected(false)
 #ifdef PERFORM_SECURITY_CHECKS
     , FVirtualDrawEditorHasBeenCalled(false)
 #endif
@@ -26,6 +28,8 @@ BaseSceneItem::BaseSceneItem(const std::string& parName, const u32 parId)
     , FEulerAngles(glm::vec3(0.f))
     , FId(parId)
     , FShowItem(false)
+    , FItemHovered(false)
+    , FItemSelected(false)
 #ifdef PERFORM_SECURITY_CHECKS
     , FVirtualDrawEditorHasBeenCalled(false)
 #endif
