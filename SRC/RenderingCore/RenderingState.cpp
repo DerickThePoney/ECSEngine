@@ -8,7 +8,7 @@ namespace Rendering
 {
 
 RenderingState::RenderingState()
-    : FRenderingState(BGFX_STATE_DEFAULT | BGFX_STATE_DEPTH_TEST_GREATER)
+    : FRenderingState(BGFX_STATE_DEFAULT)
     , FBlendingWeights(0)
 {
 }
