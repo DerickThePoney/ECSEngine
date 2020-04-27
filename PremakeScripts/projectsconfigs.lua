@@ -6,7 +6,8 @@ symbolspath '$(OutDir)$(TargetName).pdb'
 includedirs { "../External/glm", "D:/Applications/boost_1_70_0" }
 includedirs { "../External/brigand/brigand/include", "../External/cereal/include"}
 
-flags {"MultiProcessorCompile"}
+flags {"MultiProcessorCompile", "LinkTimeOptimization", "NoIncrementalLink"}
+editAndContinue "Off"
 
 filter "configurations:Debug"
   defines { "DEBUG" , "PERFORM_SECURITY_CHECKS"}
@@ -19,11 +20,11 @@ filter "configurations:Release"
 
 filter "configurations:Profile"
   defines { "NDEBUG" , "ABSOLUTELY_NOT_ASSERT", "ENABLE_BGFX_PROFILING"}
-  optimize "On"
+  optimize "Speed"
   symbols "On"
 
 filter "configurations:Final"
   defines { "NDEBUG" , "ABSOLUTELY_NOT_ASSERT"}
-  optimize "On"
+  optimize "Speed"
   symbols "On"
   disablewarnings{"4390"}
