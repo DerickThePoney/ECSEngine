@@ -11,7 +11,7 @@ namespace Rendering
 namespace MagicStuff
 {
 constexpr u32 MajorVersion = 0;
-constexpr u32 MinorVersion = 0;
+constexpr u32 MinorVersion = 1;
 } // namespace MagicStuff
 MeshFileWriter::MeshFileWriter(const std::string& parFilename)
 {
@@ -36,19 +36,28 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
     fileHeader.MinorVersion = MagicStuff::MinorVersion;
     const aiMesh* mesh0 = parMeshData->mMeshes[0];
     fileHeader.layout.HasPositions = mesh0->HasPositions();
-    if (fileHeader.layout.HasPositions)
-        fileHeader.VertexSizeInOctet += 3 * sizeof(float);
 
     fileHeader.layout.NbColorChannels = mesh0->GetNumColorChannels();
     fileHeader.layout.HasColors = fileHeader.layout.NbColorChannels != 0;
-    fileHeader.layout.NbUVs = 0; // A IMPLEMENTER mesh->GetNumUVChannels();
+    fileHeader.layout.NbUVs = mesh0->GetNumUVChannels();
     fileHeader.layout.HasUVs = fileHeader.layout.NbUVs != 0;
 
-    fileHeader.layout.HasNormals = false; // A IMPLEMENTER mesh->HasNormals();
+    fileHeader.layout.HasNormals = mesh0->HasNormals();
     fileHeader.layout.HasTangents = mesh0->HasTangentsAndBitangents();
     fileHeader.layout.HasBinormals = fileHeader.layout.HasTangents;
 
+    if (fileHeader.layout.HasPositions)
+        fileHeader.VertexSizeInOctet += 3 * sizeof(float);
+
     fileHeader.VertexSizeInOctet += fileHeader.layout.NbColorChannels * sizeof(u32);
+    fileHeader.VertexSizeInOctet += fileHeader.layout.NbUVs * 2 * sizeof(float);
+
+    if (fileHeader.layout.HasNormals)
+        fileHeader.VertexSizeInOctet += 3 * sizeof(float);
+    if (fileHeader.layout.HasTangents)
+        fileHeader.VertexSizeInOctet += 3 * sizeof(float);
+    if (fileHeader.layout.HasTangents)
+        fileHeader.VertexSizeInOctet += 3 * sizeof(float);
 
     fileHeader.NbIndices = 0;
     forrange(i, 0, parMeshData->mNumMeshes)
@@ -72,9 +81,13 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
 
         forrange(l, 0, mesh->mNumVertices)
         {
-            FOutputStream.write((c8*)&mesh->mVertices[l].x, 4);
-            FOutputStream.write((c8*)&mesh->mVertices[l].y, 4);
-            FOutputStream.write((c8*)&mesh->mVertices[l].z, 4);
+            if (fileHeader.layout.HasPositions)
+            {
+                FOutputStream.write((c8*)&mesh->mVertices[l].x, 4);
+                FOutputStream.write((c8*)&mesh->mVertices[l].y, 4);
+                FOutputStream.write((c8*)&mesh->mVertices[l].z, 4);
+            }
+
             forrange(j, 0, fileHeader.layout.NbColorChannels)
             {
                 u32 r, g, b, a;
@@ -85,6 +98,34 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
                 u32 color32 = (a << 24) | (b << 16) | (g << 8) | r;
                 FOutputStream.write((c8*)&color32, 4);
             }
+
+            forrange(j, 0, fileHeader.layout.NbUVs)
+            {
+                FOutputStream.write((c8*)&mesh->mTextureCoords[j][l].x, 4);
+                FOutputStream.write((c8*)&mesh->mTextureCoords[j][l].y, 4);
+            }
+
+            if (fileHeader.layout.HasNormals)
+            {
+                FOutputStream.write((c8*)&mesh->mNormals[l].x, 4);
+                FOutputStream.write((c8*)&mesh->mNormals[l].y, 4);
+                FOutputStream.write((c8*)&mesh->mNormals[l].z, 4);
+            }
+
+            if (fileHeader.layout.HasTangents)
+            {
+                FOutputStream.write((c8*)&mesh->mTangents[l].x, 4);
+                FOutputStream.write((c8*)&mesh->mTangents[l].y, 4);
+                FOutputStream.write((c8*)&mesh->mTangents[l].z, 4);
+            }
+
+            if (fileHeader.layout.HasBinormals)
+            {
+                FOutputStream.write((c8*)&mesh->mBitangents[l].x, 4);
+                FOutputStream.write((c8*)&mesh->mBitangents[l].y, 4);
+                FOutputStream.write((c8*)&mesh->mBitangents[l].z, 4);
+            }
+
             k++;
         }
     }
@@ -107,32 +148,7 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
     }
 
     FOutputStream.write((c8*)indices.data(), 4u * fileHeader.NbIndices);
-
-    /*   FOutputStream.write((c8*)vertexData, fileHeader.VertexSizeInOctet * fileHeader.NbVertices);
-       FOutputStream.write((c8*)indexData, fileHeader.IndexSizeInOctets * fileHeader.NbIndices);*/
 }
-
-// void MeshFileWriter::operator<<(const IMesh* parMeshData)
-//{
-//    AssertRelease(FOutputStream.is_open());
-//    AssertRelease(FOutputStream.good());
-//    MeshFileHeader fileHeader;
-//    void* vertexData = nullptr;
-//    void* indexData = nullptr;
-//
-//    fileHeader.MajorVersion = MagicStuff::MajorVersion;
-//    fileHeader.MinorVersion = MagicStuff::MinorVersion;
-//
-//    parMeshData->FillMeshFileHeader(fileHeader, vertexData, indexData);
-//
-//    AssertRelease(vertexData != nullptr);
-//    AssertRelease(indexData != nullptr);
-//
-//    FOutputStream.write((c8*)&fileHeader, sizeof(MeshFileHeader));
-//
-//    FOutputStream.write((c8*)vertexData, fileHeader.VertexSizeInOctet * fileHeader.NbVertices);
-//    FOutputStream.write((c8*)indexData, fileHeader.IndexSizeInOctets * fileHeader.NbIndices);
-//}
 
 } // namespace Rendering
 } // namespace ECSEngine
