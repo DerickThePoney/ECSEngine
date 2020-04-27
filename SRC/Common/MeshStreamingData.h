@@ -11,13 +11,17 @@ enum Type
 {
     HAS_POSTION = 0,
     HAS_COLORS = HAS_POSTION + 1, // 1 bit pour has colors et 3 pour le nombre
-    HAS_UVS = HAS_COLORS + 4, // 1 bit pour has uv et 3 pour le nombre
-    HAS_NORMALS = HAS_UVS + 4,
+    HAS_UVS = HAS_COLORS + 4, // 1 bit pour has uv et 3 pour le nombre (max 4 couleurs)
+    HAS_NORMALS = HAS_UVS + 5, // 1 bit pour has uv et 4 pour le nombre (max 8 uvs)
     HAS_TANGENTS = HAS_NORMALS + 1,
     HAS_BINORMALS = HAS_TANGENTS + 1,
     LENGTH = HAS_BINORMALS + 1
 };
 }; // namespace VERTEX_LAYOUT_PARAMS
+
+//----------------------------------------------------------------
+//          VertexLayoutHash
+//----------------------------------------------------------------
 
 constexpr u32 hashSize = ((VERTEX_LAYOUT_PARAMS::LENGTH == 1) ? 1 : 1 << (32 - __builtin_clz(VERTEX_LAYOUT_PARAMS::LENGTH - 1)));
 constexpr u32 hashSizeByte = ((VERTEX_LAYOUT_PARAMS::LENGTH == 1) ? 1 : 1 << (32 - __builtin_clz(VERTEX_LAYOUT_PARAMS::LENGTH - 1))) / 8;
@@ -44,13 +48,79 @@ struct VertexLayoutHash
     friend std::istream& operator>>(std::istream& input, VertexLayoutHash& parLayoutHash);
 
     void SetValue(const VERTEX_LAYOUT_PARAMS::Type parValue, bool parHasValue);
+    bool GetValue(const VERTEX_LAYOUT_PARAMS::Type parValue) const;
 
+    u32 GetColorsNb() const;
+    u32 GetUVsNb() const;
     void SetColorsNb(const u32 parNbColors);
     void SetUVsNb(const u32 parNbUVs);
 
     hash_storage_type hash;
 };
 
+//----------------------------------------------------------------
+//          VertexDataStream
+//----------------------------------------------------------------
+class VertexDataStream
+{
+    using TypeChannelIdPair = std::pair<VERTEX_LAYOUT_PARAMS::Type, u32>;
+    using OffsetByteSizePair = std::pair<u32, u32>;
+
+public:
+    VertexDataStream(const u32 parNbVertices, const u32 parVertexByteSize, const VertexLayoutHash& hash);
+    ~VertexDataStream();
+
+    template<typename T>
+    void PushData(const VERTEX_LAYOUT_PARAMS::Type parType, const u32 parChannel, const T& parData)
+    {
+        AssertRelease(FCurrentVertexHead < FSize);
+        const TypeChannelIdPair p = { parType, parChannel };
+        AssertRelease(FOffsetMap.find(p) != FOffsetMap.end());
+        const OffsetByteSizePair& o = FOffsetMap[p];
+        AssertRelease((u32)sizeof(T) == o.second);
+        const u32 ptrOffset = FCurrentVertexHead * FVertexByteSize + o.first;
+        AssertRelease(ptrOffset < FByteSize);
+        AssertRelease((ptrOffset + o.second) <= FByteSize);
+        c8* writePosition = FData + ptrOffset;
+        memcpy(writePosition, &parData, sizeof(T));
+
+#ifdef PERFORM_SECURITY_CHECKS
+        const T writenValue = *reinterpret_cast<T*>(writePosition);
+        AssertRelease(writenValue == parData);
+#endif
+    }
+
+    void Advance()
+    {
+        FCurrentVertexHead++;
+        AssertRelease(FCurrentVertexHead <= FSize);
+    }
+
+    const void* GetData() const
+    {
+        AssertRelease(FData != nullptr);
+        return FData;
+    }
+
+private:
+    void InitOffsetData();
+
+private:
+    std::map<TypeChannelIdPair, OffsetByteSizePair> FOffsetMap;
+
+    c8* FData;
+    u32 FVertexByteSize;
+    u32 FByteSize;
+    u32 FSize;
+
+    u32 FCurrentVertexHead;
+
+    const VertexLayoutHash& FHash;
+};
+
+//----------------------------------------------------------------
+//          MeshLayoutDescription
+//----------------------------------------------------------------
 #pragma pack(push, r1, 1)
 struct MeshLayoutDescription
 {
@@ -76,6 +146,9 @@ struct MeshLayoutDescription
     }
 };
 
+//----------------------------------------------------------------
+//          MeshFileHeader
+//----------------------------------------------------------------
 struct MeshFileHeader
 {
     u32 MajorVersion = 0;
