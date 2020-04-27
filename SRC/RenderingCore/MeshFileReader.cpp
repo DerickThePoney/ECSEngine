@@ -21,29 +21,75 @@ void ReadMeshImplementation(IMesh*& parMesh, std::istream& parStream)
     MeshFileHeader fileHeader;
     parStream.read((c8*)&fileHeader, sizeof(MeshFileHeader));
 
-    using VertexLayout = VertexPositionColorN<1>;
+    VertexLayoutHash hash(fileHeader.layout);
 
-    AssertRelease(sizeof(VertexLayout) == fileHeader.VertexSizeInOctet);
-    std::vector<VertexLayout> vertices;
+    VertexDataStream stream(fileHeader.NbVertices, fileHeader.VertexSizeInOctet, hash);
+
     std::vector<u32> indices;
-    vertices.resize(fileHeader.NbVertices);
     indices.resize(fileHeader.NbIndices);
     forrange(i, 0, fileHeader.NbVertices)
     {
-        parStream.read((c8*)&vertices[i].FPosition.x, 4);
-        parStream.read((c8*)&vertices[i].FPosition.y, 4);
-        parStream.read((c8*)&vertices[i].FPosition.z, 4);
-        forrange(j, 0, fileHeader.layout.NbColorChannels) { parStream.read((c8*)&vertices[i].FColor[j], 4); }
+        if (fileHeader.layout.HasPositions)
+        {
+            glm::vec3 data(0.0f);
+            parStream.read((c8*)&data.x, 4);
+            parStream.read((c8*)&data.y, 4);
+            parStream.read((c8*)&data.z, 4);
+            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, data);
+        }
+
+        forrange(j, 0, fileHeader.layout.NbColorChannels)
+        {
+            u32 color = 0;
+            parStream.read((c8*)&color, 4);
+            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+        }
+
+        forrange(j, 0, fileHeader.layout.NbUVs)
+        {
+            glm::vec2 uv(0.0f);
+            parStream.read((c8*)&uv.x, 4);
+            parStream.read((c8*)&uv.y, 4);
+            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uv);
+        }
+
+        if (fileHeader.layout.HasNormals)
+        {
+            glm::vec3 data(0.0f);
+            parStream.read((c8*)&data.x, 4);
+            parStream.read((c8*)&data.y, 4);
+            parStream.read((c8*)&data.z, 4);
+            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_NORMALS, 0, data);
+        }
+
+        if (fileHeader.layout.HasTangents)
+        {
+            glm::vec3 data(0.0f);
+            parStream.read((c8*)&data.x, 4);
+            parStream.read((c8*)&data.y, 4);
+            parStream.read((c8*)&data.z, 4);
+            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0, data);
+        }
+
+        if (fileHeader.layout.HasTangents)
+        {
+            glm::vec3 data(0.0f);
+            parStream.read((c8*)&data.x, 4);
+            parStream.read((c8*)&data.y, 4);
+            parStream.read((c8*)&data.z, 4);
+            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0, data);
+        }
+
+        stream.Advance();
     }
 
     parStream.read((c8*)indices.data(), 4u * fileHeader.NbIndices);
 
-    VertexLayoutHash hash(fileHeader.layout);
     parMesh = MeshHelpers::CreateIMesh(hash);
 
     AssertRelease(parMesh != nullptr);
 
-    parMesh->SetRawVertexData(vertices.data(), fileHeader.NbVertices * fileHeader.VertexSizeInOctet);
+    parMesh->SetRawVertexData(stream.GetData(), fileHeader.NbVertices * fileHeader.VertexSizeInOctet);
     parMesh->SetRawIndexData(indices.data(), fileHeader.NbIndices * 4u);
 }
 } // namespace
