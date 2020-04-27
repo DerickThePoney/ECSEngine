@@ -6,6 +6,9 @@ namespace ECSEngine
 namespace Rendering
 {
 
+//----------------------------------------------------------------
+//          VertexLayoutHash
+//----------------------------------------------------------------
 VertexLayoutHash::VertexLayoutHash()
     : hash(0)
 {
@@ -61,9 +64,38 @@ void VertexLayoutHash::SetValue(const VERTEX_LAYOUT_PARAMS::Type parValue, bool 
     }
 }
 
+bool VertexLayoutHash::GetValue(const VERTEX_LAYOUT_PARAMS::Type parValue) const
+{
+    AssertRelease(parValue < VERTEX_LAYOUT_PARAMS::LENGTH);
+    const u32 indexInBin = parValue;
+
+    return (hash & (1 << indexInBin)) > 0;
+}
+
+u32 VertexLayoutHash::GetColorsNb() const
+{
+    const u32 indexInBin = VERTEX_LAYOUT_PARAMS::HAS_COLORS + 1;
+
+    const u32 nbColors = (hash & (0x3 << indexInBin)) >> indexInBin;
+
+    AssertRelease(nbColors < 5);
+    return nbColors;
+}
+
+u32 VertexLayoutHash::GetUVsNb() const
+{
+
+    const u32 indexInBin = VERTEX_LAYOUT_PARAMS::HAS_UVS + 1;
+
+    const u32 nbUvs = (hash & (0x3 << indexInBin)) >> indexInBin;
+
+    AssertRelease(nbUvs < 9);
+    return nbUvs;
+}
+
 void VertexLayoutHash::SetColorsNb(const u32 parNbColors)
 {
-    AssertRelease(parNbColors < (1 << 3));
+    AssertRelease(parNbColors < 5);
     const u32 indexInBin = VERTEX_LAYOUT_PARAMS::HAS_COLORS + 1;
 
     hash &= ~(0x3 << indexInBin);
@@ -72,7 +104,7 @@ void VertexLayoutHash::SetColorsNb(const u32 parNbColors)
 
 void VertexLayoutHash::SetUVsNb(const u32 parNbUVs)
 {
-    AssertRelease(parNbUVs < (1 << 3));
+    AssertRelease(parNbUVs < 9);
     const u32 indexInBin = VERTEX_LAYOUT_PARAMS::HAS_UVS + 1;
 
     hash &= ~(0x3 << indexInBin);
@@ -100,5 +132,100 @@ std::istream& operator>>(std::istream& input, VertexLayoutHash& parLayoutHash)
     input.read((c8*)&parLayoutHash.hash, hashSizeByte);
     return input;
 }
+
+//----------------------------------------------------------------
+//          VertexDataStream
+//----------------------------------------------------------------
+VertexDataStream::VertexDataStream(const u32 parNbVertices, const u32 parVertexByteSize, const VertexLayoutHash& hash)
+    : FData(nullptr)
+    , FSize(parNbVertices)
+    , FVertexByteSize(parVertexByteSize)
+    , FByteSize(parNbVertices * parVertexByteSize)
+    , FCurrentVertexHead(0)
+    , FHash(hash)
+{
+    FData = new c8[FByteSize];
+    InitOffsetData();
+}
+
+VertexDataStream::~VertexDataStream()
+{
+    delete FData;
+    FData = nullptr;
+}
+
+void VertexDataStream::InitOffsetData()
+{
+    u32 currentOffset = 0;
+
+    // position
+    if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION))
+    {
+        TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0 };
+        OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec3) };
+        currentOffset += o.second;
+        FOffsetMap[p] = o;
+    }
+
+    // colors
+    if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS))
+    {
+        const u32 nbColors = FHash.GetColorsNb();
+        AssertRelease(nbColors > 0);
+
+        forrange(i, 0, nbColors)
+        {
+            TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_COLORS, (u32)i };
+            OffsetByteSizePair o = { currentOffset, (u32)sizeof(u32) };
+            currentOffset += o.second;
+            FOffsetMap[p] = o;
+        }
+    }
+
+    // uvs
+    if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_UVS))
+    {
+        const u32 nbUvs = FHash.GetUVsNb();
+        AssertRelease(nbUvs > 0);
+
+        forrange(i, 0, nbUvs)
+        {
+            TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_UVS, (u32)i };
+            OffsetByteSizePair o = { currentOffset, (u32)sizeof(u32) };
+            currentOffset += o.second;
+            FOffsetMap[p] = o;
+        }
+    }
+
+    // Normals
+    if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_NORMALS))
+    {
+        TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_NORMALS, 0 };
+        OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec3) };
+        currentOffset += o.second;
+        FOffsetMap[p] = o;
+    }
+
+    // Tangents
+    if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS))
+    {
+        TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0 };
+        OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec3) };
+        currentOffset += o.second;
+        FOffsetMap[p] = o;
+    }
+
+    // Bitangents
+    if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS))
+    {
+        TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_BINORMALS, 0 };
+        OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec3) };
+        currentOffset += o.second;
+        FOffsetMap[p] = o;
+    }
+
+    AssertRelease(currentOffset == FVertexByteSize);
+}
+
 } // namespace Rendering
 } // namespace ECSEngine
