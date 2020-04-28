@@ -111,6 +111,25 @@ void VertexLayoutHash::SetUVsNb(const u32 parNbUVs)
     hash |= ((parNbUVs & 0x3) << indexInBin);
 }
 
+u32 VertexLayoutHash::GetByteSize() const
+{
+    u32 byteSize = 0;
+    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION))
+        byteSize += 3 * sizeof(float);
+    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS))
+        byteSize += GetColorsNb() * sizeof(u32);
+    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION))
+        byteSize += GetUVsNb() * 2 * sizeof(float);
+    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_NORMALS))
+        byteSize += 3 * sizeof(float);
+    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS))
+        byteSize += 3 * sizeof(float);
+    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS))
+        byteSize += 3 * sizeof(float);
+
+    return byteSize;
+}
+
 void VertexLayoutHash::operator=(VertexLayoutHash&& parOther)
 {
     std::memcpy(&hash, &parOther.hash, hashSize);
@@ -136,6 +155,16 @@ std::istream& operator>>(std::istream& input, VertexLayoutHash& parLayoutHash)
 //----------------------------------------------------------------
 //          VertexDataStream
 //----------------------------------------------------------------
+
+VertexDataStream::VertexDataStream()
+    : FData(nullptr)
+    , FSize(0)
+    , FVertexByteSize(0)
+    , FByteSize(0)
+    , FCurrentVertexHead(0)
+{
+}
+
 VertexDataStream::VertexDataStream(const u32 parNbVertices, const u32 parVertexByteSize, const VertexLayoutHash& hash)
     : FData(nullptr)
     , FSize(parNbVertices)
@@ -148,10 +177,72 @@ VertexDataStream::VertexDataStream(const u32 parNbVertices, const u32 parVertexB
     InitOffsetData();
 }
 
+VertexDataStream::VertexDataStream(const VertexDataStream& parOther)
+{
+    FSize = parOther.FSize;
+    FVertexByteSize = parOther.FVertexByteSize;
+    FByteSize = parOther.FByteSize;
+    FCurrentVertexHead = parOther.FCurrentVertexHead;
+    FHash = parOther.FHash;
+
+    FData = new c8[FByteSize];
+    memcpy(FData, parOther.FData, FByteSize);
+
+    FOffsetMap = parOther.FOffsetMap;
+}
+
+VertexDataStream::VertexDataStream(VertexDataStream&& parOther) noexcept
+{
+    FSize = parOther.FSize;
+    FVertexByteSize = parOther.FVertexByteSize;
+    FByteSize = parOther.FByteSize;
+    FCurrentVertexHead = parOther.FCurrentVertexHead;
+    FHash = parOther.FHash;
+
+    if (FData != nullptr)
+        delete FData;
+
+    FData = parOther.FData;
+    parOther.FData = nullptr;
+
+    FOffsetMap = std::move(parOther.FOffsetMap);
+}
+
 VertexDataStream::~VertexDataStream()
 {
     delete FData;
     FData = nullptr;
+}
+
+void VertexDataStream::operator=(VertexDataStream&& parOther) noexcept
+{
+    FSize = parOther.FSize;
+    FVertexByteSize = parOther.FVertexByteSize;
+    FByteSize = parOther.FByteSize;
+    FCurrentVertexHead = parOther.FCurrentVertexHead;
+    FHash = parOther.FHash;
+
+    if (FData != nullptr)
+        delete FData;
+
+    FData = parOther.FData;
+    parOther.FData = nullptr;
+
+    FOffsetMap = std::move(parOther.FOffsetMap);
+}
+
+void VertexDataStream::operator=(const VertexDataStream& parOther)
+{
+    FSize = parOther.FSize;
+    FVertexByteSize = parOther.FVertexByteSize;
+    FByteSize = parOther.FByteSize;
+    FCurrentVertexHead = parOther.FCurrentVertexHead;
+    FHash = parOther.FHash;
+
+    FData = new c8[FByteSize];
+    memcpy(FData, parOther.FData, FByteSize);
+
+    FOffsetMap = parOther.FOffsetMap;
 }
 
 void VertexDataStream::InitOffsetData()
@@ -191,7 +282,7 @@ void VertexDataStream::InitOffsetData()
         forrange(i, 0, nbUvs)
         {
             TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_UVS, (u32)i };
-            OffsetByteSizePair o = { currentOffset, (u32)sizeof(u32) };
+            OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec2) };
             currentOffset += o.second;
             FOffsetMap[p] = o;
         }

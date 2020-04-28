@@ -54,6 +54,7 @@ struct VertexLayoutHash
     u32 GetUVsNb() const;
     void SetColorsNb(const u32 parNbColors);
     void SetUVsNb(const u32 parNbUVs);
+    u32 GetByteSize() const;
 
     hash_storage_type hash;
 };
@@ -67,8 +68,19 @@ class VertexDataStream
     using OffsetByteSizePair = std::pair<u32, u32>;
 
 public:
+    VertexDataStream();
     VertexDataStream(const u32 parNbVertices, const u32 parVertexByteSize, const VertexLayoutHash& hash);
+    VertexDataStream(const VertexDataStream& parOther);
+    VertexDataStream(VertexDataStream&& parOther) noexcept;
     ~VertexDataStream();
+
+    void operator=(const VertexDataStream& parOther);
+    void operator=(VertexDataStream&& parOther) noexcept;
+
+    u32 GetSize() const { return FSize; }
+    u32 GetVertexByteSize() const { return FVertexByteSize; }
+    u32 GetByteSize() const { return FByteSize; }
+    const VertexLayoutHash& GetHash() const { return FHash; }
 
     template<typename T>
     void PushData(const VERTEX_LAYOUT_PARAMS::Type parType, const u32 parChannel, const T& parData)
@@ -90,6 +102,42 @@ public:
 #endif
     }
 
+    template<typename T>
+    void SetValue(const VERTEX_LAYOUT_PARAMS::Type parType, const u32 parChannel, const T& parData, const u32 parVertexId)
+    {
+        AssertRelease(parVertexId < FSize);
+        const TypeChannelIdPair p = { parType, parChannel };
+        AssertRelease(FOffsetMap.find(p) != FOffsetMap.end());
+        const OffsetByteSizePair& o = FOffsetMap[p];
+        AssertRelease((u32)sizeof(T) == o.second);
+        const u32 ptrOffset = parVertexId * FVertexByteSize + o.first;
+        AssertRelease(ptrOffset < FByteSize);
+        AssertRelease((ptrOffset + o.second) <= FByteSize);
+        c8* writePosition = FData + ptrOffset;
+        memcpy(writePosition, &parData, sizeof(T));
+
+#ifdef PERFORM_SECURITY_CHECKS
+        const T writenValue = *reinterpret_cast<T*>(writePosition);
+        AssertRelease(writenValue == parData);
+#endif
+    }
+
+    template<typename T>
+    const T& GetValue(const VERTEX_LAYOUT_PARAMS::Type parType, const u32 parChannel, const u32 parVertexId)
+    {
+        AssertRelease(parVertexId < FSize);
+        const TypeChannelIdPair p = { parType, parChannel };
+        AssertRelease(FOffsetMap.find(p) != FOffsetMap.end());
+        const OffsetByteSizePair& o = FOffsetMap[p];
+        AssertRelease((u32)sizeof(T) == o.second);
+        const u32 ptrOffset = parVertexId * FVertexByteSize + o.first;
+        AssertRelease(ptrOffset < FByteSize);
+        AssertRelease((ptrOffset + o.second) <= FByteSize);
+        c8* writePosition = FData + ptrOffset;
+
+        return *reinterpret_cast<T*>(writePosition);
+    }
+
     void Advance()
     {
         FCurrentVertexHead++;
@@ -97,6 +145,12 @@ public:
     }
 
     const void* GetData() const
+    {
+        AssertRelease(FData != nullptr);
+        return FData;
+    }
+
+    void* GetData()
     {
         AssertRelease(FData != nullptr);
         return FData;
@@ -115,7 +169,7 @@ private:
 
     u32 FCurrentVertexHead;
 
-    const VertexLayoutHash& FHash;
+    VertexLayoutHash FHash;
 };
 
 //----------------------------------------------------------------
