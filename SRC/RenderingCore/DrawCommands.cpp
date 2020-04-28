@@ -3,6 +3,7 @@
 #include "DrawCommands.h"
 
 #include "Common/Camera.h"
+#include "Common/MeshStreamingData.h"
 #include "Material.h"
 #include "MaterialManager.h"
 #include "Mesh.h"
@@ -102,26 +103,53 @@ void DrawAABBCommand::SubmitCommand() const
     bgfx::TransientVertexBuffer vertexBuffer;
     bgfx::TransientIndexBuffer indexBuffer;
 
-    const bgfx::VertexLayout layout = VertexPositionColorN<1>().GetVertexLayout();
+    VertexLayoutHash hash;
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
+    hash.SetColorsNb(1);
+
+    bgfx::VertexLayout layout = GetVertexLayout(hash);
+
     u32 availableVertices = bgfx::getAvailTransientVertexBuffer(8, layout);
     AssertRelease(availableVertices == 8);
 
     bgfx::allocTransientVertexBuffer(&vertexBuffer, 8, layout);
 
-    VertexPositionColorN<1> vertices[8];
-    forrange(i, 0, 8) { vertices[i].FColor[0] = FColor; }
+    VertexDataStream stream(8, hash.GetByteSize(), hash);
 
-    vertices[0].FPosition = FMin;
-    vertices[1].FPosition = glm::vec3(FMax.x, FMin.y, FMin.z);
-    vertices[2].FPosition = glm::vec3(FMax.x, FMin.y, FMax.z);
-    vertices[3].FPosition = glm::vec3(FMin.x, FMin.y, FMax.z);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FMin);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
 
-    vertices[4].FPosition = glm::vec3(FMin.x, FMax.y, FMin.z);
-    vertices[5].FPosition = glm::vec3(FMax.x, FMax.y, FMin.z);
-    vertices[6].FPosition = FMax;
-    vertices[7].FPosition = glm::vec3(FMin.x, FMax.y, FMax.z);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMax.x, FMin.y, FMin.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
 
-    bx::memCopy(vertexBuffer.data, vertices, sizeof(vertices));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMax.x, FMin.y, FMax.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMin.x, FMin.y, FMax.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMin.x, FMax.y, FMin.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMax.x, FMax.y, FMin.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FMax);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMin.x, FMax.y, FMax.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
 
     u32 nbIndices = 0;
 
@@ -279,7 +307,13 @@ void DrawFrustumCommand::SubmitCommand() const
     bgfx::TransientVertexBuffer vertexBuffer;
     bgfx::TransientIndexBuffer indexBuffer;
 
-    const bgfx::VertexLayout layout = VertexPositionColorN<1>().GetVertexLayout();
+    VertexLayoutHash hash;
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
+    hash.SetColorsNb(1);
+
+    bgfx::VertexLayout layout = GetVertexLayout(hash);
+
     u32 availableVertices = bgfx::getAvailTransientVertexBuffer(8, layout);
     AssertRelease(availableVertices == 8);
     u32 availableIndices = bgfx::getAvailTransientIndexBuffer(24);
@@ -287,27 +321,49 @@ void DrawFrustumCommand::SubmitCommand() const
 
     bgfx::allocTransientBuffers(&vertexBuffer, layout, 8, &indexBuffer, 24);
 
-    VertexPositionColorN<1> vertices[8];
-    vertices[0].FPosition = glm::vec3(-1.0f, -1.0f, 0.0f);
-    vertices[1].FPosition = glm::vec3(1.0f, -1.0f, 0.0f);
-    vertices[2].FPosition = glm::vec3(1.0f, -1.0f, 1.0f);
-    vertices[3].FPosition = glm::vec3(-1.0f, -1.0f, 1.0f);
+    VertexDataStream stream(8, hash.GetByteSize(), hash);
 
-    vertices[4].FPosition = glm::vec3(-1.0f, 1.0f, 0.0f);
-    vertices[5].FPosition = glm::vec3(1.0f, 1.0f, 0.0f);
-    vertices[6].FPosition = glm::vec3(1.0f, 1.0f, 1.0f);
-    vertices[7].FPosition = glm::vec3(-1.0f, 1.0f, 1.0f);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.0f, -1.0f, 0.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.0f, -1.0f, 0.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.0f, -1.0f, 1.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.0f, -1.0f, 1.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.0f, 1.0f, 0.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.0f, 1.0f, 0.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.0f, 1.0f, 1.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
 
     forrange(i, 0, 8)
     {
-        vertices[i].FColor[0] = FColor;
-        glm::vec4 worldVertex = glm::vec4(vertices[i].FPosition, 1.0f);
+        glm::vec4 worldVertex = glm::vec4(stream.GetValue<glm::vec3>(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (u32)i), 1.0f);
         worldVertex = FInverseProjectionMatrix * worldVertex;
         worldVertex = worldVertex / worldVertex.w;
-        vertices[i].FPosition = FViewWorldTransform * worldVertex;
+        stream.SetValue<glm::vec3>(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FViewWorldTransform * worldVertex, (u32)i);
     }
 
-    bx::memCopy(vertexBuffer.data, vertices, sizeof(vertices));
+    bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
 
     u16 indices[24];
 
@@ -402,7 +458,7 @@ DrawMeshCommand::~DrawMeshCommand()
 
 void DrawMeshCommand::SubmitCommand() const
 {
-    Rendering::IMesh* mesh = Rendering::MeshManager::Instance().GetMesh(FMeshHandle);
+    Rendering::Mesh* mesh = Rendering::MeshManager::Instance().GetMesh(FMeshHandle);
     AssertRelease(mesh != nullptr);
 
     bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());

@@ -59,7 +59,7 @@ const bgfx::IndexBufferHandle& IndexBuffer::GetIndexBufferHandle()
 void IndexBuffer::CreateIndexBufferHandle(const void* parSrc)
 {
     AlwaysCheckedAssert(!FHandleHasBeenComputed);
-    FHandle = bgfx::createIndexBuffer(bgfx::makeRef(parSrc, GetByteSize()), BGFX_BUFFER_INDEX32);
+    FHandle = bgfx::createIndexBuffer(bgfx::copy(parSrc, GetByteSize()), BGFX_BUFFER_INDEX32);
     AlwaysCheckedAssert(bgfx::isValid(FHandle));
     FHandleHasBeenComputed = true;
 }

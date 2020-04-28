@@ -39,10 +39,10 @@ struct VertexLayoutHash
     VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbUvs, bool parNormals, bool parTangents, bool parBinormals);
 
     VertexLayoutHash(const VertexLayoutHash& parOther);
-    VertexLayoutHash(VertexLayoutHash&& parOther) noexcept;
+    VertexLayoutHash(VertexLayoutHash&& parOther) = delete;
 
     void operator=(const VertexLayoutHash& parOther);
-    void operator=(VertexLayoutHash&& parOther);
+    void operator=(VertexLayoutHash&& parOther) = delete;
 
     friend std::ostream& operator<<(std::ostream& output, const VertexLayoutHash& parLayoutHash);
     friend std::istream& operator>>(std::istream& input, VertexLayoutHash& parLayoutHash);
@@ -71,11 +71,11 @@ public:
     VertexDataStream();
     VertexDataStream(const u32 parNbVertices, const u32 parVertexByteSize, const VertexLayoutHash& hash);
     VertexDataStream(const VertexDataStream& parOther);
-    VertexDataStream(VertexDataStream&& parOther) noexcept;
+    VertexDataStream(VertexDataStream&& parOther) = delete;
     ~VertexDataStream();
 
     void operator=(const VertexDataStream& parOther);
-    void operator=(VertexDataStream&& parOther) noexcept;
+    void operator=(VertexDataStream&& parOther) = delete;
 
     u32 GetSize() const { return FSize; }
     u32 GetVertexByteSize() const { return FVertexByteSize; }

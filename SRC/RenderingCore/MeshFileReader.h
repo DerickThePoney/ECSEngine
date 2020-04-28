@@ -6,7 +6,7 @@ class Resource;
 namespace Rendering
 {
 
-class IMesh;
+class Mesh;
 
 class MeshFileReader
 {
@@ -14,8 +14,8 @@ public:
     MeshFileReader();
     ~MeshFileReader();
 
-    void ReadMesh(IMesh*& parMesh, const std::string& parFilename);
-    void ReadMesh(IMesh*& parMesh, Resource& parResource);
+    void ReadMesh(Mesh*& parMesh, const std::string& parFilename);
+    void ReadMesh(Mesh*& parMesh, Resource& parResource);
 };
 
 } // namespace Rendering
