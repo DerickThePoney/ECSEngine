@@ -16,7 +16,7 @@ namespace Rendering
 
 namespace
 {
-void ReadMeshImplementation(IMesh*& parMesh, std::istream& parStream)
+void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
 {
     MeshFileHeader fileHeader;
     parStream.read((c8*)&fileHeader, sizeof(MeshFileHeader));
@@ -89,7 +89,7 @@ void ReadMeshImplementation(IMesh*& parMesh, std::istream& parStream)
 
     AssertRelease(parMesh != nullptr);
 
-    parMesh->SetRawVertexData(stream.GetData(), fileHeader.NbVertices * fileHeader.VertexSizeInOctet);
+    parMesh->SetRawVertexData(stream);
     parMesh->SetRawIndexData(indices.data(), fileHeader.NbIndices * 4u);
 }
 } // namespace
@@ -102,14 +102,14 @@ MeshFileReader::~MeshFileReader()
 {
 }
 
-void MeshFileReader::ReadMesh(IMesh*& parMesh, const std::string& parFilename)
+void MeshFileReader::ReadMesh(Mesh*& parMesh, const std::string& parFilename)
 {
     std::ifstream ifstr(parFilename.c_str(), std::ifstream::binary);
     AssertRelease(ifstr.good());
     ReadMeshImplementation(parMesh, ifstr);
 }
 
-void MeshFileReader::ReadMesh(IMesh*& parMesh, Resource& parResource)
+void MeshFileReader::ReadMesh(Mesh*& parMesh, Resource& parResource)
 {
     std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&parResource);
 

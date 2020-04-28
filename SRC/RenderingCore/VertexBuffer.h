@@ -1,10 +1,10 @@
 #pragma once
+#include "Common/MeshStreamingData.h"
 
 namespace ECSEngine
 {
 namespace Rendering
 {
-template<typename VertexLayout>
 class VertexBuffer final
 {
 public:
@@ -13,40 +13,22 @@ public:
 
     u32 GetNumberOfVertices() const { return FSize; }
 
-    u32 GetByteSize() const { return FSize * sizeof(VertexLayout); }
+    u32 GetByteSize() const { return FByteSize; }
 
-    const void* GetRawData() const { return (void*)FData; }
-
-    void* GetRawData() { return (void*)FData; }
-
-    void SetRawData(const void* parSrc, u32 parSizeInBytes);
-
-    void CreateVertexBufferHandle();
+    void SetRawData(const VertexDataStream& parDataStream);
 
     void DestroyHandleIFN();
     const bgfx::VertexBufferHandle& GetVertexBufferHandle();
 
-    template<typename T>
-    const T* GetDataAs() const
-    {
-        return reinterpret_cast<T*>(GetRawData());
-    }
-
-    template<typename T>
-    T* GetDataAs()
-    {
-        return reinterpret_cast<T*>(GetRawData());
-    }
+private:
+    void CreateVertexBufferHandle(const VertexDataStream& parDataStream);
 
 private:
-    VertexLayout* FData;
     u32 FSize;
-
+    u32 FByteSize;
     bool FHandleHasBeenComputed;
     bgfx::VertexBufferHandle FHandle;
 };
 
 } // namespace Rendering
 } // namespace ECSEngine
-
-#include "VertexBuffer.inl"

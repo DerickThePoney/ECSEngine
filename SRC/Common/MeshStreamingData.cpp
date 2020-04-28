@@ -42,12 +42,7 @@ VertexLayoutHash::VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbU
 
 VertexLayoutHash::VertexLayoutHash(const VertexLayoutHash& parOther)
 {
-    std::memcpy(&hash, &parOther.hash, hashSize);
-}
-
-VertexLayoutHash::VertexLayoutHash(VertexLayoutHash&& parOther) noexcept
-{
-    std::memcpy(&hash, &parOther.hash, hashSize);
+    std::memcpy(&hash, &parOther.hash, hashSizeByte);
 }
 
 void VertexLayoutHash::SetValue(const VERTEX_LAYOUT_PARAMS::Type parValue, bool parHasValue)
@@ -130,14 +125,9 @@ u32 VertexLayoutHash::GetByteSize() const
     return byteSize;
 }
 
-void VertexLayoutHash::operator=(VertexLayoutHash&& parOther)
-{
-    std::memcpy(&hash, &parOther.hash, hashSize);
-}
-
 void VertexLayoutHash::operator=(const VertexLayoutHash& parOther)
 {
-    std::memcpy(&hash, &parOther.hash, hashSize);
+    std::memcpy(&hash, &parOther.hash, hashSizeByte);
 }
 
 std::ostream& operator<<(std::ostream& output, const VertexLayoutHash& parLayoutHash)
@@ -191,44 +181,10 @@ VertexDataStream::VertexDataStream(const VertexDataStream& parOther)
     FOffsetMap = parOther.FOffsetMap;
 }
 
-VertexDataStream::VertexDataStream(VertexDataStream&& parOther) noexcept
-{
-    FSize = parOther.FSize;
-    FVertexByteSize = parOther.FVertexByteSize;
-    FByteSize = parOther.FByteSize;
-    FCurrentVertexHead = parOther.FCurrentVertexHead;
-    FHash = parOther.FHash;
-
-    if (FData != nullptr)
-        delete FData;
-
-    FData = parOther.FData;
-    parOther.FData = nullptr;
-
-    FOffsetMap = std::move(parOther.FOffsetMap);
-}
-
 VertexDataStream::~VertexDataStream()
 {
     delete FData;
     FData = nullptr;
-}
-
-void VertexDataStream::operator=(VertexDataStream&& parOther) noexcept
-{
-    FSize = parOther.FSize;
-    FVertexByteSize = parOther.FVertexByteSize;
-    FByteSize = parOther.FByteSize;
-    FCurrentVertexHead = parOther.FCurrentVertexHead;
-    FHash = parOther.FHash;
-
-    if (FData != nullptr)
-        delete FData;
-
-    FData = parOther.FData;
-    parOther.FData = nullptr;
-
-    FOffsetMap = std::move(parOther.FOffsetMap);
 }
 
 void VertexDataStream::operator=(const VertexDataStream& parOther)

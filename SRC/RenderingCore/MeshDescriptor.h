@@ -5,7 +5,7 @@ namespace ECSEngine
 {
 namespace Rendering
 {
-class IMesh;
+class Mesh;
 class MeshDescriptor
 {
 public:

@@ -7,8 +7,8 @@ namespace ECSEngine
 class Resource;
 namespace Rendering
 {
-
-class IMesh;
+class VertexDataStream;
+class Mesh;
 class MeshManager : public Singleton<MeshManager>
 {
 public:
@@ -17,12 +17,12 @@ public:
 
     const MeshHandle CreateMesh(const std::string& parFilename);
     const MeshHandle CreateMesh(Resource& parResource);
-    const MeshHandle CreateMesh(const void* parVertexData, const u32 parVertexDataSizeInBytes, const void* parIndexData, const u32 parIndexDataSizeInBytes);
+    const MeshHandle CreateMesh(const VertexDataStream& parVertexData, const void* parIndexData, const u32 parIndexDataSizeInBytes);
 
-    IMesh* GetMesh(const MeshHandle& meshHandle) const;
+    Mesh* GetMesh(const MeshHandle& meshHandle) const;
 
 private:
-    std::vector<IMesh*> FMeshes;
+    std::vector<Mesh*> FMeshes;
     std::map<std::string, u32> FFileToMesh;
 };
 } // namespace Rendering

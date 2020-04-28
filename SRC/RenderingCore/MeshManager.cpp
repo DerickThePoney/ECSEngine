@@ -2,6 +2,7 @@
 
 #include "MeshManager.h"
 
+#include "Common/MeshStreamingData.h"
 #include "Common/Resource.h"
 #include "Mesh.h"
 #include "MeshFileReader.h"
@@ -27,15 +28,13 @@ MeshManager::~MeshManager()
     }
 }
 
-const MeshHandle MeshManager::CreateMesh(const void* parVertexData, const u32 parVertexDataSizeInBytes, const void* parIndexData, const u32 parIndexDataSizeInBytes)
+const MeshHandle MeshManager::CreateMesh(const VertexDataStream& parVertexData, const void* parIndexData, const u32 parIndexDataSizeInBytes)
 {
     MeshHandle handle((u32)FMeshes.size());
-    using VertexLayout = ECSEngine::Rendering::VertexPositionColorN<1>;
+    Mesh* mesh = MeshHelpers::CreateIMesh(parVertexData.GetHash());
 
-    IMesh* mesh = MeshHelpers::CreateIMesh(VertexLayout());
-
-    mesh->SetRawVertexData(parVertexData, parVertexDataSizeInBytes, true);
-    mesh->SetRawIndexData(parIndexData, parIndexDataSizeInBytes, true);
+    mesh->SetRawVertexData(parVertexData);
+    mesh->SetRawIndexData(parIndexData, parIndexDataSizeInBytes);
 
     FMeshes.push_back(mesh);
 
@@ -59,7 +58,7 @@ const MeshHandle MeshManager::CreateMesh(Resource& parResource)
     else
     {
         MeshFileReader reader;
-        IMesh* mesh = nullptr;
+        Mesh* mesh = nullptr;
 
         reader.ReadMesh(mesh, parResource);
 
@@ -71,7 +70,7 @@ const MeshHandle MeshManager::CreateMesh(Resource& parResource)
     }
 }
 
-IMesh* MeshManager::GetMesh(const MeshHandle& meshHandle) const
+Mesh* MeshManager::GetMesh(const MeshHandle& meshHandle) const
 {
     AssertRelease(meshHandle.IsValid());
     AssertRelease(meshHandle.GetMeshId() < FMeshes.size());
