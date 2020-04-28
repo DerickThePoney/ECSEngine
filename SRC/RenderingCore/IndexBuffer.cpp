@@ -8,8 +8,7 @@ namespace Rendering
 {
 
 IndexBuffer::IndexBuffer()
-    : FData(nullptr)
-    , FSize(0)
+    : FSize(0)
     , FHandleHasBeenComputed(false)
     , FHandle()
 {
@@ -23,14 +22,6 @@ IndexBuffer::~IndexBuffer()
 
     AssertRelease(!bgfx::isValid(FHandle));
     AssertRelease(!FHandleHasBeenComputed);
-
-    if (FData != nullptr)
-    {
-        delete[] FData;
-        FData = nullptr;
-    }
-
-    FSize = 0;
 }
 
 u32 IndexBuffer::GetByteSize() const
@@ -43,16 +34,6 @@ u32 IndexBuffer::GetSize() const
     return FSize;
 }
 
-u32* IndexBuffer::GetData()
-{
-    return FData;
-}
-
-const u32* IndexBuffer::GetData() const
-{
-    return FData;
-}
-
 void IndexBuffer::SetData(const void* parSrc, u32 parSize)
 {
     if (FHandleHasBeenComputed)
@@ -60,36 +41,25 @@ void IndexBuffer::SetData(const void* parSrc, u32 parSize)
 
     AssertRelease(!bgfx::isValid(FHandle));
     AssertRelease(!FHandleHasBeenComputed);
-    if (FData != nullptr)
-    {
-        delete[] FData;
-        FData = nullptr;
-        FSize = 0;
-    }
 
     AssertRelease((parSize % sizeof(u32)) == 0);
     FSize = parSize / sizeof(u32);
-    FData = new u32[FSize];
-    AssertRelease(FData != nullptr);
-    memcpy(FData, parSrc, parSize);
+
+    CreateIndexBufferHandle(parSrc);
 }
 
 const bgfx::IndexBufferHandle& IndexBuffer::GetIndexBufferHandle()
 {
-    if (!FHandleHasBeenComputed)
-    {
-        CreateIndexBufferHandle();
-    }
     AssertRelease(FHandleHasBeenComputed);
     AssertRelease(bgfx::isValid(FHandle));
 
     return FHandle;
 }
 
-void IndexBuffer::CreateIndexBufferHandle()
+void IndexBuffer::CreateIndexBufferHandle(const void* parSrc)
 {
     AlwaysCheckedAssert(!FHandleHasBeenComputed);
-    FHandle = bgfx::createIndexBuffer(bgfx::makeRef(FData, GetByteSize()), BGFX_BUFFER_INDEX32);
+    FHandle = bgfx::createIndexBuffer(bgfx::makeRef(parSrc, GetByteSize()), BGFX_BUFFER_INDEX32);
     AlwaysCheckedAssert(bgfx::isValid(FHandle));
     FHandleHasBeenComputed = true;
 }
