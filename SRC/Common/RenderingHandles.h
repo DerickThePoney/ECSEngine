@@ -8,6 +8,7 @@ namespace HandlesId
 {
 constexpr u32 InvalidMeshIdHandle = (u32)-1;
 constexpr u32 InvalidMaterialInstanceHandle = (u32)-1;
+constexpr u32 InvalidTextureHandle = (u32)-1;
 } // namespace HandlesId
 
 class MeshHandle
@@ -40,6 +41,22 @@ public:
 
 private:
     u32 FMaterialInstanceId;
+};
+
+class TextureHandle
+{
+public:
+    TextureHandle(u32 parTextureHandle = HandlesId::InvalidTextureHandle);
+
+    const u32 GetTextureId() const { return FTextureHandleId; }
+    bool IsValid() const;
+
+    bool operator<(const TextureHandle& parOther) const { return FTextureHandleId < parOther.FTextureHandleId; }
+
+    operator u32() const { return FTextureHandleId; }
+
+private:
+    u32 FTextureHandleId;
 };
 } // namespace Rendering
 } // namespace ECSEngine
