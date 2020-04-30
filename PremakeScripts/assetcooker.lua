@@ -1,11 +1,11 @@
--- MeshAndMaterialBuilder.lua
+-- AssetCooker.lua
 
-project "MeshAndMaterialBuilder"
+project "AssetCooker"
    language "C++"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "on"
    kind "ConsoleApp"
-   local srcfiles = "../SRC/Tools/MeshAndMaterialBuilder/"
+   local srcfiles = "../SRC/Tools/AssetCooker/"
 
    vpaths { 
       ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
@@ -19,7 +19,7 @@ project "MeshAndMaterialBuilder"
    includedirs { "../External/assimp/include","../External/assimp/BUILD/include"}
    includedirs { "../SRC"}
 
-   links{"Application", "AssimpWrapper"}
+   links{"Application", "AssimpWrapper", "RenderingCore"}
 
    dofile("projectsconfigs.lua")
 

@@ -38,7 +38,7 @@ group ""
 
 group "Tools"
     include("PremakeScripts/assimpwrapper.lua")
-    include("PremakeScripts/meshandmaterialbuilder.lua")
+    include("PremakeScripts/assetcooker.lua")
 group ""
 
 include("PremakeScripts/launcher.lua")
