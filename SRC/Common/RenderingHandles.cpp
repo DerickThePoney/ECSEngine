@@ -27,5 +27,15 @@ bool MaterialInstanceHandle::IsValid() const
     return FMaterialInstanceId != HandlesId::InvalidMaterialInstanceHandle;
 }
 
+TextureHandle::TextureHandle(u32 parTextureHandle /*= HandlesId::InvalidTextureHandle*/)
+    : FTextureHandleId(parTextureHandle)
+{
+}
+
+bool TextureHandle::IsValid() const
+{
+    return FTextureHandleId != HandlesId::InvalidTextureHandle;
+}
+
 } // namespace Rendering
 } // namespace ECSEngine
