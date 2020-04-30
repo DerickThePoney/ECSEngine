@@ -25,13 +25,12 @@ project "RenderingCore"
 
    dofile("projectsconfigs.lua")
 
-   filter "configurations:*"
-      postbuildcommands {"{COPY} ../External/BGFX/bgfx/.build/win64_vs2019/bin/*.pdb %{cfg.targetdir}"}
-
    filter "configurations:Debug"
+     postbuildcommands {"{COPY} ../External/BGFX/bgfx/.build/win64_vs2019/bin/bgfxRelease.pdb %{cfg.targetdir}", "{COPY} ../External/BGFX/bgfx/.build/win64_vs2019/bin/bgfxDebug.pdb %{cfg.targetdir}"}
      links {"bgfxDebug", "bimgDebug","bxDebug", "Imgui"}
      debugenvs {"PATH=%PATH%;../External/BGFX/bgfx/.build/win64_vs2019/bin"}
 
    filter "configurations:not Debug"
+     postbuildcommands {"{COPY} ../External/BGFX/bgfx/.build/win64_vs2019/bin/bxDebug.pdb %{cfg.targetdir}", "{COPY} ../External/BGFX/bgfx/.build/win64_vs2019/bin/bxRelease.pdb %{cfg.targetdir}"}
      links {"bgfxRelease", "bimgRelease","bxRelease", "Imgui"}
      debugenvs {"PATH=%PATH%;../External/BGFX/bgfx/.build/win64_vs2019/bin"}

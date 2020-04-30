@@ -24,9 +24,6 @@ project "Rendering"
 
    dofile("projectsconfigs.lua")
 
-   filter "configurations:*"
-      postbuildcommands {"{COPY} ../External/BGFX/bgfx/.build/win64_vs2019/bin/*.pdb %{cfg.targetdir}"}
-
    filter "configurations:Debug"
      links {"bgfxDebug", "bimgDebug","bxDebug"}
      debugenvs {"PATH=%PATH%;../External/BGFX/bgfx/.build/win64_vs2019/bin"}
