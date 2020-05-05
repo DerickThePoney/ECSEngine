@@ -37,5 +37,15 @@ bool TextureHandle::IsValid() const
     return FTextureHandleId != HandlesId::InvalidTextureHandle;
 }
 
+TextureName::TextureName(const std::string& parBankName, const std::string& parTextureName)
+    : FBankName(parBankName)
+    , FTexture(parTextureName)
+{
+}
+
+TextureName::~TextureName()
+{
+}
+
 } // namespace Rendering
 } // namespace ECSEngine

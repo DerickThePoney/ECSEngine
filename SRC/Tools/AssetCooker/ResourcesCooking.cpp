@@ -7,7 +7,8 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
 #include "Common/ResourceHandle.h"
-#include "RenderingCore/Texture.h"
+#include "RenderingCore/TextureBank.h"
+#include "RenderingCore/TextureDescriptor.h"
 #include "Tools/AssimpWrapper/AssimpMeshDataLoading.h"
 
 #include <codecvt>
@@ -16,13 +17,25 @@
 namespace ECSEngine
 {
 
+namespace MeshCooking
+{
+void CookMesh(const std::string& parMeshFile)
+{
+    Resource meshResource(parMeshFile);
+
+    std::shared_ptr<ResourceHandle> meshResourceHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&meshResource);
+    AssertRelease(meshResourceHandle != nullptr);
+    AssimpLoading::GenerateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + parMeshFile, meshResourceHandle->Buffer(), meshResourceHandle->Size());
+}
+} // namespace MeshCooking
+
 void CookMeshes(const std::vector<std::string>& parMeshFiles)
 {
     foreachitemconst(meshFile, parMeshFiles)
     {
         LOG_COOKING("Cooking mesh " + meshFile);
 
-        CookMesh(meshFile);
+        MeshCooking::CookMesh(meshFile);
 
         /*std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + meshFile + ".gen", std::ifstream::binary);
         AssertRelease(ifstr.good());
@@ -51,44 +64,9 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
     }
 }
 
-void CookMesh(const std::string& parMeshFile)
+namespace TextureCooking
 {
-    Resource meshResource(parMeshFile);
-
-    std::shared_ptr<ResourceHandle> meshResourceHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&meshResource);
-    AssertRelease(meshResourceHandle != nullptr);
-    AssimpLoading::GenerateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + parMeshFile, meshResourceHandle->Buffer(), meshResourceHandle->Size());
-}
-
-void CookTextures(const std::vector<std::string>& parTexturesDescriptorFiles)
-{
-    foreachitemconst(bank, parTexturesDescriptorFiles)
-    {
-        LOG_COOKING("Cooking texture bank : " + bank);
-        CookTextureBank(bank);
-    }
-}
-
-void CookTextureBank(const std::string& parTextureBankFile)
-{
-    Resource bank(parTextureBankFile);
-    std::shared_ptr<ResourceHandle> bankResource = GlobalResourceCache::Instance().FCache->GetResourceHandle(&bank);
-
-    AssertRelease(bankResource != nullptr);
-
-    std::map<std::string, Rendering::TextureDescriptor> descriptors;
-    {
-        ResourceBuffer buf = bankResource->GetResourceBuffer();
-        std::istream isstr(&buf, std::istream::in);
-
-        cereal::JSONInputArchive ar(isstr);
-        ar(NAMEDPROPERTY("Textures", descriptors));
-    }
-
-    foreachitemconst(textureDesc, descriptors) { CookTexture(textureDesc.second); }
-}
-
-void CookTexture(const Rendering::TextureDescriptor& parTextureDescriptor)
+void CookTexture(const std::string& parCookedTextureName, const Rendering::TextureDescriptor& parTextureDescriptor)
 {
     std::cout << "cooking " << parTextureDescriptor.TextureFile() << std::endl;
 
@@ -103,8 +81,18 @@ void CookTexture(const Rendering::TextureDescriptor& parTextureDescriptor)
 
     std::wstring wideString = L"..\\External\\BGFX\\bgfx\\.build\\win64_vs2019\\bin\\texturecRelease.exe -f ";
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring filename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + parTextureDescriptor.TextureFile());
-    wideString += filename + L" -o " + filename + L".ktx -t RGBA8";
+    const std::string& file = parTextureDescriptor.TextureFile();
+    std::wstring filename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + file);
+
+    auto pos = file.find_last_of('\\');
+    std::string path = "";
+    if (pos != file.npos)
+    {
+        path = file.substr(0, pos + 1);
+    }
+
+    std::wstring cookedFilename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + path + parCookedTextureName);
+    wideString += filename + L" -o " + cookedFilename + L".ktx";
 
     // start the program up
     if (!CreateProcess(NULL, // the path
@@ -126,9 +114,44 @@ void CookTexture(const Rendering::TextureDescriptor& parTextureDescriptor)
 
     // TODO GetExitCodeProcess().
 
+    DWORD exitCode;
+    if (GetExitCodeProcess(pi.hProcess, &exitCode))
+    {
+        std::cout << exitCode << std::endl;
+    }
+
     // Close process and thread handles.
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
+}
+
+void CookTextureBank(const std::string& parTextureBankFile)
+{
+    Resource bank(parTextureBankFile);
+    std::shared_ptr<ResourceHandle> bankResource = GlobalResourceCache::Instance().FCache->GetResourceHandle(&bank);
+
+    AssertRelease(bankResource != nullptr);
+
+    Rendering::TextureBank textureBank;
+    {
+        ResourceBuffer buf = bankResource->GetResourceBuffer();
+        std::istream isstr(&buf, std::istream::in);
+
+        cereal::JSONInputArchive ar(isstr);
+        ar(NAMEDPROPERTY("TextureBank", textureBank));
+    }
+
+    foreachitemconst(textureDesc, textureBank.Descriptors()) { CookTexture(textureDesc.first, textureDesc.second); }
+}
+} // namespace TextureCooking
+
+void CookTextures(const std::vector<std::string>& parTexturesDescriptorFiles)
+{
+    foreachitemconst(bank, parTexturesDescriptorFiles)
+    {
+        LOG_COOKING("Cooking texture bank : " + bank);
+        TextureCooking::CookTextureBank(bank);
+    }
 }
 
 } // namespace ECSEngine
