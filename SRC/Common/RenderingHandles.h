@@ -43,6 +43,28 @@ private:
     u32 FMaterialInstanceId;
 };
 
+class TextureName
+{
+public:
+    TextureName(const std::string& parBankName = "", const std::string& parTextureName = "");
+    ~TextureName();
+
+    const std::string& BankName() const { return FBankName; }
+    const std::string& Texture() const { return FTexture; }
+
+    bool Valid() const { return !FBankName.empty() && !FTexture.empty(); }
+
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(PROPERTY(BankName), PROPERTY(Texture));
+    }
+
+private:
+    std::string FBankName;
+    std::string FTexture;
+};
+
 class TextureHandle
 {
 public:

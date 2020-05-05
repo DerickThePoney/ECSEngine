@@ -57,6 +57,8 @@ void AssetCookerUpdater::Update()
         timings.push_back({ "Texture cooking", textureCookingTimings });
     }
 
+    foreachitemconst(t, timings) { std::cout << t.first << ": \t" << t.second << " seconds\n"; }
+
     FShouldClose = true;
 }
 
