@@ -14,7 +14,7 @@ void Initialise();
 void Shutdown();
 const MaterialInstanceHandle CreateMaterialInstanceIFN(const std::string& parMaterialFilename);
 const MaterialInstance* GetMaterialInstance(const MaterialInstanceHandle& parHandle);
-void SetSamplerUniform(const std::string& parUniformName);
+void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parTextureHandle, const u32 parSlot);
 void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue);
 void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue);
 void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue);

@@ -3,6 +3,10 @@
 #include "RenderingSystem.h"
 
 #include "Common/CameraManager.h"
+#include "Common/Resource.h"
+#include "Common/ResourceCache.h"
+#include "Common/ResourceFile.h"
+#include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
@@ -16,6 +20,10 @@
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/Mesh.h"
 #include "RenderingCore/MeshManager.h"
+#include "RenderingCore/Texture.h"
+#include "RenderingCore/TextureBank.h"
+#include "RenderingCore/TextureDescriptor.h"
+#include "RenderingCore/TexturesManager.h"
 #include "bx/bx.h"
 
 namespace ECSEngine
@@ -36,6 +44,8 @@ RenderingSystem::~RenderingSystem()
 Rendering::MaterialInstanceHandle kHandle;
 bgfx::ProgramHandle kProgramInstancing;
 const std::string& uniformName = "u_color";
+Rendering::TextureHandle th;
+
 void RenderingSystem::VirtualInit()
 {
     parent_type::VirtualInit();
@@ -53,6 +63,11 @@ void RenderingSystem::VirtualInit()
     AssertRelease(c != nullptr);
 
     FDrawBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
+
+    Rendering::TextureName name("Units", "PixelColors");
+
+    th = Rendering::TextureManager::Instance().GetTextureHandle(name);
+    AssertRelease(th.IsValid());
 }
 
 void RenderingSystem::VirtualUpdate()
@@ -79,6 +94,14 @@ void RenderingSystem::VirtualUpdate()
     const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
     glm::vec4 uniformVal = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
     Rendering::MaterialManager::SetVec4Uniform(uniformName, uniformVal);
+
+    const Rendering::Texture* t = Rendering::TextureManager::Instance().GetTexture(th);
+    AssertRelease(t != nullptr);
+    AssertRelease(t->Valid());
+
+    ImGui::Begin("Test img");
+    ImGui::Image(t->Handle(), glm::vec2(100, 100));
+    ImGui::End();
 
     if (1) //! Rendering::BGFXRenderer::Instance().IsInstancingEnabled())
     {

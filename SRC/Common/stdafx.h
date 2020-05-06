@@ -77,6 +77,14 @@
     template<class Archive>                                                                                                                                                        \
     void serialize(Archive& ar)
 
+#define LOAD()                                                                                                                                                                     \
+    template<class Archive>                                                                                                                                                        \
+    void load(Archive& ar)
+
+#define SAVE()                                                                                                                                                                     \
+    template<class Archive>                                                                                                                                                        \
+    void save(Archive& ar) const
+
 #include "GLMSerialization.h"
 
 #include "Types.h"
