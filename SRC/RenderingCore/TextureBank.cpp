@@ -9,8 +9,9 @@ namespace ECSEngine
 namespace Rendering
 {
 
-TextureBank::TextureBank()
-    : FLoaded(false)
+TextureBank::TextureBank(const u32 parBankId)
+    : FBankId(parBankId)
+    , FLoaded(false)
 {
 }
 
@@ -45,7 +46,7 @@ void TextureBank::UnloadBankIFP()
     FLoaded = false;
 }
 
-const Rendering::TextureHandle TextureBank::GetTextureHandle(const TextureName& parTexture)
+const TextureHandle TextureBank::GetTextureHandle(const TextureName& parTexture)
 {
     AssertRelease(parTexture.BankName() == FTextureBankName);
 
@@ -62,12 +63,13 @@ const Rendering::TextureHandle TextureBank::GetTextureHandle(const TextureName& 
 
     AssertRelease(FTextures.size() > itIdx->second);
     AssertRelease(FTextures[itIdx->second] != nullptr);
-    return TextureHandle(itIdx->second);
+    return TextureHandle(FBankId, itIdx->second);
 }
 
 const Texture* TextureBank::GetTexture(const TextureHandle& parHandle)
 {
     AssertRelease(parHandle.IsValid());
+    AssertRelease(parHandle.GetBankId() == FBankId);
     AssertRelease(parHandle.GetTextureId() < FTextures.size());
     AssertRelease(FTextures[parHandle.GetTextureId()] != nullptr);
     return FTextures[parHandle.GetTextureId()].get();
