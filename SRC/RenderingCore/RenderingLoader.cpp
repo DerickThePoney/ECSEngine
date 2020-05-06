@@ -7,6 +7,7 @@
 #include "ImguiRenderer.h"
 #include "MaterialManager.h"
 #include "MeshManager.h"
+#include "TexturesManager.h"
 
 namespace ECSEngine
 {
@@ -22,6 +23,9 @@ bool RenderingLoader::VirtualInitialise()
     Rendering::BGFXRenderer::CreateIFP();
     Rendering::BGFXRenderer& rendererInstance = Rendering::BGFXRenderer::Instance();
     rendererInstance.Init();
+
+    Rendering::TextureManager::CreateIFP();
+    Rendering::TextureManager::Instance().Initialise();
 
     Rendering::MaterialManager::Initialise();
 
@@ -41,6 +45,9 @@ void RenderingLoader::VirtualShutdown()
     Rendering::ImGUI::Shutdown();
 
     Rendering::MaterialManager::Shutdown();
+
+    Rendering::TextureManager::Instance().Shutdown();
+    Rendering::TextureManager::Destroy();
 
     Rendering::BGFXRenderer::Instance().Shutdown();
     Rendering::BGFXRenderer::Destroy();

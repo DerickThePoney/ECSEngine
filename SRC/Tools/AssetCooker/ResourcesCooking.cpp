@@ -132,7 +132,7 @@ void CookTextureBank(const std::string& parTextureBankFile)
 
     AssertRelease(bankResource != nullptr);
 
-    Rendering::TextureBank textureBank;
+    Rendering::TextureBank textureBank = Rendering::TextureBank(0);
     {
         ResourceBuffer buf = bankResource->GetResourceBuffer();
         std::istream isstr(&buf, std::istream::in);

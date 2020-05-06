@@ -48,8 +48,7 @@ public:
     u64 Flags() const { return FFlags; }
     bool MipMaps() const { return FMipMap; }
 
-    template<class Archive>
-    void load(Archive& ar)
+    LOAD()
     {
         ar(PROPERTY(TextureFile), PROPERTY(MipMap));
 
@@ -61,8 +60,7 @@ public:
         FFlags |= SamplerFlags::ConvertToSamplerFlags(samplerFlags);
     }
 
-    template<class Archive>
-    void save(Archive& ar) const
+    SAVE()
     {
         ar(PROPERTY(TextureFile), PROPERTY(MipMap));
 
