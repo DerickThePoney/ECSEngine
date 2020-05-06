@@ -469,6 +469,8 @@ void DrawMeshCommand::SubmitCommand() const
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
 
+    instance->SetTextures();
+
     RenderingState state;
     state.ApplyState();
 

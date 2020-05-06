@@ -1,6 +1,8 @@
 #pragma once
 #include "Common/MeshStreamingData.h"
 #include "Common/RefCountedObject.h"
+#include "Common/RenderingHandles.h"
+#include "MaterialInput.h"
 namespace ECSEngine
 {
 namespace Rendering
@@ -79,13 +81,15 @@ public:
     ~MaterialDescriptor();
 
     const std::string& GetProgramDescriptorName() const { return FProgramDescriptorFilename; }
+    const std::vector<MaterialTextureInputDescriptor>& GetTexturesInput() const { return FTexturesInputDescriptors; }
 
-    SERIALIZE() { ar(PROPERTY(ProgramDescriptorFilename)); }
+    SERIALIZE() { ar(PROPERTY(ProgramDescriptorFilename), PROPERTY(TexturesInputDescriptors)); }
 
 private:
     std::string FProgramDescriptorFilename;
 
     // Input type description?
+    std::vector<MaterialTextureInputDescriptor> FTexturesInputDescriptors;
 };
 
 //----------------------------------------------------------------
@@ -102,7 +106,9 @@ public:
     const Program* GetProgram() const { return FProgram; }
     const MaterialDescriptor* GetMaterialDescriptor() const { return FMaterialDescriptor; }
 
-    void SetSamplerUniform(const std::string& parUniformName);
+    void SetTextures() const;
+
+    void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parHandle, const u32 parSlot);
     void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue);
     void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue);
     void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue);
@@ -110,6 +116,8 @@ public:
 private:
     const Program* const FProgram;
     const MaterialDescriptor* const FMaterialDescriptor;
+
+    std::vector<MaterialTextureInput> FTextureInput;
 };
 } // namespace Rendering
 } // namespace ECSEngine

@@ -4,6 +4,7 @@
 
 #include "BGFXRenderingUtils.h"
 #include "MaterialManager.h"
+#include "TexturesManager.h"
 namespace ECSEngine
 {
 namespace Rendering
@@ -83,18 +84,26 @@ MaterialInstance::MaterialInstance(const Program* const parProgram, const Materi
     AssertRelease(FProgram != nullptr);
     AssertRelease(FProgram->IsValid());
     AssertRelease(FMaterialDescriptor != nullptr);
+
+    const std::vector<MaterialTextureInputDescriptor>& texturesInputDesc = FMaterialDescriptor->GetTexturesInput();
+    foreachitemconst(desc, texturesInputDesc)
+    {
+        const TextureHandle handle = TextureManager::Instance().GetTextureHandle(desc.GetTexture());
+        AssertRelease(handle.IsValid());
+        FTextureInput.push_back(MaterialTextureInput(handle, desc.GetTextureSlotName(), desc.GetSlot()));
+    }
 }
 
 MaterialInstance::~MaterialInstance()
 {
 }
 
-void MaterialInstance::SetSamplerUniform(const std::string& parUniformName)
+void MaterialInstance::SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parHandle, const u32 parSlot)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Sampler));
 #endif
-    MaterialManager::SetSamplerUniform(parUniformName);
+    MaterialManager::SetSamplerUniform(parUniformName, parHandle, parSlot);
 }
 
 void MaterialInstance::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue)
@@ -119,6 +128,11 @@ void MaterialInstance::SetMat4Uniform(const std::string& parUniformName, const g
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Mat4));
 #endif
     MaterialManager::SetMat4Uniform(parUniformName, parUniformValue);
+}
+
+void MaterialInstance::SetTextures() const
+{
+    foreachitemconst(textureInput, FTextureInput) { textureInput.SetTexture(); }
 }
 
 } // namespace Rendering

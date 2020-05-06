@@ -9,6 +9,7 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::SpawnEntitySceneAction);
@@ -71,12 +72,13 @@ bool SpawnEntitySceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuff
     const ApparenceModuleTemplate* apparenceModuleTemplate = (ApparenceModuleTemplate*)FTemplate->GetModuleTemplate<ApparenceModule>();
     AssertRelease(apparenceModuleTemplate != nullptr);
     const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(apparenceModuleTemplate->GetMeshFileName());
+    const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(apparenceModuleTemplate->GetMaterialFileName());
     if (meshHandle.IsValid())
     {
         const glm::vec3 eulerAngles = item->GetEulerAngles();
         const glm::mat4 mtx = glm::translate(item->GetPosition()) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
 
-        parCommandBuffer.DrawMesh(meshHandle, parMaterial, mtx);
+        parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial, mtx);
     }
 
     return true;
