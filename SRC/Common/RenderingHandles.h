@@ -9,6 +9,7 @@ namespace HandlesId
 constexpr u32 InvalidMeshIdHandle = (u32)-1;
 constexpr u32 InvalidMaterialInstanceHandle = (u32)-1;
 constexpr u32 InvalidTextureHandle = (u32)-1;
+constexpr u32 InvalidTextureBankId = (u32)-1;
 } // namespace HandlesId
 
 class MeshHandle
@@ -54,11 +55,7 @@ public:
 
     bool Valid() const { return !FBankName.empty() && !FTexture.empty(); }
 
-    template<class Archive>
-    void serialize(Archive& ar)
-    {
-        ar(PROPERTY(BankName), PROPERTY(Texture));
-    }
+    SERIALIZE() { ar(PROPERTY(BankName), PROPERTY(Texture)); }
 
 private:
     std::string FBankName;
@@ -68,9 +65,10 @@ private:
 class TextureHandle
 {
 public:
-    TextureHandle(u32 parTextureHandle = HandlesId::InvalidTextureHandle);
+    TextureHandle(u32 parBankId = HandlesId::InvalidTextureBankId, u32 parTextureHandle = HandlesId::InvalidTextureHandle);
 
     const u32 GetTextureId() const { return FTextureHandleId; }
+    const u32 GetBankId() const { return FBankId; }
     bool IsValid() const;
 
     bool operator<(const TextureHandle& parOther) const { return FTextureHandleId < parOther.FTextureHandleId; }
@@ -78,6 +76,7 @@ public:
     operator u32() const { return FTextureHandleId; }
 
 private:
+    u32 FBankId;
     u32 FTextureHandleId;
 };
 } // namespace Rendering

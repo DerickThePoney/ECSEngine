@@ -27,14 +27,15 @@ bool MaterialInstanceHandle::IsValid() const
     return FMaterialInstanceId != HandlesId::InvalidMaterialInstanceHandle;
 }
 
-TextureHandle::TextureHandle(u32 parTextureHandle /*= HandlesId::InvalidTextureHandle*/)
-    : FTextureHandleId(parTextureHandle)
+TextureHandle::TextureHandle(u32 parBankId /*= HandlesId::InvalidTextureBankId*/, u32 parTextureHandle /*= HandlesId::InvalidTextureHandle*/)
+    : FBankId(parBankId)
+    , FTextureHandleId(parTextureHandle)
 {
 }
 
 bool TextureHandle::IsValid() const
 {
-    return FTextureHandleId != HandlesId::InvalidTextureHandle;
+    return FBankId != HandlesId::InvalidTextureBankId && FTextureHandleId != HandlesId::InvalidTextureHandle;
 }
 
 TextureName::TextureName(const std::string& parBankName, const std::string& parTextureName)
