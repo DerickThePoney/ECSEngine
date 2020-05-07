@@ -7,7 +7,7 @@ namespace ECSEngine
 {
 class SceneScenario
 {
-    friend class EditorScene;
+    friend class ScenarioEditor;
 
 public:
     SceneScenario();

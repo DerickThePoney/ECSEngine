@@ -3,7 +3,7 @@
 #include "ApplicationUpdater.h"
 
 #include "Common/TimeManager.h"
-#include "ECSGameplay_Common/EditorScene.h"
+#include "ECSGameplay_Common/ScenarioEditor.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
@@ -50,7 +50,7 @@ namespace
 
 void ApplicationUpdater::Initialise()
 {
-    scene = new EditorScene();
+    scene = new ScenarioEditor();
     scene->Initialise();
 }
 

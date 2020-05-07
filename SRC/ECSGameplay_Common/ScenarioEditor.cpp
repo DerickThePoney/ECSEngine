@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "EditorScene.h"
+#include "ScenarioEditor.h"
 
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
@@ -12,19 +12,19 @@
 namespace ECSEngine
 {
 
-EditorScene::EditorScene()
+ScenarioEditor::ScenarioEditor()
     : FCurrentScenario(nullptr)
     , FEditorSceneObjectPickingRenderer(nullptr)
     , FEditorSceneRenderer(nullptr)
 {
 }
 
-EditorScene::~EditorScene()
+ScenarioEditor::~ScenarioEditor()
 {
     delete FCurrentScenario;
 }
 
-void EditorScene::Initialise()
+void ScenarioEditor::Initialise()
 {
     FEditorSceneObjectPickingRenderer = new SceneObjectsPickingRenderer();
     FEditorSceneObjectPickingRenderer->Initialise();
@@ -34,7 +34,7 @@ void EditorScene::Initialise()
     FEditorCamera.Initialise();
 }
 
-void EditorScene::Destroy()
+void ScenarioEditor::Destroy()
 {
     if (FCurrentScenario != nullptr)
         FCurrentScenario->Destroy();
@@ -46,7 +46,7 @@ void EditorScene::Destroy()
     delete FEditorSceneObjectPickingRenderer;
 }
 
-void EditorScene::Update()
+void ScenarioEditor::Update()
 {
     FEditorCamera.Update();
 
@@ -133,7 +133,7 @@ void EditorScene::Update()
         FEditorSceneObjectPickingRenderer->DrawDebugData(&FWindows.showPickingDebug);
 }
 
-void EditorScene::Render()
+void ScenarioEditor::Render()
 {
     const SceneScenario* currentScene = GetEditedScenario();
 
@@ -144,7 +144,7 @@ void EditorScene::Render()
     }
 }
 
-void EditorScene::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect)
+void ScenarioEditor::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect)
 {
     SceneScenario* currentScene = GetEditedScenario();
     if (currentScene != nullptr)
