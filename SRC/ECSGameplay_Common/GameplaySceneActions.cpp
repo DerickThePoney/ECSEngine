@@ -28,7 +28,7 @@ SpawnEntitySceneAction::~SpawnEntitySceneAction()
 {
 }
 
-void SpawnEntitySceneAction::VirtualInitialise(const Scene* parScene)
+void SpawnEntitySceneAction::VirtualInitialise(const SceneScenario* parScene)
 {
     SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateName);

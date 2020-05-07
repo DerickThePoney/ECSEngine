@@ -1,5 +1,5 @@
 #pragma once
-#include "Application/Scene.h"
+#include "Application/SceneScenario.h"
 #include "EditorCamera.h"
 
 namespace ECSEngine
@@ -25,27 +25,27 @@ struct IOScene
 class SceneObjectsPickingRenderer;
 class EditorSceneRenderer;
 
-class EditorScene final : public Scene
+class EditorScene final
 {
 public:
     EditorScene();
     ~EditorScene();
 
-    void Initialise() override;
-    void Destroy() override;
+    void Initialise();
+    void Destroy();
 
-    void Update() override;
-    void Render() override;
+    void Update();
+    void Render();
 
-    const Scene* GetEditedScene() const { return FCurrentScene; }
-    Scene* GetEditedScene() { return FCurrentScene; }
+    const SceneScenario* GetEditedScenario() const { return FCurrentScenario; }
+    SceneScenario* GetEditedScenario() { return FCurrentScenario; }
 
     WindowsToShow& GetWindowsToShow() { return FWindows; }
 
     void UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect);
 
 private:
-    Scene* FCurrentScene;
+    SceneScenario* FCurrentScenario;
     WindowsToShow FWindows;
     IOScene FIOScene;
     EditorCamera FEditorCamera;

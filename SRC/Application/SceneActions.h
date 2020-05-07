@@ -11,7 +11,7 @@ namespace ECSEngine
 /*************************************************************/
 /*                      ISceneAction                         */
 /*************************************************************/
-class Scene;
+class SceneScenario;
 
 namespace Rendering
 {
@@ -21,7 +21,7 @@ class MaterialInstanceHandle;
 
 class ISceneAction
 {
-    friend class Scene;
+    friend class SceneScenario;
 
 public:
     ISceneAction(const std::string& parFName = "Dummy");
@@ -36,10 +36,10 @@ public:
     const std::string& GetName() const { return FName; }
     void SetName(const std::string& parName) { FName = parName; }
 
-    const Scene* GetScene() const { return FScene; }
-    void SetScene(const Scene* parScene) { FScene = parScene; }
+    const SceneScenario* GetScene() const { return FScene; }
+    void SetScene(const SceneScenario* parScene) { FScene = parScene; }
 
-    void Initialise(const Scene* parScene);
+    void Initialise(const SceneScenario* parScene);
     void Shutdown();
 
     void Start();
@@ -60,7 +60,7 @@ public:
     }
 
 protected:
-    virtual void VirtualInitialise(const Scene* parScene);
+    virtual void VirtualInitialise(const SceneScenario* parScene);
     virtual void VirtualShutdown();
 
     virtual void VirtualStart();
@@ -72,7 +72,7 @@ protected:
 
 private:
     std::string FName;
-    const Scene* FScene;
+    const SceneScenario* FScene;
 
     bool FStarted;
     bool FFinished;

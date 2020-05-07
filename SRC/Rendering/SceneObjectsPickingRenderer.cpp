@@ -3,8 +3,8 @@
 #include "SceneObjectsPickingRenderer.h"
 
 #include "Application/PropertyDrawer.h"
-#include "Application/Scene.h"
 #include "Application/SceneItems.h"
+#include "Application/SceneScenario.h"
 #include "Common/CameraManager.h"
 #include "Common/InputManager.h"
 #include "RenderingCore/BGFXRenderer.h"
@@ -55,7 +55,7 @@ void SceneObjectsPickingRenderer::Initialise()
     bgfx::TextureHandle rt[2] = { FPickingTexture, FPickingDepthTexture };
     FPickingFramebuffer = bgfx::createFrameBuffer(2, rt, true);
 
-    FDrawIdMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+    FDrawIdMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\objectpickingmaterial.material");
     AssertRelease(FDrawIdMaterial.IsValid());
 }
 
@@ -70,7 +70,7 @@ void SceneObjectsPickingRenderer::Shutdown()
     bgfx::destroy(FPickingTexture);
 }
 
-void SceneObjectsPickingRenderer::RenderScene(const Scene* parScene)
+void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
 {
     AssertRelease(FDrawCommandBuffer != nullptr);
     AssertRelease(FBlitCommandBuffer != nullptr);

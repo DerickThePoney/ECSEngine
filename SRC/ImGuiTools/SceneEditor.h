@@ -1,13 +1,13 @@
 #pragma once
 namespace ECSEngine
 {
-class Scene;
+class SceneScenario;
 struct WindowsToShow;
 struct IOScene;
 namespace ImGUITools
 {
-void DrawSceneEditorMainMenu(Scene* parScene, WindowsToShow& parOutWindowsToShow, IOScene& parOutIOScene);
-const std::string ChooseScene(bool& isDone, bool& isCancel);
-const std::string NewScene(bool& isOk, bool& isCancel);
+void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindowsToShow, IOScene& parOutIOScene);
+const std::string ChooseScenario(bool& isDone, bool& isCancel);
+const std::string NewScenario(bool& isOk, bool& isCancel);
 } // namespace ImGUITools
 } // namespace ECSEngine

@@ -3,7 +3,7 @@
 
 namespace ECSEngine
 {
-class Scene;
+class SceneScenario;
 namespace Rendering
 {
 class DrawCommandBuffer;
@@ -18,7 +18,7 @@ public:
     void Initialise(const std::string& parHandleFileName, const std::string& parHandleMaterial);
     void Shutdown();
 
-    void RenderScene(const Scene* parScene);
+    void RenderScene(const SceneScenario* parScene);
 
 private:
     Rendering::MeshHandle FHandleMesh;

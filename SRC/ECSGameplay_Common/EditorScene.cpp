@@ -13,17 +13,15 @@ namespace ECSEngine
 {
 
 EditorScene::EditorScene()
-    : Scene()
-    , FCurrentScene(nullptr)
+    : FCurrentScenario(nullptr)
     , FEditorSceneObjectPickingRenderer(nullptr)
     , FEditorSceneRenderer(nullptr)
 {
-    SetName("Editor Scene");
 }
 
 EditorScene::~EditorScene()
 {
-    delete FCurrentScene;
+    delete FCurrentScenario;
 }
 
 void EditorScene::Initialise()
@@ -38,8 +36,8 @@ void EditorScene::Initialise()
 
 void EditorScene::Destroy()
 {
-    if (FCurrentScene != nullptr)
-        FCurrentScene->Destroy();
+    if (FCurrentScenario != nullptr)
+        FCurrentScenario->Destroy();
 
     FEditorSceneRenderer->Shutdown();
     FEditorSceneObjectPickingRenderer->Shutdown();
@@ -53,28 +51,28 @@ void EditorScene::Update()
     FEditorCamera.Update();
 
     if (!FIOScene.openScene)
-        ImGUITools::DrawSceneEditorMainMenu(FCurrentScene, FWindows, FIOScene);
+        ImGUITools::DrawSceneEditorMainMenu(FCurrentScenario, FWindows, FIOScene);
 
     if (FIOScene.newScene)
     {
         bool isDone = false;
         bool isCancel = false;
-        const std::string sceneToChoose = ImGUITools::NewScene(isDone, isCancel);
+        const std::string sceneToChoose = ImGUITools::NewScenario(isDone, isCancel);
 
         AlwaysCheckedAssert(!(isDone && isCancel));
 
         if (isDone)
         {
             AlwaysCheckedAssert(!sceneToChoose.empty());
-            if (FCurrentScene != nullptr)
+            if (FCurrentScenario != nullptr)
             {
-                FCurrentScene->Destroy();
-                FCurrentScene = nullptr;
+                FCurrentScenario->Destroy();
+                FCurrentScenario = nullptr;
             }
 
-            FCurrentScene = new Scene();
-            FCurrentScene->SetName(sceneToChoose);
-            FCurrentScene->Initialise();
+            FCurrentScenario = new SceneScenario();
+            FCurrentScenario->SetName(sceneToChoose);
+            FCurrentScenario->Initialise();
             FIOScene.newScene = false;
         }
         else if (isCancel)
@@ -83,12 +81,12 @@ void EditorScene::Update()
         }
     }
 
-    if (FCurrentScene != nullptr && FIOScene.saveScene)
+    if (FCurrentScenario != nullptr && FIOScene.saveScene)
     {
-        std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "/Scenes/" + FCurrentScene->GetName() + ".scene");
+        std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "/Scenes/" + FCurrentScenario->GetName() + ".scene");
         cereal::JSONOutputArchive outputArchive(ofstr);
 
-        outputArchive(*FCurrentScene);
+        outputArchive(*FCurrentScenario);
         FIOScene.saveScene = false;
     }
 
@@ -97,16 +95,16 @@ void EditorScene::Update()
 
         bool isDone = false;
         bool isCancel = false;
-        const std::string sceneToChoose = ImGUITools::ChooseScene(isDone, isCancel);
+        const std::string sceneToChoose = ImGUITools::ChooseScenario(isDone, isCancel);
 
         AlwaysCheckedAssert(!(isDone && isCancel));
 
         if (isDone)
         {
-            if (FCurrentScene != nullptr)
+            if (FCurrentScenario != nullptr)
             {
-                FCurrentScene->Destroy();
-                FCurrentScene = nullptr;
+                FCurrentScenario->Destroy();
+                FCurrentScenario = nullptr;
             }
 
             Resource res(sceneToChoose);
@@ -115,11 +113,11 @@ void EditorScene::Update()
             std::istream sstr(&buff, std::istream::in);
 
             cereal::JSONInputArchive archive(sstr);
-            FCurrentScene = new Scene();
-            archive(*FCurrentScene);
+            FCurrentScenario = new SceneScenario();
+            archive(*FCurrentScenario);
             FIOScene.openScene = false;
 
-            FCurrentScene->Initialise();
+            FCurrentScenario->Initialise();
         }
         else if (isCancel)
         {
@@ -137,7 +135,7 @@ void EditorScene::Update()
 
 void EditorScene::Render()
 {
-    const Scene* currentScene = GetEditedScene();
+    const SceneScenario* currentScene = GetEditedScenario();
 
     if (currentScene != nullptr)
     {
@@ -148,7 +146,7 @@ void EditorScene::Render()
 
 void EditorScene::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect)
 {
-    Scene* currentScene = GetEditedScene();
+    SceneScenario* currentScene = GetEditedScenario();
     if (currentScene != nullptr)
     {
         currentScene->SetItemHovered(parSelectedItem.first);

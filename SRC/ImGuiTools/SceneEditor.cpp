@@ -3,7 +3,7 @@
 #include "SceneEditor.h"
 
 #include "Application/PropertyDrawer.h"
-#include "Application/Scene.h"
+#include "Application/SceneScenario.h"
 #include "Common/Logger.h"
 #include "Common/ResourceCache.h"
 #include "Common/Singleton.h"
@@ -26,9 +26,9 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
     parOutMenuBarHeight = ImGui::GetWindowSize();
     if (ImGui::BeginMenu("File"))
     {
-        ImGui::MenuItem("New scene", NULL, &parOutIOScene.newScene);
-        ImGui::MenuItem("Open scene", NULL, &parOutIOScene.openScene);
-        ImGui::MenuItem("Save scene", NULL, &parOutIOScene.saveScene);
+        ImGui::MenuItem("New scenario", NULL, &parOutIOScene.newScene);
+        ImGui::MenuItem("Open scenario", NULL, &parOutIOScene.openScene);
+        ImGui::MenuItem("Save scenario", NULL, &parOutIOScene.saveScene);
         ImGui::Separator();
         ImGui::EndMenu();
     }
@@ -56,7 +56,7 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
     ImGui::EndMainMenuBar();
 }
 
-void SceneItemsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2& menuBarHeight)
+void SceneItemsWindow(SceneScenario* parScene, WindowsToShow& options, const glm::vec2& menuBarHeight)
 {
     const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     const float menuBarProportion = menuBarHeight.y / (float)windowSize.y;
@@ -110,7 +110,7 @@ void SceneItemsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2& 
     ImGui::End();
 }
 
-void SceneActionsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2& menuBarHeight)
+void SceneActionsWindow(SceneScenario* parScene, WindowsToShow& options, const glm::vec2& menuBarHeight)
 {
     const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     const float menuBarProportion = menuBarHeight.y / (float)windowSize.y;
@@ -207,7 +207,7 @@ void SceneActionsWindow(Scene* parScene, WindowsToShow& options, const glm::vec2
 }
 } // namespace
 
-void DrawSceneEditorMainMenu(Scene* parScene, WindowsToShow& parOutWindowsToShow, IOScene& parOutIOScene)
+void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindowsToShow, IOScene& parOutIOScene)
 {
 
     glm::vec2 menuBarHeight;
@@ -232,11 +232,11 @@ void DrawSceneEditorMainMenu(Scene* parScene, WindowsToShow& parOutWindowsToShow
         InputDebug(&parOutWindowsToShow.showInputDebug);
 }
 
-const std::string NewScene(bool& isOk, bool& isCancel)
+const std::string NewScenario(bool& isOk, bool& isCancel)
 {
-    ImGui::Begin("Choose Scene Name...", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin("Choose Scenario Name...", NULL, ImGuiWindowFlags_AlwaysAutoResize);
     static std::string sceneToChoose;
-    EDITOR_PROPERTY_STRING("New scene name", sceneToChoose, false, "*.scene");
+    EDITOR_PROPERTY_STRING("New scenario name", sceneToChoose, false, "*.scene");
     ImGui::SameLine();
     if (ImGui::Button("Ok"))
         isOk = true;
@@ -248,11 +248,11 @@ const std::string NewScene(bool& isOk, bool& isCancel)
     return sceneToChoose;
 }
 
-const std::string ChooseScene(bool& isOk, bool& isCancel)
+const std::string ChooseScenario(bool& isOk, bool& isCancel)
 {
-    ImGui::Begin("Choose Scene...", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin("Choose Scenario...", NULL, ImGuiWindowFlags_AlwaysAutoResize);
     static std::string sceneToChoose;
-    EDITOR_PROPERTY_STRING("Scene to open", sceneToChoose, true, "*.scene");
+    EDITOR_PROPERTY_STRING("Scenario to open", sceneToChoose, true, "*.scene");
     ImGui::SameLine();
     if (ImGui::Button("Ok"))
         isOk = true;
