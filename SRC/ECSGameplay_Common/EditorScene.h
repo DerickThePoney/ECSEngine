@@ -1,6 +1,6 @@
 #pragma once
+#include "Application/Scene.h"
 #include "EditorCamera.h"
-#include "Scene.h"
 
 namespace ECSEngine
 {
