@@ -39,6 +39,8 @@ public:
 
     WindowsToShow& GetWindowsToShow() { return FWindows; }
 
+    void UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect);
+
 private:
     Scene* FCurrentScene;
     WindowsToShow FWindows;

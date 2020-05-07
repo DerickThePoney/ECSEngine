@@ -117,4 +117,18 @@ void EditorScene::Render()
 {
 }
 
+void EditorScene::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect)
+{
+    Scene* currentScene = GetEditedScene();
+    if (currentScene != nullptr)
+    {
+        currentScene->SetItemHovered(parSelectedItem.first);
+
+        if (parSelected)
+            currentScene->SetItemSelected(parSelectedItem.first);
+        else if (parUnselect)
+            currentScene->SetItemSelected(-1);
+    }
+}
+
 } // namespace ECSEngine
