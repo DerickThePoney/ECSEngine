@@ -61,6 +61,9 @@ void SpawnEntitySceneAction::VirtualDrawEditor()
 bool SpawnEntitySceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
 {
     SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+    if (FTemplate == nullptr)
+        return false;
+
     const bool hasApparenceModule = FTemplate->HasModule<ApparenceModule>();
     if (!hasApparenceModule)
         return false;

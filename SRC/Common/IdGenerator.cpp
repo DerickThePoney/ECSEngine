@@ -6,6 +6,7 @@ namespace ECSEngine
 {
 
 IdGenerator::IdGenerator()
+    : FNextIncrementalId(0)
 {
 }
 
