@@ -6,6 +6,8 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "ImGuiTools/SceneEditor.h"
+#include "Rendering/EditorSceneRenderer.h"
+#include "Rendering/SceneObjectsPickingRenderer.h"
 
 namespace ECSEngine
 {
@@ -13,6 +15,8 @@ namespace ECSEngine
 EditorScene::EditorScene()
     : Scene()
     , FCurrentScene(nullptr)
+    , FEditorSceneObjectPickingRenderer(nullptr)
+    , FEditorSceneRenderer(nullptr)
 {
     SetName("Editor Scene");
 }
@@ -24,6 +28,11 @@ EditorScene::~EditorScene()
 
 void EditorScene::Initialise()
 {
+    FEditorSceneObjectPickingRenderer = new SceneObjectsPickingRenderer();
+    FEditorSceneObjectPickingRenderer->Initialise();
+    FEditorSceneRenderer = new EditorSceneRenderer();
+    FEditorSceneRenderer->Initialise("meshes\\testobjects\\movehandle.fbx.gen", "materials\\vertexcolormaterial.material");
+
     FEditorCamera.Initialise();
 }
 
@@ -31,6 +40,12 @@ void EditorScene::Destroy()
 {
     if (FCurrentScene != nullptr)
         FCurrentScene->Destroy();
+
+    FEditorSceneRenderer->Shutdown();
+    FEditorSceneObjectPickingRenderer->Shutdown();
+
+    delete FEditorSceneRenderer;
+    delete FEditorSceneObjectPickingRenderer;
 }
 
 void EditorScene::Update()
@@ -111,10 +126,24 @@ void EditorScene::Update()
             FIOScene.openScene = false;
         }
     }
+
+    std::pair<u32, u32> selectedItem = FEditorSceneObjectPickingRenderer->GetPickedItemAndHits(0.0f);
+
+    UpdateSelectedItems(selectedItem, Input::GetMouseButtonState(0), Input::GetMouseButtonState(1));
+
+    if (FWindows.showPickingDebug)
+        FEditorSceneObjectPickingRenderer->DrawDebugData(&FWindows.showPickingDebug);
 }
 
 void EditorScene::Render()
 {
+    const Scene* currentScene = GetEditedScene();
+
+    if (currentScene != nullptr)
+    {
+        FEditorSceneObjectPickingRenderer->RenderScene(currentScene);
+        FEditorSceneRenderer->RenderScene(currentScene);
+    }
 }
 
 void EditorScene::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect)

@@ -26,12 +26,10 @@ void ModuleSystem::Init()
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualInitCalled = false;
 #endif
-    LockControllers();
 
     VirtualInit();
 
     AlwaysCheckedAssert(FVirtualInitCalled == true);
-    UnlockControllers();
 }
 
 void ModuleSystem::Update()
@@ -52,12 +50,10 @@ void ModuleSystem::Destroy()
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualDestroyCalled = false;
 #endif
-    LockControllers();
 
     VirtualDestroy();
 
     AlwaysCheckedAssert(FVirtualDestroyCalled == true);
-    UnlockControllers();
 }
 
 void ModuleSystem::LockControllers()
