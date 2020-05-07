@@ -1,6 +1,7 @@
 #pragma once
 #include "Application/SceneScenario.h"
 #include "EditorCamera.h"
+#include "IScenarioUpdater.h"
 
 namespace ECSEngine
 {
@@ -25,17 +26,17 @@ struct IOScene
 class SceneObjectsPickingRenderer;
 class EditorSceneRenderer;
 
-class EditorScene final
+class ScenarioEditor final : public IScenarioUpdater
 {
 public:
-    EditorScene();
-    ~EditorScene();
+    ScenarioEditor();
+    virtual ~ScenarioEditor();
 
-    void Initialise();
-    void Destroy();
+    void Initialise() override;
+    void Destroy() override;
 
-    void Update();
-    void Render();
+    void Update() override;
+    void Render() override;
 
     const SceneScenario* GetEditedScenario() const { return FCurrentScenario; }
     SceneScenario* GetEditedScenario() { return FCurrentScenario; }
