@@ -6,7 +6,7 @@
 #include "PropertyDrawer.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
-#include "Scene.h"
+#include "SceneScenario.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::SceneActionWithBaseSceneItem);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ISceneAction, ECSEngine::SceneActionWithBaseSceneItem)
@@ -35,7 +35,7 @@ void SceneActionWithBaseSceneItem::SetSceneItem(const BaseSceneItem* parSceneIte
     FSceneItemID = parSceneItem->GetSceneItemTypeId();
 }
 
-void SceneActionWithBaseSceneItem::VirtualInitialise(const Scene* parScene)
+void SceneActionWithBaseSceneItem::VirtualInitialise(const SceneScenario* parScene)
 {
     ISceneAction::VirtualInitialise(parScene);
     auto sceneItems = GetScene()->GetSceneItems();
@@ -71,7 +71,7 @@ SceneActionCreateMainCamera::~SceneActionCreateMainCamera()
 {
 }
 
-void SceneActionCreateMainCamera::VirtualInitialise(const Scene* parScene)
+void SceneActionCreateMainCamera::VirtualInitialise(const SceneScenario* parScene)
 {
     SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
 }

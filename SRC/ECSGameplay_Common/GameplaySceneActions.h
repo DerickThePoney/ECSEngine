@@ -18,7 +18,7 @@ public:
     virtual ~SpawnEntitySceneAction();
 
 protected:
-    virtual void VirtualInitialise(const Scene* parScene) override;
+    virtual void VirtualInitialise(const SceneScenario* parScene) override;
 
     virtual void VirtualStart() override;
 

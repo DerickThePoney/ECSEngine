@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Scene.h"
+#include "SceneScenario.h"
 
 #include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "SceneItems.h"
@@ -8,15 +8,15 @@
 namespace ECSEngine
 {
 
-Scene::Scene()
+SceneScenario::SceneScenario()
 {
 }
 
-Scene::~Scene()
+SceneScenario::~SceneScenario()
 {
 }
 
-void Scene::AddSceneItem(const u32 parSceneItemTypeId)
+void SceneScenario::AddSceneItem(const u32 parSceneItemTypeId)
 {
     const u32 nextId = FSceneItemsIdGenerator.GetNextId();
     std::shared_ptr<BaseSceneItem> sceneItem = std::shared_ptr<BaseSceneItem>(new BaseSceneItem("New scene item", nextId));
@@ -25,7 +25,7 @@ void Scene::AddSceneItem(const u32 parSceneItemTypeId)
     sceneItem->SetEulerAngles(glm::vec3(0.0f));
 }
 
-void Scene::RemoveSceneItem(const std::vector<std::shared_ptr<BaseSceneItem>>::iterator parWhere)
+void SceneScenario::RemoveSceneItem(const std::vector<std::shared_ptr<BaseSceneItem>>::iterator parWhere)
 {
     AssertRelease(parWhere != FSceneItems.end());
     const u32 id = (*parWhere)->Id();
@@ -33,20 +33,20 @@ void Scene::RemoveSceneItem(const std::vector<std::shared_ptr<BaseSceneItem>>::i
     FSceneItems.erase(parWhere);
 }
 
-void Scene::Initialise()
+void SceneScenario::Initialise()
 {
     FCurrentAction = 0;
     // FActions.push_back(std::unique_ptr<SpawnEntitySceneAction>(new SpawnEntitySceneAction));
     foreachitem(action, FActions) action->Initialise(this);
 }
 
-void Scene::Destroy()
+void SceneScenario::Destroy()
 {
     FActions.clear();
     FSceneItems.clear();
 }
 
-void Scene::Update()
+void SceneScenario::Update()
 {
     if (FCurrentAction >= FActions.size())
         return;
@@ -68,21 +68,21 @@ void Scene::Update()
     }
 }
 
-void Scene::Render()
+void SceneScenario::Render()
 {
 }
 
-void Scene::SetItemHovered(const u32 parId)
+void SceneScenario::SetItemHovered(const u32 parId)
 {
     foreachitem(sceneItem, FSceneItems) { sceneItem->SetItemHovered(sceneItem->Id() == parId); }
 }
 
-void Scene::SetItemSelected(const u32 parId)
+void SceneScenario::SetItemSelected(const u32 parId)
 {
     foreachitem(sceneItem, FSceneItems) { sceneItem->SetItemSelected(sceneItem->Id() == parId); }
 }
 
-void Scene::AddSceneActionStealOwnership(ISceneAction* parAction)
+void SceneScenario::AddSceneActionStealOwnership(ISceneAction* parAction)
 {
     AssertRelease(parAction != nullptr);
     parAction->Initialise(this);

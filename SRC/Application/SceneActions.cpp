@@ -30,7 +30,7 @@ ISceneAction::~ISceneAction()
 {
 }
 
-void ISceneAction::Initialise(const Scene* parScene)
+void ISceneAction::Initialise(const SceneScenario* parScene)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualInitialiseCalled = false;
@@ -112,7 +112,7 @@ bool ISceneAction::DrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuf
     return res;
 }
 
-void ISceneAction::VirtualInitialise(const Scene* parScene)
+void ISceneAction::VirtualInitialise(const SceneScenario* parScene)
 {
     FScene = parScene;
 #ifdef PERFORM_SECURITY_CHECKS

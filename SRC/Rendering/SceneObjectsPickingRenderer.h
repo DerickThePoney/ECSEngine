@@ -2,7 +2,7 @@
 #include "Common/RenderingHandles.h"
 namespace ECSEngine
 {
-class Scene;
+class SceneScenario;
 namespace Rendering
 {
 class DrawCommandBuffer;
@@ -16,7 +16,7 @@ public:
 
     void Initialise();
     void Shutdown();
-    void RenderScene(const Scene* parScene);
+    void RenderScene(const SceneScenario* parScene);
 
     void DrawDebugData(bool* parOpen);
 

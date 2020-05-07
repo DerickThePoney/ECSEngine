@@ -1,8 +1,8 @@
 #pragma once
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
-#include "Scene.h"
 #include "SceneItems.h"
+#include "SceneScenario.h"
 
 namespace ECSEngine
 {
@@ -179,7 +179,7 @@ template<>
 class PropertyDrawer<const BaseSceneItem*>
 {
 public:
-    PropertyDrawer(const std::string& parPropertyName, const BaseSceneItem** parProperty, u32* parIdProperty, const Scene* parScene)
+    PropertyDrawer(const std::string& parPropertyName, const BaseSceneItem** parProperty, u32* parIdProperty, const SceneScenario* parScene)
         : FName(parPropertyName)
         , FProperty(parProperty)
         , FIdProperty(parIdProperty)
@@ -233,7 +233,7 @@ private:
     std::string FName;
     const BaseSceneItem** FProperty = nullptr;
     u32* FIdProperty = nullptr;
-    const Scene* const FScene;
+    const SceneScenario* const FScene;
 };
 
 #define EDITOR_PROPERTY_SCENE_ITEM(NAME, PROPERTY, NAME_PROPERTY, SCENE)                                                                                                           \

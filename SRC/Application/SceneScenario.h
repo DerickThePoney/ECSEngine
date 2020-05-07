@@ -5,13 +5,13 @@
 
 namespace ECSEngine
 {
-class Scene
+class SceneScenario
 {
     friend class EditorScene;
 
 public:
-    Scene();
-    virtual ~Scene();
+    SceneScenario();
+    virtual ~SceneScenario();
 
     const std::string& GetName() const { return FName; }
     void SetName(const std::string& parName) { FName = parName; }

@@ -4,7 +4,7 @@
 namespace ECSEngine
 {
 class EntityTemplate;
-class Scene;
+class EditorScene;
 class ApplicationUpdater
 {
 public:
@@ -28,7 +28,7 @@ public:
     }
 
 private:
-    Scene* scene;
+    EditorScene* scene;
 };
 
 class ApplicationUpdaterWrapper final : public IGameplayUpdater

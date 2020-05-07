@@ -2,7 +2,7 @@
 
 #include "EditorSceneRenderer.h"
 
-#include "Application/Scene.h"
+#include "Application/SceneScenario.h"
 #include "Common/CameraManager.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/DrawCommands.h"
@@ -39,7 +39,7 @@ void EditorSceneRenderer::Shutdown()
     CameraManager::Instance().DestroyCamera(FCameraId);
 }
 
-void EditorSceneRenderer::RenderScene(const Scene* parScene)
+void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
 {
     AssertRelease(FDrawCommandBuffer != nullptr);
     FDrawCommandBuffer->clear();
