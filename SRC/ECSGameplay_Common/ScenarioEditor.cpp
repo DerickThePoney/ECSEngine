@@ -5,6 +5,7 @@
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
+#include "GameScenarioUpdater.h"
 #include "ImGuiTools/SceneEditor.h"
 #include "Rendering/EditorSceneRenderer.h"
 #include "Rendering/SceneObjectsPickingRenderer.h"

@@ -159,6 +159,7 @@ void ISceneAction::VirtualFinish()
 void ISceneAction::VirtualDrawEditor()
 {
     FShowEditor = ImGui::CollapsingHeader("", ImGuiTreeNodeFlags_CollapsingHeader);
+    ImGui::PushID(ImGui::GetID(this));
     ImGui::SameLine();
     ImGui::Text("%s", FName.c_str());
 
@@ -170,6 +171,7 @@ void ISceneAction::VirtualDrawEditor()
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualDrawEditorCalled = true;
 #endif
+    ImGui::PopID();
 }
 
 bool ISceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
