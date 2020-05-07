@@ -163,16 +163,7 @@ void ApplicationUpdater::Update()
 
     std::pair<u32, u32> selectedItem = editorSceneObjectPickingRenderer.GetPickedItemAndHits(0.0f);
 
-    Scene* currentScene = scene.GetEditedScene();
-    if (currentScene != nullptr)
-    {
-        currentScene->SetItemHovered(selectedItem.first);
-
-        if (Input::GetMouseButtonState(0))
-            currentScene->SetItemSelected(selectedItem.first);
-        else if (Input::GetMouseButtonState(1))
-            currentScene->SetItemSelected(-1);
-    }
+    scene.UpdateSelectedItems(selectedItem, Input::GetMouseButtonState(0), Input::GetMouseButtonState(1));
 
     if (currentWindows.showPickingDebug)
         editorSceneObjectPickingRenderer.DrawDebugData(&currentWindows.showPickingDebug);
