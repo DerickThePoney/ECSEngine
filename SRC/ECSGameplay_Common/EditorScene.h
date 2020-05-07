@@ -22,6 +22,9 @@ struct IOScene
     bool saveScene = false;
 };
 
+class SceneObjectsPickingRenderer;
+class EditorSceneRenderer;
+
 class EditorScene final : public Scene
 {
 public:
@@ -46,5 +49,8 @@ private:
     WindowsToShow FWindows;
     IOScene FIOScene;
     EditorCamera FEditorCamera;
+
+    EditorSceneRenderer* FEditorSceneRenderer;
+    SceneObjectsPickingRenderer* FEditorSceneObjectPickingRenderer;
 };
 } // namespace ECSEngine

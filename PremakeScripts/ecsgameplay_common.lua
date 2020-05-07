@@ -18,7 +18,7 @@ project "ECSGameplay_Common"
       pchheader ("stdafx.h")
    pchsource(srcfiles.."stdafx.cpp")
 
-   links { "ECSCore", "Rendering"}
+   links { "ECSCore", "Rendering", "ImGuiTools"}
 
    includedirs { "../SRC", "../External/imgui"}
 
