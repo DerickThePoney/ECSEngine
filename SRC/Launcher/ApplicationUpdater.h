@@ -1,5 +1,5 @@
 #pragma once
-#include "Application/EditorScene.h"
+#include "ECSGameplay_Common/EditorScene.h"
 #include "Application/IGameplayUpdater.h"
 #include "Application/Scene.h"
 #include "Common/RenderingHandles.h"

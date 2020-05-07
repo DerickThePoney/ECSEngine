@@ -2,12 +2,12 @@
 
 #include "SceneEditor.h"
 
-#include "Application/EditorScene.h"
 #include "Application/PropertyDrawer.h"
 #include "Application/Scene.h"
 #include "Common/Logger.h"
 #include "Common/ResourceCache.h"
 #include "Common/Singleton.h"
+#include "ECSGameplay_Common/EditorScene.h"
 #include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "EntityTemplatesEditor.h"
 #include "InputDebug.h"
