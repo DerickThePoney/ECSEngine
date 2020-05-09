@@ -23,6 +23,16 @@ struct IOScene
     bool saveScene = false;
 };
 
+namespace ScenarioEditorStatus
+{
+enum Type
+{
+    EDITING_SCENARIO,
+    PLAYING_SCENARIO,
+    LENGTH
+};
+}
+
 class SceneObjectsPickingRenderer;
 class EditorSceneRenderer;
 
@@ -50,6 +60,7 @@ private:
     WindowsToShow FWindows;
     IOScene FIOScene;
     EditorCamera FEditorCamera;
+    ScenarioEditorStatus::Type FState;
 
     EditorSceneRenderer* FEditorSceneRenderer;
     SceneObjectsPickingRenderer* FEditorSceneObjectPickingRenderer;

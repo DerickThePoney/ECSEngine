@@ -29,7 +29,7 @@ void TextureBank::LoadBankIFP()
     {
         const u32 idx = (u32)FTextures.size();
         FTextureNameToTextureIndex[descriptor.first] = idx;
-        FTextures.push_back(std::unique_ptr<Texture>(new Texture(&descriptor.second)));
+        FTextures.push_back(std::unique_ptr<Texture>(new Texture(&descriptor.second, descriptor.first)));
         FTextures.back()->Load();
         AssertRelease(FTextures.back()->Valid());
     }

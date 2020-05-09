@@ -16,9 +16,10 @@ namespace Rendering
 //----------------------------------------------------------------
 IMPLEMENT_POOL_ALLOCATED(Texture);
 
-Texture::Texture(const TextureDescriptor* parTextureDescriptor)
+Texture::Texture(const TextureDescriptor* parTextureDescriptor, const std::string& parTextureName)
     : RefCountedObject()
     , FTextureDescriptor(parTextureDescriptor)
+    , FTextureName(parTextureName)
 {
 }
 
@@ -33,9 +34,9 @@ void Texture::Load()
 {
     AssertRelease(FTextureDescriptor != nullptr);
     const std::string& textureFile = FTextureDescriptor->TextureFile();
-    std::size_t found = textureFile.find_last_of('.');
+    std::size_t found = textureFile.find_last_of('\\');
     AssertRelease(found != textureFile.npos);
-    Resource r(textureFile.substr(0, found + 1) + "ktx");
+    Resource r(textureFile.substr(0, found + 1) + FTextureName + ".ktx");
     std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
     AssertRelease(handle != nullptr);
 

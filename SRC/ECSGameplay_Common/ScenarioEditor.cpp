@@ -17,6 +17,7 @@ ScenarioEditor::ScenarioEditor()
     : FCurrentScenario(nullptr)
     , FEditorSceneObjectPickingRenderer(nullptr)
     , FEditorSceneRenderer(nullptr)
+    , FState(ScenarioEditorStatus::EDITING_SCENARIO)
 {
 }
 
@@ -52,13 +53,34 @@ void ScenarioEditor::Update()
     FEditorCamera.Update();
 
     if (!FIOScene.openScene)
+    {
+        // // TODO This should be changed in scenario playing mode
         ImGUITools::DrawSceneEditorMainMenu(FCurrentScenario, FWindows, FIOScene);
+        bool isPlaying = FState == ScenarioEditorStatus::PLAYING_SCENARIO;
+        ImGUITools::DrawPlayScenarioWindow(isPlaying);
+        if (FCurrentScenario != nullptr)
+        {
+            if (isPlaying && FState != ScenarioEditorStatus::PLAYING_SCENARIO)
+            {
+                FState = ScenarioEditorStatus::PLAYING_SCENARIO;
+                // TODO Launch scenario play mode
+            }
+            else if (!isPlaying && FState != ScenarioEditorStatus::EDITING_SCENARIO)
+            {
+                FState = ScenarioEditorStatus::EDITING_SCENARIO;
+                // TODO Stop Scenario Editing IFN
+            }
+        }
+    }
 
+    // // TODO This should be changed in scenario playing mode
     if (FIOScene.newScene)
     {
         bool isDone = false;
         bool isCancel = false;
         const std::string sceneToChoose = ImGUITools::NewScenario(isDone, isCancel);
+
+        // TODO Stop Scenario Editing IFN
 
         AlwaysCheckedAssert(!(isDone && isCancel));
 
@@ -119,6 +141,7 @@ void ScenarioEditor::Update()
             FIOScene.openScene = false;
 
             FCurrentScenario->Initialise();
+            // TODO Stop Scenario Editing IFN
         }
         else if (isCancel)
         {

@@ -1,5 +1,7 @@
 #pragma once
 #include "IScenarioUpdater.h"
+#include "OrientationSystem.h"
+#include "Rendering/RenderingSystem.h"
 
 namespace ECSEngine
 {
@@ -19,5 +21,9 @@ public:
 
 private:
     SceneScenario* FScenario;
+
+    RenderingSystem FRenderingSystem;
+
+    OrientationSystem FOrientationSystem;
 };
 } // namespace ECSEngine
