@@ -5,6 +5,7 @@
 #include "Application/PropertyDrawer.h"
 #include "Application/SceneScenario.h"
 #include "Common/Logger.h"
+#include "Common/RenderingHandles.h"
 #include "Common/ResourceCache.h"
 #include "Common/Singleton.h"
 #include "ECSGameplay_Common/GameplaySceneActions.h"
@@ -13,6 +14,8 @@
 #include "InputDebug.h"
 #include "LoggerGUI.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/Texture.h"
+#include "RenderingCore/TexturesManager.h"
 
 namespace ECSEngine
 {
@@ -230,6 +233,41 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showInputDebug)
         InputDebug(&parOutWindowsToShow.showInputDebug);
+}
+
+void DrawPlayScenarioWindow(bool& parOutPlayScenario)
+{
+    static Rendering::TextureName playButton("UI", "PlayButton");
+    static Rendering::TextureName pauseButton("UI", "StopButton");
+
+    static Rendering::TextureHandle playHandle = Rendering::TextureManager::Instance().GetTextureHandle(playButton);
+    static Rendering::TextureHandle pauseHandle = Rendering::TextureManager::Instance().GetTextureHandle(pauseButton);
+
+    AssertRelease(playHandle.IsValid());
+    AssertRelease(pauseHandle.IsValid());
+    const Rendering::Texture* playTexture = Rendering::TextureManager::Instance().GetTexture(playHandle);
+    const Rendering::Texture* pauseTexture = Rendering::TextureManager::Instance().GetTexture(pauseHandle);
+
+    const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+
+    ImGui::BeginMainMenuBar();
+    const glm::vec2 menuBarHeight = ImGui::GetWindowSize();
+    ImGui::EndMainMenuBar();
+
+    ImGui::Begin("PlayButton", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground);
+    const float thisWindowSize = ImGui::GetWindowWidth();
+    ImGui::SetWindowPos(glm::vec2((windowSize.x - thisWindowSize) * 0.5f, menuBarHeight.y));
+    if (parOutPlayScenario)
+    {
+        if (ImGui::ImageButton(pauseTexture->Handle(), glm::vec2(64, 64)))
+            parOutPlayScenario = false;
+    }
+    else
+    {
+        if (ImGui::ImageButton(playTexture->Handle(), glm::vec2(64, 64)))
+            parOutPlayScenario = true;
+    }
+    ImGui::End();
 }
 
 const std::string NewScenario(bool& isOk, bool& isCancel)

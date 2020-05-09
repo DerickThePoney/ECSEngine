@@ -18,8 +18,8 @@ project "ImGuiTools"
       pchheader ("stdafx.h")
    pchsource(srcfiles.."stdafx.cpp")
 
-   links { "Imgui" }
+   links { "Imgui", "RenderingCore" }
 
-   includedirs { "../SRC", "../External/imgui"}
+   includedirs { "../SRC", "../External/imgui", "../External/BGFX/bgfx/include", "../External/BGFX/bimg/include", "../External/BGFX/bx/include", "../External/BGFX/bx/include/compat/msvc" }
 
    dofile("projectsconfigs.lua")

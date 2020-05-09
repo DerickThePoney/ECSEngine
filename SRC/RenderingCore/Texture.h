@@ -15,7 +15,7 @@ class Texture : public RefCountedObject
     DECLARE_POOL_ALLOCATED(Texture);
 
 public:
-    Texture(const TextureDescriptor* parTextureDescriptor);
+    Texture(const TextureDescriptor* parTextureDescriptor, const std::string& parTextureName);
     ~Texture();
 
     void Load();
@@ -29,6 +29,7 @@ public:
 
 private:
     const TextureDescriptor* FTextureDescriptor;
+    const std::string& FTextureName;
 
     bgfx::TextureHandle FHandle;
     bgfx::TextureInfo FInfo;
