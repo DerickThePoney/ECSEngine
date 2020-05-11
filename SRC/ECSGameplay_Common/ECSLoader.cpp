@@ -3,10 +3,11 @@
 #include "ECSLoader.h"
 
 #include "Common/ResourceCache.h"
-#include "EntityTemplate.h"
-#include "EntityTemplateManager.h"
-#include "ModuleParameters.h"
-#include "WorldManager.h"
+#include "ECSCore/EntityTemplate.h"
+#include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/ModuleParameters.h"
+#include "ECSCore/WorldManager.h"
+#include "WorldDeclaration.h"
 
 namespace ECSEngine
 {
@@ -16,11 +17,13 @@ bool ECSLoader::VirtualInitialise()
     ILoader::VirtualInitialise();
 
     ECSEngine::ModuleParameters::InitParameterIdentifiersTraits();
+    ECSEngine::ModuleTemplates::InitModuleTemplateFactories();
 
     WorldManager::CreateIFP();
     AssertRelease(WorldManager::HasInstance());
     WorldManager& worldManagerInstance = WorldManager::Instance();
     worldManagerInstance.Init();
+    CreateWorlds();
 
     EntityTemplateManager::CreateIFP();
     AssertRelease(EntityTemplateManager::HasInstance());
