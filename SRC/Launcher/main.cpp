@@ -3,7 +3,7 @@
 #include "Application/BaseApplication.h"
 #include "Application/CommonLoaders.h"
 #include "ApplicationUpdater.h"
-#include "ECSCore/ECSLoader.h"
+#include "ECSGameplay_Common/ECSLoader.h"
 #include "RenderingCore/RenderingLoader.h"
 
 int main(int argc, char** argv)
