@@ -46,6 +46,8 @@ void SpawnEntitySceneAction::VirtualStart()
     container.Set<ModuleParameters::EulerAngles>(FSceneItem->GetEulerAngles());
 
     EntityFactory::CreateEntity(FTemplate, container);
+
+    Finish();
 }
 
 void SpawnEntitySceneAction::VirtualDrawEditor()

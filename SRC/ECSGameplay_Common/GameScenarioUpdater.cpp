@@ -21,7 +21,6 @@ void GameScenarioUpdater::Initialise()
 {
     AssertRelease(FScenario != nullptr);
     FRenderingSystem.Init();
-    FOrientationSystem.Init();
 
     FScenario->Initialise();
 }
@@ -32,7 +31,6 @@ void GameScenarioUpdater::Destroy()
     delete FScenario;
     FScenario = nullptr;
 
-    FOrientationSystem.Destroy();
     FRenderingSystem.Destroy();
 }
 
@@ -40,8 +38,6 @@ void GameScenarioUpdater::Update()
 {
     AssertRelease(FScenario != nullptr);
     FScenario->Update();
-
-    FOrientationSystem.Update();
 }
 
 void GameScenarioUpdater::Render()

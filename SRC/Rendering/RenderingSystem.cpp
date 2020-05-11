@@ -41,33 +41,26 @@ RenderingSystem::RenderingSystem()
 RenderingSystem::~RenderingSystem()
 {
 }
-Rendering::MaterialInstanceHandle kHandle;
-bgfx::ProgramHandle kProgramInstancing;
-const std::string& uniformName = "u_color";
-Rendering::TextureHandle th;
+// Rendering::MaterialInstanceHandle kHandle;
+// bgfx::ProgramHandle kProgramInstancing;
 
 void RenderingSystem::VirtualInit()
 {
     parent_type::VirtualInit();
 
-    kHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
-    kProgramInstancing = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColorInstancing");
+    // kHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+    // kProgramInstancing = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColorInstancing");
 
-    const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
+    /*const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
     const glm::vec3 eye = { 0.0f, 50.0f, 0.0f };
 
-    glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 0, 1.0f));
+    glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 0, 1.0f));*/
 
     FCamId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
-    Camera* c = CameraManager::Instance().GetCamera(FCamId);
-    AssertRelease(c != nullptr);
+    /*Camera* c = CameraManager::Instance().GetCamera(FCamId);
+    AssertRelease(c != nullptr);*/
 
     FDrawBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
-
-    Rendering::TextureName name("Units", "PixelColors");
-
-    th = Rendering::TextureManager::Instance().GetTextureHandle(name);
-    AssertRelease(th.IsValid());
 }
 
 void RenderingSystem::VirtualUpdate()
@@ -90,18 +83,6 @@ void RenderingSystem::VirtualUpdate()
     glm::mat4 view = c->GetWorldViewMatrix();
     glm::mat4 proj = c->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
     FDrawBuffer->SetViewTranform(view, proj);
-
-    /*const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
-    glm::vec4 uniformVal = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    Rendering::MaterialManager::SetVec4Uniform(uniformName, uniformVal);*/
-
-    const Rendering::Texture* t = Rendering::TextureManager::Instance().GetTexture(th);
-    AssertRelease(t != nullptr);
-    AssertRelease(t->Valid());
-
-    ImGui::Begin("Test img");
-    ImGui::Image(t->Handle(), glm::vec2(100, 100));
-    ImGui::End();
 
     if (1) //! Rendering::BGFXRenderer::Instance().IsInstancingEnabled())
     {
@@ -181,7 +162,7 @@ void RenderingSystem::VirtualDestroy()
 {
     parent_type::VirtualDestroy();
     Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FDrawBuffer);
-    bgfx::destroy(kProgramInstancing);
+    /*bgfx::destroy(kProgramInstancing);*/
 }
 
 } // namespace ECSEngine
