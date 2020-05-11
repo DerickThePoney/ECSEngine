@@ -2,6 +2,8 @@
 
 #include "ApplicationSceneActions.h"
 
+#include "Common/Camera.h"
+#include "Common/CameraManager.h"
 #include "Common/RenderingHandles.h"
 #include "PropertyDrawer.h"
 #include "RenderingCore/DrawCommands.h"
@@ -74,11 +76,26 @@ SceneActionCreateMainCamera::~SceneActionCreateMainCamera()
 void SceneActionCreateMainCamera::VirtualInitialise(const SceneScenario* parScene)
 {
     SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
+
+    const BaseSceneItem* item = GetSceneItem();
+    AssertRelease(item != nullptr);
+
+    const glm::vec3 eulerAngles = item->GetEulerAngles();
+    const glm::mat4 worldViewMatrix = glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z) * glm::translate(-item->GetPosition());
+
+    const u32 camId = CameraManager::Instance().CreateCameraIFN(FCameraName);
+    Camera* cam = CameraManager::Instance().GetCamera(camId);
+    cam->SetWorldViewMatrix(worldViewMatrix);
+    cam->SetFov(FFov);
+    cam->SetNear(FNearPlane);
+    cam->SetFar(FFarPlane);
 }
 
 void SceneActionCreateMainCamera::VirtualStart()
 {
     SceneActionWithBaseSceneItem::VirtualStart();
+
+    Finish();
 }
 
 void SceneActionCreateMainCamera::VirtualDrawEditor()
@@ -99,7 +116,7 @@ bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawComman
     SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(FFov), float(windowSize.x) / float(windowSize.y), FNearPlane, FFarPlane);
+    const glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(FFov), float(windowSize.x) / float(windowSize.y), FNearPlane, FFarPlane);
     const BaseSceneItem* item = GetSceneItem();
     if (item != nullptr)
     {
