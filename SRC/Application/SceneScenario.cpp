@@ -60,7 +60,8 @@ void SceneScenario::Update()
         AlwaysCheckedAssert(action->IsStarted());
     }
 
-    action->Update();
+    if (!action->IsFinished())
+        action->Update();
 
     if (action->IsFinished())
     {
