@@ -35,6 +35,7 @@ enum Type
 
 class SceneObjectsPickingRenderer;
 class EditorSceneRenderer;
+class GameScenarioUpdater;
 
 class ScenarioEditor final : public IScenarioUpdater
 {
@@ -56,11 +57,22 @@ public:
     void UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect);
 
 private:
+    void UpdateForSceneEditing();
+    void UpdateForInEditorPlaying();
+
+    void UpdateSceneEditorStatus();
+
+    void RenderForSceneEditing();
+    void RenderForEditorPlaying();
+
+private:
     SceneScenario* FCurrentScenario;
     WindowsToShow FWindows;
     IOScene FIOScene;
     EditorCamera FEditorCamera;
     ScenarioEditorStatus::Type FState;
+
+    GameScenarioUpdater* FInGameScenarioPlayer;
 
     EditorSceneRenderer* FEditorSceneRenderer;
     SceneObjectsPickingRenderer* FEditorSceneObjectPickingRenderer;

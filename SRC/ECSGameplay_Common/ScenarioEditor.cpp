@@ -17,6 +17,7 @@ ScenarioEditor::ScenarioEditor()
     : FCurrentScenario(nullptr)
     , FEditorSceneObjectPickingRenderer(nullptr)
     , FEditorSceneRenderer(nullptr)
+    , FInGameScenarioPlayer(nullptr)
     , FState(ScenarioEditorStatus::EDITING_SCENARIO)
 {
 }
@@ -24,6 +25,7 @@ ScenarioEditor::ScenarioEditor()
 ScenarioEditor::~ScenarioEditor()
 {
     delete FCurrentScenario;
+    delete FInGameScenarioPlayer;
 }
 
 void ScenarioEditor::Initialise()
@@ -44,43 +46,79 @@ void ScenarioEditor::Destroy()
     FEditorSceneRenderer->Shutdown();
     FEditorSceneObjectPickingRenderer->Shutdown();
 
+    if (FInGameScenarioPlayer != nullptr)
+    {
+        AlwaysCheckedAssert(FState == ScenarioEditorStatus::PLAYING_SCENARIO) FInGameScenarioPlayer->Destroy();
+        delete FInGameScenarioPlayer;
+        FInGameScenarioPlayer = nullptr;
+    }
+
     delete FEditorSceneRenderer;
     delete FEditorSceneObjectPickingRenderer;
 }
 
 void ScenarioEditor::Update()
 {
+    UpdateSceneEditorStatus();
+
+    switch (FState)
+    {
+    case ECSEngine::ScenarioEditorStatus::EDITING_SCENARIO:
+        UpdateForSceneEditing();
+        break;
+    case ECSEngine::ScenarioEditorStatus::PLAYING_SCENARIO:
+        UpdateForInEditorPlaying();
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
+}
+
+void ScenarioEditor::Render()
+{
+    switch (FState)
+    {
+    case ECSEngine::ScenarioEditorStatus::EDITING_SCENARIO:
+        RenderForSceneEditing();
+        break;
+    case ECSEngine::ScenarioEditorStatus::PLAYING_SCENARIO:
+        RenderForEditorPlaying();
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
+}
+
+void ScenarioEditor::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect)
+{
+    SceneScenario* currentScene = GetEditedScenario();
+    if (currentScene != nullptr)
+    {
+        currentScene->SetItemHovered(parSelectedItem.first);
+
+        if (parSelected)
+            currentScene->SetItemSelected(parSelectedItem.first);
+        else if (parUnselect)
+            currentScene->SetItemSelected(-1);
+    }
+}
+
+void ScenarioEditor::UpdateForSceneEditing()
+{
     FEditorCamera.Update();
 
     if (!FIOScene.openScene)
     {
-        // // TODO This should be changed in scenario playing mode
         ImGUITools::DrawSceneEditorMainMenu(FCurrentScenario, FWindows, FIOScene);
-        bool isPlaying = FState == ScenarioEditorStatus::PLAYING_SCENARIO;
-        ImGUITools::DrawPlayScenarioWindow(isPlaying);
-        if (FCurrentScenario != nullptr)
-        {
-            if (isPlaying && FState != ScenarioEditorStatus::PLAYING_SCENARIO)
-            {
-                FState = ScenarioEditorStatus::PLAYING_SCENARIO;
-                // TODO Launch scenario play mode
-            }
-            else if (!isPlaying && FState != ScenarioEditorStatus::EDITING_SCENARIO)
-            {
-                FState = ScenarioEditorStatus::EDITING_SCENARIO;
-                // TODO Stop Scenario Editing IFN
-            }
-        }
     }
 
-    // // TODO This should be changed in scenario playing mode
     if (FIOScene.newScene)
     {
         bool isDone = false;
         bool isCancel = false;
         const std::string sceneToChoose = ImGUITools::NewScenario(isDone, isCancel);
-
-        // TODO Stop Scenario Editing IFN
 
         AlwaysCheckedAssert(!(isDone && isCancel));
 
@@ -141,7 +179,6 @@ void ScenarioEditor::Update()
             FIOScene.openScene = false;
 
             FCurrentScenario->Initialise();
-            // TODO Stop Scenario Editing IFN
         }
         else if (isCancel)
         {
@@ -157,7 +194,44 @@ void ScenarioEditor::Update()
         FEditorSceneObjectPickingRenderer->DrawDebugData(&FWindows.showPickingDebug);
 }
 
-void ScenarioEditor::Render()
+void ScenarioEditor::UpdateForInEditorPlaying()
+{
+    AssertRelease(FInGameScenarioPlayer != nullptr);
+
+    // TODO Editor Playing scene menu
+
+    FInGameScenarioPlayer->Update();
+}
+
+void ScenarioEditor::UpdateSceneEditorStatus()
+{
+    if (!FIOScene.openScene)
+    {
+        bool isPlaying = FState == ScenarioEditorStatus::PLAYING_SCENARIO;
+        ImGUITools::DrawPlayScenarioWindow(isPlaying);
+        if (FCurrentScenario != nullptr)
+        {
+            if (isPlaying && FState != ScenarioEditorStatus::PLAYING_SCENARIO)
+            {
+                FState = ScenarioEditorStatus::PLAYING_SCENARIO;
+                AssertRelease(FInGameScenarioPlayer == nullptr);
+                FInGameScenarioPlayer = new GameScenarioUpdater();
+                FInGameScenarioPlayer->SetScenario(GlobalResourceCache::Instance().FCache->GetBasePath() + "/Scenes/" + FCurrentScenario->GetName() + ".scene");
+                FInGameScenarioPlayer->Initialise();
+            }
+            else if (!isPlaying && FState != ScenarioEditorStatus::EDITING_SCENARIO)
+            {
+                FState = ScenarioEditorStatus::EDITING_SCENARIO;
+                AssertRelease(FInGameScenarioPlayer != nullptr);
+                FInGameScenarioPlayer->Destroy();
+                delete FInGameScenarioPlayer;
+                FInGameScenarioPlayer = nullptr;
+            }
+        }
+    }
+}
+
+void ScenarioEditor::RenderForSceneEditing()
 {
     const SceneScenario* currentScene = GetEditedScenario();
 
@@ -168,18 +242,10 @@ void ScenarioEditor::Render()
     }
 }
 
-void ScenarioEditor::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect)
+void ScenarioEditor::RenderForEditorPlaying()
 {
-    SceneScenario* currentScene = GetEditedScenario();
-    if (currentScene != nullptr)
-    {
-        currentScene->SetItemHovered(parSelectedItem.first);
-
-        if (parSelected)
-            currentScene->SetItemSelected(parSelectedItem.first);
-        else if (parUnselect)
-            currentScene->SetItemSelected(-1);
-    }
+    AssertRelease(FInGameScenarioPlayer != nullptr);
+    FInGameScenarioPlayer->Render();
 }
 
 } // namespace ECSEngine
