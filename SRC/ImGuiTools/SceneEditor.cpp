@@ -14,7 +14,6 @@
 #include "InputDebug.h"
 #include "LoggerGUI.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
-#include "RenderingCore/Texture.h"
 #include "RenderingCore/TexturesManager.h"
 
 namespace ECSEngine
@@ -245,8 +244,10 @@ void DrawPlayScenarioWindow(bool& parOutPlayScenario)
 
     AssertRelease(playHandle.IsValid());
     AssertRelease(pauseHandle.IsValid());
-    const Rendering::Texture* playTexture = Rendering::TextureManager::Instance().GetTexture(playHandle);
+    /*const Rendering::Texture* playTexture = Rendering::TextureManager::Instance().GetTexture(playHandle);
     const Rendering::Texture* pauseTexture = Rendering::TextureManager::Instance().GetTexture(pauseHandle);
+    AssertRelease(playTexture != nullptr);
+    AssertRelease(pauseTexture != nullptr);*/
 
     const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
@@ -259,12 +260,12 @@ void DrawPlayScenarioWindow(bool& parOutPlayScenario)
     ImGui::SetWindowPos(glm::vec2((windowSize.x - thisWindowSize) * 0.5f, menuBarHeight.y));
     if (parOutPlayScenario)
     {
-        if (ImGui::ImageButton(pauseTexture->Handle(), glm::vec2(64, 64)))
+        if (ImGui::ImageButton((ImTextureID)&pauseHandle, glm::vec2(64, 64)))
             parOutPlayScenario = false;
     }
     else
     {
-        if (ImGui::ImageButton(playTexture->Handle(), glm::vec2(64, 64)))
+        if (ImGui::ImageButton((ImTextureID)&playHandle, glm::vec2(64, 64)))
             parOutPlayScenario = true;
     }
     ImGui::End();
