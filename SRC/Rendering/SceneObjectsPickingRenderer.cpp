@@ -161,7 +161,7 @@ void SceneObjectsPickingRenderer::DrawDebugData(bool* parOpen)
     ImGui::SetNextWindowSize(ImVec2(windowSize.x / 5.0f, windowSize.y / 2.0f), ImGuiCond_FirstUseEver);
     ImGui::Begin("Picking texture", parOpen, 0);
 
-    ImGui::Image(FPickingTexture, ImVec2(windowSize.x / 5.0f - 16.0f, windowSize.x / 5.0f - 16.0f));
+    /*ImGui::Image(FPickingTexture, ImVec2(windowSize.x / 5.0f - 16.0f, windowSize.x / 5.0f - 16.0f));
 
     EDITOR_PROPERTY_WITH_LIMITS("Selection FoV", FSelectionFoV, 0.f, 180.f);
 
@@ -173,7 +173,7 @@ void SceneObjectsPickingRenderer::DrawDebugData(bool* parOpen)
     else
     {
         ImGui::Text("No hits");
-    }
+    }*/
 
     ImGui::End();
 }

@@ -3,11 +3,14 @@
 #include "ImguiRenderer.h"
 
 #include "BGFXRenderingUtils.h"
+#include "Common/RenderingHandles.h"
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
 #include "GLFWDisplayWindowHandler.h"
+#include "Texture.h"
+#include "TexturesManager.h"
 #include "bx/math.h"
 
 #include <bx/timer.h>
@@ -163,23 +166,13 @@ void ImguiRenderer::Render(ImDrawData* parDrawData)
 
                 if (NULL != cmd->TextureId)
                 {
-                    union {
-                        ImTextureID ptr;
-                        struct
-                        {
-                            bgfx::TextureHandle handle;
-                            uint8_t flags;
-                            uint8_t mip;
-                        } s;
-                    } texture = { cmd->TextureId };
-                    state |= 0 != (IMGUI_FLAGS_ALPHA_BLEND & texture.s.flags) ? BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA) : BGFX_STATE_NONE;
-                    th = texture.s.handle;
-                    if (0 != texture.s.mip)
-                    {
-                        const float lodEnabled[4] = { float(texture.s.mip), 1.0f, 0.0f, 0.0f };
-                        bgfx::setUniform(FImageLodEnabledUniform, lodEnabled);
-                        program = FImageProgram;
-                    }
+                    const Rendering::TextureHandle* textureHandle = (Rendering::TextureHandle*)cmd->TextureId;
+                    const Rendering::Texture* textureToDisplay = Rendering::TextureManager::Instance().GetTexture(*textureHandle);
+                    AssertRelease(textureToDisplay != nullptr);
+                    AssertRelease(textureToDisplay->Valid());
+
+                    state |= BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
+                    th = textureToDisplay->Handle();
                 }
                 else
                 {
