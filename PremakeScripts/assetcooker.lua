@@ -13,7 +13,7 @@ project "AssetCooker"
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
 
-   pchheader "stdafx.h"
+   pchheader (srcfiles.."stdafx.h")
    pchsource(srcfiles.."stdafx.cpp")
    
    includedirs { "../External/assimp/include","../External/assimp/BUILD/include"}
