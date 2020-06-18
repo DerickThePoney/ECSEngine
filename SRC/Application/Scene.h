@@ -14,7 +14,7 @@ public:
     const std::string& GetName() const { return FName; }
     void SetName(const std::string& parName) { FName = parName; }
 
-    const size_t& GetSceneId() const { return std::hash<std::string>().operator()(FName); } // FNV 1a
+    const size_t GetSceneId() const { return std::hash<std::string>().operator()(FName); } // FNV 1a
 
     void AddSceneItem(const u32 parSceneItemTypeId);
     void RemoveSceneItem(const std::vector<std::shared_ptr<BaseSceneItem>>::iterator parWhere);
