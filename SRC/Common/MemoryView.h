@@ -118,7 +118,7 @@ public:
     iterator begin() { return iterator(this, 0); }
     const_iterator cbegin() { return const_iterator(this, 0); }
     reverse_iterator rbegin() { return reverse_iterator(this, FSize - 1); }
-    const_reverse_iterator rbegin() { return const_reverse_iterator(this, FSize - 1); }
+    const_reverse_iterator crbegin() { return const_reverse_iterator(this, FSize - 1); }
 
     iterator end() { return iterator(this, FSize); }
     const_iterator cend() { return const_iterator(this, FSize); }
