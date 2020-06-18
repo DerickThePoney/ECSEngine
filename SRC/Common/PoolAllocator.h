@@ -1,4 +1,5 @@
 #pragma once
+#include <list>
 namespace ECSEngine
 {
 template<typename T>
