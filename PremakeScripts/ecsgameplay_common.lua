@@ -13,7 +13,7 @@ project "ECSGameplay_Common"
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
 
-   pchheader "stdafx.h"
+   pchheader (srcfiles.."stdafx.h")
    pchsource(srcfiles.."stdafx.cpp")
 
    links { "ECSCore", "Rendering"}

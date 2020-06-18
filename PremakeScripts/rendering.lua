@@ -13,7 +13,7 @@ project "Rendering"
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
 
-   pchheader "stdafx.h"
+   pchheader (srcfiles.."stdafx.h")
    pchsource(srcfiles.."stdafx.cpp")
 
    libdirs {"../External/glfw-3.3.bin.WIN64/lib-vc2019", "../External/BGFX/bgfx/.build/win64_vs2019/bin"}

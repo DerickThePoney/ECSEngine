@@ -12,7 +12,7 @@ project "ECSCore"
       ["Sources"] = {srcfiles.."*.cpp"}
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
-   pchheader "stdafx.h"
+   pchheader (srcfiles.."stdafx.h")
    pchsource(srcfiles.."stdafx.cpp")
 
    links { "Application" }
