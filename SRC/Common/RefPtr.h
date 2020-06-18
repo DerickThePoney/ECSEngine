@@ -44,7 +44,7 @@ public:
 
     void operator=(const RefPtr& parOther)
     {
-        FPtr = other.FPtr;
+        FPtr = parOther.FPtr;
         AddReference(FPtr);
     }
 
