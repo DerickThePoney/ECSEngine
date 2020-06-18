@@ -73,7 +73,7 @@ public:
     bool operator==(const RefPtr& parOther) { return FPtr == parOther.FPtr; }
     bool operator==(const T* parOther) { return FPtr == parOther; }
 
-    T* get() const { return FPtr; }
+    T* get() { return FPtr; }
     const T* get() const { return FPtr; }
 
     void reset(T* parNewPtr) { FPtr = parNewPtr; }
