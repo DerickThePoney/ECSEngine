@@ -204,8 +204,8 @@ public:
     u32 GetSize() { return (u32)FAllocatedModules.size(); }
 
 private:
+    std::atomic_bool FLock;
     ModulePoolAllocator<Mod, ModulePoolSize, false> FAllocator;
     std::set<EntityId> FAllocatedModules;
-    std::atomic_bool FLock;
 };
 } // namespace ECSEngine

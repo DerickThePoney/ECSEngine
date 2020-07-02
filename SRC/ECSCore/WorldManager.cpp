@@ -2,8 +2,6 @@
 
 #include "WorldManager.h"
 
-#include "ECSGameplay_Common/WorldDeclaration.h"
-
 namespace ECSEngine
 {
 
@@ -19,8 +17,7 @@ WorldManager::~WorldManager()
 
 void WorldManager::Init()
 {
-    FWorlds.insert_or_assign(Worlds::STANDARD, EntityWorld());
-    CreateWorld(FWorlds.at(Worlds::STANDARD));
+    FWorlds.resize(Worlds::LENGTH);
 }
 
 void WorldManager::Shutdown()
@@ -28,19 +25,23 @@ void WorldManager::Shutdown()
     FWorlds.clear();
 }
 
-ECSEngine::EntityWorld& WorldManager::GetWorld(Worlds::Type parWorld)
+EntityWorld& WorldManager::GetWorld(Worlds::Type parWorld)
 {
-    auto it = FWorlds.find(parWorld);
-    AssertRelease(it != FWorlds.end());
-    return FWorlds.at(parWorld);
+    return *FWorlds[parWorld];
 }
 
-ECSEngine::EntityWorld* WorldManager::GetWorldIFP(Worlds::Type parWorld)
+EntityWorld* WorldManager::GetWorldIFP(Worlds::Type parWorld)
 {
-    auto it = FWorlds.find(parWorld);
-    if (it == FWorlds.end())
-        return nullptr;
-    return &it->second;
+    return FWorlds[parWorld].get();
+}
+
+void WorldManager::AddEntityWorldStealOwnership(Worlds::Type parType, EntityWorld* parWorld)
+{
+    AssertRelease(parType < Worlds::LENGTH);
+    AssertRelease(parWorld != nullptr);
+    AssertRelease(FWorlds[parType] == nullptr);
+
+    FWorlds[parType] = std::unique_ptr<EntityWorld>(parWorld);
 }
 
 } // namespace ECSEngine

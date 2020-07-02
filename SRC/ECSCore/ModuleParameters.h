@@ -90,7 +90,7 @@ public:
 
     ModuleParameter(const ModuleParameter& parOther)
     {
-        memset(FData, '\0', MaxParameterByteSize);
+        memset(&FData, '\0', MaxParameterByteSize);
         FId = parOther.FId;
 
         IParameterIdentifierTrait* identifierTrait = GetIdentifierTrait(parOther.FId);

@@ -4,15 +4,15 @@ namespace ECSEngine
 {
 enum class EModuleId
 {
-#define DECLARE_MODULE(NAME) EModuleId_##NAME,
+#define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE) EModuleId_##NAME,
 #include "ModuleList.inl"
-#undef DECLARE_MODULE
+#undef DECLARE_MODULE_AND_TEMPLATE
     Length
 };
 
-#define DECLARE_MODULE(NAME) class NAME;
+#define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE) class NAME;
 #include "ModuleList.inl"
-#undef DECLARE_MODULE
+#undef DECLARE_MODULE_AND_TEMPLATE
 
 template<class T>
 struct ModuleTraits
@@ -24,7 +24,7 @@ struct ModuleTraits
     }
 };
 
-#define DECLARE_MODULE(NAME)                                                                                                                                                       \
+#define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE)                                                                                                                                \
     template<>                                                                                                                                                                     \
     struct ModuleTraits<NAME>                                                                                                                                                      \
     {                                                                                                                                                                              \
@@ -32,5 +32,5 @@ struct ModuleTraits
     };
 
 #include "ModuleList.inl"
-#undef DECLARE_MODULE
+#undef DECLARE_MODULE_AND_TEMPLATE
 } // namespace ECSEngine

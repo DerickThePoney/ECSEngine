@@ -1,4 +1,4 @@
 
-DECLARE_MODULE(PositionModule)
-DECLARE_MODULE(OrientationModule)
-DECLARE_MODULE(ApparenceModule)
+DECLARE_MODULE_AND_TEMPLATE(PositionModule, PositionModuleTemplate)
+DECLARE_MODULE_AND_TEMPLATE(OrientationModule, OrientationModuleTemplate)
+DECLARE_MODULE_AND_TEMPLATE(ApparenceModule, ApparenceModuleTemplate)

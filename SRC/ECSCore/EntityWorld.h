@@ -17,9 +17,9 @@ class EntityId;
 class EntityWorld
 {
 public:
-    EntityWorld();
-    EntityWorld(EntityWorld&& other) noexcept;
-    void operator=(EntityWorld&& other) noexcept;
+    EntityWorld(const Worlds::Type parWorldId);
+    EntityWorld(EntityWorld&& other) noexcept = delete;
+    void operator=(EntityWorld&& other) noexcept = delete;
     ~EntityWorld();
 
     template<typename T>
@@ -31,19 +31,19 @@ public:
     EntityId CreateEntityFromTemplateReturnEntityId(const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer);
     void DestroyEntity(const EntityId& parId);
 
-    const u8 WorldID() const { return FWorldID; }
+    const u32 WorldID() const { return FWorldID; }
 
     const EntityTemplate* GetTemplateForEntity(const EntityId& parId);
 
 private:
-    IModuleController** FControllers;
-    std::vector<Entity> FEntities;
-    std::set<EntityId> FAllocatedEntityIds;
-    EntityIDGenerator FEntityIdGenerator;
     u32 FSize;
-    u8 FWorldID;
+    u32 FWorldID;
 
-    static u8 sWorldIdGenerator;
+    EntityIDGenerator FEntityIdGenerator;
+    // std::set<EntityId> FAllocatedEntityIds;
+    std::vector<Entity> FEntities;
+
+    std::vector<IModuleController*> FControllers;
 };
 
 } // namespace ECSEngine

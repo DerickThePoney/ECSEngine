@@ -33,7 +33,10 @@ EntityIDGenerator::~EntityIDGenerator()
 EntityId EntityIDGenerator::GetNextEntityId()
 {
     AssertRelease(FAssociatedWorldID != -1);
-    return EntityId(FAssociatedWorldID, GetNextId());
+    EntityId nextId = EntityId(FAssociatedWorldID, GetNextId());
+    AssertRelease(nextId.Valid());
+    AssertRelease(nextId.GetWorld() == FAssociatedWorldID);
+    return nextId;
 }
 
 void EntityIDGenerator::ReleaseEntityId(const EntityId& parId)

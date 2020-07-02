@@ -1,32 +1,14 @@
 #pragma once
-
-#include "ApparenceModule.h"
-#include "Common/Types.h"
-#include "ECSCore/EntityWorld.h"
 #include "ECSCore/ModuleId.h"
-#include "OrientationModule.h"
-#include "PositionModule.h"
-
-#include <standalone/brigand.hpp>
-
 namespace ECSEngine
 {
 
-using Controllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule>;
+void CreateWorlds();
 
-struct f
+namespace ModuleTemplates
 {
-    template<typename U>
-    void operator()(brigand::type_<U>)
-    {
-        world->AddController<U>();
-    }
+void InitModuleTemplateFactories();
+void DestroyModyleTemplateFactories();
+} // namespace ModuleTemplates
 
-    EntityWorld* world;
-};
-
-void CreateWorld(EntityWorld& world)
-{
-    auto r = brigand::for_each<Controllers>(f{ &world });
-}
 } // namespace ECSEngine

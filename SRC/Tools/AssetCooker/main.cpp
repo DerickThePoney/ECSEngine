@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 
     try
     {
-        app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>("D:\\Programmation\\GameEngine\\ECSEngine\\Assets");
+        app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>("..\\Assets");
         app.SetGameplayUpdater_StealOwnership(new ECSEngine::AssetCookerUpdaterWrapper());
 
         app.Initialise();

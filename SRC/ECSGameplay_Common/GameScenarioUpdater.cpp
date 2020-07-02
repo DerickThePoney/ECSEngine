@@ -43,7 +43,7 @@ void GameScenarioUpdater::Update()
 void GameScenarioUpdater::Render()
 {
     AssertRelease(FScenario != nullptr);
-    FScenario->Render();
+    // FScenario->Render();
 
     FRenderingSystem.Update();
 }

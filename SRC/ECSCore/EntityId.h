@@ -6,8 +6,8 @@ namespace ECSEngine
 #pragma pack(push, 1)
 struct PackedEntityId
 {
-    PackedEntityId(u8 parWorldId, u32 parId)
-        : FId(parWorldId << 24 | parId)
+    PackedEntityId(u32 parWorldId, u32 parId)
+        : FId((parWorldId & 0xFF) << 24 | parId)
     {
     }
 
@@ -20,10 +20,10 @@ private:
     u32 FId;
 };
 
-class EntityId : public RefCountedObject
+class EntityId
 {
 public:
-    explicit EntityId(u8 parWorldId = 0xFF, u32 parId = 0xFFFFFF);
+    explicit EntityId(u32 parWorldId = 0xFF, u32 parId = 0xFFFFFF);
 
     const u8 GetWorldId() const { return FId.GetWorldId(); }
     const Worlds::Type GetWorld() const { return (Worlds::Type)GetWorldId(); }

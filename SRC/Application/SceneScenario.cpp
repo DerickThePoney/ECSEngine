@@ -69,10 +69,6 @@ void SceneScenario::Update()
     }
 }
 
-void SceneScenario::Render()
-{
-}
-
 void SceneScenario::SetItemHovered(const u32 parId)
 {
     foreachitem(sceneItem, FSceneItems) { sceneItem->SetItemHovered(sceneItem->Id() == parId); }
