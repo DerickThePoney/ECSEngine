@@ -1,0 +1,144 @@
+{
+    "EntityTemplatesList": {
+        "EntityTemplates": [
+            {
+                "ptr_wrapper": {
+                    "id": 2147483649,
+                    "data": {
+                        "Name": "TEMPLATE_ENNEMY",
+                        "World": 0,
+                        "Key": 7,
+                        "ModuleTemplatesList": [
+                            {
+                                "key": 0,
+                                "value": {
+                                    "polymorphic_id": 2147483649,
+                                    "polymorphic_name": "ECSEngine::PositionModuleTemplate",
+                                    "ptr_wrapper": {
+                                        "valid": 1,
+                                        "data": {}
+                                    }
+                                }
+                            },
+                            {
+                                "key": 1,
+                                "value": {
+                                    "polymorphic_id": 2147483650,
+                                    "polymorphic_name": "ECSEngine::OrientationModuleTemplate",
+                                    "ptr_wrapper": {
+                                        "valid": 1,
+                                        "data": {}
+                                    }
+                                }
+                            },
+                            {
+                                "key": 2,
+                                "value": {
+                                    "polymorphic_id": 2147483651,
+                                    "polymorphic_name": "ECSEngine::ApparenceModuleTemplate",
+                                    "ptr_wrapper": {
+                                        "valid": 1,
+                                        "data": {
+                                            "MeshFileName": "meshes\\testobjects\\cube.fbx.gen",
+                                            "MaterialFileName": "materials\\vertexcolormaterial.material"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "ptr_wrapper": {
+                    "id": 2147483650,
+                    "data": {
+                        "Name": "TEMPLATE_JOUEUR",
+                        "World": 0,
+                        "Key": 7,
+                        "ModuleTemplatesList": [
+                            {
+                                "key": 0,
+                                "value": {
+                                    "polymorphic_id": 1,
+                                    "ptr_wrapper": {
+                                        "valid": 1,
+                                        "data": {}
+                                    }
+                                }
+                            },
+                            {
+                                "key": 1,
+                                "value": {
+                                    "polymorphic_id": 2,
+                                    "ptr_wrapper": {
+                                        "valid": 1,
+                                        "data": {}
+                                    }
+                                }
+                            },
+                            {
+                                "key": 2,
+                                "value": {
+                                    "polymorphic_id": 3,
+                                    "ptr_wrapper": {
+                                        "valid": 1,
+                                        "data": {
+                                            "MeshFileName": "meshes\\testobjects\\lowpoly1.fbx.gen",
+                                            "MaterialFileName": "materials\\texturedmeshmaterial.material"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "ptr_wrapper": {
+                    "id": 2147483651,
+                    "data": {
+                        "Name": "Template_Handle",
+                        "World": 0,
+                        "Key": 7,
+                        "ModuleTemplatesList": [
+                            {
+                                "key": 0,
+                                "value": {
+                                    "polymorphic_id": 1,
+                                    "ptr_wrapper": {
+                                        "valid": 1,
+                                        "data": {}
+                                    }
+                                }
+                            },
+                            {
+                                "key": 1,
+                                "value": {
+                                    "polymorphic_id": 2,
+                                    "ptr_wrapper": {
+                                        "valid": 1,
+                                        "data": {}
+                                    }
+                                }
+                            },
+                            {
+                                "key": 2,
+                                "value": {
+                                    "polymorphic_id": 3,
+                                    "ptr_wrapper": {
+                                        "valid": 1,
+                                        "data": {
+                                            "MeshFileName": "meshes\\testobjects\\movehandle.fbx.gen",
+                                            "MaterialFileName": "materials\\vertexcolormaterial.material"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}

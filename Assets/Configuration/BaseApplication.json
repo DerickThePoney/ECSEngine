@@ -1,0 +1,53 @@
+{
+    "value0": {
+        "value0": [
+            {
+                "polymorphic_id": 2147483649,
+                "polymorphic_name": "ECSEngine::LoaderInitialiseCommonResources",
+                "ptr_wrapper": {
+                    "valid": 1,
+                    "data": {
+                        "value0": {
+                            "LoaderName": "ECSEngine::LoaderInitialiseCommonResources"
+                        },
+                        "AssetDirectory": "D:\\Programmation\\GameEngine\\ECSEngine\\ECSEngine\\Assets"
+                    }
+                }
+            },
+            {
+                "polymorphic_id": 2147483650,
+                "polymorphic_name": "ECSEngine::ECSLoader",
+                "ptr_wrapper": {
+                    "valid": 1,
+                    "data": {
+                        "value0": {
+                            "LoaderName": "ECSEngine::ECSLoader"
+                        },
+                        "EntityTemplatesFile": "\\Configuration\\EntityTemplates.json"
+                    }
+                }
+            },
+            {
+                "polymorphic_id": 2147483651,
+                "polymorphic_name": "ECSEngine::RenderingLoader",
+                "ptr_wrapper": {
+                    "valid": 1,
+                    "data": {
+                        "value0": {
+                            "LoaderName": "ECSEngine::RenderingLoader"
+                        },
+                        "ApplicationName": "Base Application"
+                    }
+                }
+            }
+        ],
+        "value1": {
+            "polymorphic_id": 2147483652,
+            "polymorphic_name": "ECSEngine::ApplicationUpdaterWrapper",
+            "ptr_wrapper": {
+                "valid": 1,
+                "data": {}
+            }
+        }
+    }
+}

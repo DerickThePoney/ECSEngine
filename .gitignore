@@ -45,3 +45,6 @@ External/brigand-master
 External/glm-0.9.9.5
 
 *.orig
+*.fbx.gen
+*.ktx
+*.bin

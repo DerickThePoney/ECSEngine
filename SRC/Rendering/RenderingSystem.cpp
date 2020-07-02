@@ -91,9 +91,9 @@ void RenderingSystem::VirtualUpdate()
     glm::mat4 proj = c->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
     FDrawBuffer->SetViewTranform(view, proj);
 
-    const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
+    /*const float sinTime = 0.5f * (sin(3.14f * timepoint / 10.f) + 1);
     glm::vec4 uniformVal = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    Rendering::MaterialManager::SetVec4Uniform(uniformName, uniformVal);
+    Rendering::MaterialManager::SetVec4Uniform(uniformName, uniformVal);*/
 
     const Rendering::Texture* t = Rendering::TextureManager::Instance().GetTexture(th);
     AssertRelease(t != nullptr);

@@ -1,0 +1,18 @@
+{
+	"ProgramDescriptor": {
+		"ShadersBasePath": "Shaders\\Perso\\",
+		"ShadersBaseName": "VertexColor",
+		"UniformsAndTypes": [],
+		"LayoutDescription": {
+			"HasPositions": true,
+			"HasColors": true,
+			"NbColorChannels": 1,
+			"HasUVs": false,
+			"NbUVs": 0,
+			"HasNormals": false,
+			"HasBinormals": false,
+			"HasBinormals": false
+		},
+		"IsInstanced": false
+	}
+}

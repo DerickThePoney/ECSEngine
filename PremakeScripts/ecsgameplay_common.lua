@@ -14,6 +14,8 @@ project "ECSGameplay_Common"
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
 
    pchheader (srcfiles.."stdafx.h")
+   filter {"action:vs*", "options:not clang"}
+      pchheader ("stdafx.h")
    pchsource(srcfiles.."stdafx.cpp")
 
    links { "ECSCore", "Rendering"}

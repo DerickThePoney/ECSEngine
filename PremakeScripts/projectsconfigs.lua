@@ -3,8 +3,11 @@ objdir ("../obj/%{cfg.platform}/%{cfg.buildcfg}")
 targetdir ("../bin/%{cfg.platform}/%{cfg.buildcfg}")
 symbolspath '$(OutDir)$(TargetName).pdb'
 
-includedirs { "../External/glm", "D:/Applications/boost_1_70_0" }
+includedirs { "../External/glm", "../../boost_1_73_0" }
 includedirs { "../External/brigand/brigand/include", "../External/cereal/include"}
+
+filter "options:clang"
+  toolset("msc-clangcl")
 
 flags {"MultiProcessorCompile", "LinkTimeOptimization", "NoIncrementalLink"}
 editAndContinue "Off"

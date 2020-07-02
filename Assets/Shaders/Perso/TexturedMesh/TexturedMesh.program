@@ -1,0 +1,23 @@
+{
+	"ProgramDescriptor": {
+		"ShadersBasePath": "Shaders\\Perso\\",
+		"ShadersBaseName": "TexturedMesh",
+		"UniformsAndTypes": [
+			{
+				"first": "s_diffuseColor",
+				"second": 0
+			}
+		],
+		"LayoutDescription": {
+			"HasPositions": true,
+			"HasColors": false,
+			"NbColorChannels": 0,
+			"HasUVs": true,
+			"NbUVs": 1,
+			"HasNormals": false,
+			"HasBinormals": false,
+			"HasBinormals": false
+		},
+		"IsInstanced": false
+	}
+}

@@ -13,19 +13,19 @@ int main(int argc, char** argv)
     {
         try
         {
-            std::ifstream ifstr("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\Configuration\\BaseApplication.json");
+            std::ifstream ifstr("..\\Assets\\Configuration\\BaseApplication.json");
             cereal::JSONInputArchive ar(ifstr);
             ar(app);
         }
         catch (std::exception e)
         {
-            app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>("D:\\Programmation\\GameEngine\\ECSEngine\\Assets");
+            app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>("..\\Assets");
             app.AddNewLoader<ECSEngine::ECSLoader>("\\Configuration\\EntityTemplates.json");
             app.AddNewLoader<ECSEngine::RenderingLoader>("Base Application");
             app.SetGameplayUpdater_StealOwnership(new ECSEngine::ApplicationUpdaterWrapper());
 
             {
-                std::ofstream ofstr("D:\\Programmation\\GameEngine\\ECSEngine\\Assets\\Configuration\\BaseApplication.json", std::ofstream::out);
+                std::ofstream ofstr("Assets\\Configuration\\BaseApplication.json", std::ofstream::out);
                 AssertRelease(ofstr.good());
                 cereal::JSONOutputArchive outputArchive(ofstr);
                 outputArchive(app);

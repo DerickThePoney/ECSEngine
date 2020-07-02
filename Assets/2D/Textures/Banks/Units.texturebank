@@ -1,0 +1,19 @@
+{
+    "TextureBank": {
+        "TextureBankName": "Units",
+        "Textures": [
+            {
+                "key": "PixelColors",
+                "value": {
+                    "TextureFile": "2D\\Textures\\Units\\PixelColors.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            }
+        ]
+    }
+}

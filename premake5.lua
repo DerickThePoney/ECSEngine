@@ -9,6 +9,10 @@ workspace "ECSEngine"
     system "Windows"
     architecture "x64"
 
+   --filter { "platforms:Win32" }
+    --system "Windows"
+    --architecture "x86"
+
    -- Get that C++17 goodness
    cppdialect  "C++17"
 

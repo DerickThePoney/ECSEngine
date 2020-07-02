@@ -214,7 +214,6 @@ void* PoolAllocator<T, ChunkSize>::FindContiguousAllocationSpot(const u32 parNum
 
         auto itInList = chunkFreeBlocks.second.begin();
         itFound = chunkFreeBlocks.second.end();
-        u32 sizeFound = 0;
         foundSpot = false;
         chunkId = chunkFreeBlocks.first;
 

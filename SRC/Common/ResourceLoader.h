@@ -14,6 +14,9 @@ public:
 class DefaultResourceLoader : public IResourceLoader
 {
 public:
+    DefaultResourceLoader() { }
+    virtual ~DefaultResourceLoader() { }
+
     virtual const std::string& GetPattern() const override
     {
         static std::string pattern = "*";

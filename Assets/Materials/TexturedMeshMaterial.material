@@ -1,0 +1,15 @@
+{
+    "Material": {
+        "ProgramDescriptorFilename": "Shaders\\Perso\\TexturedMesh\\TexturedMesh.program",
+    	"TexturesInputDescriptors": [
+	    	{
+	    		"Texture": {
+	    			"BankName": "Units",
+	    			"Texture": "PixelColors"
+	    		},
+	    		"TextureSamplerName": "s_diffuseColor",
+	    		"TextureSlot": 0
+	    	}
+    	]
+    }
+}

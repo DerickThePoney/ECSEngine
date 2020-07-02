@@ -1,0 +1,115 @@
+{
+    "TextureBank": {
+        "TextureBankName": "UI",
+        "Textures": [
+            {
+                "key": "element_blue_square_glossy",
+                "value": {
+                    "TextureFile": "2D\\Textures\\UI\\element_blue_square_glossy.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            },
+            {
+                "key": "element_green_square_glossy",
+                "value": {
+                    "TextureFile": "2D\\Textures\\UI\\element_green_square_glossy.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            },
+            {
+                "key": "element_grey_square_glossy",
+                "value": {
+                    "TextureFile": "2D\\Textures\\UI\\element_grey_square_glossy.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            },
+            {
+                "key": "element_purple_square_glossy",
+                "value": {
+                    "TextureFile": "2D\\Textures\\UI\\element_purple_square_glossy.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            },
+            {
+                "key": "element_red_square_glossy",
+                "value": {
+                    "TextureFile": "2D\\Textures\\UI\\element_red_square_glossy.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            },
+            {
+                "key": "element_yellow_square_glossy",
+                "value": {
+                    "TextureFile": "2D\\Textures\\UI\\element_yellow_square_glossy.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            },
+            {
+                "key": "PlayButton",
+                "value": {
+                    "TextureFile": "2D\\Textures\\UI\\icons8-play-64.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            },
+            {
+                "key": "PauseButton",
+                "value": {
+                    "TextureFile": "2D\\Textures\\UI\\icons8-pause-64.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            },
+			{
+                "key": "StopButton",
+                "value": {
+                    "TextureFile": "2D\\Textures\\UI\\icons8-stop-64.png",
+                    "MipMap": false,
+                    "TextureFlags": [],
+                    "SamplerFlags": [
+                        "SAMPLER_MIN_POINT",
+                        "SAMPLER_MAG_POINT"
+                    ]
+                }
+            }
+        ]
+    }
+}

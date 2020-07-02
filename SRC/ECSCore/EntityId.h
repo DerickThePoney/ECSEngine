@@ -3,7 +3,7 @@
 #include "WorldIds.h"
 namespace ECSEngine
 {
-#pragma pack(1)
+#pragma pack(push, 1)
 struct PackedEntityId
 {
     PackedEntityId(u8 parWorldId, u32 parId)
@@ -36,9 +36,11 @@ public:
 private:
     PackedEntityId FId;
 };
+#pragma pack(pop)
 
 static bool operator<(const EntityId& left, const EntityId& right)
 {
     return left.GetSequentialId() < right.GetSequentialId();
 }
+
 } // namespace ECSEngine
