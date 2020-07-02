@@ -25,7 +25,6 @@ public:
     virtual void Destroy();
 
     virtual void Update();
-    virtual void Render();
 
     const std::vector<std::shared_ptr<BaseSceneItem>>& GetSceneItems() const { return FSceneItems; }
     const std::vector<std::shared_ptr<ISceneAction>>& GetSceneActions() const { return FActions; }

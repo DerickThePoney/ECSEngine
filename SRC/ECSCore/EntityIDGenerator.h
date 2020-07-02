@@ -11,8 +11,8 @@ namespace ECSEngine
 class EntityIDGenerator : public IdGenerator
 {
 public:
-    EntityIDGenerator(u32 parWorldID = -1);
-    ~EntityIDGenerator();
+    EntityIDGenerator(u32 parWorldID = 0xFF);
+    virtual ~EntityIDGenerator();
     EntityIDGenerator(EntityIDGenerator&& other);
 
     void operator=(EntityIDGenerator&& other) noexcept;

@@ -4,7 +4,7 @@
 #include "WorldIds.h"
 namespace ECSEngine
 {
-
+class EntityWorld;
 class WorldManager final : public Singleton<WorldManager>
 {
 public:
@@ -14,10 +14,12 @@ public:
     void Init();
     void Shutdown();
 
+    void AddEntityWorldStealOwnership(Worlds::Type parType, EntityWorld* parWorld);
+
     EntityWorld& GetWorld(Worlds::Type parWorld);
     EntityWorld* GetWorldIFP(Worlds::Type parWorld);
 
 private:
-    std::unordered_map<Worlds::Type, EntityWorld> FWorlds;
+    std::vector<std::unique_ptr<EntityWorld>> FWorlds;
 };
 } // namespace ECSEngine
