@@ -85,10 +85,7 @@ void SceneActionCreateMainCamera::VirtualInitialise(const SceneScenario* parScen
 
     const u32 camId = CameraManager::Instance().CreateCameraIFN(FCameraName);
     Camera* cam = CameraManager::Instance().GetCamera(camId);
-    cam->SetWorldViewMatrix(worldViewMatrix);
-    cam->SetFov(FFov);
-    cam->SetNear(FNearPlane);
-    cam->SetFar(FFarPlane);
+    cam->Init(worldViewMatrix, glm::radians(FFov), FNearPlane, FFarPlane);
 }
 
 void SceneActionCreateMainCamera::VirtualStart()
