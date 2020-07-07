@@ -11,43 +11,6 @@
 namespace ECSEngine
 {
 
-namespace
-{
-// void AllocateUnits(const EntityTemplate* temp, EntityWorld& world, std::vector<EntityId>& entities)
-//{
-//    TScopedTimer st("Allocate 900 Units");
-//    entities.reserve(entities.size() + 900);
-//    for (int i = -50; i < 50; ++i)
-//    {
-//        for (int j = -4; j < 5; ++j)
-//        {
-//            ModuleParameters::ParameterContainer container;
-//            container.Set<ModuleParameters::Position>(glm::vec3((float)i, (float)j, 0.f));
-//
-//            EntityId unitId = EntityFactory::CreateEntity(temp, container);
-//            entities.push_back(unitId);
-//        }
-//    }
-//}
-//
-// void StressTestDebug(const EntityTemplate* temp, RingBuffer<float, 100>& frameTimeBuffer, EntityWorld& world, std::vector<EntityId>& entities)
-//{
-//    ImGui::Begin("Stress test");
-//    int realVal = (int)entities.size();
-//    ImGui::InputInt("Current number of entities", &realVal, 1, 100, ImGuiInputTextFlags_ReadOnly);
-//    float frameTime = TimeManager::FrameDeltaTime();
-//    frameTimeBuffer.Push((frameTime == 0.0f) ? frameTime : 1.f / frameTime);
-//    ImGui::InputFloat("Frame Time", &frameTime, 1, 100, "%.5f", ImGuiInputTextFlags_ReadOnly);
-//    ImGui::PlotHistogram("FPS", frameTimeBuffer.data(), frameTimeBuffer.GetSize(), frameTimeBuffer.GetWriteHeadPosition(), "", 0.0f, 150.0f, ImVec2(0.0f, 45.0f));
-//    /*if (ImGui::Button("Add 900 units"))
-//    {
-//        AllocateUnits(temp, world, entities);
-//    }*/
-//    ImGui::End();
-//}
-
-} // namespace
-
 void ApplicationUpdater::Initialise()
 {
     scene = new ScenarioEditor();

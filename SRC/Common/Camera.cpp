@@ -39,12 +39,12 @@ void Camera::Rotate(const glm::mat4& parRotationMatrix)
     FWorldViewMatrix = glm::inverse(glm::inverse(FWorldViewMatrix) * parRotationMatrix);
 }
 
-glm::mat4 Camera::GetProjectionMatrix(const float parAspectRatio)
+glm::mat4 Camera::GetProjectionMatrix(const float parAspectRatio) const
 {
     return glm::perspective(FFov, parAspectRatio, FNearPlane, FFarPlane);
 }
 
-glm::mat4 Camera::GetWorldViewMatrix()
+glm::mat4 Camera::GetWorldViewMatrix() const
 {
     return FWorldViewMatrix;
 }
