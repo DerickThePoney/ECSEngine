@@ -28,8 +28,8 @@ public:
     void Translate(const glm::vec3& parTranslation);
     void Rotate(const glm::mat4& parRotationMatrix);
 
-    glm::mat4 GetProjectionMatrix(const float parAspectRatio);
-    glm::mat4 GetWorldViewMatrix();
+    glm::mat4 GetProjectionMatrix(const float parAspectRatio) const;
+    glm::mat4 GetWorldViewMatrix() const;
 
 private:
     glm::mat4 FWorldViewMatrix;
