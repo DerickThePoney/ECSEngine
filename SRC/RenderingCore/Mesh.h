@@ -20,7 +20,7 @@ public:
         , FIndexBuffer()
     {
     }
-    virtual ~Mesh() {}
+    virtual ~Mesh() { }
 
     virtual const bgfx::VertexBufferHandle& GetVertexBufferHandle();
 
@@ -30,9 +30,14 @@ public:
 
     virtual void SetRawIndexData(const void* parSrc, u32 parSizeInBytes);
 
+    virtual void SetBoundingCircle(const glm::vec4 parBoundingCircle);
+    virtual const glm::vec4& BoundingCircle() const { return FBoundingCircle; };
+
 private:
     IndexBuffer FIndexBuffer;
     VertexBuffer FVertexBuffer;
+
+    glm::vec4 FBoundingCircle;
 };
 
 } // namespace Rendering

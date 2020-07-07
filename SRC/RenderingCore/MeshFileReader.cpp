@@ -23,9 +23,10 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
 
     VertexLayoutHash hash(fileHeader.layout);
 
-    VertexDataStream stream(fileHeader.NbVertices, fileHeader.VertexSizeInOctet, hash);
+    VertexDataStream vertexDataStream(fileHeader.NbVertices, fileHeader.VertexSizeInOctet, hash);
 
     std::vector<u32> indices;
+    glm::vec3 verticesGravityCenter = glm::vec3(0.0f);
     indices.resize(fileHeader.NbIndices);
     forrange(i, 0, fileHeader.NbVertices)
     {
@@ -35,14 +36,15 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
             parStream.read((c8*)&data.x, 4);
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
-            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, data);
+            verticesGravityCenter += data;
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, data);
         }
 
         forrange(j, 0, fileHeader.layout.NbColorChannels)
         {
             u32 color = 0;
             parStream.read((c8*)&color, 4);
-            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
         }
 
         forrange(j, 0, fileHeader.layout.NbUVs)
@@ -50,7 +52,7 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
             glm::vec2 uv(0.0f);
             parStream.read((c8*)&uv.x, 4);
             parStream.read((c8*)&uv.y, 4);
-            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uv);
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uv);
         }
 
         if (fileHeader.layout.HasNormals)
@@ -59,7 +61,7 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
             parStream.read((c8*)&data.x, 4);
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
-            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_NORMALS, 0, data);
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_NORMALS, 0, data);
         }
 
         if (fileHeader.layout.HasTangents)
@@ -68,7 +70,7 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
             parStream.read((c8*)&data.x, 4);
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
-            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0, data);
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0, data);
         }
 
         if (fileHeader.layout.HasTangents)
@@ -77,11 +79,24 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
             parStream.read((c8*)&data.x, 4);
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
-            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0, data);
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0, data);
         }
 
-        stream.Advance();
+        vertexDataStream.Advance();
     }
+
+    verticesGravityCenter /= fileHeader.NbVertices;
+    float radius = 0.0f;
+    if (fileHeader.layout.HasPositions)
+    {
+        forrange(i, 0, fileHeader.NbVertices)
+        {
+            const glm::vec3 currentVertex = vertexDataStream.GetValue<glm::vec3>(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, i);
+            radius = std::max(radius, glm::length2(currentVertex - verticesGravityCenter));
+        }
+    }
+
+    radius = std::sqrt(radius);
 
     parStream.read((c8*)indices.data(), 4u * fileHeader.NbIndices);
 
@@ -89,8 +104,9 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
 
     AssertRelease(parMesh != nullptr);
 
-    parMesh->SetRawVertexData(stream);
+    parMesh->SetRawVertexData(vertexDataStream);
     parMesh->SetRawIndexData(indices.data(), fileHeader.NbIndices * 4u);
+    parMesh->SetBoundingCircle(glm::vec4(verticesGravityCenter, radius));
 }
 } // namespace
 
