@@ -48,7 +48,8 @@ void ScenarioEditor::Destroy()
 
     if (FInGameScenarioPlayer != nullptr)
     {
-        AlwaysCheckedAssert(FState == ScenarioEditorStatus::PLAYING_SCENARIO) FInGameScenarioPlayer->Destroy();
+        AlwaysCheckedAssert(FState == ScenarioEditorStatus::PLAYING_SCENARIO);
+        FInGameScenarioPlayer->Destroy();
         delete FInGameScenarioPlayer;
         FInGameScenarioPlayer = nullptr;
     }
