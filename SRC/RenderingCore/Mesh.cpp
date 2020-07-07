@@ -20,6 +20,11 @@ void Mesh::SetRawIndexData(const void* parSrc, u32 parSizeInBytes)
     AssertRelease(bgfx::isValid(FIndexBuffer.GetIndexBufferHandle()));
 }
 
+void Mesh::SetBoundingCircle(const glm::vec4 parBoundingCircle)
+{
+    FBoundingCircle = parBoundingCircle;
+}
+
 const bgfx::IndexBufferHandle& Mesh::GetIndexBufferHandle()
 {
     const bgfx::IndexBufferHandle& handle = FIndexBuffer.GetIndexBufferHandle();
