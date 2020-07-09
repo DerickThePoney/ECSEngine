@@ -30,6 +30,7 @@ public:
 
     EntityId CreateEntityFromTemplateReturnEntityId(const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer);
     void DestroyEntity(const EntityId& parId);
+    void DestroyAllRemainingEntities();
 
     const u32 WorldID() const { return FWorldID; }
 
@@ -40,8 +41,8 @@ private:
     u32 FWorldID;
 
     EntityIDGenerator FEntityIdGenerator;
-    // std::set<EntityId> FAllocatedEntityIds;
     std::vector<Entity> FEntities;
+    std::set<u32> FAllocatedEntities;
 
     std::vector<IModuleController*> FControllers;
 };

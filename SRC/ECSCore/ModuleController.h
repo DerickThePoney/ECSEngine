@@ -201,7 +201,7 @@ public:
         return const_reverse_iterator(this, FAllocatedModules.crend());
     }
 
-    u32 GetSize() { return (u32)FAllocatedModules.size(); }
+    u32 GetSize() const { return (u32)FAllocatedModules.size(); }
 
 private:
     std::atomic_bool FLock;

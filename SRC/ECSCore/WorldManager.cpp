@@ -44,4 +44,9 @@ void WorldManager::AddEntityWorldStealOwnership(Worlds::Type parType, EntityWorl
     FWorlds[parType] = std::unique_ptr<EntityWorld>(parWorld);
 }
 
+void WorldManager::DestroyAllRemainingEntities()
+{
+    foreachitem(world, FWorlds) { world->DestroyAllRemainingEntities(); }
+}
+
 } // namespace ECSEngine

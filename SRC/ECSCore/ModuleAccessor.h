@@ -64,7 +64,7 @@ public:
         return FController->crend();
     }
 
-    u32 GetSize() { return FController->GetSize(); }
+    u32 size() const { return FController->GetSize(); }
 
 private:
     ModuleController<T>* FController;

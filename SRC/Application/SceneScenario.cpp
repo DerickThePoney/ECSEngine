@@ -48,24 +48,30 @@ void SceneScenario::Destroy()
 
 void SceneScenario::Update()
 {
-    if (FCurrentAction >= FActions.size())
-        return;
-
-    ISceneAction* action = FActions[FCurrentAction].get();
-    AssertRelease(action != nullptr);
-
-    if (!action->IsStarted())
+    bool shouldContinue = true;
+    while (FCurrentAction < FActions.size() && shouldContinue)
     {
-        action->Start();
-        AlwaysCheckedAssert(action->IsStarted());
-    }
+        shouldContinue = false;
+        ISceneAction* action = FActions[FCurrentAction].get();
+        AssertRelease(action != nullptr);
 
-    if (!action->IsFinished())
-        action->Update();
+        if (!action->IsStarted())
+        {
+            action->Start();
+            AlwaysCheckedAssert(action->IsStarted());
+        }
 
-    if (action->IsFinished())
-    {
-        FCurrentAction++;
+        if (!action->IsFinished())
+            action->Update();
+
+        if (action->IsFinished())
+        {
+            FCurrentAction++;
+        }
+        else
+        {
+            shouldContinue = false;
+        }
     }
 }
 
