@@ -3,6 +3,7 @@
 #include "RenderingSystem.h"
 
 #include "Common/CameraManager.h"
+#include "Common/Frustum.h"
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
@@ -19,6 +20,7 @@
 #include "RenderingCore/Material.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/Mesh.h"
+#include "RenderingCore/MeshCuller.h"
 #include "RenderingCore/MeshManager.h"
 #include "RenderingCore/Texture.h"
 #include "RenderingCore/TextureBank.h"
@@ -48,17 +50,7 @@ void RenderingSystem::VirtualInit()
 {
     parent_type::VirtualInit();
 
-    // kHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
-    // kProgramInstancing = ECSEngine::Rendering::LoadProgram("Shaders\\Perso\\", "VertexColorInstancing");
-
-    /*const glm::vec3 at = { 0.0f, 0.0f, 1.0f };
-    const glm::vec3 eye = { 0.0f, 50.0f, 0.0f };
-
-    glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 0, 1.0f));*/
-
     FCamId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
-    /*Camera* c = CameraManager::Instance().GetCamera(FCamId);
-    AssertRelease(c != nullptr);*/
 
     FDrawBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
 }
@@ -76,15 +68,19 @@ void RenderingSystem::VirtualUpdate()
 
     const float timepoint = TimeManager::DurationSinceStartRealTime();
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const float aspectRatio = float(windowSize.x) / float(windowSize.y);
 
     Camera* c = CameraManager::Instance().GetCamera(FCamId);
     AssertRelease(c != nullptr);
 
+    Frustum frustum;
+    frustum.InitFromCamera(*c, aspectRatio);
+
     glm::mat4 view = c->GetWorldViewMatrix();
-    glm::mat4 proj = c->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y));
+    glm::mat4 proj = c->GetProjectionMatrix(aspectRatio);
     FDrawBuffer->SetViewTranform(view, proj);
 
-    if (1) //! Rendering::BGFXRenderer::Instance().IsInstancingEnabled())
+    if (1)
     {
         foreachitem(apparenceModule, apparenceController)
         {
@@ -100,7 +96,10 @@ void RenderingSystem::VirtualUpdate()
             glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
             mtx = mtx * (glm::mat4)orientationModule->GetOrientation();
 
-            FDrawBuffer->DrawMesh(meshHandle, materialHandle, mtx);
+            if (Rendering::MeshFrustumCulling::CullApparenceModule(apparenceModule, mtx, frustum))
+            {
+                FDrawBuffer->DrawMesh(meshHandle, materialHandle, mtx);
+            }
         }
     }
     else
