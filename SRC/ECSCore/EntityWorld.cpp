@@ -28,6 +28,8 @@ EntityWorld::~EntityWorld()
 {
     AssertRelease(FSize != 0);
 
+    DestroyAllRemainingEntities();
+
     for (u32 i = 0; i < FSize; ++i)
     {
         if (FControllers[i] != nullptr)
@@ -43,7 +45,7 @@ EntityWorld::~EntityWorld()
 EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer)
 {
     EntityId newID = FEntityIdGenerator.GetNextEntityId();
-    // FAllocatedEntityIds.insert(newID);
+    AssertRelease(FAllocatedEntities.find(newID.GetSequentialId()) == FAllocatedEntities.end());
 
     Entity newEntity(newID, parTemplate);
 
@@ -51,6 +53,7 @@ EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(const EntityTemplat
         FEntities.resize(FEntities.size() + ModulePoolSize);
 
     FEntities[newID.GetSequentialId()] = newEntity;
+    FAllocatedEntities.insert(newID.GetSequentialId());
 
     for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
     {
@@ -69,11 +72,12 @@ void EntityWorld::DestroyEntity(const EntityId& parId)
 {
     AssertRelease(parId.Valid());
     AssertRelease(parId.GetWorldId() == FWorldID);
-    /*AssertRelease(FAllocatedEntityIds.find(parId) != FAllocatedEntityIds.end());
-    FAllocatedEntityIds.erase(parId);*/
+    AssertRelease(FAllocatedEntities.find(parId.GetSequentialId()) != FAllocatedEntities.end());
     FEntityIdGenerator.ReleaseEntityId(parId);
 
-    const Entity& entity = FEntities[parId.GetSequentialId()];
+    const u32 sequentialId = parId.GetSequentialId();
+
+    const Entity& entity = FEntities[sequentialId];
 
     for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
     {
@@ -91,15 +95,29 @@ void EntityWorld::DestroyEntity(const EntityId& parId)
         }
     }
 
-    // AssertReleaseMsg(entity.GetEntityId().GetReferenceCounter()->GetRefCounts() == 1, "An EntityId object still references this id, not good, not good at all");
+    FAllocatedEntities.erase(sequentialId);
+    FEntities[sequentialId] = Entity();
+}
 
-    FEntities[parId.GetSequentialId()] = Entity();
+void EntityWorld::DestroyAllRemainingEntities()
+{
+    while (!FAllocatedEntities.empty())
+    {
+        const u32 id = *(FAllocatedEntities.begin());
+        const EntityId& allocatedId = FEntities[id].GetEntityId();
+        AssertRelease(allocatedId.Valid());
+        DestroyEntity(allocatedId);
+    }
+
+    AssertRelease(FAllocatedEntities.empty());
+#ifdef PERFORM_SECURITY_CHECKS
+    foreachitemconst(entity, FEntities) { AssertRelease(!entity.GetEntityId().Valid()); }
+#endif
 }
 
 const EntityTemplate* EntityWorld::GetTemplateForEntity(const EntityId& parId)
 {
-    // AssertRelease(FAllocatedEntityIds.find(parId) != FAllocatedEntityIds.end());
-
+    AssertRelease(FAllocatedEntities.find(parId.GetSequentialId()) != FAllocatedEntities.end());
     return FEntities[parId.GetSequentialId()].GetTemplate();
 }
 

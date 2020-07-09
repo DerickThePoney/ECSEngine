@@ -3,6 +3,7 @@
 #include "GameScenarioUpdater.h"
 
 #include "Application/SceneScenario.h"
+#include "ECSCore/WorldManager.h"
 
 namespace ECSEngine
 {
@@ -27,6 +28,8 @@ void GameScenarioUpdater::Initialise()
 
 void GameScenarioUpdater::Destroy()
 {
+    WorldManager::Instance().DestroyAllRemainingEntities();
+
     FScenario->Destroy();
     delete FScenario;
     FScenario = nullptr;

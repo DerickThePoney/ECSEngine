@@ -15,6 +15,7 @@ public:
     void Shutdown();
 
     void AddEntityWorldStealOwnership(Worlds::Type parType, EntityWorld* parWorld);
+    void DestroyAllRemainingEntities();
 
     EntityWorld& GetWorld(Worlds::Type parWorld);
     EntityWorld* GetWorldIFP(Worlds::Type parWorld);
