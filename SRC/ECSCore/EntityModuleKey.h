@@ -1,9 +1,11 @@
 #pragma once
+#include "Common/BitSet.h"
 #include "Common/Constants.h"
 #include "ModuleId.h"
 
 namespace ECSEngine
 {
+constexpr u32 MaxModuleNumber = 32;
 struct EntityModuleKey
 {
 public:
@@ -15,55 +17,49 @@ public:
     template<typename T>
     const bool HasModule() const
     {
-        static_assert(ModuleTraits<T>::GetModuleId() < sizeof(FKey) * 8, "You should consider removing modules or increasing the size of the entity module key");
-        return FKey & (1 << ModuleTraits<T>::GetModuleId());
+        static_assert(ModuleTraits<T>::GetModuleId() < MaxModuleNumber, "You should consider removing modules or increasing the size of the entity module key");
+        return HasModule(ModuleTraits<T>::GetModuleId());
     }
 
     const bool HasModule(const u32 parModuleId) const
     {
-        AssertRelease(parModuleId < ModulePoolSize);
-        return FKey & (1 << parModuleId);
+        AssertRelease(parModuleId < MaxModuleNumber);
+        return FKey.GetValue(parModuleId);
     }
 
     template<typename T>
     void SetHasModule()
     {
-        static_assert(ModuleTraits<T>::GetModuleId() < sizeof(FKey) * 8, "You should consider removing modules or increasing the size of the entity module key");
+        static_assert(ModuleTraits<T>::GetModuleId() < MaxModuleNumber, "You should consider removing modules or increasing the size of the entity module key");
         SetHasModule(ModuleTraits<T>::GetModuleId());
     }
 
     template<typename T>
     void RemoveModule()
     {
-        static_assert(ModuleTraits<T>::GetModuleId() < sizeof(FKey) * 8, "You should consider removing modules or increasing the size of the entity module key");
+        static_assert(ModuleTraits<T>::GetModuleId() < MaxModuleNumber, "You should consider removing modules or increasing the size of the entity module key");
         RemoveModule(ModuleTraits<T>::GetModuleId());
     }
 
     void SetHasModule(const u32 parModuleId)
     {
-        AssertRelease(parModuleId < ModulePoolSize);
-        FKey |= (1 << parModuleId);
+        AssertRelease(parModuleId < MaxModuleNumber);
+        FKey.SetBit(parModuleId, true);
     }
 
     void RemoveModule(const u32 parModuleId)
     {
-        AssertRelease(parModuleId < ModulePoolSize);
-        FKey &= ~(1 << parModuleId);
+        AssertRelease(parModuleId < MaxModuleNumber);
+        FKey.SetBit(parModuleId, false);
     }
 
     template<class Archive>
-    u32 save_minimal(Archive const&) const
+    void serialize(Archive& ar)
     {
-        return FKey;
-    }
-
-    template<class Archive>
-    void load_minimal(Archive const&, const u32& value)
-    {
-        FKey = value;
+        ar(FKey);
     }
 
 private:
-    u32 FKey;
+    BitSet<MaxModuleNumber> FKey;
 };
 } // namespace ECSEngine
