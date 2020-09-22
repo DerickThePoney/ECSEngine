@@ -5,7 +5,6 @@
 
 namespace ECSEngine
 {
-constexpr u32 MaxModuleNumber = 32;
 struct EntityModuleKey
 {
 public:
@@ -58,6 +57,8 @@ public:
     {
         ar(FKey);
     }
+
+    const BitSet<MaxModuleNumber>& GetKey() const { return FKey; }
 
 private:
     BitSet<MaxModuleNumber> FKey;

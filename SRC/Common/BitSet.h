@@ -17,6 +17,12 @@ public:
     void SetBit(const u32 parBitIndex, const bool parValue);
     void SetAllBits(const bool parValue);
 
+    bool IsSubSetOf(const BitSet<BitSetSize>& parOther);
+    bool IsSuperSetOf(const BitSet<BitSetSize>& parOther);
+    bool IsSuperOrSubSetOf(const BitSet<BitSetSize>& parOther);
+    bool IsDistinctFrom(const BitSet<BitSetSize>& parOther);
+    bool Intersects(const BitSet<BitSetSize>& parOther);
+
     bool operator==(const BitSet<BitSetSize>& parOther) const;
     bool operator!=(const BitSet<BitSetSize>& parOther) const;
 
@@ -47,6 +53,81 @@ private:
 private:
     BitSetType FBitSet[MEMORY_SIZE];
 };
+
+template<u32 BitSetSize>
+bool BitSet<BitSetSize>::IsSuperSetOf(const BitSet<BitSetSize>& parOther)
+{
+    const u32 memSize = MEMORY_SIZE;
+    bool res = true;
+    forrange(i, 0, memSize)
+    {
+        const BitSetType ith = FBitSet[i] & parOther.FBitSet[i];
+        const bool ithRes = (ith == parOther.FBitSet[i]);
+        res = res && ithRes;
+    }
+
+    return res;
+}
+
+template<u32 BitSetSize>
+bool BitSet<BitSetSize>::IsSubSetOf(const BitSet<BitSetSize>& parOther)
+{
+    const u32 memSize = MEMORY_SIZE;
+    bool res = true;
+    forrange(i, 0, memSize)
+    {
+        const BitSetType ith = FBitSet[i] & parOther.FBitSet[i];
+        const bool ithRes = (ith == FBitSet[i]);
+        res = res && ithRes;
+    }
+
+    return res;
+}
+
+template<u32 BitSetSize>
+bool BitSet<BitSetSize>::Intersects(const BitSet<BitSetSize>& parOther)
+{
+    const u32 memSize = MEMORY_SIZE;
+    bool res = true;
+    forrange(i, 0, memSize)
+    {
+        const BitSetType ith = FBitSet[i] & parOther.FBitSet[i];
+        const bool ithRes = ith != (BitSetType)0;
+        res = res && ithRes;
+    }
+
+    return res;
+}
+
+template<u32 BitSetSize>
+bool BitSet<BitSetSize>::IsDistinctFrom(const BitSet<BitSetSize>& parOther)
+{
+    const u32 memSize = MEMORY_SIZE;
+    bool res = true;
+    forrange(i, 0, memSize)
+    {
+        const BitSetType ith = FBitSet[i] & parOther.FBitSet[i];
+        const bool ithRes = ith == (BitSetType)0;
+        res = res && ithRes;
+    }
+
+    return res;
+}
+
+template<u32 BitSetSize>
+bool BitSet<BitSetSize>::IsSuperOrSubSetOf(const BitSet<BitSetSize>& parOther)
+{
+    const u32 memSize = MEMORY_SIZE;
+    bool res = true;
+    forrange(i, 0, memSize)
+    {
+        const BitSetType ith = FBitSet[i] & parOther.FBitSet[i];
+        const bool ithRes = (ith == FBitSet[i]) || (ith == parOther.FBitSet[i]);
+        res = res && ithRes;
+    }
+
+    return res;
+}
 
 template<u32 BitSetSize>
 bool BitSet<BitSetSize>::operator!=(const BitSet<BitSetSize>& parOther) const
