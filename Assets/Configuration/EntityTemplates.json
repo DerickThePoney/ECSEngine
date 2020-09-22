@@ -7,7 +7,12 @@
                     "data": {
                         "Name": "TEMPLATE_ENNEMY",
                         "World": 0,
-                        "Key": 7,
+                        "Key": {
+                            "value0": {
+                                "BitSetMemSize": 1,
+                                "value0": 7
+                            }
+                        },
                         "ModuleTemplatesList": [
                             {
                                 "key": 0,
@@ -55,7 +60,12 @@
                     "data": {
                         "Name": "TEMPLATE_JOUEUR",
                         "World": 0,
-                        "Key": 7,
+                        "Key": {
+                            "value0": {
+                                "BitSetMemSize": 1,
+                                "value0": 7
+                            }
+                        },
                         "ModuleTemplatesList": [
                             {
                                 "key": 0,
@@ -100,7 +110,12 @@
                     "data": {
                         "Name": "Template_Handle",
                         "World": 0,
-                        "Key": 7,
+                        "Key": {
+                            "value0": {
+                                "BitSetMemSize": 1,
+                                "value0": 7
+                            }
+                        },
                         "ModuleTemplatesList": [
                             {
                                 "key": 0,

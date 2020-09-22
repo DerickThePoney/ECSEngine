@@ -2,6 +2,7 @@
 
 namespace ECSEngine
 {
+constexpr u32 MaxModuleNumber = 32;
 enum class EModuleId
 {
 #define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE) EModuleId_##NAME,
