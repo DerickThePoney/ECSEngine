@@ -10,7 +10,7 @@
                         "value0": {
                             "LoaderName": "ECSEngine::LoaderInitialiseCommonResources"
                         },
-                        "AssetDirectory": "D:\\Programmation\\GameEngine\\ECSEngine\\ECSEngine\\Assets"
+                        "AssetDirectory": "C:\\Users\\Administrateur\\Documents\\Programming\\GameEngine\\ECSEngine\\ECSEngine\\Assets"
                     }
                 }
             },
