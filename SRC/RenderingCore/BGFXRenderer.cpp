@@ -2,6 +2,7 @@
 
 #include "BGFXRenderer.h"
 
+#include "Common/Logger.h"
 #include "DrawCommands.h"
 #include "GLFWDisplayWindowHandler.h"
 
@@ -29,7 +30,7 @@ void BGFXRenderer::Init()
 
     bgfx::Init bgfxInit;
     bgfxInit.platformData = pd;
-    bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a renderer.
+    bgfxInit.type = bgfx::RendererType::Direct3D12; // Automatically choose a renderer.
     bgfxInit.resolution.width = window.GetSize().x;
     bgfxInit.resolution.height = window.GetSize().y;
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
@@ -41,7 +42,7 @@ void BGFXRenderer::Init()
 
     bgfx::RendererType::Enum chosenType = bgfx::getRendererType();
 
-    bgfx::setViewClear(RenderPassId::GEOMETRY_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x443355FF, 1.0f, 0);
+    bgfx::setViewClear(RenderPassId::GEOMETRY_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
     bgfx::setViewRect(0, 0, 0, window.GetSize().x, window.GetSize().y);
 }
 
