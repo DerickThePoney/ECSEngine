@@ -102,7 +102,7 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
     const glm::mat4 pickView = glm::lookAt(pickEye, pickAt, glm::vec3(0.0f, 0.0f, 1.0f));
     const glm::mat4 pickProj = glm::perspective(glm::radians(FSelectionFoV), 1.0f, 0.1f, 500.0f);
 
-    bgfx::setViewTransform(Rendering::RenderPassId::SELECTION_PASS, &pickView[0][0], &pickProj[0][0]);
+    FDrawCommandBuffer->SetViewTranform(pickView, pickProj);
 
     AssertRelease(parScene != nullptr);
     const std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItems();
