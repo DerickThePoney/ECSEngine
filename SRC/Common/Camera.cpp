@@ -25,8 +25,8 @@ void Camera::Init(const glm::mat4& parWorldViewMatrix, const float parFov, const
 {
     FWorldViewMatrix = parWorldViewMatrix;
     FFov = parFov;
-    FFarPlane = parNearPlane;
-    FNearPlane = parFarPlane;
+    FNearPlane = parNearPlane;
+    FFarPlane = parFarPlane;
 }
 
 void Camera::Translate(const glm::vec3& parTranslation)
