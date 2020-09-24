@@ -41,8 +41,8 @@ void EditorGridRenderer::RenderScene()
     Camera* c = CameraManager::Instance().GetCamera(cameraId);
     AssertRelease(c);
 
-    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    FDrawCommandBuffer->SetViewTranform(c->GetWorldViewMatrix(), c->GetProjectionMatrix((float)windowSize.x / (float)windowSize.y));
+    const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
+    FDrawCommandBuffer->SetViewTranform(c->GetWorldViewMatrix(), c->GetProjectionMatrix(aspectRatio));
 
     Rendering::RenderingState state;
     state.PartiallyModifyState(BGFX_STATE_BLEND_ALPHA);
@@ -50,6 +50,8 @@ void EditorGridRenderer::RenderScene()
 
     const std::vector<glm::vec3> vertices = { glm::vec3(-1, -1, 0), glm::vec3(1, -1, 0), glm::vec3(1, 1, 0), glm::vec3(-1, 1, 0) };
     const u16 indices[] = { 0, 1, 2, 0, 2, 3 };
+
+    Rendering::MaterialManager::SetVec4Uniform("u_nearFar", glm::vec4(c->Near(), c->Far(), 0.0, 0.0));
 
     FDrawCommandBuffer->DrawVertices(vertices.data(), (u32)vertices.size(), indices, 6, FGridMaterial);
 

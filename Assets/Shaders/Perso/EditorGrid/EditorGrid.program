@@ -2,7 +2,12 @@
 	"ProgramDescriptor": {
 		"ShadersBasePath": "Shaders\\Perso\\",
 		"ShadersBaseName": "EditorGrid",
-		"UniformsAndTypes": [],
+		"UniformsAndTypes": [
+			{
+				"first": "u_nearFar",
+				"second": 2
+			}
+		],
 		"LayoutDescription": {
 			"HasPositions": false,
 			"HasColors": false,

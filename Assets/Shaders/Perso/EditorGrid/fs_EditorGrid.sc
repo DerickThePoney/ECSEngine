@@ -2,6 +2,8 @@ $input v_nearPoint, v_farPoint
 
 #include <bgfx_shader.sh>
 
+vec4 u_nearFar;
+
 vec4 grid(vec3 fragPos3D, float scale, float baseGrey, float baseAxisMult) {
     vec2 coord = fragPos3D.xz / scale; // use the scale variable to set the distance between the lines
     vec2 derivative = fwidth(coord);
@@ -31,8 +33,8 @@ float computeDepth(vec3 pos) {
 }
 
 float computeLinearDepth(vec3 pos) {
-	float far = 200.0;
-	float near = 1.0;
+	float far = u_nearFar.y;
+	float near = u_nearFar.x;
     vec4 clip_space_pos = mul(u_proj, mul(u_view, vec4(pos.xyz, 1.0)));
     float clip_space_depth = (clip_space_pos.z / clip_space_pos.w) * 2.0 - 1.0;
     float linearDepth = (near * far) / (far + near - clip_space_depth * (far - near)); // get linear value between 0.01 and 100
