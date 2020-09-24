@@ -58,6 +58,9 @@ const char* GetName(Type parValue)
     case ECSEngine::ELoggingCategory::ERROR_MESSAGE:
         return "Error";
         break;
+    case ECSEngine::ELoggingCategory::ASSET_COOKING:
+        return "AssetCooking";
+        break;
     case ECSEngine::ELoggingCategory::LENGTH:
         return "LENGTH";
         break;
