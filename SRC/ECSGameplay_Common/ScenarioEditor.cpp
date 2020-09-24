@@ -7,6 +7,7 @@
 #include "Common/ResourceHandle.h"
 #include "GameScenarioUpdater.h"
 #include "ImGuiTools/SceneEditor.h"
+#include "Rendering/EditorGridRenderer.h"
 #include "Rendering/EditorSceneRenderer.h"
 #include "Rendering/SceneObjectsPickingRenderer.h"
 
@@ -17,6 +18,7 @@ ScenarioEditor::ScenarioEditor()
     : FCurrentScenario(nullptr)
     , FEditorSceneObjectPickingRenderer(nullptr)
     , FEditorSceneRenderer(nullptr)
+    , FEditorGridRenderer(nullptr)
     , FInGameScenarioPlayer(nullptr)
     , FState(ScenarioEditorStatus::EDITING_SCENARIO)
 {
@@ -34,6 +36,8 @@ void ScenarioEditor::Initialise()
     FEditorSceneObjectPickingRenderer->Initialise();
     FEditorSceneRenderer = new EditorSceneRenderer();
     FEditorSceneRenderer->Initialise("meshes\\testobjects\\movehandle.fbx.gen", "materials\\vertexcolormaterial.material");
+    FEditorGridRenderer = new EditorGridRenderer();
+    FEditorGridRenderer->Initialise();
 
     FEditorCamera.Initialise();
 }
@@ -43,6 +47,7 @@ void ScenarioEditor::Destroy()
     if (FCurrentScenario != nullptr)
         FCurrentScenario->Destroy();
 
+    FEditorGridRenderer->Shutdown();
     FEditorSceneRenderer->Shutdown();
     FEditorSceneObjectPickingRenderer->Shutdown();
 
@@ -54,6 +59,7 @@ void ScenarioEditor::Destroy()
         FInGameScenarioPlayer = nullptr;
     }
 
+    delete FEditorGridRenderer;
     delete FEditorSceneRenderer;
     delete FEditorSceneObjectPickingRenderer;
 }
@@ -241,6 +247,8 @@ void ScenarioEditor::RenderForSceneEditing()
         FEditorSceneObjectPickingRenderer->RenderScene(currentScene);
         FEditorSceneRenderer->RenderScene(currentScene);
     }
+
+    FEditorGridRenderer->RenderScene();
 }
 
 void ScenarioEditor::RenderForEditorPlaying()

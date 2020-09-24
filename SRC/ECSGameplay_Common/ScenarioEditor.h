@@ -35,6 +35,7 @@ enum Type
 
 class SceneObjectsPickingRenderer;
 class EditorSceneRenderer;
+class EditorGridRenderer;
 class GameScenarioUpdater;
 
 class ScenarioEditor final : public IScenarioUpdater
@@ -76,5 +77,6 @@ private:
 
     EditorSceneRenderer* FEditorSceneRenderer;
     SceneObjectsPickingRenderer* FEditorSceneObjectPickingRenderer;
+    EditorGridRenderer* FEditorGridRenderer;
 };
 } // namespace ECSEngine

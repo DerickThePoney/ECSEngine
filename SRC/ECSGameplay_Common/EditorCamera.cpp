@@ -46,15 +46,15 @@ EditorCamera::~EditorCamera()
 void EditorCamera::Initialise()
 {
     const glm::vec3 at = { 0.0f, 0.0f, 0.0f };
-    const glm::vec3 eye = { 0.0f, 100.f, 0.0f };
+    const glm::vec3 eye = { 0.0f, 10.0f, -10.0f };
 
-    glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 0, 1.0f));
+    glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 1.0f, 0.0f));
 
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
     AssertRelease(FCameraId != -1);
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
-    camera->Init(worldWiewMatrix, glm::radians(60.0f), 0.1f, 500.0f);
+    camera->Init(worldWiewMatrix, glm::radians(60.0f), 1.f, 50.0f);
 }
 
 void EditorCamera::Update()
