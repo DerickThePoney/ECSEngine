@@ -50,6 +50,8 @@ SetViewTranformCommand::~SetViewTranformCommand()
 
 void SetViewTranformCommand::SubmitCommand() const
 {
+    glm::mat4 inv = glm::inverse(FViewTransform);
+    glm::mat4 inv2 = glm::inverse(FProjection);
     bgfx::setViewTransform(FViewId, &FViewTransform[0][0], &FProjection[0][0]);
 }
 
@@ -478,6 +480,96 @@ void DrawMeshCommand::SubmitCommand() const
 }
 
 //----------------------------------------------------------------
+//          DrawVerticesCommand
+//----------------------------------------------------------------
+
+class DrawVerticesCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(DrawVerticesCommand);
+
+public:
+    DrawVerticesCommand(const u16 parViewId,
+          const glm::vec3* parVertices,
+          const u32 parVerticesSize,
+          const u16* parIndices,
+          const u32 parIndicesSize,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const glm::mat4& parTransform = glm::identity<glm::mat4>());
+    virtual ~DrawVerticesCommand();
+
+    virtual void SubmitCommand() const override;
+
+private:
+    const glm::vec3* FVertices;
+    const u32 FVerticesSize;
+    const u16* FIndices;
+    const u32 FIndicesSize;
+    glm::mat4 FTransform;
+    MaterialInstanceHandle FMaterialInstanceHandle;
+};
+
+IMPLEMENT_POOL_ALLOCATED(DrawVerticesCommand);
+DrawVerticesCommand::DrawVerticesCommand(const u16 parViewId,
+      const glm::vec3* parVertices,
+      const u32 parVerticesSize,
+      const u16* parIndices,
+      const u32 parIndicesSize,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+    : IDrawCommand(parViewId)
+    , FVertices(parVertices)
+    , FVerticesSize(parVerticesSize)
+    , FIndices(parIndices)
+    , FIndicesSize(parIndicesSize)
+    , FTransform(parTransform)
+    , FMaterialInstanceHandle(parMaterialInstanceHandle)
+{
+    AssertRelease(FVertices != nullptr);
+    AssertRelease(FIndices != nullptr);
+}
+
+DrawVerticesCommand::~DrawVerticesCommand()
+{
+}
+
+void DrawVerticesCommand::SubmitCommand() const
+{
+    bgfx::TransientVertexBuffer vertexBuffer;
+    bgfx::TransientIndexBuffer indexBuffer;
+
+    VertexLayoutHash hash;
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetColorsNb(1);
+
+    bgfx::VertexLayout layout = GetVertexLayout(hash);
+
+    u32 availableVertices = bgfx::getAvailTransientVertexBuffer(FVerticesSize, layout);
+    AssertRelease(availableVertices == FVerticesSize);
+    u32 availableIndices = bgfx::getAvailTransientIndexBuffer(FIndicesSize);
+    AssertRelease(availableIndices == FIndicesSize);
+
+    bgfx::allocTransientBuffers(&vertexBuffer, layout, FVerticesSize, &indexBuffer, FIndicesSize);
+
+    VertexDataStream stream(FVerticesSize, hash.GetByteSize(), hash);
+
+    forrange(i, 0, FVerticesSize) { stream.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FVertices[i], (u32)i); }
+
+    bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
+
+    bx::memCopy(indexBuffer.data, FIndices, FIndicesSize * sizeof(u16));
+
+    bgfx::setVertexBuffer(0, &vertexBuffer, 0, FVerticesSize, vertexBuffer.layoutHandle);
+    bgfx::setIndexBuffer(&indexBuffer, 0, FIndicesSize);
+
+    bgfx::setTransform(&FTransform[0][0]);
+
+    const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
+    AssertRelease(instance != nullptr);
+
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+}
+
+//----------------------------------------------------------------
 //          DrawCommandBuffer
 //----------------------------------------------------------------
 IMPLEMENT_POOL_ALLOCATED(DrawCommandBuffer);
@@ -504,6 +596,17 @@ void DrawCommandBuffer::clear()
 void DrawCommandBuffer::SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetViewTranformCommand(FViewId, parViewTransform, parProjection)));
+}
+
+void DrawCommandBuffer::DrawVertices(const glm::vec3* parVertices,
+      const u32 parVerticesSize,
+      const u16* parIndices,
+      const u32 parIndicesSize,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::mat4& parTransform)
+{
+    FCommandVector.push_back(
+          std::unique_ptr<IDrawCommand>(new DrawVerticesCommand(FViewId, parVertices, parVerticesSize, parIndices, parIndicesSize, parMaterialInstanceHandle, parTransform)));
 }
 
 void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,

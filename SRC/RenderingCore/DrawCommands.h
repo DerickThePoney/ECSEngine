@@ -18,7 +18,7 @@ public:
         : FViewId(parViewId)
     {
     }
-    virtual ~IDrawCommand() {}
+    virtual ~IDrawCommand() { }
     virtual void SubmitCommand() const = 0;
 
 protected:
@@ -46,6 +46,12 @@ public:
     void clear();
 
     void SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection);
+    void DrawVertices(const glm::vec3* parVertices,
+          const u32 parVerticesSize,
+          const u16* parIndices,
+          const u32 parIndicesSize,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const glm::mat4& parTransform = glm::identity<glm::mat4>());
     void DrawMesh(const MeshHandle& parMeshHandle, const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::mat4& parTransform = glm::identity<glm::mat4>());
     void DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor = 0xFFFFFFFF);
     void DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor = 0xFFFFFFFF);
