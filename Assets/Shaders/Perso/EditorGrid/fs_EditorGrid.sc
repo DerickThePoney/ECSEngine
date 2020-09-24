@@ -9,19 +9,19 @@ vec4 grid(vec3 fragPos3D, float scale, float baseGrey, float baseAxisMult) {
     vec2 grid = abs(fract(coord - 0.5) - 0.5) / derivative;
     float l = min(grid.x, grid.y);
     vec4 color = vec4(baseGrey, baseGrey, baseGrey, 1.0 - min(l, 1.0));
+
+    float minimumz = min(1/derivative.y, 1);// * baseAxisMult;
+    float minimumx = min(1/derivative.x, 1);// * baseAxisMult;
+
     // z axis
-    if(coord.x > -0.1 * baseAxisMult && coord.x < 0.1 * baseAxisMult)
+    if(fragPos3D.x > -0.1 * minimumx && fragPos3D.x < 0.1 * minimumx)
     {
-    	color.z = clamp((1.0 - min(grid.x, 1.0)) * 10,0,1);
-    	color.xy = vec2(0.0,0.0);
-    	color.a *= baseAxisMult;
+    	color.z = 1.0;
     }
     // x axis
-    if(coord.y > -0.1 * baseAxisMult && coord.y < 0.1 * baseAxisMult)
+    if(fragPos3D.z > -0.1 * minimumz && fragPos3D.z < 0.1 * minimumz)
     {
-    	color.x = clamp((1.0 - min(grid.y, 1.0)) * 10,0,1);
-    	color.yz = vec2(0.0,0.0);
-    	color.a *= baseAxisMult;
+    	color.x = 1.0;
     }
     return color;
 }
@@ -31,11 +31,10 @@ float computeDepth(vec3 pos) {
 }
 
 float computeLinearDepth(vec3 pos) {
-	float far = 50.0;
+	float far = 200.0;
 	float near = 1.0;
     vec4 clip_space_pos = mul(u_proj, mul(u_view, vec4(pos.xyz, 1.0)));
-    float clip_space_depth = (clip_space_pos.z / clip_space_pos.w);
-    return clip_space_depth;
+    float clip_space_depth = (clip_space_pos.z / clip_space_pos.w) * 2.0 - 1.0;
     float linearDepth = (near * far) / (far + near - clip_space_depth * (far - near)); // get linear value between 0.01 and 100
     return linearDepth / far; // normalize
 }
@@ -46,15 +45,14 @@ void main()
 	vec3 fragPos3D = v_nearPoint + t * (v_farPoint - v_nearPoint);
 
 	float mult = float(t>0.0);
-	vec4 colorScale = grid(fragPos3D, 1, 0.5, 1.0) * mult;
-	vec4 colorScaleBig = grid(fragPos3D, 10, 1, 0.0) * mult;
+	vec4 colorScale = grid(fragPos3D, 1, 0.2, 1.0) * mult;
+	vec4 colorScaleBig = grid(fragPos3D, 10, 0.2, 1.0) * mult;
 
 	gl_FragDepth = computeDepth(fragPos3D);
 	
 	float linearDepth = computeLinearDepth(fragPos3D);
     float fading = max(0, (0.5 - linearDepth));
 
-	gl_FragColor = mix(colorScale, colorScaleBig, colorScaleBig.a);//vec4(1.0, 0.0, 0.0, 1.0 * float(t > 0.0));max(colorScale, colorScaleBig)
-	//gl_FragColor = vec4_splat(fading);
-	//gl_FragColor.a = 1.0;
+	gl_FragColor = colorScale +  colorScaleBig;	
+	gl_FragColor.a *= fading;
 }	
