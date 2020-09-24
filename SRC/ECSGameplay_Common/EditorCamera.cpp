@@ -54,7 +54,7 @@ void EditorCamera::Initialise()
     AssertRelease(FCameraId != -1);
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
-    camera->Init(worldWiewMatrix, glm::radians(60.0f), 1.f, 50.0f);
+    camera->Init(worldWiewMatrix, glm::radians(60.0f), 1.f, 200.0f);
 }
 
 void EditorCamera::Update()
