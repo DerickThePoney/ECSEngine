@@ -21,9 +21,19 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+
+      - run: git submodule update --init --recursive
+
+      - run: ls -l
+        shell: bash
       
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.0.1
+
+      - name: build bgfx
+        run: cd External/BGFX/bgfx && pwd && ../bx/tools/bin/windows/genie.exe --with-windows=10.0 vs2019 && msbuild.exe -m .build/projects/vs2019/bgfx.sln
+        shell: bash
+
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
