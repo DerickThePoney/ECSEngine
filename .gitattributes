@@ -3,3 +3,4 @@
 External/glfw-3.3.bin.WIN64/lib-vc2019/glfw3.lib filter=lfs diff=lfs merge=lfs -text
 External/glfw-3.3.bin.WIN64/lib-vc2019/glfw3dll.lib filter=lfs diff=lfs merge=lfs -text
 External/glfw-3.3.bin.WIN64/lib-vc2019/glfw3.dll filter=lfs diff=lfs merge=lfs -text
+tools/premake5.exe filter=lfs diff=lfs merge=lfs -text
