@@ -1,0 +1,25 @@
+
+name: compileall
+
+input:
+  target:
+    description: 'Compilation target'
+    required: true
+    default: 'Release'
+
+runs:
+  using: "composite"
+  steps:    
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1.0.1
+
+    - name: build engine solution
+      run: tools/premake5.exe vs2019
+      shell: bash
+
+    - name: build bgfx
+      run: cd External/BGFX/bgfx && pwd && ../bx/tools/bin/windows/genie.exe --with-windows=10.0 vs2019 && msbuild.exe -m .build/projects/vs2019/bgfx.sln /property:Configuration=Release /property:Platform=x64
+      shell: bash
+
+    - name: Build engine
+      run: msbuild.exe -m build/ECSEngine.sln /p:Configuration="Release"
