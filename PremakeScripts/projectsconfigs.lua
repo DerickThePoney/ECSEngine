@@ -3,7 +3,7 @@ objdir ("../obj/%{cfg.platform}/%{cfg.buildcfg}")
 targetdir ("../bin/%{cfg.platform}/%{cfg.buildcfg}")
 symbolspath '$(OutDir)$(TargetName).pdb'
 
-includedirs { "../External/glm", "../../boost_1_73_0" }
+includedirs { "../External/glm", "%BOOST_ROOT%" }
 includedirs { "../External/brigand/brigand/include", "../External/cereal/include"}
 
 filter "options:clang"
