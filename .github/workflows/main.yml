@@ -28,9 +28,12 @@ jobs:
           lfs: true
           submodules: true
 
-      - uses: ./.github/actions/compileall
-        with:
-          target: "Release"
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.0.1
+
+      - name: Build all
+        run: py -u Script/Compil/BuildAll.py Release msbuild.exe
+        shell: bash
 
 
 
