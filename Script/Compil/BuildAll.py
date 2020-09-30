@@ -19,16 +19,19 @@ def BuildAll(args):
     if len(args) >= 2:
         MSBUILD = args[1]
 
+    print('Making solution')
     result = subprocess.run(['./tools/premake5.exe', 'vs2019'])
 
     if result.returncode != 0:
         return result.returncode
 
+    print('BUILDING BGFX')
     result = subprocess.run('cd External/BGFX/bgfx/ && ..\\bx\\tools\\bin\\windows\\genie.exe --with-windows=10.0 vs2019 && {0} -m .build/projects/vs2019/bgfx.sln /verbosity:minimal /p:Configuration={1} /p:Platform=x64'.format(MSBUILD, configBGFX), shell=True)
 
     if result.returncode != 0:
         return result.returncode
 
+    print('BUILDING ECSEngine')
     result = subprocess.run('{0} -m build/ECSEngine.sln /verbosity:minimal /p:Configuration={1}'.format(MSBUILD, configECS))
 
     if result.returncode != 0:
