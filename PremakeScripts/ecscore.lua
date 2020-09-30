@@ -7,8 +7,8 @@ project "ECSCore"
    kind "StaticLib"
    local srcfiles = "../SRC/ECSCore/"
 
-   vpaths { 
-      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
+   vpaths {
+      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"},
       ["Sources"] = {srcfiles.."*.cpp"}
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
@@ -19,6 +19,6 @@ project "ECSCore"
 
    links { "Application" }
 
-   includedirs { "../SRC",  "../External/imgui"}
+   includedirs { "../SRC"}
 
    dofile("projectsconfigs.lua")

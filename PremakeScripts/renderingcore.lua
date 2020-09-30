@@ -8,8 +8,8 @@ project "RenderingCore"
    local srcfiles = "../SRC/RenderingCore/"
    local srcfilesImGUi = "../External/imgui/imgui/"
 
-   vpaths { 
-      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
+   vpaths {
+      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"},
       ["Sources"] = {srcfiles.."*.cpp"}
       }
 
@@ -22,7 +22,7 @@ project "RenderingCore"
    libdirs {"../External/glfw-3.3.bin.WIN64/lib-vc2019", "../External/BGFX/bgfx/.build/win64_vs2019/bin"}
    links { "glfw3dll"}
 
-   includedirs { "../External/imgui", "../External/glfw-3.3.bin.WIN64/include", "../External/BGFX/bgfx/include", "../External/BGFX/bimg/include", "../External/BGFX/bx/include", "../External/BGFX/bx/include/compat/msvc" }
+   includedirs { "../External/glfw-3.3.bin.WIN64/include", "../External/BGFX/bgfx/include", "../External/BGFX/bimg/include", "../External/BGFX/bx/include", "../External/BGFX/bx/include/compat/msvc" }
    includedirs { "../SRC"}
 
    dofile("projectsconfigs.lua")

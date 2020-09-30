@@ -7,8 +7,8 @@ project "Application"
    kind "StaticLib"
    local srcfiles = "../SRC/Application/"
 
-   vpaths { 
-      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
+   vpaths {
+      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"},
       ["Sources"] = {srcfiles.."*.cpp"}
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
@@ -21,6 +21,6 @@ project "Application"
 
    links { "Common" }
 
-   includedirs { "../SRC", "../External/imgui"}
+   includedirs { "../SRC"}
 
    dofile("projectsconfigs.lua")

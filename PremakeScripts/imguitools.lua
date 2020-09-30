@@ -7,8 +7,8 @@ project "ImGuiTools"
    kind "StaticLib"
    local srcfiles = "../SRC/ImGuiTools/"
 
-   vpaths { 
-      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
+   vpaths {
+      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"},
       ["Sources"] = {srcfiles.."*.cpp"}
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
@@ -20,6 +20,6 @@ project "ImGuiTools"
 
    links { "Imgui" }
 
-   includedirs { "../SRC", "../External/imgui" }
+   includedirs { "../SRC"}
 
    dofile("projectsconfigs.lua")

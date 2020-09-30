@@ -7,8 +7,8 @@ project "ECSGameplay_Common"
    kind "StaticLib"
    local srcfiles = "../SRC/ECSGameplay_Common/"
 
-   vpaths { 
-      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
+   vpaths {
+      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"},
       ["Sources"] = {srcfiles.."*.cpp"}
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
@@ -20,6 +20,6 @@ project "ECSGameplay_Common"
 
    links { "ECSCore", "Rendering", "ImGuiTools"}
 
-   includedirs { "../SRC", "../External/imgui"}
+   includedirs { "../SRC"}
 
    dofile("projectsconfigs.lua")

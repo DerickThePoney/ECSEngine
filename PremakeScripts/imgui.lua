@@ -6,10 +6,10 @@ project "Imgui"
    kind "StaticLib"
    staticruntime "on"
 
-   local srcfiles = "../External/imgui/imgui/"
+   local srcfiles = "../SRC/imgui/"
 
-   vpaths { 
-      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"}, 
+   vpaths {
+      ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"},
       ["Sources"] = {srcfiles.."*.cpp"}
       }
    files{srcfiles.."*.cpp", srcfiles.."*.h"}
