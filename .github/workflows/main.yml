@@ -31,6 +31,8 @@ jobs:
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.0.1
 
+      run: echo %BOOST_ROOT%
+
       - name: Build all
         run: py -u Script/Compil/BuildAll.py Release msbuild.exe
         shell: bash
