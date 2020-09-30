@@ -12,8 +12,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  # This workflow contains a single job called "build-release"
+  build-release:
     # The type of runner that the job will run on
     runs-on: windows-latest
 
@@ -36,6 +36,73 @@ jobs:
         shell: bash
 
 
+  # This workflow contains a single job called "build-release"
+  build-debug:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
 
+    env:
+      BOOST_ROOT: BOOST_ROOT_1_72_0
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+          # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+          submodules: true
+
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.0.1
+
+      - name: Build all
+        run: py -u Script/Compil/BuildAll.py Debug msbuild.exe
+        shell: bash
+
+# This workflow contains a single job called "build-release"
+  build-profile:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    env:
+      BOOST_ROOT: BOOST_ROOT_1_72_0
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+          # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+          submodules: true
+
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.0.1
+
+      - name: Build all
+        run: py -u Script/Compil/BuildAll.py Profile msbuild.exe
+        shell: bash
+
+# This workflow contains a single job called "build-release"
+  build-final:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    env:
+      BOOST_ROOT: BOOST_ROOT_1_72_0
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+          # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+          submodules: true
+
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.0.1
+
+      - name: Build all
+        run: py -u Script/Compil/BuildAll.py Final msbuild.exe
+        shell: bash
       #- name: build solution
       #  run: msbuild.exe -m build/ECSEngine.sln
