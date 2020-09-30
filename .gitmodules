@@ -28,3 +28,63 @@
 [submodule "External/assimp"]
 	path = External/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "External/boost/fusion"]
+	path = External/boost/fusion
+	url = https://github.com/boostorg/fusion.git
+[submodule "External/boost/stacktrace"]
+	path = External/boost/stacktrace
+	url = https://github.com/boostorg/stacktrace.git
+[submodule "External/boost/config"]
+	path = External/boost/config
+	url = https://github.com/boostorg/config.git
+[submodule "External/boost/core"]
+	path = External/boost/core
+	url = https://github.com/boostorg/core.git
+[submodule "External/boost/variant"]
+	path = External/boost/variant
+	url = https://github.com/boostorg/variant.git
+[submodule "External/boost/preprocessor"]
+	path = External/boost/preprocessor
+	url = https://github.com/boostorg/preprocessor.git
+[submodule "External/boost/winapi"]
+	path = External/boost/winapi
+	url = https://github.com/boostorg/winapi.git
+[submodule "External/boost/predef"]
+	path = External/boost/predef
+	url = https://github.com/boostorg/predef.git
+[submodule "External/boost/static_assert"]
+	path = External/boost/static_assert
+	url = https://github.com/boostorg/static_assert.git
+[submodule "External/boost/type_index"]
+	path = External/boost/type_index
+	url = https://github.com/boostorg/type_index.git
+[submodule "External/boost/type_traits"]
+	path = External/boost/type_traits
+	url = https://github.com/boostorg/type_traits.git
+[submodule "External/boost/container_hash"]
+	path = External/boost/container_hash
+	url = https://github.com/boostorg/container_hash.git
+[submodule "External/boost/array"]
+	path = External/boost/array
+	url = https://github.com/boostorg/array.git
+[submodule "External/boost/throw_exception"]
+	path = External/boost/throw_exception
+	url = https://github.com/boostorg/throw_exception.git
+[submodule "External/boost/assert"]
+	path = External/boost/assert
+	url = https://github.com/boostorg/assert.git
+[submodule "External/boost/mpl"]
+	path = External/boost/mpl
+	url = https://github.com/boostorg/mpl.git
+[submodule "External/boost/detail"]
+	path = External/boost/detail
+	url = https://github.com/boostorg/detail.git
+[submodule "External/boost/utility"]
+	path = External/boost/utility
+	url = https://github.com/boostorg/utility.git
+[submodule "External/boost/move"]
+	path = External/boost/move
+	url = https://github.com/boostorg/move.git
+[submodule "External/boost/integer"]
+	path = External/boost/integer
+	url = https://github.com/boostorg/integer.git

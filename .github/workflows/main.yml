@@ -17,9 +17,6 @@ jobs:
     # The type of runner that the job will run on
     runs-on: windows-latest
 
-    env:
-      BOOST_ROOT: BOOST_ROOT_1_72_0
-
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
           # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -31,8 +28,6 @@ jobs:
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.0.1
 
-      run: echo %BOOST_ROOT%
-
       - name: Build all
         run: py -u Script/Compil/BuildAll.py Release msbuild.exe
         shell: bash
@@ -43,8 +38,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: windows-latest
 
-    env:
-      BOOST_ROOT: BOOST_ROOT_1_72_0
+    needs: build-release
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -66,8 +60,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: windows-latest
 
-    env:
-      BOOST_ROOT: BOOST_ROOT_1_72_0
+    needs: build-release
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -89,8 +82,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: windows-latest
 
-    env:
-      BOOST_ROOT: BOOST_ROOT_1_72_0
+    needs: build-release
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
