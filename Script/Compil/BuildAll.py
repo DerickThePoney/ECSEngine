@@ -6,14 +6,18 @@ import subprocess
 
 import argparse
 
-def BuildBGFX(config, MSBUILD):
+def BuildBGFX(config, MSBUILD, tools):
     configBGFX = 'Release'
     if config == 'Debug':
         configBGFX = 'Debug'
 
+    addoptions = ''
+    if tools:
+        addoptions = '--with-tools '
+
     print('BUILDING BGFX')
     sys.stdout.flush()
-    result = subprocess.run('cd External/BGFX/bgfx/ && ..\\bx\\tools\\bin\\windows\\genie.exe --with-windows=10.0 vs2019 && {0} -m .build/projects/vs2019/bgfx.sln /verbosity:minimal /p:Configuration={1} /p:Platform=x64'.format(MSBUILD, configBGFX), shell=True)
+    result = subprocess.run('cd External/BGFX/bgfx/ && ..\\bx\\tools\\bin\\windows\\genie.exe {2}--with-windows=10.0 vs2019 && {0} -m .build/projects/vs2019/bgfx.sln /verbosity:minimal /p:Configuration={1} /p:Platform=x64'.format(MSBUILD, configBGFX, addoptions), shell=True)
 
     return result.returncode
 
@@ -49,6 +53,7 @@ def main():
     group.add_argument('-e', '--engine', action="store_true", help='Build Engine')
     parser.add_argument('-c', '--config', type=str, help='Configuration to build', default='Release')
     parser.add_argument('-m', '--msbuild', type=str, help='Path to MSBuild')
+    parser.add_argument('-t', '--bgfxtools', action="store_true", help='Build BGFX Tools')
 
     args = parser.parse_args()
 
@@ -61,7 +66,7 @@ def main():
         return BuildAll(args.config, MSBUILD)
     elif args.bgfx:
         print('Build BGFX')
-        return BuildBGFX(args.config, MSBUILD)
+        return BuildBGFX(args.config, MSBUILD, args.bgfxtools)
     elif args.engine:
         print('Build Engine')
         return BuildEngine(args.config, MSBUILD)
