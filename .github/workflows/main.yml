@@ -29,7 +29,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.1
 
       - name: Build all
-        run: py -u Script/Compil/BuildAll.py Release msbuild.exe
+        run: py -u Script/Compil/BuildAll.py -a -c Release -m msbuild.exe
         shell: bash
 
 
@@ -52,7 +52,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.1
 
       - name: Build all
-        run: py -u Script/Compil/BuildAll.py Debug msbuild.exe
+        run: py -u Script/Compil/BuildAll.py -a -c Debug -m msbuild.exe
         shell: bash
 
 # This workflow contains a single job called "build-release"
@@ -74,7 +74,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.1
 
       - name: Build all
-        run: py -u Script/Compil/BuildAll.py Profile msbuild.exe
+        run: py -u Script/Compil/BuildAll.py -a -c Profile -m msbuild.exe
         shell: bash
 
 # This workflow contains a single job called "build-release"
@@ -96,7 +96,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.1
 
       - name: Build all
-        run: py -u Script/Compil/BuildAll.py Final msbuild.exe
+        run: py -u Script/Compil/BuildAll.py -a -c Final -m msbuild.exe
         shell: bash
       #- name: build solution
       #  run: msbuild.exe -m build/ECSEngine.sln

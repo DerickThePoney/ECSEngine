@@ -4,38 +4,67 @@ import sys
 import os
 import subprocess
 
-def BuildAll(args):
+import argparse
 
+def BuildBGFX(config, MSBUILD):
     configBGFX = 'Release'
-    configECS = 'Release'
-
-    if len(args) >= 1:
-        configECS = args[0]
-
-    if configECS == 'Debug':
+    if config == 'Debug':
         configBGFX = 'Debug'
 
-    MSBUILD = '\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\"'
-    if len(args) >= 2:
-        MSBUILD = args[1]
+    print('BUILDING BGFX')
+    sys.stdout.flush()
+    result = subprocess.run('cd External/BGFX/bgfx/ && ..\\bx\\tools\\bin\\windows\\genie.exe --with-windows=10.0 vs2019 && {0} -m .build/projects/vs2019/bgfx.sln /verbosity:minimal /p:Configuration={1} /p:Platform=x64'.format(MSBUILD, configBGFX), shell=True)
 
+    return result.returncode
+
+def BuildEngine(config, MSBUILD):
     print('Making solution')
+    sys.stdout.flush()
     result = subprocess.run(['./tools/premake5.exe', 'vs2019'])
 
     if result.returncode != 0:
         return result.returncode
 
-    print('BUILDING BGFX')
-    result = subprocess.run('cd External/BGFX/bgfx/ && ..\\bx\\tools\\bin\\windows\\genie.exe --with-windows=10.0 vs2019 && {0} -m .build/projects/vs2019/bgfx.sln /verbosity:minimal /p:Configuration={1} /p:Platform=x64'.format(MSBUILD, configBGFX), shell=True)
-
-    if result.returncode != 0:
-        return result.returncode
-
     print('BUILDING ECSEngine')
-    result = subprocess.run('{0} -m build/ECSEngine.sln /verbosity:minimal /p:Configuration={1}'.format(MSBUILD, configECS))
+    sys.stdout.flush()
+    result = subprocess.run('{0} -m build/ECSEngine.sln /verbosity:minimal /p:Configuration={1}'.format(MSBUILD, config))
 
-    if result.returncode != 0:
-        return result.returncode
+    return result.returncode
+
+def BuildAll(config, MSBUILD):
+
+    res = BuildBGFX(config, MSBUILD)
+
+    if res != 0:
+        return res
+
+    return BuildEngine(config, MSBUILD)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-a', '--all', action="store_true", help='Build all')
+    group.add_argument('-b', '--bgfx', action="store_true", help='Build BGFX')
+    group.add_argument('-e', '--engine', action="store_true", help='Build Engine')
+    parser.add_argument('-c', '--config', type=str, help='Configuration to build', default='Release')
+    parser.add_argument('-m', '--msbuild', type=str, help='Path to MSBuild')
+
+    args = parser.parse_args()
+
+    MSBUILD = '\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\"'
+    if args.msbuild:
+        MSBUILD = args.msbuild
+
+    if args.all:
+        print('Build all')
+        return BuildAll(args.config, MSBUILD)
+    elif args.bgfx:
+        print('Build BGFX')
+        return BuildBGFX(args.config, MSBUILD)
+    elif args.engine:
+        print('Build Engine')
+        return BuildEngine(args.config, MSBUILD)
 
 if __name__ == "__main__":
-   sys.exit(BuildAll(sys.argv[1:]))
+   sys.exit(main())
