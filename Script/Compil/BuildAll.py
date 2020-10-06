@@ -6,7 +6,7 @@ import subprocess
 
 import argparse
 
-def BuildBGFX(config, MSBUILD, tools):
+def BuildBGFX(config, MSBUILD, tools, samples):
     configBGFX = 'Release'
     if config == 'Debug':
         configBGFX = 'Debug'
@@ -14,6 +14,9 @@ def BuildBGFX(config, MSBUILD, tools):
     addoptions = ''
     if tools:
         addoptions = '--with-tools '
+
+    if samples:
+        addoptions += '--with-examples '
 
     print('BUILDING BGFX')
     sys.stdout.flush()
@@ -54,6 +57,7 @@ def main():
     parser.add_argument('-c', '--config', type=str, help='Configuration to build', default='Release')
     parser.add_argument('-m', '--msbuild', type=str, help='Path to MSBuild')
     parser.add_argument('-t', '--bgfxtools', action="store_true", help='Build BGFX Tools')
+    parser.add_argument('-s', '--bgfxsamples', action="store_true", help='Build BGFX Samples')
 
     args = parser.parse_args()
 
@@ -66,7 +70,7 @@ def main():
         return BuildAll(args.config, MSBUILD)
     elif args.bgfx:
         print('Build BGFX')
-        return BuildBGFX(args.config, MSBUILD, args.bgfxtools)
+        return BuildBGFX(args.config, MSBUILD, args.bgfxtools, args.bgfxsamples)
     elif args.engine:
         print('Build Engine')
         return BuildEngine(args.config, MSBUILD)
