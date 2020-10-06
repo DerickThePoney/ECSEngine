@@ -14,6 +14,7 @@ namespace ECSEngine
 
 EditorCamera::EditorCamera()
     : FCameraId(-1)
+    , FViewWorldMatrix(glm::identity<glm::mat4>())
 {
     FForward.FKeyboardKey = InputKeyNames::INPUT_KEY_W;
     FForward.FInputType = EInputType::REPEATED;
@@ -49,6 +50,29 @@ void EditorCamera::Initialise()
     const glm::vec3 eye = { 0.0f, 10.0f, -10.0f };
 
     glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 1.0f, 0.0f));
+    FViewWorldMatrix = glm::inverse(worldWiewMatrix);
+
+    /*glm::mat4 localWorld = glm::identity<glm::mat4>();
+
+    glm::vec3 f = glm::normalize(at - eye);
+    glm::vec3 axis = glm::normalize(glm::cross(f, glm::vec3(0.f, 0.f, 1.f)));
+
+    float angle = -glm::acos(glm::dot(f, glm::vec3(0.f, 0.f, 1.f)));
+
+    localWorld = glm::rotate(angle, axis) * localWorld;
+    localWorld = glm::translate(eye) * localWorld;
+
+    glm::mat4 invlocalworld = glm::inverse(localWorld);
+
+    glm::mat4 localWorld2 = glm::identity<glm::mat4>();
+    localWorld2 = glm::translate(eye) * localWorld2;
+    localWorld2 = glm::rotate(angle, axis) * localWorld2;
+
+    glm::mat4 invlocalworld2 = glm::inverse(localWorld2);
+
+    glm::mat4 invworldView = glm::inverse(worldWiewMatrix);
+
+    glm::mat4 worldWiewMatrix2 = glm::lookAt(glm::vec3(localWorld[3]), glm::vec3(localWorld[3]) + glm::vec3(localWorld[2]), glm::vec3(0, 1.0f, 0.0f));*/
 
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
     AssertRelease(FCameraId != -1);
@@ -64,27 +88,55 @@ void EditorCamera::Update()
 
     const float deltaTime = TimeManager::FrameDeltaTime();
 
+    bool overrideWorldViewMatrix = false;
     glm::vec3 movementCommand = glm::vec3(0.0f);
     glm::vec2 rotationScreenDirection = glm::vec2(0.0f);
+
+    if (FMiddleMouseRotation.Evaluate())
+    {
+        rotationScreenDirection = Input::GetMousePositionDelta();
+
+#ifdef PERFORM_SECURITY_CHECKS
+        {
+            std::stringstream sstr;
+            sstr << "Command: " << rotationScreenDirection[0] << "\t" << rotationScreenDirection[1];
+            LOG_INPUT(sstr.str());
+        }
+#endif
+
+        if (rotationScreenDirection != glm::vec2(0.0f))
+        {
+            rotationScreenDirection = glm::normalize(rotationScreenDirection);
+            AssertRelease(!glm::isNan(rotationScreenDirection));
+            const glm::mat4 rotationMatrix = glm::rotate(rotationScreenDirection.y * glm::radians(FRotationSpeed) * deltaTime, glm::vec3(1.f, 0.f, 0.f)) *
+                  glm::rotate(rotationScreenDirection.x * glm::radians(FRotationSpeed) * deltaTime, glm::vec3(0.f, 1.f, 0.f));
+
+            const glm::mat4 positionMatrix = glm::translate(glm::vec3(FViewWorldMatrix[3]));
+
+            FViewWorldMatrix = positionMatrix * rotationMatrix * glm::inverse(positionMatrix) * FViewWorldMatrix;
+            overrideWorldViewMatrix = true;
+        }
+    }
+
     const bool slowMo = Input::IsCtrlDown();
-    const float factor = 1.0f;
+    const float factor = (slowMo) ? 0.2f : 1.0f;
     if (FForward.Evaluate())
-        movementCommand.x -= factor;
+        movementCommand.z += factor;
 
     if (FBackward.Evaluate())
-        movementCommand.x += factor;
-
-    if (FLeft.Evaluate())
-        movementCommand.y -= factor;
-
-    if (FRight.Evaluate())
-        movementCommand.y += factor;
-
-    if (FUp.Evaluate())
         movementCommand.z -= factor;
 
+    if (FLeft.Evaluate())
+        movementCommand.x += factor;
+
+    if (FRight.Evaluate())
+        movementCommand.x -= factor;
+
+    if (FUp.Evaluate())
+        movementCommand.y += factor;
+
     if (FDown.Evaluate())
-        movementCommand.z += factor;
+        movementCommand.y -= factor;
 
     if (movementCommand != glm::vec3(.0f))
     {
@@ -93,39 +145,13 @@ void EditorCamera::Update()
         sstr << "Command: " << movementCommand[0] << "\t" << movementCommand[1] << "\t" << movementCommand[2];
         LOG_INPUT(sstr.str());
 #endif
-        camera->Translate(glm::vec3(movementCommand.y * FLateralSpeed * deltaTime, movementCommand.z * FLateralSpeed * deltaTime, movementCommand.x * FForwardSpeed * deltaTime));
+        const float incrementFactor = FLateralSpeed * factor * deltaTime;
+        FViewWorldMatrix = FViewWorldMatrix * glm::translate(movementCommand * incrementFactor);
+        overrideWorldViewMatrix = true;
     }
 
-    //    if (FMiddleMouseRotation.Evaluate())
-    //    {
-    //        rotationScreenDirection = Input::GetMousePositionDelta();
-    //
-    //#ifdef PERFORM_SECURITY_CHECKS
-    //        std::stringstream sstr;
-    //        sstr << "Command: " << rotationScreenDirection[0] << "\t" << rotationScreenDirection[1];
-    //        LOG_INPUT(sstr.str());
-    //#endif
-    //
-    //        if (rotationScreenDirection != glm::vec2(0.0f))
-    //        {
-    //            rotationScreenDirection = glm::normalize(rotationScreenDirection);
-    //            AssertRelease(!glm::isNan(rotationScreenDirection));
-    //            rotationScreenDirection.y = -rotationScreenDirection.y;
-    //            const glm::vec3 rotationViewDirection = glm::normalize(
-    //                  glm::vec3(1.0f, 0.0f, 0.0f) * rotationScreenDirection.x + glm::vec3(0.0f, 1.0f, 0.0f) * rotationScreenDirection.y);
-    //            const glm::vec3 rotationAxis = glm::cross(rotationViewDirection, glm::vec3(0.0f, 0.0f, 1.0f));
-    //
-    //            const glm::mat4 rotationMatrix = glm::axisAngleMatrix(rotationAxis, glm::radians(FRotationSpeed) * deltaTime);
-    //
-    //            camera->Rotate(rotationMatrix);
-    //
-    //            /*const glm::vec3 newForward = rotationMatrix * camera->Forward();
-    //
-    //            const glm::mat4 worldWiewMatrix = glm::lookAt(glm::vec3(camera->Position()), glm::vec3(camera->Position()) + newForward, glm::vec3(0, 0, 1.0f));
-    //
-    //            camera->SetWorldViewMatrix(worldWiewMatrix);*/
-    //        }
-    //    }
+    if (overrideWorldViewMatrix)
+        camera->SetWorldViewMatrix(glm::inverse(FViewWorldMatrix));
 }
 
 void EditorCamera::Shutdown()
