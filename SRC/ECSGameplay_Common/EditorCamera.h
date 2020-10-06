@@ -15,6 +15,8 @@ public:
     void Shutdown();
 
 private:
+    glm::mat4 FViewWorldMatrix;
+
     KeyboardCommand FForward;
     KeyboardCommand FBackward;
     KeyboardCommand FLeft;
@@ -28,6 +30,6 @@ private:
 
     float FForwardSpeed = 100.0f;
     float FLateralSpeed = 50.0f;
-    float FRotationSpeed = 45.0f;
+    float FRotationSpeed = 90.0f;
 };
 } // namespace ECSEngine
