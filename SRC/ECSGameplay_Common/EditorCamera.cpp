@@ -52,28 +52,6 @@ void EditorCamera::Initialise()
     glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 1.0f, 0.0f));
     FViewWorldMatrix = glm::inverse(worldWiewMatrix);
 
-    /*glm::mat4 localWorld = glm::identity<glm::mat4>();
-
-    glm::vec3 f = glm::normalize(at - eye);
-    glm::vec3 axis = glm::normalize(glm::cross(f, glm::vec3(0.f, 0.f, 1.f)));
-
-    float angle = -glm::acos(glm::dot(f, glm::vec3(0.f, 0.f, 1.f)));
-
-    localWorld = glm::rotate(angle, axis) * localWorld;
-    localWorld = glm::translate(eye) * localWorld;
-
-    glm::mat4 invlocalworld = glm::inverse(localWorld);
-
-    glm::mat4 localWorld2 = glm::identity<glm::mat4>();
-    localWorld2 = glm::translate(eye) * localWorld2;
-    localWorld2 = glm::rotate(angle, axis) * localWorld2;
-
-    glm::mat4 invlocalworld2 = glm::inverse(localWorld2);
-
-    glm::mat4 invworldView = glm::inverse(worldWiewMatrix);
-
-    glm::mat4 worldWiewMatrix2 = glm::lookAt(glm::vec3(localWorld[3]), glm::vec3(localWorld[3]) + glm::vec3(localWorld[2]), glm::vec3(0, 1.0f, 0.0f));*/
-
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
     AssertRelease(FCameraId != -1);
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
@@ -88,64 +66,55 @@ void EditorCamera::Update()
 
     const float deltaTime = TimeManager::FrameDeltaTime();
 
+    const bool slowMo = Input::IsCtrlDown();
+    const float speedFactor = (slowMo) ? 0.2f : 1.0f;
+
     bool overrideWorldViewMatrix = false;
     glm::vec3 movementCommand = glm::vec3(0.0f);
     glm::vec2 rotationScreenDirection = glm::vec2(0.0f);
 
+    rotationScreenDirection = Input::GetMousePositionDelta();
+
     if (FMiddleMouseRotation.Evaluate())
     {
-        rotationScreenDirection = Input::GetMousePositionDelta();
-
-#ifdef PERFORM_SECURITY_CHECKS
-        {
-            std::stringstream sstr;
-            sstr << "Command: " << rotationScreenDirection[0] << "\t" << rotationScreenDirection[1];
-            LOG_INPUT(sstr.str());
-        }
-#endif
-
         if (rotationScreenDirection != glm::vec2(0.0f))
         {
             rotationScreenDirection = glm::normalize(rotationScreenDirection);
+
             AssertRelease(!glm::isNan(rotationScreenDirection));
-            const glm::mat4 rotationMatrix = glm::rotate(rotationScreenDirection.y * glm::radians(FRotationSpeed) * deltaTime, glm::vec3(1.f, 0.f, 0.f)) *
-                  glm::rotate(rotationScreenDirection.x * glm::radians(FRotationSpeed) * deltaTime, glm::vec3(0.f, 1.f, 0.f));
 
             const glm::mat4 positionMatrix = glm::translate(glm::vec3(FViewWorldMatrix[3]));
+            const float rotationSpeed = glm::radians(speedFactor * FRotationSpeed);
+            glm::mat4 newWorldViewNoTranslation = glm::inverse(positionMatrix) * FViewWorldMatrix;
+            newWorldViewNoTranslation = glm::rotate(rotationScreenDirection.x * rotationSpeed * deltaTime, glm::vec3(0.f, 1.f, 0.f)) * newWorldViewNoTranslation;
+            newWorldViewNoTranslation = glm::rotate(rotationScreenDirection.y * rotationSpeed * deltaTime, glm::vec3(newWorldViewNoTranslation[0])) * newWorldViewNoTranslation;
 
-            FViewWorldMatrix = positionMatrix * rotationMatrix * glm::inverse(positionMatrix) * FViewWorldMatrix;
+            FViewWorldMatrix = positionMatrix * newWorldViewNoTranslation;
             overrideWorldViewMatrix = true;
         }
     }
 
-    const bool slowMo = Input::IsCtrlDown();
-    const float factor = (slowMo) ? 0.2f : 1.0f;
     if (FForward.Evaluate())
-        movementCommand.z += factor;
+        movementCommand.z += speedFactor;
 
     if (FBackward.Evaluate())
-        movementCommand.z -= factor;
+        movementCommand.z -= speedFactor;
 
     if (FLeft.Evaluate())
-        movementCommand.x += factor;
+        movementCommand.x += speedFactor;
 
     if (FRight.Evaluate())
-        movementCommand.x -= factor;
+        movementCommand.x -= speedFactor;
 
     if (FUp.Evaluate())
-        movementCommand.y += factor;
+        movementCommand.y += speedFactor;
 
     if (FDown.Evaluate())
-        movementCommand.y -= factor;
+        movementCommand.y -= speedFactor;
 
     if (movementCommand != glm::vec3(.0f))
     {
-#ifdef PERFORM_SECURITY_CHECKS
-        std::stringstream sstr;
-        sstr << "Command: " << movementCommand[0] << "\t" << movementCommand[1] << "\t" << movementCommand[2];
-        LOG_INPUT(sstr.str());
-#endif
-        const float incrementFactor = FLateralSpeed * factor * deltaTime;
+        const float incrementFactor = FLateralSpeed * speedFactor * deltaTime;
         FViewWorldMatrix = FViewWorldMatrix * glm::translate(movementCommand * incrementFactor);
         overrideWorldViewMatrix = true;
     }

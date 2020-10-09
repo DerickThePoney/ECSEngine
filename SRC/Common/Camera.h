@@ -16,8 +16,8 @@ public:
     const float Near() const { return FNearPlane; }
     const float Far() const { return FFarPlane; }
     const glm::vec4& Forward() const { return FWorldViewMatrix[2]; }
-    const glm::vec4& Right() const { return FWorldViewMatrix[1]; }
-    const glm::vec4& Up() const { return FWorldViewMatrix[0]; }
+    const glm::vec4& Right() const { return FWorldViewMatrix[0]; }
+    const glm::vec4& Up() const { return FWorldViewMatrix[1]; }
 
     void SetPosition(const glm::vec4& parPosition) { FWorldViewMatrix[3] = parPosition; }
     void SetFov(const float parFov) { FFov = parFov; }
