@@ -48,3 +48,4 @@ External/glm-0.9.9.5
 *.fbx.gen
 *.ktx
 *.bin
+*.exp
