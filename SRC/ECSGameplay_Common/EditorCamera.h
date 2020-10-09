@@ -30,6 +30,6 @@ private:
 
     float FForwardSpeed = 100.0f;
     float FLateralSpeed = 50.0f;
-    float FRotationSpeed = 90.0f;
+    float FRotationSpeed = 200.0f;
 };
 } // namespace ECSEngine
