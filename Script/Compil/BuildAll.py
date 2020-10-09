@@ -38,9 +38,9 @@ def BuildEngine(config, MSBUILD):
 
     return result.returncode
 
-def BuildAll(config, MSBUILD):
+def BuildAll(config, MSBUILD, tools, samples):
 
-    res = BuildBGFX(config, MSBUILD)
+    res = BuildBGFX(config, MSBUILD, tools, samples)
 
     if res != 0:
         return res
@@ -67,7 +67,7 @@ def main():
 
     if args.all:
         print('Build all')
-        return BuildAll(args.config, MSBUILD)
+        return BuildAll(args.config, MSBUILD, args.bgfxtools, args.bgfxsamples)
     elif args.bgfx:
         print('Build BGFX')
         return BuildBGFX(args.config, MSBUILD, args.bgfxtools, args.bgfxsamples)
