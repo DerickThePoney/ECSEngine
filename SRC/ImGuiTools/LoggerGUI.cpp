@@ -19,6 +19,7 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
 
     };
 
+    ImGui::SetNextWindowSize(ImVec2(600.f, 400.f), ImGuiCond_Once);
     if (drawOwnWindow)
         ImGui::Begin("Logger window", open);
 
@@ -61,6 +62,18 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
     ImGui::SameLine();
 
     ImGui::BeginChild("MessgageCheckboxes", checkboxesPlace, true);
+
+    if (ImGui::Button("Select all"))
+    {
+        forrange(i, 0, ELoggingCategory::LENGTH) { showMessages[i] = true; }
+    }
+    ImGui::SameLine(0.f, 20.f);
+    if (ImGui::Button("Select None"))
+    {
+        forrange(i, 0, ELoggingCategory::LENGTH) { showMessages[i] = false; }
+    }
+
+    ImGui::Separator();
 
     forrange(i, 0, ELoggingCategory::LENGTH)
     {
