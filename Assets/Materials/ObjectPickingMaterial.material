@@ -1,6 +1,0 @@
-{
-    "Material": {
-        "ProgramDescriptorFilename" : "Shaders\\Perso\\ObjectPicking\\ObjectPicking.program",
-    	"TexturesInputDescriptors" : []
-    }
-}

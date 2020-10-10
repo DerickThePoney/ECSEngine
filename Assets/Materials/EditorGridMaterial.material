@@ -1,6 +1,0 @@
-{
-    "Material": {
-        "ProgramDescriptorFilename" : "Shaders\\Perso\\EditorGrid\\EditorGrid.program",
-    	"TexturesInputDescriptors" : []
-    }
-}

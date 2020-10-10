@@ -1,6 +1,0 @@
-{
-    "Material": {
-        "ProgramDescriptorFilename" : "Shaders\\Perso\\VertexColor\\VertexColor.program",
-    	"TexturesInputDescriptors" : []
-    }
-}
