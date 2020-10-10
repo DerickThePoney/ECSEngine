@@ -88,3 +88,6 @@
 [submodule "External/boost/integer"]
 	path = External/boost/integer
 	url = https://github.com/boostorg/integer.git
+[submodule "Assets"]
+	path = Assets
+	url = https://github.com/DerickThePoney/Assets.git
