@@ -45,8 +45,8 @@ jobs:
           # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
-          lfs: true
           submodules: true
+          token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.0.1
@@ -67,8 +67,8 @@ jobs:
           # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
-          lfs: true
           submodules: true
+          token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.0.1
@@ -89,8 +89,8 @@ jobs:
           # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
-          lfs: true
           submodules: true
+          token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.0.1
