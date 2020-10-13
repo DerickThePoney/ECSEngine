@@ -9,7 +9,7 @@ import argparse
 def CloneBGFX():
     print('CLONING BGFX')
     sys.stdout.flush()
-    result = subprocess.run('git submodule update --init -- External/BGFX', shell=True)
+    result = subprocess.run('git submodule update --init --detph 1 -- External/BGFX', shell=True)
 
     return result.returncode
 
