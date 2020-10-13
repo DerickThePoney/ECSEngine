@@ -9,33 +9,31 @@ import argparse
 def CloneBGFX():
     print('CLONING BGFX')
     sys.stdout.flush()
-    result = subprocess.run('git submodule update --init --detph 1 -- External/BGFX', shell=True)
+    result = subprocess.run('git submodule update --depth 1 --init -- External/BGFX', shell=True)
 
     return result.returncode
 
-# def BuildEngine(config, MSBUILD):
-#     print('Making solution')
-#     sys.stdout.flush()
-#     result = subprocess.run(['./tools/premake5.exe', 'vs2019'])
+def CloneEngine():
+    print('CLONING FOR ENGINE')
+    sys.stdout.flush()
+    result = subprocess.run('git submodule update --depth 1 --init -- External/', shell=True)
 
-#     if result.returncode != 0:
-#         return result.returncode
+    return result.returncode
 
-#     print('BUILDING ECSEngine')
-#     sys.stdout.flush()
-#     result = subprocess.run('{0} -m build/ECSEngine.sln /verbosity:minimal /p:Configuration={1}'.format(MSBUILD, config))
+def CloneAssets():
+    print('CLONING FOR ASSETS')
+    sys.stdout.flush()
+    result = subprocess.run('git submodule update --depth 1 --init -- Assets/', shell=True)
 
-#     return result.returncode
+    return result.returncode
 
-# def BuildAll(config, MSBUILD, tools, samples):
+def CloneAll():
+    result = CloneEngine()
 
-#     res = BuildBGFX(config, MSBUILD, tools, samples)
+    if result != 0:
+        return result
 
-#     if res != 0:
-#         return res
-
-#     return BuildEngine(config, MSBUILD)
-
+    return CloneAssets()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -47,18 +45,18 @@ def main():
 
     args = parser.parse_args()
 
-    # if args.all:
-    #     print('Clone all')
-    #     return BuildAll(args.config, MSBUILD, args.bgfxtools, args.bgfxsamples)
-    if args.bgfx:
+    if args.all:
+        print('Clone all')
+        return CloneAll()
+    elif args.bgfx:
         print('Clone BGFX')
         return CloneBGFX()
-    # elif args.engine:
-    #     print('Clone Engine')
-    #     return BuildEngine(args.config, MSBUILD)
-    # elif args.assets:
-    #     print('Clone Assets')
-    #     return BuildEngine(args.config, MSBUILD)
+    elif args.engine:
+        print('Clone Engine')
+        return CloneEngine()
+    elif args.assets:
+        print('Clone Assets')
+        return CloneAssets()
 
 if __name__ == "__main__":
    sys.exit(main())
