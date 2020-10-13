@@ -43,14 +43,14 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: BGFX-Binaries-Release
-          path: External/BGFX/bgfx/.build/win64_vs2019/bin/*Release.lib
+          path: External/BGFX/bgfx/.build/win64_vs2019/bin/*Release.*
           if-no-files-found: error
 
       - name: Upload BGFX debug build
         uses: actions/upload-artifact@v2
         with:
           name: BGFX-Binaries-Debug
-          path: External/BGFX/bgfx/.build/win64_vs2019/bin/*Debug.lib
+          path: External/BGFX/bgfx/.build/win64_vs2019/bin/*Debug.*
           if-no-files-found: error
 
 
@@ -86,12 +86,6 @@ jobs:
           name: BGFX-Binaries-Release
           path: External/BGFX/bgfx/.build/win64_vs2019/bin/
 
-      - name: Display structure of downloaded files
-        run: |
-          cd External/BGFX/bgfx/.build/win64_vs2019/bin/
-          ls -R
-        shell: bash
-
       - name: Build all
         run: py -u Script/Compil/BuildAll.py -e -c Release -m msbuild.exe
         shell: bash
@@ -116,121 +110,145 @@ jobs:
           if-no-files-found: error
 
 
-#   generate-assets:
-#     runs-on: windows-latest
-#     needs: build-release
+  generate-assets:
+    runs-on: windows-latest
+    needs: build-release
 
-#     steps:
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - run: |
+          mkdir bin/
+          mkdir bin/Win64/
+          mkdir bin/Win64/Release/
+
+      - name: ECSEngine-Binaries-Release
+        uses: actions/download-artifact@v2
+        with:
+          name: ECSEngine-Binaries-Release
+          path: bin/Win64/Release/
+
+      - name: Clone Assets submodules
+        run: py -u Script/Cloning/CloneSubmodules.py --assets
+        shell: bash
+
+      - name: Run Asset cooking
+        run: |
+          mkdir build
+          cd build
+          ../bin/Win64/Release/AssetCooker.exe
+        shell: bash
 
 
 
-#   # This workflow contains a single job called "build-release"
-#   build-debug:
-#     # The type of runner that the job will run on
-#     runs-on: windows-latest
 
-#     needs: build-BGFX
 
-#     # Steps represent a sequence of tasks that will be executed as part of the job
-#     steps:
-#       - name: Download a Build Artifact
-#         uses: actions/download-artifact@v2
-#         with:
-#           name: BGFX-Binaries-Debug
-#           path: External/BGFX/bgfx/.build/win64_vs2019/bin/
+  # This workflow contains a single job called "build-release"
+  build-debug:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
 
-#       - name: Display structure of downloaded files
-#         run: |
-#           # cd External/BGFX/bgfx/.build/win64_vs2019/bin/
-#           ls -R
-#         shell: bash
+    needs: build-BGFX
 
-#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#       - uses: actions/checkout@v2
-#         with:
-#           token: ${{ secrets.ACCESS_TOKEN }}
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
 
-#       - name: setup-msbuild
-#         uses: microsoft/setup-msbuild@v1.0.1
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.0.1
 
-#       - name: Clone ENGINE submodules
-#         run: py -u Script/Cloning/CloneSubmodules.py -e
-#         shell: bash
+      - name: Clone ENGINE submodules
+        run: py -u Script/Cloning/CloneSubmodules.py -e
+        shell: bash
 
-#       - name: Build all
-#         run: py -u Script/Compil/BuildAll.py -e -c Debug -m msbuild.exe
-#         shell: bash
+      - run: |
+          mkdir External/BGFX/bgfx/.build/
+          mkdir External/BGFX/bgfx/.build/win64_vs2019/
+          mkdir External/BGFX/bgfx/.build/win64_vs2019/bin/
 
-# # This workflow contains a single job called "build-release"
-#   build-profile:
-#     # The type of runner that the job will run on
-#     runs-on: windows-latest
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: BGFX-Binaries-Debug
+          path: External/BGFX/bgfx/.build/win64_vs2019/bin/
 
-#     needs: build-BGFX
+      - name: Build all
+        run: py -u Script/Compil/BuildAll.py -e -c Debug -m msbuild.exe
+        shell: bash
 
-#     # Steps represent a sequence of tasks that will be executed as part of the job
-#     steps:
-#       - name: Download a Build Artifact
-#         uses: actions/download-artifact@v2
-#         with:
-#           name: BGFX-Binaries-Release
-#           path: External/BGFX/bgfx/.build/win64_vs2019/bin/
+# This workflow contains a single job called "build-release"
+  build-profile:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
 
-#       - name: Display structure of downloaded files
-#         run: |
-#           # cd External/BGFX/bgfx/.build/win64_vs2019/bin/
-#           ls -R
-#         shell: bash
+    needs: build-BGFX
 
-#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#       - uses: actions/checkout@v2
-#         with:
-#           token: ${{ secrets.ACCESS_TOKEN }}
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
 
-#       - name: setup-msbuild
-#         uses: microsoft/setup-msbuild@v1.0.1
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.0.1
 
-#       - name: Clone ENGINE submodules
-#         run: py -u Script/Cloning/CloneSubmodules.py -e
-#         shell: bash
+      - name: Clone ENGINE submodules
+        run: py -u Script/Cloning/CloneSubmodules.py -e
+        shell: bash
 
-#       - name: Build all
-#         run: py -u Script/Compil/BuildAll.py -e -c Profile -m msbuild.exe
-#         shell: bash
+      - run: |
+          mkdir External/BGFX/bgfx/.build/
+          mkdir External/BGFX/bgfx/.build/win64_vs2019/
+          mkdir External/BGFX/bgfx/.build/win64_vs2019/bin/
 
-# # This workflow contains a single job called "build-release"
-#   build-final:
-#     # The type of runner that the job will run on
-#     runs-on: windows-latest
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: BGFX-Binaries-Release
+          path: External/BGFX/bgfx/.build/win64_vs2019/bin/
 
-#     needs: build-release
+      - name: Build all
+        run: py -u Script/Compil/BuildAll.py -e -c Profile -m msbuild.exe
+        shell: bash
 
-#     # Steps represent a sequence of tasks that will be executed as part of the job
-#     steps:
-#       - name: Download a Build Artifact
-#         uses: actions/download-artifact@v2
-#         with:
-#           name: BGFX-Binaries-Release
-#           path: External/BGFX/bgfx/.build/win64_vs2019/bin/
+# This workflow contains a single job called "build-release"
+  build-final:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
 
-#       - name: Display structure of downloaded files
-#         run: |
-#           # cd External/BGFX/bgfx/.build/win64_vs2019/bin/
-#           ls -R
-#         shell: bash
+    needs: build-release
 
-#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#       - uses: actions/checkout@v2
-#         with:
-#           token: ${{ secrets.ACCESS_TOKEN }}
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
 
-#       - name: setup-msbuild
-#         uses: microsoft/setup-msbuild@v1.0.1
+      - name: setup-msbuild
+        uses: microsoft/setup-msbuild@v1.0.1
 
-#       - name: Clone ENGINE submodules
-#         run: py -u Script/Cloning/CloneSubmodules.py -e
-#         shell: bash
+      - name: Clone ENGINE submodules
+        run: py -u Script/Cloning/CloneSubmodules.py -e
+        shell: bash
 
-#       - name: Build all
-#         run: py -u Script/Compil/BuildAll.py -e -c Final -m msbuild.exe
-#         shell: bash
+      - run: |
+          mkdir External/BGFX/bgfx/.build/
+          mkdir External/BGFX/bgfx/.build/win64_vs2019/
+          mkdir External/BGFX/bgfx/.build/win64_vs2019/bin/
+
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: BGFX-Binaries-Release
+          path: External/BGFX/bgfx/.build/win64_vs2019/bin/
+
+      - name: Build all
+        run: py -u Script/Compil/BuildAll.py -e -c Final -m msbuild.exe
+        shell: bash
