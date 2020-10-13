@@ -32,7 +32,7 @@ jobs:
         shell: bash
 
       - name: Build BGFX Release
-        run: py -u Script/Compil/BuildAll.py -b -c Release -m msbuild.exe
+        run: py -u Script/Compil/BuildAll.py -b -t -c Release -m msbuild.exe
         shell: bash
 
       - name: Build BGFX Debug
@@ -124,10 +124,10 @@ jobs:
           mkdir bin/Win64/
           mkdir bin/Win64/Release/
 
-      - name: ECSEngine-Binaries-Release
+      - name: AssetCooker-Binaries-Release
         uses: actions/download-artifact@v2
         with:
-          name: ECSEngine-Binaries-Release
+          name: AssetCooker-Binaries-Release
           path: bin/Win64/Release/
 
       - name: Clone Assets submodules
@@ -222,7 +222,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: windows-latest
 
-    needs: build-release
+    needs: build-BGFX
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
