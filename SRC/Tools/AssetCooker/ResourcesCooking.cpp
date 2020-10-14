@@ -36,31 +36,6 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
         LOG_COOKING("Cooking mesh " + meshFile);
 
         MeshCooking::CookMesh(meshFile);
-
-        /*std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + meshFile + ".gen", std::ifstream::binary);
-        AssertRelease(ifstr.good());
-        Rendering::MeshFileHeader fileHeader;
-        ifstr.read((c8*)&fileHeader, sizeof(fileHeader));
-
-        Rendering::VertexLayoutHash hash(fileHeader.layout);
-
-        std::vector<glm::vec3> vertices;
-        std::vector<std::vector<u32>> colors;
-        std::vector<u32> indices;
-        vertices.resize(fileHeader.NbVertices);
-        colors.resize(fileHeader.layout.NbColorChannels);
-        forrange(i, 0, fileHeader.layout.NbColorChannels) colors[i].resize(fileHeader.NbVertices);
-        indices.resize(fileHeader.NbIndices);
-
-        forrange(i, 0, fileHeader.NbVertices)
-        {
-            ifstr.read((c8*)&vertices[i].x, 4);
-            ifstr.read((c8*)&vertices[i].y, 4);
-            ifstr.read((c8*)&vertices[i].z, 4);
-            forrange(j, 0, fileHeader.layout.NbColorChannels) { ifstr.read((c8*)&colors[j][i], 4); }
-        }
-
-        ifstr.read((c8*)indices.data(), 4u * fileHeader.NbIndices);*/
     }
 }
 
@@ -79,7 +54,7 @@ void CookTexture(const std::string& parCookedTextureName, const Rendering::Textu
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    std::wstring wideString = L"..\\External\\BGFX\\bgfx\\.build\\win64_vs2019\\bin\\texturecRelease.exe -f ";
+    std::wstring wideString = L"..\\External\\BGFX\\ToolBinaries\\texturecRelease.exe -f ";
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     const std::string& file = parTextureDescriptor.TextureFile();
     std::wstring filename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + file);
