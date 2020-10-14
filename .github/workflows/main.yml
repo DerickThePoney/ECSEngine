@@ -32,7 +32,7 @@ jobs:
         shell: bash
 
       - name: Build BGFX Release
-        run: py -u Script/Compil/BuildAll.py -b -t -c Release -m msbuild.exe
+        run: py -u Script/Compil/BuildAll.py -b -c Release -m msbuild.exe
         shell: bash
 
       - name: Build BGFX Debug
