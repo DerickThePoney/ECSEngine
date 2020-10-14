@@ -109,42 +109,6 @@ jobs:
             bin/Win64/Release/assimp-vc142-mt.dll
           if-no-files-found: error
 
-
-  generate-assets:
-    runs-on: windows-latest
-    needs: build-release
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.ACCESS_TOKEN }}
-
-      - run: |
-          mkdir bin/
-          mkdir bin/Win64/
-          mkdir bin/Win64/Release/
-
-      - name: AssetCooker-Binaries-Release
-        uses: actions/download-artifact@v2
-        with:
-          name: AssetCooker-Binaries-Release
-          path: bin/Win64/Release/
-
-      - name: Clone Assets submodules
-        run: py -u Script/Cloning/CloneSubmodules.py --assets
-        shell: bash
-
-      - name: Run Asset cooking
-        run: |
-          mkdir build
-          cd build
-          ../bin/Win64/Release/AssetCooker.exe
-        shell: bash
-
-
-
-
-
   # This workflow contains a single job called "build-release"
   build-debug:
     # The type of runner that the job will run on
@@ -252,3 +216,47 @@ jobs:
       - name: Build all
         run: py -u Script/Compil/BuildAll.py -e -c Final -m msbuild.exe
         shell: bash
+
+  generate-assets:
+    runs-on: windows-latest
+    needs: build-release
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - run: |
+          mkdir bin/
+          mkdir bin/Win64/
+          mkdir bin/Win64/Release/
+
+      - name: AssetCooker-Binaries-Release
+        uses: actions/download-artifact@v2
+        with:
+          name: AssetCooker-Binaries-Release
+          path: bin/Win64/Release/
+
+      - name: Clone Assets submodules
+        run: py -u Script/Cloning/CloneSubmodules.py --assets
+        shell: bash
+
+      - name: Run Asset cooking
+        run: |
+          mkdir build
+          cd build
+          ../bin/Win64/Release/AssetCooker.exe
+        shell: bash
+
+
+  cleanup_job:
+    needs: [build-final, build-profile, build-debug, generate-assets]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: call webhook to delete artifacts
+      env:
+        FOR_WEBHOOKS_SECRET: ${{ secrets.ACCESS_TOKEN }}
+      run: |
+        echo "::add-mask::$FOR_WEBHOOKS_SECRET"
+        curl --verbose --fail --show-error --location --request POST "https://api.github.com/repos/$GITHUB_REPOSITORY/dispatches" --header "Authorization: token $FOR_WEBHOOKS_SECRET" --header 'Content-Type: application/json' --header 'Accept: application/vnd.github.everest-preview+json' --data-raw "{ \"event_type\": \"delete_all_artifacts\", \"client_payload\": {\"parent_runid\": \"$GITHUB_RUN_ID\", \"parent_repo\": \"$GITHUB_REPOSITORY\"} }"
