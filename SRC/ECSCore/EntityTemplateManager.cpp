@@ -45,30 +45,43 @@ EntityTemplateManager::~EntityTemplateManager()
 
 namespace EntityTemplateManagerMethods
 {
-static std::unordered_map<u32, ModuleTemplate* (*)()> FModuleTemplateFactories;
-static std::map<u32, std::string> FModuleList;
+static std::unordered_map<u32, ModuleTemplate* (*)()>* FModuleTemplateFactories = nullptr;
+static std::map<u32, std::string>* FModuleList = nullptr;
 bool RegisterTemplateFactory(const u32 parId, ModuleTemplate* (*parFactory)())
 {
-    AlwaysCheckedAssert(FModuleTemplateFactories.find(parId) == FModuleTemplateFactories.end());
-    FModuleTemplateFactories[parId] = parFactory;
+    if (FModuleTemplateFactories == nullptr)
+        FModuleTemplateFactories = new std::unordered_map<u32, ModuleTemplate* (*)()>();
+    if (FModuleList == nullptr)
+        FModuleList = new std::map<u32, std::string>();
+
+    AlwaysCheckedAssert(FModuleTemplateFactories->find(parId) == FModuleTemplateFactories->end());
+    (*FModuleTemplateFactories)[parId] = parFactory;
     ModuleTemplate* temp = CreateModuleTemplate(parId);
-    AlwaysCheckedAssert(FModuleList.find(parId) == FModuleList.end());
-    FModuleList[parId] = temp->GetName();
+    AlwaysCheckedAssert(FModuleList->find(parId) == FModuleList->end());
+    (*FModuleList)[parId] = temp->GetName();
     delete temp;
     return true;
 }
 
 ModuleTemplate* CreateModuleTemplate(const u32 parId)
 {
-    AlwaysCheckedAssert(FModuleTemplateFactories.find(parId) != FModuleTemplateFactories.end());
-    ModuleTemplate* temp = FModuleTemplateFactories[parId]();
+    AlwaysCheckedAssert(FModuleTemplateFactories->find(parId) != FModuleTemplateFactories->end());
+    ModuleTemplate* temp = (*FModuleTemplateFactories)[parId]();
     AssertRelease(temp != nullptr);
     return temp;
 }
 
 const std::map<u32, std::string>& GetModuleList()
 {
-    return FModuleList;
+    return *FModuleList;
+}
+
+void Cleanup()
+{
+    delete FModuleTemplateFactories;
+    FModuleTemplateFactories = nullptr;
+    delete FModuleList;
+    FModuleList = nullptr;
 }
 
 } // namespace EntityTemplateManagerMethods
