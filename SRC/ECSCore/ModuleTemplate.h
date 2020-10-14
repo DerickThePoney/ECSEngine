@@ -66,10 +66,13 @@ private:
 public:                                                                                                                                                                            \
     using parent_type = ModuleTemplate;                                                                                                                                            \
     const std::string GetName() const override { return #TYPE; }                                                                                                                   \
-    static ModuleTemplate* CreateTemplate##TEMPLATE() { return new TEMPLATE; }                                                                                                     \
+    static ModuleTemplate* CreateTemplate() { return new TEMPLATE; }                                                                                                               \
     static const std::string StaticGetName() { return #TYPE; }                                                                                                                     \
     static const u32 GetId() { return ECSEngine::ModuleTraits<TYPE>::GetModuleId(); }
 
-#define IMPLEMENT_MODULE_TEMPLATE(TYPE, TEMPLATE) IMPLEMENT_POOL_ALLOCATED(TEMPLATE);
+#define IMPLEMENT_MODULE_TEMPLATE(TYPE, TEMPLATE)                                                                                                                                  \
+    IMPLEMENT_POOL_ALLOCATED(TEMPLATE);                                                                                                                                            \
+    ModuleTemplate* CreateTemplate##TEMPLATE() { return TEMPLATE::CreateTemplate(); }                                                                                              \
+    static bool gRegister_##TEMPLATE = EntityTemplateManagerMethods::RegisterTemplateFactory(ECSEngine::ModuleTraits<TYPE>::GetModuleId(), &CreateTemplate##TEMPLATE);
 
 } // namespace ECSEngine

@@ -43,6 +43,7 @@ void ECSLoader::VirtualShutdown()
     ILoader::VirtualShutdown();
 
     WorldManager::Destroy();
+    EntityTemplateManagerMethods::Cleanup();
     EntityTemplateManager::Destroy();
     ECSEngine::ModuleParameters::DestroyParameterIdentifiersTraits();
 }

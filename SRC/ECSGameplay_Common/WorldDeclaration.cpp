@@ -41,7 +41,7 @@ void InitModuleTemplateFactories()
 {
 #define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE)                                                                                                                                \
     {                                                                                                                                                                              \
-        FModuleTemplateFactories[TEMPLATE::GetId()] = &TEMPLATE::CreateTemplate##TEMPLATE;                                                                                         \
+        FModuleTemplateFactories[TEMPLATE::GetId()] = &TEMPLATE::CreateTemplate;                                                                                                   \
     }
 #include "ECSCore/ModuleList.inl"
 #undef DECLARE_MODULE_AND_TEMPLATE

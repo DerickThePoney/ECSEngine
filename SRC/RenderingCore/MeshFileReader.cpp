@@ -91,7 +91,7 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
     {
         forrange(i, 0, fileHeader.NbVertices)
         {
-            const glm::vec3 currentVertex = vertexDataStream.GetValue<glm::vec3>(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, i);
+            const glm::vec3 currentVertex = vertexDataStream.GetValue<glm::vec3>(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (u32)i);
             radius = std::max(radius, glm::length2(currentVertex - verticesGravityCenter));
         }
     }
