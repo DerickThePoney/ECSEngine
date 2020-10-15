@@ -13,8 +13,8 @@ namespace AssimpLoading
 void GenerateMesh(const std::string& parFileName, const char* parMeshFileBuffer, const u32 parSize)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFileFromMemory(
-          parMeshFileBuffer, parSize, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes | aiProcess_FindDegenerates | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFileFromMemory(parMeshFileBuffer, parSize,
+          aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes | aiProcess_FindDegenerates | aiProcess_FlipUVs | aiProcess_FlipWindingOrder);
     AssertRelease(scene != nullptr);
 
     ECSEngine::Rendering::MeshFileWriter writer(parFileName + ".gen");
