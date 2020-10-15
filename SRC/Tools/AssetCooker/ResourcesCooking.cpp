@@ -82,6 +82,7 @@ void CookTexture(const std::string& parCookedTextureName, const Rendering::Textu
               &pi // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
               ))
     {
+        printf("CreateProcess failed (%d).\n", GetLastError());
         return;
     }
     // Wait until child process exits.
