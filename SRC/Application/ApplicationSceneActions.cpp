@@ -113,8 +113,8 @@ bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawComman
 {
     SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
-    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    const glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(FFov), float(windowSize.x) / float(windowSize.y), FNearPlane, FFarPlane);
+    const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
+    const glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(FFov), aspectRatio, FNearPlane, FFarPlane);
     const BaseSceneItem* item = GetSceneItem();
     if (item != nullptr)
     {
