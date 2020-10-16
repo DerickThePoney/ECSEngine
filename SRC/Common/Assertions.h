@@ -39,8 +39,8 @@ private:
 #define AlwaysCheckedAssertMsg(CND, MSG) DONOTHING
 #define AssertReleaseMsg(CND, MSG) DONOTHING
 #define AssertNotReachedMsg(MSG) DONOTHING
-#define COMMA DONOTHING
-#define OnlyWithAssertions(CMD) DONOTHING
+#define COMMA
+#define OnlyWithAssertions(CMD)
 #endif
 
 } // namespace ECSEngine
