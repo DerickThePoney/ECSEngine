@@ -151,10 +151,23 @@ void ScenarioEditor::UpdateForSceneEditing()
 
     if (FCurrentScenario != nullptr && FIOScene.saveScene)
     {
-        std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "/Scenes/" + FCurrentScenario->GetName() + ".scene");
-        cereal::JSONOutputArchive outputArchive(ofstr);
+        const std::string filename = GlobalResourceCache::Instance().FCache->GetBasePath() + "/Scenes/" + FCurrentScenario->GetName() + ".scene";
+        bool isNewScene = false;
+        {
+            std::ifstream ifstr(filename);
+            isNewScene = !ifstr.good();
+        }
 
-        outputArchive(*FCurrentScenario);
+        {
+            std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "/Scenes/" + FCurrentScenario->GetName() + ".scene");
+            cereal::JSONOutputArchive outputArchive(ofstr);
+
+            outputArchive(*FCurrentScenario);
+        }
+
+        if (isNewScene)
+            GlobalResourceCache::Instance().FCache->ReOpenFileSystem();
+
         FIOScene.saveScene = false;
     }
 

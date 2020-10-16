@@ -78,7 +78,8 @@ void SceneActionCreateMainCamera::VirtualInitialise(const SceneScenario* parScen
     SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
 
     const BaseSceneItem* item = GetSceneItem();
-    AssertRelease(item != nullptr);
+    if (item == nullptr)
+        return;
 
     const glm::vec3 eulerAngles = item->GetEulerAngles();
     const glm::mat4 worldViewMatrix = glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z) * glm::translate(-item->GetPosition());

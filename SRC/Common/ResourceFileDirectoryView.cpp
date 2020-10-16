@@ -71,6 +71,8 @@ void ResourceFileDirectoryView::ListResources()
 
     const std::filesystem::path basePath(FPath);
 
+    FPathToFilename.clear();
+
     for (; itDir != itEnd; ++itDir)
     {
         if (itDir->is_regular_file())
