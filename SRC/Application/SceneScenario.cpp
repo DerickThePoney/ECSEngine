@@ -51,7 +51,6 @@ void SceneScenario::Update()
     bool shouldContinue = true;
     while (FCurrentAction < FActions.size() && shouldContinue)
     {
-        shouldContinue = false;
         ISceneAction* action = FActions[FCurrentAction].get();
         AssertRelease(action != nullptr);
 

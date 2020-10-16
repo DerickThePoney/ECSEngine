@@ -96,10 +96,10 @@ void RenderingSystem::VirtualUpdate()
             glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
             mtx = mtx * (glm::mat4)orientationModule->GetOrientation();
 
-            if (Rendering::MeshFrustumCulling::CullApparenceModule(apparenceModule, mtx, frustum))
-            {
-                FDrawBuffer->DrawMesh(meshHandle, materialHandle, mtx);
-            }
+            /*if (Rendering::MeshFrustumCulling::CullApparenceModule(apparenceModule, mtx, frustum))
+            {*/
+            FDrawBuffer->DrawMesh(meshHandle, materialHandle, mtx);
+            /*}*/
         }
     }
     else
