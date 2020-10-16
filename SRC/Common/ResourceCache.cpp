@@ -56,6 +56,12 @@ void ResourceCache::RegisterLoader(std::shared_ptr<IResourceLoader> parLoader)
     FResourceLoaders.push_front(parLoader);
 }
 
+void ResourceCache::ReOpenFileSystem()
+{
+    AssertRelease(FFileSystem != nullptr);
+    AssertRelease(FFileSystem->Open());
+}
+
 std::shared_ptr<ResourceHandle> ResourceCache::GetResourceHandle(Resource* parResource)
 {
     AssertRelease(FFileSystem != nullptr);
@@ -65,6 +71,11 @@ std::shared_ptr<ResourceHandle> ResourceCache::GetResourceHandle(Resource* parRe
     else
         Update(handle);
     return handle;
+}
+
+bool ResourceCache::FileExists(Resource* parResource)
+{
+    return FFileSystem->FileExists(parResource->FName);
 }
 
 const std::string& ResourceCache::GetBasePath() const

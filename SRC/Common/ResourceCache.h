@@ -1,5 +1,6 @@
 #pragma once
 #include "Singleton.h"
+
 #include <list>
 
 namespace ECSEngine
@@ -23,9 +24,13 @@ public:
     bool Initialize();
     void RegisterLoader(std::shared_ptr<IResourceLoader> parLoader);
 
+    void ReOpenFileSystem();
+
     std::shared_ptr<ResourceHandle> GetResourceHandle(Resource* parResource);
     i32 Preload(std::string parPattern, void (*parProgressCallback)(i32, bool&));
     void Flush();
+
+    bool FileExists(Resource* parResource);
 
     const std::string& GetBasePath() const;
 
