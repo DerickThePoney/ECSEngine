@@ -148,6 +148,8 @@ void MaterialManagerSingleton::Shutdown()
 {
     LOG_RENDERING("Finalizing materials");
 
+    foreachitem(uniform, FUniformMap) { bgfx::destroy(uniform.second.first); }
+
     foreachitem(materialInstance, FMaterialInstances) { delete materialInstance.second; }
     FMaterialInstances.clear();
 
