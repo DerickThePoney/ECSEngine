@@ -16,6 +16,7 @@
 #include <array>
 #include <thread>
 #include <atomic>
+#include <mutex>
 #include <malloc.h>
 #include <chrono>
 // clang-format on
