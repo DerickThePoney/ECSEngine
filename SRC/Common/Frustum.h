@@ -32,6 +32,7 @@ enum Type
 }
 
 class Camera;
+class FrustumCorners;
 class Frustum
 {
 public:
@@ -39,9 +40,24 @@ public:
 
     void InitFromCamera(const Camera& parCamera, const float parAspectRatio);
     void InitFromMatrices(const glm::mat4& parViewWorldMatrix, const glm::mat4& parInverseProjectionMatrix);
+    void InitFromCorners(const FrustumCorners& parCorners);
     MemoryView<const glm::vec4> GetPlanes() const;
 
 private:
     std::array<glm::vec4, 6> FPlanes;
+};
+
+class FrustumCorners
+{
+public:
+    FrustumCorners();
+
+    void InitFromCamera(const Camera& parCamera, const float parAspectRatio);
+    void InitFromMatrices(const glm::mat4& parViewWorldMatrix, const glm::mat4& parInverseProjectionMatrix);
+
+    MemoryView<const glm::vec4> GetCorners() const;
+
+private:
+    std::array<glm::vec4, 8> FCorners;
 };
 } // namespace ECSEngine

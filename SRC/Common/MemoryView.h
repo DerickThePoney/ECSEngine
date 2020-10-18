@@ -125,6 +125,12 @@ public:
     reverse_iterator rend() { return reverse_iterator(this, (u32)-1); }
     const_reverse_iterator crend() { return const_reverse_iterator(this, (u32)-1); }
 
+    const T& operator[](const u32 parIndex) const
+    {
+        AssertRelease(parIndex < FSize);
+        return *(FData + parIndex);
+    }
+
 private:
     T* FData;
     u32 FSize;
