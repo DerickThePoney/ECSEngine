@@ -5,8 +5,10 @@
 #include "Application/PropertyDrawer.h"
 #include "Application/SceneItems.h"
 #include "Application/SceneScenario.h"
+#include "Common/CameraHelpers.h"
 #include "Common/CameraManager.h"
 #include "Common/InputManager.h"
+#include "Common/Ray.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -87,20 +89,9 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
 
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
-    const glm::mat4 projMatrix = c->GetProjectionMatrix(aspectRatio);
-    const glm::mat4 invProjectionMatrix = glm::inverse(projMatrix);
-    const glm::mat4 viewWorldMatrix = glm::inverse(c->GetWorldViewMatrix());
+    Ray ray = GetCameraRayFromMouseInput(*c, aspectRatio, windowSize, Input::GetMousePosition());
 
-    const glm::vec2 mousePosition = Input::GetMousePosition();
-    const float mouseXNDC = (mousePosition.x / (float)windowSize.x) * 2.0f - 1.0f;
-    const float mouseYNDC = ((windowSize.y - mousePosition.y) / (float)windowSize.y) * 2.0f - 1.0f;
-
-    const glm::vec4 pickEyeH = invProjectionMatrix * glm::vec4(mouseXNDC, mouseYNDC, 0.0f, 1.0f);
-    const glm::vec4 pickAtH = invProjectionMatrix * glm::vec4(mouseXNDC, mouseYNDC, 1.0f, 1.0f);
-    const glm::vec3 pickEye = viewWorldMatrix * pickEyeH / pickEyeH.w;
-    const glm::vec3 pickAt = viewWorldMatrix * pickAtH / pickAtH.w;
-
-    const glm::mat4 pickView = glm::lookAt(pickEye, pickAt, glm::vec3(0.0f, 1.0f, 0.0f));
+    const glm::mat4 pickView = glm::lookAt(ray.FOrigin, ray.FOrigin + ray.FDirection, glm::vec3(0.0f, 1.0f, 0.0f));
     const glm::mat4 pickProj = glm::perspective(glm::radians(FSelectionFoV), 1.0f, 0.1f, 500.0f);
 
     FDrawCommandBuffer->SetViewTranform(pickView, pickProj);
