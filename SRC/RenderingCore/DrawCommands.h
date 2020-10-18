@@ -58,7 +58,9 @@ public:
     void DrawFrustum(const MaterialInstanceHandle& parMaterialInstanceHandle,
           const glm::mat4& parWorldViewTransform,
           const glm::mat4& parProjectionMatrix,
-          const u32 parColor = 0xFFFFFFFF);
+          const bool parDrawFrustumNormals /*= false*/,
+          const u32 parColor /*= 0xFFFFFFFF*/,
+          const u32 parNormalsColor /*= 0xFFFFFFFF*/);
 
     void Submit();
 

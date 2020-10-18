@@ -121,7 +121,7 @@ bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawComman
         const glm::vec3 eulerAngles = item->GetEulerAngles();
         const glm::mat4 worldViewMatrix = glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z) * glm::translate(-item->GetPosition());
 
-        parCommandBuffer.DrawFrustum(parMaterial, worldViewMatrix, perspectiveMatrix, 0xFF00FF00);
+        parCommandBuffer.DrawFrustum(parMaterial, worldViewMatrix, perspectiveMatrix, true, 0xFF00FF00, 0xFF0000FF);
         return true;
     }
     return false;
