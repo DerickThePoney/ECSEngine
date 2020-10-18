@@ -21,6 +21,7 @@ GameScenarioUpdater::~GameScenarioUpdater()
 void GameScenarioUpdater::Initialise()
 {
     AssertRelease(FScenario != nullptr);
+    FCameraMoverSystem.Init();
     FRenderingSystem.Init();
 
     FScenario->Initialise();
@@ -34,6 +35,7 @@ void GameScenarioUpdater::Destroy()
     delete FScenario;
     FScenario = nullptr;
 
+    FCameraMoverSystem.Destroy();
     FRenderingSystem.Destroy();
 }
 
@@ -41,6 +43,7 @@ void GameScenarioUpdater::Update()
 {
     AssertRelease(FScenario != nullptr);
     FScenario->Update();
+    FCameraMoverSystem.Update();
 }
 
 void GameScenarioUpdater::Render()

@@ -3,6 +3,7 @@
 #include "WorldDeclaration.h"
 
 #include "ApparenceModule.h"
+#include "CameraMoverModule.h"
 #include "ECSCore/EntityWorld.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/WorldManager.h"
@@ -13,7 +14,7 @@
 
 namespace ECSEngine
 {
-using Controllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule>;
+using Controllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::CameraMoverModule>;
 
 struct f
 {
