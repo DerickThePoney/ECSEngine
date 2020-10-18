@@ -37,7 +37,7 @@ bgfx::FrameBufferHandle FPickingFramebuffer;
 void SceneObjectsPickingRenderer::Initialise()
 {
     bgfx::setViewName(Rendering::RenderPassId::SELECTION_PASS, "Picking pass");
-    bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+    bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0.0f);
 
     FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_PASS);
     FBlitCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_BLIT_PASS);
@@ -99,7 +99,7 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
     const glm::vec3 pickEye = viewWorldMatrix * pickEyeH / pickEyeH.w;
     const glm::vec3 pickAt = viewWorldMatrix * pickAtH / pickAtH.w;
 
-    const glm::mat4 pickView = glm::lookAt(pickEye, pickAt, glm::vec3(0.0f, 0.0f, 1.0f));
+    const glm::mat4 pickView = glm::lookAt(pickEye, pickAt, glm::vec3(0.0f, 1.0f, 0.0f));
     const glm::mat4 pickProj = glm::perspective(glm::radians(FSelectionFoV), 1.0f, 0.1f, 500.0f);
 
     FDrawCommandBuffer->SetViewTranform(pickView, pickProj);
