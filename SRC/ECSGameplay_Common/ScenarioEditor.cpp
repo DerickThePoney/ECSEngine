@@ -35,7 +35,7 @@ void ScenarioEditor::Initialise()
     FEditorSceneObjectPickingRenderer = new SceneObjectsPickingRenderer();
     FEditorSceneObjectPickingRenderer->Initialise();
     FEditorSceneRenderer = new EditorSceneRenderer();
-    FEditorSceneRenderer->Initialise("meshes\\testobjects\\movehandle.fbx.gen", "materials\\vertexcolormaterial.material");
+    FEditorSceneRenderer->Initialise("meshes\\testobjects\\movehandle_v2.fbx.gen", "materials\\vertexcolormaterial.material");
     FEditorGridRenderer = new EditorGridRenderer();
     FEditorGridRenderer->Initialise();
 
