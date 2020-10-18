@@ -18,4 +18,6 @@ project "Common"
       pchheader ("stdafx.h")
    pchsource(srcfiles.."stdafx.cpp")
 
+   links("FMT")
+
    dofile("projectsconfigs.lua")

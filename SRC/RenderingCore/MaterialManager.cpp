@@ -66,7 +66,7 @@ void MaterialManagerSingleton::Initialise()
     GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.material", materialsList);
     foreachitemconst(material, materialsList)
     {
-        LOG_RENDERING("Loading Material " + material + "...");
+        LOG_RENDERING(fmt::format("Loading Material {}...", material));
         Resource res(material);
         std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
 
@@ -80,7 +80,7 @@ void MaterialManagerSingleton::Initialise()
         FMaterialDescriptors.push_back(descriptor);
         FFileToMaterialDescriptor[material] = id;
 
-        LOG_RENDERING("Loading Material " + material + "...    SUCCESS");
+        LOG_RENDERING(fmt::format("Loading Material {}...    SUCCESS", material));
     }
 
     foreachitemconst(material, FMaterialDescriptors)
@@ -91,11 +91,11 @@ void MaterialManagerSingleton::Initialise()
         auto itFind = FFileToProgramDescriptor.find(programName);
         if (itFind != FFileToProgramDescriptor.end())
         {
-            LOG_RENDERING("Program " + programName + " is already loaded");
+            LOG_RENDERING(fmt::format("Program {} is already loaded", programName));
             continue;
         }
 
-        LOG_RENDERING("Loading Program " + programName + "...");
+        LOG_RENDERING(fmt::format("Loading Program {}...", programName));
         Resource res(programName);
         std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
 
@@ -123,11 +123,10 @@ void MaterialManagerSingleton::Initialise()
 #ifdef PERFORM_SECURITY_CHECKS
                 if (itFind->second.second != uniform.second)
                 {
-                    std::ostringstream sstr;
-                    sstr << "A uniform named " << uniform.first << " was already created with type " << itFind->second.second
-                         << " and we are trying to create another one with type " << uniform.second;
+                    const std::string message = fmt::format("A uniform named {} was already created with type {} and we are trying to create another one with type {}",
+                          uniform.first, itFind->second.second, uniform.second);
 
-                    AssertNotReachedMsg(sstr.str().c_str());
+                    AssertNotReachedMsg(message.c_str());
                 }
 #endif
                 continue;
@@ -140,7 +139,7 @@ void MaterialManagerSingleton::Initialise()
             }
         }
 
-        LOG_RENDERING("Loading Program " + programName + "...    SUCCESS");
+        LOG_RENDERING(fmt::format("Loading Program {}...    SUCCESS", programName));
     }
 }
 

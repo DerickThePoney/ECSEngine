@@ -21,6 +21,8 @@
 #include <chrono>
 // clang-format on
 
+#include <fmt/format.h>
+
 #include "Macros.h"
 
 #define GLM_ENABLE_EXPERIMENTAL

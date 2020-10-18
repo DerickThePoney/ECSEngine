@@ -7,7 +7,7 @@ includedirs { "../External/glm",
 "../External/boost/*/include"
 }
 
-includedirs { "../External/brigand/brigand/include", "../External/cereal/include"}
+includedirs { "../External/fmt/", "../External/brigand/brigand/include", "../External/cereal/include"}
 
 filter "options:clang"
   toolset("msc-clangcl")

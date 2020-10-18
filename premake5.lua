@@ -20,6 +20,7 @@ workspace "ECSEngine"
    -- prebuildcommands {"premake5.exe --file=..\\premake5.lua vs2019"}
 
 group "Core"
+    include("PremakeScripts/fmt.lua")
     include("PremakeScripts/common.lua")
     include("PremakeScripts/ecscore.lua")
     include("PremakeScripts/application.lua")
