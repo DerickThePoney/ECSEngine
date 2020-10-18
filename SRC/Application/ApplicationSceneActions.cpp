@@ -82,7 +82,8 @@ void SceneActionCreateMainCamera::VirtualInitialise(const SceneScenario* parScen
         return;
 
     const glm::vec3 eulerAngles = item->GetEulerAngles();
-    const glm::mat4 worldViewMatrix = glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z) * glm::translate(-item->GetPosition());
+    const glm::mat4 localToWorld = glm::translate(item->GetPosition()) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+    const glm::mat4 worldViewMatrix = glm::inverse(localToWorld);
 
     const u32 camId = CameraManager::Instance().CreateCameraIFN(FCameraName);
     Camera* cam = CameraManager::Instance().GetCamera(camId);
@@ -119,9 +120,9 @@ bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawComman
     if (item != nullptr)
     {
         const glm::vec3 eulerAngles = item->GetEulerAngles();
-        const glm::mat4 worldViewMatrix = glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z) * glm::translate(-item->GetPosition());
+        const glm::mat4 localToWorld = glm::translate(item->GetPosition()) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
 
-        parCommandBuffer.DrawFrustum(parMaterial, worldViewMatrix, perspectiveMatrix, true, 0xFF00FF00, 0xFF0000FF);
+        parCommandBuffer.DrawFrustum(parMaterial, localToWorld, perspectiveMatrix, true, 0xFF00FF00, 0xFF0000FF);
         return true;
     }
     return false;
