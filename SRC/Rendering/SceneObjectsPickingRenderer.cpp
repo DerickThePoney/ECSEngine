@@ -37,7 +37,7 @@ bgfx::FrameBufferHandle FPickingFramebuffer;
 void SceneObjectsPickingRenderer::Initialise()
 {
     bgfx::setViewName(Rendering::RenderPassId::SELECTION_PASS, "Picking pass");
-    bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0.0f);
+    bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 
     FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_PASS);
     FBlitCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_BLIT_PASS);
@@ -86,7 +86,8 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
     bgfx::setViewRect(Rendering::RenderPassId::SELECTION_PASS, 0, 0, PickTextureSize, PickTextureSize);
 
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    const glm::mat4 projMatrix = c->GetProjectionMatrix((float)windowSize.x / (float)windowSize.y);
+    const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
+    const glm::mat4 projMatrix = c->GetProjectionMatrix(aspectRatio);
     const glm::mat4 invProjectionMatrix = glm::inverse(projMatrix);
     const glm::mat4 viewWorldMatrix = glm::inverse(c->GetWorldViewMatrix());
 
@@ -94,8 +95,8 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
     const float mouseXNDC = (mousePosition.x / (float)windowSize.x) * 2.0f - 1.0f;
     const float mouseYNDC = ((windowSize.y - mousePosition.y) / (float)windowSize.y) * 2.0f - 1.0f;
 
-    const glm::vec4 pickEyeH = invProjectionMatrix * glm::vec4(mouseXNDC, mouseYNDC, 1.0f, 1.0f);
-    const glm::vec4 pickAtH = invProjectionMatrix * glm::vec4(mouseXNDC, mouseYNDC, 0.0f, 1.0f);
+    const glm::vec4 pickEyeH = invProjectionMatrix * glm::vec4(mouseXNDC, mouseYNDC, 0.0f, 1.0f);
+    const glm::vec4 pickAtH = invProjectionMatrix * glm::vec4(mouseXNDC, mouseYNDC, 1.0f, 1.0f);
     const glm::vec3 pickEye = viewWorldMatrix * pickEyeH / pickEyeH.w;
     const glm::vec3 pickAt = viewWorldMatrix * pickAtH / pickAtH.w;
 
