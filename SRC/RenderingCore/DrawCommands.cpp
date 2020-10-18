@@ -3,6 +3,7 @@
 #include "DrawCommands.h"
 
 #include "Common/Camera.h"
+#include "Common/Frustum.h"
 #include "Common/MeshStreamingData.h"
 #include "Material.h"
 #include "MaterialManager.h"
@@ -266,6 +267,20 @@ IMPLEMENT_POOL_ALLOCATED(DrawAABBCommand);
 //----------------------------------------------------------------
 //          DrawFrustumCommand
 //----------------------------------------------------------------
+namespace
+{
+void PushNormalVertices(const glm::vec3 vertex, const glm::vec3 normal, const u32 color, VertexDataStream& stream)
+{
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vertex);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vertex + normal);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+    stream.Advance();
+}
+} // namespace
+
 class DrawFrustumCommand : public IDrawCommand
 {
     DECLARE_POOL_ALLOCATED(DrawFrustumCommand);
@@ -275,7 +290,9 @@ public:
           const MaterialInstanceHandle& parMaterialInstanceHandle,
           const glm::mat4& parWorldViewTransform,
           const glm::mat4& parProjectionMatrix,
-          const u32 parColor = 0xFFFFFFFF);
+          const bool parDrawFrustumNormals = false,
+          const u32 parColor = 0xFFFFFFFF,
+          const u32 parNormalsColor = 0xFFFFFFFF);
     virtual ~DrawFrustumCommand();
 
     virtual void SubmitCommand() const override;
@@ -284,6 +301,8 @@ private:
     glm::mat4 FViewWorldTransform;
     glm::mat4 FInverseProjectionMatrix;
     u32 FColor;
+    u32 FNormalsColor;
+    bool FDrawFrustumNormals;
     const MaterialInstanceHandle& FMaterialInstanceHandle;
 };
 
@@ -291,12 +310,16 @@ DrawFrustumCommand::DrawFrustumCommand(const u16 parViewId,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
       const glm::mat4& parWorldViewTransform,
       const glm::mat4& parProjectionMatrix,
-      const u32 parColor /*= 0xFFFFFFFF*/)
+      const bool parDrawFrustumNormals /*= false*/,
+      const u32 parColor /*= 0xFFFFFFFF*/,
+      const u32 parNormalsColor /*= 0xFFFFFFFF*/)
     : IDrawCommand(parViewId)
     , FMaterialInstanceHandle(parMaterialInstanceHandle)
     , FViewWorldTransform(glm::inverse(parWorldViewTransform))
     , FInverseProjectionMatrix(glm::inverse(parProjectionMatrix))
+    , FDrawFrustumNormals(parDrawFrustumNormals)
     , FColor(parColor)
+    , FNormalsColor(parNormalsColor)
 {
 }
 
@@ -316,58 +339,98 @@ void DrawFrustumCommand::SubmitCommand() const
 
     bgfx::VertexLayout layout = GetVertexLayout(hash);
 
-    u32 availableVertices = bgfx::getAvailTransientVertexBuffer(8, layout);
-    AssertRelease(availableVertices == 8);
-    u32 availableIndices = bgfx::getAvailTransientIndexBuffer(24);
-    AssertRelease(availableIndices == 24);
+    FrustumCorners frustumCorners;
+    frustumCorners.InitFromMatrices(FViewWorldTransform, FInverseProjectionMatrix);
+    const MemoryView<const glm::vec4> corners = frustumCorners.GetCorners();
 
-    bgfx::allocTransientBuffers(&vertexBuffer, layout, 8, &indexBuffer, 24);
+    const u32 wantedVertices = 8 + ((FDrawFrustumNormals) ? 12 : 0);
+    const u32 availableVertices = bgfx::getAvailTransientVertexBuffer(wantedVertices, layout);
+    AssertRelease(availableVertices == wantedVertices);
+    const u32 wantedIndices = 24 + ((FDrawFrustumNormals) ? 12 : 0);
+    const u32 availableIndices = bgfx::getAvailTransientIndexBuffer(wantedIndices);
+    AssertRelease(availableIndices == wantedIndices);
 
-    VertexDataStream stream(8, hash.GetByteSize(), hash);
+    bgfx::allocTransientBuffers(&vertexBuffer, layout, wantedVertices, &indexBuffer, wantedIndices);
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.0f, -1.0f, 0.0f));
+    VertexDataStream stream(wantedVertices, hash.GetByteSize(), hash);
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::NEAR_BOTTOM_LEFT]));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.0f, -1.0f, 0.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::NEAR_BOTTOM_RIGHT]));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.0f, -1.0f, 1.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::FAR_BOTTOM_RIGHT]));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.0f, -1.0f, 1.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::FAR_BOTTOM_LEFT]));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.0f, 1.0f, 0.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::NEAR_TOP_LEFT]));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.0f, 1.0f, 0.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::NEAR_TOP_RIGHT]));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::FAR_TOP_RIGHT]));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.0f, 1.0f, 1.0f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::FAR_TOP_LEFT]));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    forrange(i, 0, 8)
+    if (FDrawFrustumNormals)
     {
-        glm::vec4 worldVertex = glm::vec4(stream.GetValue<glm::vec3>(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (u32)i), 1.0f);
-        worldVertex = FInverseProjectionMatrix * worldVertex;
-        worldVertex = worldVertex / worldVertex.w;
-        stream.SetValue<glm::vec3>(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FViewWorldTransform * worldVertex, (u32)i);
+        Frustum f;
+        f.InitFromCorners(frustumCorners);
+        MemoryView<const glm::vec4> planes = f.GetPlanes();
+
+        // NearPlane
+        const glm::vec4 nearPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_LEFT] +
+                                               corners[FrustumCorner::NEAR_TOP_RIGHT]) /
+              4;
+        PushNormalVertices(nearPlanePoint, glm::xyz(planes[FrustumPlane::NEAR_PLANE]), FNormalsColor, stream);
+
+        // Farplane
+        const glm::vec4 farPlanePoint =
+              (corners[FrustumCorner::FAR_BOTTOM_LEFT] + corners[FrustumCorner::FAR_BOTTOM_RIGHT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_RIGHT]) /
+              4;
+        PushNormalVertices(farPlanePoint, glm::xyz(planes[FrustumPlane::FAR_PLANE]), FNormalsColor, stream);
+
+        // LEFTPlane
+        const glm::vec4 leftPlanePoint =
+              (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_BOTTOM_LEFT]) /
+              4;
+        PushNormalVertices(leftPlanePoint, glm::xyz(planes[FrustumPlane::LEFT_PLANE]), FNormalsColor, stream);
+
+        // RightPlane
+        const glm::vec4 rightPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_RIGHT] +
+                                                corners[FrustumCorner::FAR_TOP_RIGHT]) /
+              4;
+        PushNormalVertices(rightPlanePoint, glm::xyz(planes[FrustumPlane::RIGHT_PLANE]), FNormalsColor, stream);
+
+        // TopPlane
+        const glm::vec4 topPlanePoint =
+              (corners[FrustumCorner::NEAR_TOP_LEFT] + corners[FrustumCorner::NEAR_TOP_RIGHT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_RIGHT]) / 4;
+        PushNormalVertices(topPlanePoint, glm::xyz(planes[FrustumPlane::TOP_PLANE]), FNormalsColor, stream);
+
+        // BottomPlane
+        const glm::vec4 bottomPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_LEFT] +
+                                                 corners[FrustumCorner::FAR_BOTTOM_RIGHT]) /
+              4;
+        PushNormalVertices(bottomPlanePoint, glm::xyz(planes[FrustumPlane::BOTTOM_PLANE]), FNormalsColor, stream);
     }
 
     bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
 
-    u16 indices[24];
+    std::vector<u16> indices(wantedIndices, 0);
 
     u32 idx = 0;
 
@@ -398,14 +461,35 @@ void DrawFrustumCommand::SubmitCommand() const
     indices[idx++] = 3;
     indices[idx++] = 7;
 
-    bx::memCopy(indexBuffer.data, indices, 24 * sizeof(u16));
+    if (FDrawFrustumNormals)
+    {
+        indices[idx++] = 8;
+        indices[idx++] = 9;
+
+        indices[idx++] = 10;
+        indices[idx++] = 11;
+
+        indices[idx++] = 12;
+        indices[idx++] = 13;
+
+        indices[idx++] = 14;
+        indices[idx++] = 15;
+
+        indices[idx++] = 16;
+        indices[idx++] = 17;
+
+        indices[idx++] = 18;
+        indices[idx++] = 19;
+    }
+
+    bx::memCopy(indexBuffer.data, indices.data(), wantedIndices * sizeof(u16));
 
     RenderingState state;
     state.PartiallyModifyState(BGFX_STATE_PT_LINES);
     state.ApplyState();
 
-    bgfx::setVertexBuffer(0, &vertexBuffer, 0, 8, vertexBuffer.layoutHandle);
-    bgfx::setIndexBuffer(&indexBuffer, 0, 24);
+    bgfx::setVertexBuffer(0, &vertexBuffer, 0, stream.GetSize(), vertexBuffer.layoutHandle);
+    bgfx::setIndexBuffer(&indexBuffer, 0, (u32)indices.size());
 
     glm::mat4 transform = glm::identity<glm::mat4>();
     bgfx::setTransform(&transform[0][0]);
@@ -632,9 +716,12 @@ void DrawCommandBuffer::DrawAABBAsCube(const MaterialInstanceHandle& parMaterial
 void DrawCommandBuffer::DrawFrustum(const MaterialInstanceHandle& parMaterialInstanceHandle,
       const glm::mat4& parWorldViewTransform,
       const glm::mat4& parProjectionMatrix,
-      const u32 parColor /*= 0xFFFFFFFF*/)
+      const bool parDrawFrustumNormals /*= false*/,
+      const u32 parColor /*= 0xFFFFFFFF*/,
+      const u32 parNormalsColor /*= 0xFFFFFFFF*/)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawFrustumCommand(FViewId, parMaterialInstanceHandle, parWorldViewTransform, parProjectionMatrix, parColor)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
+          new DrawFrustumCommand(FViewId, parMaterialInstanceHandle, parWorldViewTransform, parProjectionMatrix, parDrawFrustumNormals, parColor, parNormalsColor)));
 }
 
 void DrawCommandBuffer::Submit()
