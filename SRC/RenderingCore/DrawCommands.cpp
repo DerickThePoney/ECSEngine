@@ -315,7 +315,7 @@ DrawFrustumCommand::DrawFrustumCommand(const u16 parViewId,
       const u32 parNormalsColor /*= 0xFFFFFFFF*/)
     : IDrawCommand(parViewId)
     , FMaterialInstanceHandle(parMaterialInstanceHandle)
-    , FViewWorldTransform(glm::inverse(parWorldViewTransform))
+    , FViewWorldTransform(parWorldViewTransform)
     , FInverseProjectionMatrix(glm::inverse(parProjectionMatrix))
     , FDrawFrustumNormals(parDrawFrustumNormals)
     , FColor(parColor)
