@@ -99,11 +99,8 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
     AssertRelease(parScene != nullptr);
     const std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItems();
 
-    Rendering::RenderingState state;
-
     foreachitemconst(sceneItem, sceneItems)
     {
-        state.ApplyState();
         const glm::vec3& position = sceneItem->GetPosition();
         const u32 sceneItemID = (sceneItem->Id() + 1);
         const u32 color = 0xFF000000 | (sceneItemID & 0x00FFFFFF);
