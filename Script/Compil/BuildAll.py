@@ -23,7 +23,7 @@ def BuildBGFX(config, MSBUILD, tools, samples):
     sys.stdout.flush()
     result = subprocess.run('cd External/BGFX/bgfx/ && ..\\bx\\tools\\bin\\windows\\genie.exe {2}--with-windows=10.0 vs2019 && {0} -m .build/projects/vs2019/bgfx.sln /verbosity:minimal /p:Configuration={1} /p:Platform=x64'.format(MSBUILD, configBGFX, addoptions), shell=True)
 
-    if tools and result.returncode == 0:
+    if tools and result.returncode == 0 and config != 'Debug':
         copyfile('External/BGFX/bgfx/.build/win64_vs2019/bin/texturecRelease.exe', 'External/BGFX/ToolBinaries/texturecRelease.exe')
         copyfile('External/BGFX/bgfx/.build/win64_vs2019/bin/shadercRelease.exe', 'External/BGFX/ToolBinaries/shadercRelease.exe')
 
