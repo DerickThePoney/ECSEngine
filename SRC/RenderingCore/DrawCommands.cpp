@@ -265,6 +265,114 @@ void DrawAABBCommand::SubmitCommand() const
 IMPLEMENT_POOL_ALLOCATED(DrawAABBCommand);
 
 //----------------------------------------------------------------
+//          DrawLinesCommand
+//----------------------------------------------------------------
+
+class DrawLinesCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(DrawLinesCommand);
+
+public:
+    DrawLinesCommand(const u16 parViewId,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const glm::vec3* parVertices,
+          const u32 parVerticesSize,
+          const u32 parColor,
+          const bool parClose);
+    virtual ~DrawLinesCommand();
+
+    virtual void SubmitCommand() const override;
+
+private:
+    const glm::vec3* FVertices;
+    u32 FVerticesSize;
+    u32 FColor;
+    bool FClose;
+    const MaterialInstanceHandle& FMaterialHandle;
+};
+
+DrawLinesCommand::DrawLinesCommand(const u16 parViewId,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::vec3* parVertices,
+      const u32 parVerticesSize,
+      const u32 parColor,
+      const bool parClose)
+    : IDrawCommand(parViewId)
+    , FMaterialHandle(parMaterialInstanceHandle)
+    , FVertices(parVertices)
+    , FVerticesSize(parVerticesSize)
+    , FColor(parColor)
+    , FClose(parClose)
+{
+}
+
+DrawLinesCommand::~DrawLinesCommand()
+{
+}
+
+void DrawLinesCommand::SubmitCommand() const
+{
+    bgfx::TransientVertexBuffer vertexBuffer;
+    bgfx::TransientIndexBuffer indexBuffer;
+
+    VertexLayoutHash hash;
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
+    hash.SetColorsNb(1);
+
+    bgfx::VertexLayout layout = GetVertexLayout(hash);
+
+    const u32 availableVertices = bgfx::getAvailTransientVertexBuffer(FVerticesSize, layout);
+    AlwaysCheckedAssert(availableVertices == FVerticesSize);
+
+    bgfx::allocTransientVertexBuffer(&vertexBuffer, FVerticesSize, layout);
+
+    VertexDataStream stream(FVerticesSize, hash.GetByteSize(), hash);
+
+    forrange(i, 0, FVerticesSize)
+    {
+        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FVertices[i]);
+        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+        stream.Advance();
+    }
+
+    std::vector<u16> indices;
+    forrange(i, 0, FVerticesSize - 1)
+    {
+        indices.push_back((u16)i);
+        indices.push_back((u16)(i + 1));
+    }
+
+    if (FClose)
+    {
+        indices.push_back((u16)(FVerticesSize - 1));
+        indices.push_back((u16)0);
+    }
+    const u32 availableIndices = bgfx::getAvailTransientIndexBuffer((u32)indices.size());
+    AlwaysCheckedAssert(availableIndices == (u32)indices.size());
+    bgfx::allocTransientIndexBuffer(&indexBuffer, (u32)indices.size());
+    bx::memCopy(indexBuffer.data, indices.data(), (u32)indices.size() * sizeof(u16));
+    bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
+
+    RenderingState state;
+    state.PartiallyModifyState(BGFX_STATE_PT_LINES);
+    state.ApplyState();
+
+    bgfx::setVertexBuffer(0, &vertexBuffer, 0, FVerticesSize, vertexBuffer.layoutHandle);
+    bgfx::setIndexBuffer(&indexBuffer, 0, (u32)indices.size());
+
+    glm::mat4 transform = glm::identity<glm::mat4>();
+    bgfx::setTransform(&transform[0][0]);
+
+    const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialHandle);
+    AssertRelease(instance != nullptr);
+
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+}
+
+IMPLEMENT_POOL_ALLOCATED(DrawLinesCommand);
+
+//----------------------------------------------------------------
 //          DrawFrustumCommand
 //----------------------------------------------------------------
 namespace
@@ -722,6 +830,15 @@ void DrawCommandBuffer::DrawFrustum(const MaterialInstanceHandle& parMaterialIns
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
           new DrawFrustumCommand(FViewId, parMaterialInstanceHandle, parWorldViewTransform, parProjectionMatrix, parDrawFrustumNormals, parColor, parNormalsColor)));
+}
+
+void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::vec3* parVertices,
+      const u32 parVerticesSize,
+      const u32 parColor,
+      const bool parClose)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawLinesCommand(FViewId, parMaterialInstanceHandle, parVertices, parVerticesSize, parColor, parClose)));
 }
 
 void DrawCommandBuffer::Submit()
