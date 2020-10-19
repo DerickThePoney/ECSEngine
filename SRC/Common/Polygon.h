@@ -21,6 +21,10 @@ public:
 
     std::size_t size() const { return FPoints.size(); }
 
+    void erase(const size_t at) { FPoints.erase(FPoints.begin() + at); }
+    void erase(const std::vector<glm::vec2>::iterator at) { FPoints.erase(at); }
+    void erase(const std::vector<glm::vec2>::const_iterator at) { FPoints.erase(at); }
+
     glm::vec2& operator[](const size_t at) { return FPoints[at]; }
     const glm::vec2 operator[](const size_t at) const { return FPoints[at]; }
 
