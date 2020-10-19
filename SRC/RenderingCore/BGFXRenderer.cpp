@@ -30,7 +30,7 @@ void BGFXRenderer::Init()
 
     bgfx::Init bgfxInit;
     bgfxInit.platformData = pd;
-    bgfxInit.type = bgfx::RendererType::Direct3D12; // Automatically choose a renderer.
+    bgfxInit.type = bgfx::RendererType::Direct3D11; // Automatically choose a renderer.
     bgfxInit.resolution.width = window.GetSize().x;
     bgfxInit.resolution.height = window.GetSize().y;
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
