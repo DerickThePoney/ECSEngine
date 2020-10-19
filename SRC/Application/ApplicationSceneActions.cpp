@@ -4,10 +4,12 @@
 
 #include "Common/Camera.h"
 #include "Common/CameraManager.h"
+#include "Common/PolygonTriangulator.h"
 #include "Common/RenderingHandles.h"
 #include "PropertyDrawer.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/MaterialManager.h"
 #include "SceneScenario.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::SceneActionWithBaseSceneItem);
@@ -15,6 +17,9 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ISceneAction, ECSEngine::SceneAc
 
 CEREAL_REGISTER_TYPE(ECSEngine::SceneActionCreateMainCamera);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionWithBaseSceneItem, ECSEngine::SceneActionCreateMainCamera)
+
+CEREAL_REGISTER_TYPE(ECSEngine::SceneActionPolygonalPattern);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionWithBaseSceneItem, ECSEngine::SceneActionPolygonalPattern)
 
 namespace ECSEngine
 {
@@ -126,6 +131,75 @@ bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawComman
         return true;
     }
     return false;
+}
+
+/*************************************************************/
+/*            SceneActionPolygonalPattern                    */
+/*************************************************************/
+IMPLEMENT_SCENE_ACTION(SceneActionPolygonalPattern);
+
+SceneActionPolygonalPattern::SceneActionPolygonalPattern(const std::string& parFName /*= "Dummy"*/)
+    : SceneActionWithBaseSceneItem(parFName)
+{
+}
+
+SceneActionPolygonalPattern::~SceneActionPolygonalPattern()
+{
+}
+
+void SceneActionPolygonalPattern::VirtualInitialise(const SceneScenario* parScene)
+{
+    SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
+
+    FPolygon.push_back(glm::vec2(0.f));
+    FPolygon.push_back(glm::vec2(1.f, 1.5f));
+    FPolygon.push_back(glm::vec2(2.5f, 0.f));
+    FPolygon.push_back(glm::vec2(2.f, 1.0f));
+    FPolygon.push_back(glm::vec2(3.f, 0.5f));
+    FPolygon.push_back(glm::vec2(2.5f, 4.0f));
+    FPolygon.push_back(glm::vec2(0.5f, 2.0f));
+
+    PolygonTriangulator triangulator;
+    FTriangles = triangulator.Triangulate(FPolygon);
+}
+
+void SceneActionPolygonalPattern::VirtualStart()
+{
+    SceneActionWithBaseSceneItem::VirtualStart();
+}
+
+void SceneActionPolygonalPattern::VirtualDrawEditor()
+{
+    SceneActionWithBaseSceneItem::VirtualDrawEditor();
+}
+
+bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
+{
+    SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+
+    const glm::vec3 offset = (GetSceneItem() == nullptr) ? glm::vec3(0.f) : GetSceneItem()->GetPosition();
+    vertices.clear();
+    forrange(i, 0, FPolygon.size())
+    {
+        const glm::vec2& currentVertex = FPolygon[i];
+        vertices.push_back(glm::vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
+    }
+
+    parCommandBuffer.DrawLines(parMaterial, vertices.data(), (u32)vertices.size(), 0xFF00FF00, true);
+
+    verticesForTriangles.clear();
+    forrange(i, 0, FTriangles.size())
+    {
+        const Triangle2D& currentTri = FTriangles[i];
+        std::vector<glm::vec3> verts;
+        verts.push_back(glm::vec3(currentTri.A.x, 0.f, currentTri.A.y) + offset);
+        verts.push_back(glm::vec3(currentTri.B.x, 0.f, currentTri.B.y) + offset);
+        verts.push_back(glm::vec3(currentTri.C.x, 0.f, currentTri.C.y) + offset);
+        verticesForTriangles.push_back(verts);
+        parCommandBuffer.DrawLines(parMaterial, verticesForTriangles[verticesForTriangles.size() - 1].data(), 3, 0xFFFF0000, true);
+    }
+
+    return true;
 }
 
 } // namespace ECSEngine
