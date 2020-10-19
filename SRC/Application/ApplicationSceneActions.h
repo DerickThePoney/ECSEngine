@@ -1,5 +1,7 @@
 #pragma once
+#include "Common/Polygon.h"
 #include "Common/PoolAllocator.h"
+#include "Common/Triangle.h"
 #include "SceneActions.h"
 
 namespace ECSEngine
@@ -69,4 +71,39 @@ private:
     float FNearPlane = 0.1f;
     float FFarPlane = 100.0f;
 };
+
+/*************************************************************/
+/*            SceneActionPolygonalPattern                    */
+/*************************************************************/
+class SceneActionPolygonalPattern : public SceneActionWithBaseSceneItem
+{
+    DECLARE_SCENE_ACTION(SceneActionPolygonalPattern);
+
+public:
+    SceneActionPolygonalPattern(const std::string& parFName = "Dummy");
+    virtual ~SceneActionPolygonalPattern();
+
+protected:
+    virtual void VirtualInitialise(const SceneScenario* parScene) override;
+
+    virtual void VirtualStart() override;
+
+    virtual void VirtualDrawEditor() override;
+
+    virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial) override;
+
+public:
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(cereal::base_class<SceneActionWithBaseSceneItem>(this));
+    }
+
+private:
+    Polygon2D FPolygon;
+    std::vector<Triangle2D> FTriangles;
+    std::vector<glm::vec3> vertices;
+    std::vector<std::vector<glm::vec3>> verticesForTriangles;
+};
+
 } // namespace ECSEngine
