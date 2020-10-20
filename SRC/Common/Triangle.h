@@ -13,6 +13,7 @@ public:
     {
     }
 
+    float Area() const;
     bool IsDegenerate() const;
 
     glm::vec2 A = glm::vec2(0.f);
