@@ -4,6 +4,7 @@
 
 #include "ApparenceModule.h"
 #include "Application/SceneItems.h"
+#include "Common/PolygonRandomGenerator.h"
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityTemplateManager.h"
@@ -141,6 +142,12 @@ void SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawEditor()
     if (ShouldShowEditor())
     {
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Entity to spawn", FTemplate, FEntityTemplateName);
+        EDITOR_PROPERTY_WITH_LIMITS("Number of entities", FNumberOfPoints, 1u, 50u);
+
+        if (ImGui::Button("Regenerate"))
+        {
+            GenerateRandomPoints();
+        }
     }
 }
 
@@ -148,7 +155,29 @@ bool SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawInSceneEditor(Render
 {
     parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
+    if (FRandomPoints.size() == 0)
+        GenerateRandomPoints();
+
+    const glm::vec3 offset = (GetSceneItem() == nullptr) ? glm::vec3(0.f) : GetSceneItem()->GetPosition();
+    foreachitemconst(point, FRandomPoints)
+    {
+        const glm::vec3 min = glm::vec3(point.x, 0.f, point.y) + offset - glm::vec3(0.1f);
+        const glm::vec3 max = glm::vec3(point.x, 0.f, point.y) + offset + glm::vec3(0.1f);
+        parCommandBuffer.DrawAABBAsCube(parMaterial, min, max, 0xFF0000FF);
+    }
+
     return true;
+}
+
+void SpawnEntitiesInPolygonalPatternSceneAction::GenerateRandomPoints()
+{
+    PolygonRandomGenerator randomGenerator;
+    RandomPolygonGenerationParameters params = { FNumberOfPoints };
+
+    FRandomPoints.clear();
+    FRandomPoints.reserve(params.NumberOfPoints);
+
+    randomGenerator.GenerateRandomPoints(Polygon(), params, FRandomPoints);
 }
 
 } // namespace ECSEngine

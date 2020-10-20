@@ -71,8 +71,15 @@ public:
         ar(cereal::base_class<parent_type>(this), PROPERTY(EntityTemplateName));
     }
 
+protected:
+    void GenerateRandomPoints();
+
 private:
     std::string FEntityTemplateName = "Entity template name";
     const EntityTemplate* FTemplate = nullptr;
+
+    std::vector<glm::vec2> FRandomPoints;
+
+    u32 FNumberOfPoints = 2;
 };
 } // namespace ECSEngine
