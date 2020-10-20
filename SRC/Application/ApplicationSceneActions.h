@@ -92,11 +92,17 @@ protected:
 
     virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial) override;
 
+private:
+    void ComputeTriangulation();
+
 public:
     template<class Archive>
     void serialize(Archive& ar)
     {
         ar(cereal::base_class<SceneActionWithBaseSceneItem>(this));
+        Polygon2D defaultPolygon;
+        defaultPolygon.append(std::vector<glm::vec2>({ glm::vec2(0.f, 0.f), glm::vec2(1.f, 0.f), glm::vec2(0.f, 1.f) }));
+        PROPERTYFIELD(Polygon, defaultPolygon);
     }
 
 private:
