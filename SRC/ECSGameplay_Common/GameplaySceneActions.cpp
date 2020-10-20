@@ -15,12 +15,19 @@
 CEREAL_REGISTER_TYPE(ECSEngine::SpawnEntitySceneAction);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionWithBaseSceneItem, ECSEngine::SpawnEntitySceneAction)
 
+CEREAL_REGISTER_TYPE(ECSEngine::SpawnEntitiesInPolygonalPatternSceneAction);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionPolygonalPattern, ECSEngine::SpawnEntitiesInPolygonalPatternSceneAction)
+
 namespace ECSEngine
 {
+
+/*************************************************************/
+/*                 SpawnEntitySceneAction                    */
+/*************************************************************/
 IMPLEMENT_SCENE_ACTION(SpawnEntitySceneAction);
 
 SpawnEntitySceneAction::SpawnEntitySceneAction(const std::string& parFName)
-    : SceneActionWithBaseSceneItem(parFName)
+    : parent_type(parFName)
 {
 }
 
@@ -30,13 +37,13 @@ SpawnEntitySceneAction::~SpawnEntitySceneAction()
 
 void SpawnEntitySceneAction::VirtualInitialise(const SceneScenario* parScene)
 {
-    SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
+    parent_type::VirtualInitialise(parScene);
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateName);
 }
 
 void SpawnEntitySceneAction::VirtualStart()
 {
-    SceneActionWithBaseSceneItem::VirtualStart();
+    parent_type::VirtualStart();
 
     AssertRelease(FSceneItem != nullptr);
     AssertRelease(FTemplate != nullptr);
@@ -52,7 +59,7 @@ void SpawnEntitySceneAction::VirtualStart()
 
 void SpawnEntitySceneAction::VirtualDrawEditor()
 {
-    SceneActionWithBaseSceneItem::VirtualDrawEditor();
+    parent_type::VirtualDrawEditor();
 
     if (ShouldShowEditor())
     {
@@ -62,7 +69,7 @@ void SpawnEntitySceneAction::VirtualDrawEditor()
 
 bool SpawnEntitySceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
 {
-    SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+    parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
     if (FTemplate == nullptr)
         return false;
 
@@ -85,6 +92,61 @@ bool SpawnEntitySceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuff
 
         parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial, mtx);
     }
+
+    return true;
+}
+
+/*************************************************************/
+/*        SpawnEntitiesInPolygonalPatternSceneAction         */
+/*************************************************************/
+IMPLEMENT_SCENE_ACTION(SpawnEntitiesInPolygonalPatternSceneAction);
+
+SpawnEntitiesInPolygonalPatternSceneAction::SpawnEntitiesInPolygonalPatternSceneAction(const std::string& parFName /*= "Dummy"*/)
+    : parent_type(parFName)
+{
+}
+
+SpawnEntitiesInPolygonalPatternSceneAction::~SpawnEntitiesInPolygonalPatternSceneAction()
+{
+}
+
+void SpawnEntitiesInPolygonalPatternSceneAction::VirtualInitialise(const SceneScenario* parScene)
+{
+    parent_type::VirtualInitialise(parScene);
+    FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateName);
+}
+
+void SpawnEntitiesInPolygonalPatternSceneAction::VirtualStart()
+{
+    parent_type::VirtualStart();
+
+    /*AssertRelease(FSceneItem != nullptr);
+    AssertRelease(FTemplate != nullptr);
+
+    ModuleParameters::ParameterContainer container;
+    container.Set<ModuleParameters::Position>(FSceneItem->GetPosition());
+    container.Set<ModuleParameters::EulerAngles>(FSceneItem->GetEulerAngles());
+
+    EntityFactory::CreateEntity(FTemplate, container);*/
+
+    AssertNotReachedMsg("Not implemented yet!!");
+
+    Finish();
+}
+
+void SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawEditor()
+{
+    parent_type::VirtualDrawEditor();
+
+    if (ShouldShowEditor())
+    {
+        EDITOR_PROPERTY_ENTITY_TEMPLATE("Entity to spawn", FTemplate, FEntityTemplateName);
+    }
+}
+
+bool SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
+{
+    parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
     return true;
 }
