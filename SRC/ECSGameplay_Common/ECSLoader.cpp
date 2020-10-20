@@ -2,6 +2,7 @@
 
 #include "ECSLoader.h"
 
+#include "Common/RandomGenerator.h"
 #include "Common/ResourceCache.h"
 #include "ECSCore/EntityTemplate.h"
 #include "ECSCore/EntityTemplateManager.h"
@@ -16,8 +17,10 @@ bool ECSLoader::VirtualInitialise()
 {
     ILoader::VirtualInitialise();
 
-    ECSEngine::ModuleParameters::InitParameterIdentifiersTraits();
-    ECSEngine::ModuleTemplates::InitModuleTemplateFactories();
+    RandomNumbers::InitRandomNumberGenerator(772);
+
+    ModuleParameters::InitParameterIdentifiersTraits();
+    ModuleTemplates::InitModuleTemplateFactories();
 
     WorldManager::CreateIFP();
     AssertRelease(WorldManager::HasInstance());
@@ -46,6 +49,8 @@ void ECSLoader::VirtualShutdown()
     EntityTemplateManagerMethods::Cleanup();
     EntityTemplateManager::Destroy();
     ECSEngine::ModuleParameters::DestroyParameterIdentifiersTraits();
+
+    RandomNumbers::DestroyRandomNumberGenerator();
 }
 
 } // namespace ECSEngine
