@@ -94,6 +94,8 @@ protected:
 
     void ComputeTriangulation();
 
+    const Polygon2D& Polygon() const { return FPolygon; }
+
 public:
     template<class Archive>
     void serialize(Archive& ar)
