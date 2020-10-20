@@ -3,6 +3,12 @@
 namespace glm
 {
 template<class Archive>
+void serialize(Archive& ar, glm::vec2& v)
+{
+    ar(NAMEDPROPERTY("x", v.x), NAMEDPROPERTY("y", v.y));
+}
+
+template<class Archive>
 void serialize(Archive& ar, glm::vec3& v)
 {
     ar(NAMEDPROPERTY("x", v.x), NAMEDPROPERTY("y", v.y), NAMEDPROPERTY("z", v.z));
