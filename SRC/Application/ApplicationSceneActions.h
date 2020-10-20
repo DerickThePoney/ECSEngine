@@ -43,7 +43,7 @@ protected:
 /*************************************************************/
 class SceneActionCreateMainCamera : public SceneActionWithBaseSceneItem
 {
-    DECLARE_SCENE_ACTION(SceneActionCreateMainCamera);
+    DECLARE_SCENE_ACTION(SceneActionCreateMainCamera, SceneActionWithBaseSceneItem);
 
 public:
     SceneActionCreateMainCamera(const std::string& parFName = "Dummy");
@@ -62,7 +62,7 @@ public:
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(cereal::base_class<SceneActionWithBaseSceneItem>(this), PROPERTY(CameraName), PROPERTY(Fov), PROPERTY(NearPlane), PROPERTY(FarPlane));
+        ar(cereal::base_class<parent_type>(this), PROPERTY(CameraName), PROPERTY(Fov), PROPERTY(NearPlane), PROPERTY(FarPlane));
     }
 
 private:
@@ -77,7 +77,7 @@ private:
 /*************************************************************/
 class SceneActionPolygonalPattern : public SceneActionWithBaseSceneItem
 {
-    DECLARE_SCENE_ACTION(SceneActionPolygonalPattern);
+    DECLARE_SCENE_ACTION(SceneActionPolygonalPattern, SceneActionWithBaseSceneItem);
 
 public:
     SceneActionPolygonalPattern(const std::string& parFName = "Dummy");
@@ -92,14 +92,13 @@ protected:
 
     virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial) override;
 
-private:
     void ComputeTriangulation();
 
 public:
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(cereal::base_class<SceneActionWithBaseSceneItem>(this));
+        ar(cereal::base_class<parent_type>(this));
         Polygon2D defaultPolygon;
         defaultPolygon.append(std::vector<glm::vec2>({ glm::vec2(0.f, 0.f), glm::vec2(1.f, 0.f), glm::vec2(0.f, 1.f) }));
         PROPERTYFIELD(Polygon, defaultPolygon);

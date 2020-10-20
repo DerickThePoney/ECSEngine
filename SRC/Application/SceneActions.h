@@ -96,8 +96,9 @@ private:
 
 #include "SceneActionIds.h"
 
-#define DECLARE_SCENE_ACTION(TYPE)                                                                                                                                                 \
+#define DECLARE_SCENE_ACTION(TYPE, PARENT_TYPE)                                                                                                                                    \
     DECLARE_POOL_ALLOCATED(TYPE);                                                                                                                                                  \
+    using parent_type = PARENT_TYPE;                                                                                                                                               \
                                                                                                                                                                                    \
 public:                                                                                                                                                                            \
     static u32 GetSceneActionTypeId() { return SceneActionTrait<TYPE>::GetSceneActionTypeId(); }                                                                                   \

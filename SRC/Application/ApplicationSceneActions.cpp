@@ -70,7 +70,7 @@ void SceneActionWithBaseSceneItem::VirtualDrawEditor()
 IMPLEMENT_SCENE_ACTION(SceneActionCreateMainCamera);
 
 SceneActionCreateMainCamera::SceneActionCreateMainCamera(const std::string& parFName)
-    : SceneActionWithBaseSceneItem(parFName)
+    : parent_type(parFName)
 {
 }
 
@@ -80,7 +80,7 @@ SceneActionCreateMainCamera::~SceneActionCreateMainCamera()
 
 void SceneActionCreateMainCamera::VirtualInitialise(const SceneScenario* parScene)
 {
-    SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
+    parent_type::VirtualInitialise(parScene);
 
     const BaseSceneItem* item = GetSceneItem();
     if (item == nullptr)
@@ -97,14 +97,14 @@ void SceneActionCreateMainCamera::VirtualInitialise(const SceneScenario* parScen
 
 void SceneActionCreateMainCamera::VirtualStart()
 {
-    SceneActionWithBaseSceneItem::VirtualStart();
+    parent_type::VirtualStart();
 
     Finish();
 }
 
 void SceneActionCreateMainCamera::VirtualDrawEditor()
 {
-    SceneActionWithBaseSceneItem::VirtualDrawEditor();
+    parent_type::VirtualDrawEditor();
 
     if (ShouldShowEditor())
     {
@@ -117,7 +117,7 @@ void SceneActionCreateMainCamera::VirtualDrawEditor()
 
 bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
 {
-    SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+    parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
     const glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(FFov), aspectRatio, FNearPlane, FFarPlane);
@@ -139,8 +139,9 @@ bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawComman
 IMPLEMENT_SCENE_ACTION(SceneActionPolygonalPattern);
 
 SceneActionPolygonalPattern::SceneActionPolygonalPattern(const std::string& parFName /*= "Dummy"*/)
-    : SceneActionWithBaseSceneItem(parFName)
+    : parent_type(parFName)
 {
+    FPolygon.append(std::vector<glm::vec2>({ glm::vec2(0.f, 0.f), glm::vec2(1.f, 0.f), glm::vec2(0.f, 1.f) }));
 }
 
 SceneActionPolygonalPattern::~SceneActionPolygonalPattern()
@@ -149,19 +150,19 @@ SceneActionPolygonalPattern::~SceneActionPolygonalPattern()
 
 void SceneActionPolygonalPattern::VirtualInitialise(const SceneScenario* parScene)
 {
-    SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
+    parent_type::VirtualInitialise(parScene);
 
     ComputeTriangulation();
 }
 
 void SceneActionPolygonalPattern::VirtualStart()
 {
-    SceneActionWithBaseSceneItem::VirtualStart();
+    parent_type::VirtualStart();
 }
 
 void SceneActionPolygonalPattern::VirtualDrawEditor()
 {
-    SceneActionWithBaseSceneItem::VirtualDrawEditor();
+    parent_type::VirtualDrawEditor();
 
     if (ShouldShowEditor())
     {
@@ -176,7 +177,7 @@ void SceneActionPolygonalPattern::VirtualDrawEditor()
 
 bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
 {
-    SceneActionWithBaseSceneItem::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+    parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
     const glm::vec3 offset = (GetSceneItem() == nullptr) ? glm::vec3(0.f) : GetSceneItem()->GetPosition();
     vertices.clear();
