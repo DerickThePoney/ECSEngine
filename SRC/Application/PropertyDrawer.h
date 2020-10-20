@@ -175,6 +175,64 @@ private:
     float FMax;
 };
 
+template<>
+class PropertyDrawer<i32>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, i32* parProperty, bool parUseLimits, i32 parMin, i32 parMax)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FUseLimits(parUseLimits)
+        , FMin(parMin)
+        , FMax(parMax)
+    {
+    }
+
+    void ShowProperty()
+    {
+        if (FUseLimits)
+            ImGui::DragInt(FName.c_str(), FProperty, .5f, FMin, FMax);
+        else
+            ImGui::InputInt(FName.c_str(), FProperty);
+    }
+
+private:
+    std::string FName;
+    i32* FProperty = nullptr;
+    bool FUseLimits;
+    i32 FMin;
+    i32 FMax;
+};
+
+template<>
+class PropertyDrawer<u32>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, u32* parProperty, bool parUseLimits, u32 parMin, u32 parMax)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FUseLimits(parUseLimits)
+        , FMin(parMin)
+        , FMax(parMax)
+    {
+    }
+
+    void ShowProperty()
+    {
+        if (FUseLimits)
+            ImGui::DragInt(FName.c_str(), (i32*)FProperty, .5f, (i32)FMin, (i32)FMax);
+        else
+            ImGui::InputInt(FName.c_str(), (i32*)FProperty);
+    }
+
+private:
+    std::string FName;
+    u32* FProperty = nullptr;
+    bool FUseLimits;
+    u32 FMin;
+    u32 FMax;
+};
+
 template<typename T>
 void MakeSimpleProperty(const std::string& parName, T* parProperty)
 {
