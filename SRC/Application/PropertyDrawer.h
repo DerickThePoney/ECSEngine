@@ -84,6 +84,29 @@ private:
 };
 
 template<>
+class PropertyDrawer<glm::vec2>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, glm::vec2* parProperty, bool parUseLimits, glm::vec2 parMin, glm::vec2 parMax)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FUseLimits(parUseLimits)
+        , FMin(parMin)
+        , FMax(parMax)
+    {
+    }
+
+    void ShowProperty() { ImGui::InputFloat2(FName.c_str(), (float*)FProperty); }
+
+private:
+    std::string FName;
+    glm::vec2* FProperty = nullptr;
+    bool FUseLimits;
+    glm::vec2 FMin;
+    glm::vec2 FMax;
+};
+
+template<>
 class PropertyDrawer<glm::vec3>
 {
 public:
@@ -239,6 +262,115 @@ private:
 #define EDITOR_PROPERTY_SCENE_ITEM(NAME, PROPERTY, NAME_PROPERTY, SCENE)                                                                                                           \
     {                                                                                                                                                                              \
         PropertyDrawer<const BaseSceneItem*> drawer(NAME, &PROPERTY, &NAME_PROPERTY, SCENE);                                                                                       \
+        drawer.ShowProperty();                                                                                                                                                     \
+    }
+
+template<class T>
+class PropertyDrawer<std::vector<T>>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, std::vector<T>* parProperty, bool parFixedSize)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FFixedSize(parFixedSize)
+    {
+    }
+
+    void ShowProperty()
+    {
+        if (FProperty == nullptr)
+            return;
+
+        if (FFixedSize)
+            ShowFixedSize();
+        else
+            ShowVariableSize();
+    }
+
+private:
+    void ShowFixedSize()
+    {
+        if (ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str()))
+        {
+            forrange(i, 0, FProperty->size()) { MakeSimpleProperty(fmt::format("Item_{}", i), &(*FProperty)[i]); }
+        }
+    }
+
+    void ShowVariableSize()
+    {
+        if (ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str()))
+        {
+            std::vector<T>::iterator itToErase = FProperty->end();
+            u32 i = 0;
+            u32 action = -1; // 0 erase / 1 up / 2 down
+            for (auto element = FProperty->begin(); element != FProperty->end(); ++element, ++i)
+            {
+                ImGui::PushID(i);
+                if (ImGui::Button("X"))
+                {
+                    itToErase = element;
+                    action = 0;
+                }
+                ImGui::SameLine();
+                if (i > 0 && ImGui::Button("UP"))
+                {
+                    itToErase = element;
+                    action = 1;
+                }
+                ImGui::SameLine();
+                if (i < ((u32)FProperty->size() - 1) && ImGui::Button("DOWN"))
+                {
+                    itToErase = element;
+                    action = 2;
+                }
+                ImGui::SameLine();
+                MakeSimpleProperty(fmt::format("Item_{}", i), &(*FProperty)[i]);
+                ImGui::PopID();
+            }
+
+            if (itToErase != FProperty->end())
+            {
+                switch (action)
+                {
+                case 0:
+                {
+                    FProperty->erase(itToErase);
+                    break;
+                }
+                case 1:
+                {
+                    auto previousIt = itToErase - 1;
+                    std::iter_swap(itToErase, previousIt);
+                    break;
+                }
+                case 2:
+                {
+                    auto nextIt = itToErase + 1;
+                    std::iter_swap(itToErase, nextIt);
+                    break;
+                }
+                default:
+                    AssertNotReached();
+                }
+            }
+
+            if (ImGui::Button(fmt::format("Add {}", FName).c_str()))
+            {
+                T newElement = 0.5f * ((*FProperty)[0] + (*FProperty)[FProperty->size() - 1]);
+                FProperty->push_back(newElement);
+            }
+        }
+    }
+
+private:
+    std::string FName;
+    std::vector<T>* FProperty = nullptr;
+    bool FFixedSize;
+};
+
+#define EDITOR_PROPERTY_VECTOR(TYPE, NAME, PROPERTY, FIXED_SIZE)                                                                                                                   \
+    {                                                                                                                                                                              \
+        PropertyDrawer<std::vector<TYPE>> drawer(NAME, &PROPERTY, FIXED_SIZE);                                                                                                     \
         drawer.ShowProperty();                                                                                                                                                     \
     }
 

@@ -151,16 +151,7 @@ void SceneActionPolygonalPattern::VirtualInitialise(const SceneScenario* parScen
 {
     SceneActionWithBaseSceneItem::VirtualInitialise(parScene);
 
-    FPolygon.push_back(glm::vec2(0.f));
-    FPolygon.push_back(glm::vec2(1.f, 1.5f));
-    FPolygon.push_back(glm::vec2(2.5f, 0.f));
-    FPolygon.push_back(glm::vec2(2.f, 1.0f));
-    FPolygon.push_back(glm::vec2(3.f, 0.5f));
-    FPolygon.push_back(glm::vec2(2.5f, 4.0f));
-    FPolygon.push_back(glm::vec2(0.5f, 2.0f));
-
-    PolygonTriangulator triangulator;
-    FTriangles = triangulator.Triangulate(FPolygon);
+    ComputeTriangulation();
 }
 
 void SceneActionPolygonalPattern::VirtualStart()
@@ -171,6 +162,16 @@ void SceneActionPolygonalPattern::VirtualStart()
 void SceneActionPolygonalPattern::VirtualDrawEditor()
 {
     SceneActionWithBaseSceneItem::VirtualDrawEditor();
+
+    if (ShouldShowEditor())
+    {
+        if (ImGui::Button("Triangulate"))
+        {
+            ComputeTriangulation();
+        }
+
+        EDITOR_PROPERTY_VECTOR(glm::vec2, "Polygon points", FPolygon.data(), false);
+    }
 }
 
 bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
@@ -200,6 +201,12 @@ bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawComman
     }
 
     return true;
+}
+
+void SceneActionPolygonalPattern::ComputeTriangulation()
+{
+    PolygonTriangulator triangulator;
+    FTriangles = triangulator.Triangulate(FPolygon);
 }
 
 } // namespace ECSEngine
