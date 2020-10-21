@@ -51,7 +51,7 @@ void CameraMoverSystem::VirtualUpdate()
     ModuleAccessor<CameraMoverModule> cameraMoverAccessor;
     ModuleAccessor<PositionModule> positionAccessor;
     ModuleAccessor<OrientationModule> orientationAccessor;
-    AssertRelease(cameraMoverAccessor.size() == 1); // Pour l'instant on en prend qu'un !!
+    AssertRelease(cameraMoverAccessor.size() <= 1); // Pour l'instant on en prend qu'un !!
 
     const float deltaTime = TimeManager::FrameDeltaTime();
     foreachitem(moverModule, cameraMoverAccessor)
