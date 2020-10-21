@@ -212,6 +212,9 @@ void ScenarioEditor::UpdateForSceneEditing()
 
     if (FWindows.showPickingDebug)
         FEditorSceneObjectPickingRenderer->DrawDebugData(&FWindows.showPickingDebug);
+
+    if (FWindows.showEditorCameraParameters)
+        FEditorCamera.EditorWindow(&FWindows.showEditorCameraParameters);
 }
 
 void ScenarioEditor::UpdateForInEditorPlaying()

@@ -52,6 +52,8 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
         }
         ImGui::Separator();
         ImGui::MenuItem("Scene logger", NULL, &options.showLogger);
+        ImGui::Separator();
+        ImGui::MenuItem("Editor camera", NULL, &options.showEditorCameraParameters);
 
         ImGui::EndMenu();
     }
