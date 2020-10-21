@@ -154,6 +154,17 @@ public:
         : FName(parPropertyName)
         , FProperty(parProperty)
         , FUseLimits(parUseLimits)
+        , FIsAngle(false)
+        , FMin(parMin)
+        , FMax(parMax)
+    {
+    }
+
+    PropertyDrawer(const std::string& parPropertyName, float* parProperty, float parMin, float parMax, bool parAngle)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FUseLimits(true)
+        , FIsAngle(parAngle)
         , FMin(parMin)
         , FMax(parMax)
     {
@@ -162,15 +173,29 @@ public:
     void ShowProperty()
     {
         if (FUseLimits)
-            ImGui::DragFloat(FName.c_str(), FProperty, .5f, FMin, FMax);
+        {
+            if (FIsAngle)
+            {
+                float valueInDegrees = glm::degrees(*FProperty);
+                ImGui::SliderAngle(FName.c_str(), &valueInDegrees, FMin, FMax);
+                *FProperty = glm::radians(valueInDegrees);
+            }
+            else
+            {
+                ImGui::DragFloat(FName.c_str(), FProperty, .5f, FMin, FMax);
+            }
+        }
         else
+        {
             ImGui::InputFloat(FName.c_str(), (float*)FProperty);
+        }
     }
 
 private:
     std::string FName;
     float* FProperty = nullptr;
     bool FUseLimits;
+    bool FIsAngle;
     float FMin;
     float FMax;
 };
@@ -249,6 +274,11 @@ void MakePropertyWithLimits(const std::string& parName, T* parProperty, const T&
 
 #define EDITOR_PROPERTY_SIMPLE(NAME, PROPERTY) MakeSimpleProperty(NAME, &PROPERTY);
 #define EDITOR_PROPERTY_WITH_LIMITS(NAME, PROPERTY, MIN, MAX) MakePropertyWithLimits(NAME, &PROPERTY, MIN, MAX);
+#define EDITOR_PROPERTY_ANGLE(NAME, PROPERTY, MIN, MAX)                                                                                                                            \
+    {                                                                                                                                                                              \
+        PropertyDrawer<float> drawer(NAME, &PROPERTY, MIN, MAX, true);                                                                                                             \
+        drawer.ShowProperty();                                                                                                                                                     \
+    }
 
 #define EDITOR_PROPERTY_STRING(NAME, PROPERTY, IS_FILE, PATTERN)                                                                                                                   \
     {                                                                                                                                                                              \
