@@ -2,6 +2,7 @@
 
 #include "EditorCamera.h"
 
+#include "Application/PropertyDrawer.h"
 #include "Common/Camera.h"
 #include "Common/CameraManager.h"
 #include "Common/GLMHelpers.h"
@@ -56,7 +57,7 @@ void EditorCamera::Initialise()
     AssertRelease(FCameraId != -1);
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
-    camera->Init(worldWiewMatrix, glm::radians(60.0f), 1.f, 200.0f);
+    camera->Init(worldWiewMatrix, glm::radians(60.0f), 1.f, 500.0f);
 }
 
 void EditorCamera::Update()
@@ -126,6 +127,32 @@ void EditorCamera::Update()
 void EditorCamera::Shutdown()
 {
     CameraManager::Instance().DestroyCamera(FCameraId);
+}
+
+void EditorCamera::EditorWindow(bool* parOpen)
+{
+    Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
+    AssertRelease(camera != nullptr);
+
+    float fov = camera->Fov();
+    float nearPlane = camera->Near();
+    float farPlane = camera->Far();
+    ImGui::Begin("Editor Camera Parameters", parOpen);
+    ImGui::Text("Camera Parameters");
+    EDITOR_PROPERTY_ANGLE("FoV", fov, 0, 180);
+    EDITOR_PROPERTY_WITH_LIMITS("Near plane", nearPlane, 0.01f, farPlane - 0.1f);
+    EDITOR_PROPERTY_WITH_LIMITS("Far plane", farPlane, nearPlane + 0.2f, 1500.0f);
+
+    camera->SetFov(fov);
+    camera->SetNear(nearPlane);
+    camera->SetFar(farPlane);
+
+    ImGui::Separator();
+    ImGui::Text("Camera Movement");
+    EDITOR_PROPERTY_WITH_LIMITS("Forward speed", FForwardSpeed, 10.0f, 1000.0f);
+    EDITOR_PROPERTY_WITH_LIMITS("Lateral speed", FLateralSpeed, 10.0f, 1000.0f);
+    EDITOR_PROPERTY_WITH_LIMITS("Rotation speed", FRotationSpeed, 10.0f, 1000.0f);
+    ImGui::End();
 }
 
 } // namespace ECSEngine

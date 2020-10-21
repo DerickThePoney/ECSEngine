@@ -14,6 +14,8 @@ public:
     void Update();
     void Shutdown();
 
+    void EditorWindow(bool* parOpen);
+
 private:
     glm::mat4 FViewWorldMatrix;
 
