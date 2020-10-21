@@ -142,7 +142,7 @@ void SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawEditor()
     if (ShouldShowEditor())
     {
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Entity to spawn", FTemplate, FEntityTemplateName);
-        EDITOR_PROPERTY_WITH_LIMITS("Number of entities", FNumberOfPoints, 1u, 50u);
+        EDITOR_PROPERTY_WITH_LIMITS("Number of entities", FNumberOfPoints, 1u, 1000u);
 
         if (ImGui::Button("Regenerate"))
         {
@@ -155,15 +155,33 @@ bool SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawInSceneEditor(Render
 {
     parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
+    if (FTemplate == nullptr)
+        return false;
+
+    const bool hasApparenceModule = FTemplate->HasModule<ApparenceModule>();
+    if (!hasApparenceModule)
+        return false;
+
     if (FRandomPoints.size() == 0)
         GenerateRandomPoints();
 
-    const glm::vec3 offset = (GetSceneItem() == nullptr) ? glm::vec3(0.f) : GetSceneItem()->GetPosition();
-    foreachitemconst(point, FRandomPoints)
+    const BaseSceneItem* item = GetSceneItem();
+    if (item == nullptr)
+        return false;
+
+    const ApparenceModuleTemplate* apparenceModuleTemplate = (ApparenceModuleTemplate*)FTemplate->GetModuleTemplate<ApparenceModule>();
+    AssertRelease(apparenceModuleTemplate != nullptr);
+    const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(apparenceModuleTemplate->GetMeshFileName());
+    const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(apparenceModuleTemplate->GetMaterialFileName());
+    if (meshHandle.IsValid())
     {
-        const glm::vec3 min = glm::vec3(point.x, 0.f, point.y) + offset - glm::vec3(0.1f);
-        const glm::vec3 max = glm::vec3(point.x, 0.f, point.y) + offset + glm::vec3(0.1f);
-        parCommandBuffer.DrawAABBAsCube(parMaterial, min, max, 0xFF0000FF);
+        const glm::vec3 offset = (GetSceneItem() == nullptr) ? glm::vec3(0.f) : GetSceneItem()->GetPosition();
+        foreachitemconst(point, FRandomPoints)
+        {
+            const glm::vec3 eulerAngles = item->GetEulerAngles();
+            const glm::mat4 mtx = glm::translate(item->GetPosition() + glm::vec3(point.x, 0.f, point.y)) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+            parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial, mtx);
+        }
     }
 
     return true;
