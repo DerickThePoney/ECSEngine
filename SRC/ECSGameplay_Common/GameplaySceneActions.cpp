@@ -121,16 +121,22 @@ void SpawnEntitiesInPolygonalPatternSceneAction::VirtualStart()
 {
     parent_type::VirtualStart();
 
-    /*AssertRelease(FSceneItem != nullptr);
+    AssertRelease(FSceneItem != nullptr);
     AssertRelease(FTemplate != nullptr);
 
-    ModuleParameters::ParameterContainer container;
-    container.Set<ModuleParameters::Position>(FSceneItem->GetPosition());
-    container.Set<ModuleParameters::EulerAngles>(FSceneItem->GetEulerAngles());
+    if (FRandomPoints.size() == 0)
+        GenerateRandomPoints();
 
-    EntityFactory::CreateEntity(FTemplate, container);*/
+    const glm::vec3 position = FSceneItem->GetPosition();
+    const glm::vec3 eulerAngles = FSceneItem->GetEulerAngles();
+    forrange(i, 0, FRandomPoints.size())
+    {
+        ModuleParameters::ParameterContainer container;
+        container.Set<ModuleParameters::Position>(position + glm::vec3(FRandomPoints[i].x, 0.f, FRandomPoints[i].y));
+        container.Set<ModuleParameters::EulerAngles>(FSceneItem->GetEulerAngles());
 
-    AssertNotReachedMsg("Not implemented yet!!");
+        EntityFactory::CreateEntity(FTemplate, container);
+    }
 
     Finish();
 }

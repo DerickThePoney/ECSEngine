@@ -80,6 +80,6 @@ private:
 
     std::vector<glm::vec2> FRandomPoints;
 
-    u32 FNumberOfPoints = 2;
+    u32 FNumberOfPoints = 1000;
 };
 } // namespace ECSEngine
