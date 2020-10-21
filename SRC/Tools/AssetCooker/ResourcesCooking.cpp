@@ -21,6 +21,8 @@ namespace MeshCooking
 {
 void CookMesh(const std::string& parMeshFile)
 {
+    std::cout << "cooking " << parMeshFile << std::endl;
+
     Resource meshResource(parMeshFile);
 
     std::shared_ptr<ResourceHandle> meshResourceHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&meshResource);
