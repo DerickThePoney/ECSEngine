@@ -15,6 +15,7 @@ struct WindowsToShow
     bool showInputDebug = false;
     bool showPickingDebug = false;
     bool showEditorCameraParameters = false;
+    bool showBGFXStatistics = false;
 };
 
 struct IOScene
