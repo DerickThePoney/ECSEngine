@@ -29,6 +29,8 @@ public:
 
     u32 GetCurrentFrame() const { return FCurrentFrame; }
 
+    void DrawStats(bool* outOpen);
+
 private:
     u32 FCurrentFrame;
 

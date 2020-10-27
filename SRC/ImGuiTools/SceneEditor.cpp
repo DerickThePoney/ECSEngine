@@ -13,6 +13,7 @@
 #include "EntityTemplatesEditor.h"
 #include "InputDebug.h"
 #include "LoggerGUI.h"
+#include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/TexturesManager.h"
 
@@ -48,6 +49,8 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
             ImGui::MenuItem("Input debug", NULL, &options.showInputDebug);
             ImGui::Separator();
             ImGui::MenuItem("Picking debug", NULL, &options.showPickingDebug);
+            ImGui::Separator();
+            ImGui::MenuItem("BGFX statistics", NULL, &options.showBGFXStatistics);
             ImGui::EndMenu();
         }
         ImGui::Separator();
@@ -234,6 +237,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showInputDebug)
         InputDebug(&parOutWindowsToShow.showInputDebug);
+
+    if (parOutWindowsToShow.showBGFXStatistics)
+        Rendering::BGFXRenderer::Instance().DrawStats(&parOutWindowsToShow.showBGFXStatistics);
 }
 
 void DrawPlayScenarioWindow(bool& parOutPlayScenario)
