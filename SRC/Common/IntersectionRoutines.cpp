@@ -7,7 +7,7 @@
 
 namespace ECSEngine
 {
-namespace Intersect
+namespace Intersection
 {
 namespace
 {
@@ -45,5 +45,5 @@ bool FrustumSphereIntersect(const Frustum& parFrustum, const glm::vec4& parSpher
 
     return true;
 }
-} // namespace Intersect
+} // namespace Intersection
 } // namespace ECSEngine
