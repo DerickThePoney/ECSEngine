@@ -32,6 +32,39 @@ bool PointTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint)
     return !(has_neg && has_pos);
 }
 
+bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, float& outIntersection)
+{
+    const glm::vec2 w = parRay.FOrigin - parSegment.Start;
+    const glm::vec2 segDirNormalised = parSegment.DirectionNormalized();
+
+    if (glm::abs(glm::dot(segDirNormalised, parRay.FDirection)) > 0.99f)
+    {
+        return false;
+    }
+    const glm::vec2 segDir = parSegment.Direction();
+    const glm::vec2 rayDirPerp = glm::vec2(-parRay.FDirection.y, parRay.FDirection.x);
+    const glm::vec2 segDirPerp = glm::vec2(-segDir.y, segDir.x);
+
+    const float denom = glm::dot(segDirPerp, parRay.FDirection);
+
+    if (glm::abs(denom) < 0.01f)
+        return false;
+
+    const float t1 = glm::dot(-segDirPerp, w) / denom;
+
+    if (t1 < 0.f)
+        return false;
+
+    const float s1 = glm::dot(rayDirPerp, w) / (-denom);
+
+    if (s1 < 0.f || s1 > 1.f)
+        return false;
+
+    outIntersection = t1;
+
+    return true;
+}
+
 bool FrustumSphereIntersect(const Frustum& parFrustum, const glm::vec4& parSphere)
 {
     MemoryView<const glm::vec4> frustumPlane = parFrustum.GetPlanes();
