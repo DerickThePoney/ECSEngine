@@ -1,17 +1,22 @@
 #pragma once
 namespace ECSEngine
 {
+template<typename T>
 struct Ray
 {
     Ray() { }
-    Ray(const glm::vec3 parOrigin, const glm::vec3 parDirection)
+    Ray(const T parOrigin, const T parDirection)
         : FOrigin(parOrigin)
         , FDirection(parDirection)
     {
     }
-    glm::vec3 FOrigin = glm::vec3(0.f);
-    glm::vec3 FDirection = glm::vec3(0.f, 0.f, 1.f);
+    T FOrigin = T(0.f);
+    T FDirection = T(1.f);
 };
 
-static_assert(std::is_trivially_copyable<Ray>(), "Ray must trivially copyable");
+using Ray2D = Ray<glm::vec2>;
+using Ray3D = Ray<glm::vec3>;
+
+static_assert(std::is_trivially_copyable<Ray2D>(), "Ray2D must trivially copyable");
+static_assert(std::is_trivially_copyable<Ray3D>(), "Ray3D must trivially copyable");
 } // namespace ECSEngine

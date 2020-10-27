@@ -7,7 +7,7 @@
 namespace ECSEngine
 {
 
-Ray GetCameraRayFromMouseInput(const Camera& parCamera, const float parAspectRatio, const glm::uvec2 parWindowSize, const glm::vec2 parMousePosition)
+Ray3D GetCameraRayFromMouseInput(const Camera& parCamera, const float parAspectRatio, const glm::uvec2 parWindowSize, const glm::vec2 parMousePosition)
 {
     const glm::mat4 projMatrix = parCamera.GetProjectionMatrix(parAspectRatio);
     const glm::mat4 invProjectionMatrix = glm::inverse(projMatrix);
@@ -21,7 +21,7 @@ Ray GetCameraRayFromMouseInput(const Camera& parCamera, const float parAspectRat
     const glm::vec3 pickEye = viewWorldMatrix * pickEyeH / pickEyeH.w;
     const glm::vec3 pickAt = viewWorldMatrix * pickAtH / pickAtH.w;
 
-    return Ray(pickEye, glm::normalize(pickAt - pickEye));
+    return Ray3D(pickEye, glm::normalize(pickAt - pickEye));
 }
 
 } // namespace ECSEngine
