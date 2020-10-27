@@ -32,7 +32,7 @@ bool CullApparenceModule(const ApparenceModule& parApparenceModule, const glm::m
     // TODO extract scale for radius
     sphere.w = radius;
 
-    return Intersect::FrustumSphereIntersect(parFrustum, sphere);
+    return Intersection::FrustumSphereIntersect(parFrustum, sphere);
 }
 } // namespace MeshFrustumCulling
 } // namespace Rendering

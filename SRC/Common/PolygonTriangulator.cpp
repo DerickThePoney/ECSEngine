@@ -25,7 +25,7 @@ bool EarTest(const u32 i_m1, const u32 i, const u32 i_1, const Polygon2D& parPol
     Triangle2D currentTri(parPolygon[i], parPolygon[i_m1], parPolygon[i_1]);
     while (idx != i_m1)
     {
-        bool thisRes = Intersect::PointTriangle2D(currentTri, parPolygon[idx]);
+        bool thisRes = Intersection::PointTriangle2D(currentTri, parPolygon[idx]);
         if (thisRes)
             return false;
 

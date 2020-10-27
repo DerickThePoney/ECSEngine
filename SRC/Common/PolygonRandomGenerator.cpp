@@ -69,7 +69,7 @@ glm::vec2 PolygonRandomGenerator::GenerateOneRandomPoint(const std::vector<Trian
         const float randomU = RandomNumbers::NextFloat();
         const float randomV = RandomNumbers::NextFloat();
         randomPoint = randomU * (triangle.B - triangle.A) + randomV * (triangle.C - triangle.A) + triangle.A;
-    } while (!Intersect::PointTriangle2D(triangle, randomPoint));
+    } while (!Intersection::PointTriangle2D(triangle, randomPoint));
 
     return randomPoint;
 }
