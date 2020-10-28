@@ -18,19 +18,27 @@ float sign(const glm::vec2 p1, const glm::vec2 p2, const glm::vec2 p3)
 }
 } // namespace
 
-bool PointTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint)
+bool PointInTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint, const bool parStrictlyInside /*= false*/)
 {
     float d1, d2, d3;
-    bool has_neg, has_pos;
+    bool has_neg, has_pos, has_zeros;
 
     d1 = sign(parPoint, parTriangle.A, parTriangle.B);
     d2 = sign(parPoint, parTriangle.B, parTriangle.C);
     d3 = sign(parPoint, parTriangle.C, parTriangle.A);
 
-    has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-    has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+    has_neg = (d1 < 0.f) || (d2 < 0.f) || (d3 < 0.f);
+    has_pos = (d1 > 0.f) || (d2 > 0.f) || (d3 > 0.f);
+    has_zeros = (d1 == 0.f) || (d2 == 0.f) || (d3 == 0.f);
 
-    return !(has_neg && has_pos);
+    if (parStrictlyInside)
+    {
+        return !has_zeros && !(has_neg && has_pos);
+    }
+    else
+    {
+        return !(has_neg && has_pos);
+    }
 }
 
 bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, LinearComponentIntersection& outIntersection)
