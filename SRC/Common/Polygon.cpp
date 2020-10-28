@@ -21,6 +21,7 @@ bool Polygon2D::IsClockWise() const
 Polygon2D Polygon2D::Revert() const
 {
     Polygon2D result;
+    result.reserve(FPoints.size());
 #ifdef PERFORM_SECURITY_CHECKS
     bool isClockwise = IsClockWise();
 #endif //  PERFORM_SECURITY_CHECKS

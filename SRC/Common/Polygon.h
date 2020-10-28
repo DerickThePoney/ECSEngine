@@ -19,8 +19,12 @@ public:
 
     void append(const std::vector<glm::vec2>& parPoints) { FPoints.insert(FPoints.end(), parPoints.begin(), parPoints.end()); }
     void push_back(const glm::vec2& parPoint) { FPoints.push_back(parPoint); }
+    void reserve(const std::size_t parSize) { FPoints.reserve(parSize); }
+    void resize(const std::size_t parSize) { FPoints.resize(parSize); }
+    void resize(const std::size_t parSize, const glm::vec2& parDefault) { FPoints.resize(parSize, parDefault); }
 
     std::size_t size() const { return FPoints.size(); }
+    bool empty() const { return FPoints.empty(); }
 
     void erase(const size_t at) { FPoints.erase(FPoints.begin() + at); }
     void erase(const std::vector<glm::vec2>::iterator at) { FPoints.erase(at); }
@@ -31,6 +35,9 @@ public:
 
     std::vector<glm::vec2>& data() { return FPoints; }
     const std::vector<glm::vec2>& data() const { return FPoints; }
+
+    void set_points(const std::vector<glm::vec2>& parPoints) { FPoints = parPoints; }
+    void set_points(std::vector<glm::vec2>&& parPoints) { FPoints = parPoints; }
 
     bool IsClockWise() const;
     Polygon2D Revert() const;
