@@ -4,8 +4,11 @@
 
 #include "Common/Camera.h"
 #include "Common/CameraManager.h"
+#include "Common/IntersectionRoutines.h"
 #include "Common/PolygonTriangulator.h"
+#include "Common/Ray.h"
 #include "Common/RenderingHandles.h"
+#include "Common/Segment.h"
 #include "PropertyDrawer.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -173,6 +176,76 @@ void SceneActionPolygonalPattern::VirtualDrawEditor()
         }
 
         EDITOR_PROPERTY_VECTOR(glm::vec2, "Polygon points", FPolygon.data(), false);
+
+        if (ImGui::CollapsingHeader("Polygon holes"))
+        {
+            ImGui::Indent();
+            if (ImGui::Button("Add hole"))
+            {
+                Polygon2D p;
+                p.push_back(glm::vec2(0.f));
+                p.push_back(glm::vec2(0.f));
+                p.push_back(glm::vec2(0.f));
+                FPolygonHoles.push_back(p);
+            }
+            std::vector<Polygon2D>::iterator itToErase = FPolygonHoles.end();
+            u32 i = 0;
+            u32 action = -1; // 0 erase / 1 up / 2 down
+            for (auto polygon = FPolygonHoles.begin(); polygon != FPolygonHoles.end(); ++polygon)
+            {
+                ImGui::PushID((u32)i);
+                if (ImGui::Button("X"))
+                {
+                    itToErase = polygon;
+                    action = 0;
+                }
+                ImGui::SameLine();
+                if (i > 0 && ImGui::Button("UP"))
+                {
+                    itToErase = polygon;
+                    action = 1;
+                }
+                ImGui::SameLine();
+                if (i < ((u32)FPolygonHoles.size() - 1) && ImGui::Button("DOWN"))
+                {
+                    itToErase = polygon;
+                    action = 2;
+                }
+                ImGui::SameLine();
+                EDITOR_PROPERTY_VECTOR(glm::vec2, fmt::format("Hole {} points", i + 1), FPolygonHoles[i].data(), false);
+                ImGui::PopID();
+                ++i;
+            }
+
+            if (itToErase != FPolygonHoles.end())
+            {
+                switch (action)
+                {
+                case 0:
+                {
+                    FPolygonHoles.erase(itToErase);
+                    break;
+                }
+                case 1:
+                {
+                    auto previousIt = itToErase - 1;
+                    std::iter_swap(itToErase, previousIt);
+                    break;
+                }
+                case 2:
+                {
+                    auto nextIt = itToErase + 1;
+                    std::iter_swap(itToErase, nextIt);
+                    break;
+                }
+                default:
+                    AssertNotReached();
+                }
+            }
+            ImGui::Unindent();
+        }
+
+        ImGui::Checkbox("Show extented polygon", &FShowExtentedPolygon);
     }
 }
 
@@ -182,13 +255,34 @@ bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawComman
 
     const glm::vec3 offset = (GetSceneItem() == nullptr) ? glm::vec3(0.f) : GetSceneItem()->GetPosition();
     vertices.clear();
-    forrange(i, 0, FPolygon.size())
+
+    const Polygon2D& polygonToShow = (FShowExtentedPolygon) ? FExtendedPolygon : FPolygon;
+    forrange(i, 0, polygonToShow.size())
     {
-        const glm::vec2& currentVertex = FPolygon[i];
+        const glm::vec2& currentVertex = polygonToShow[i];
         vertices.push_back(glm::vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
     }
 
     parCommandBuffer.DrawLines(parMaterial, vertices.data(), (u32)vertices.size(), 0xFF00FF00, true);
+
+    if (!FShowExtentedPolygon)
+    {
+        holesVertices.clear();
+        forrange(i, 0, FPolygonHoles.size())
+        {
+            std::vector<glm::vec3> verts;
+            verts.reserve(FPolygonHoles[i].size());
+
+            forrange(j, 0, FPolygonHoles[i].size())
+            {
+                const glm::vec2& currentVertex = FPolygonHoles[i][j];
+                verts.push_back(glm::vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
+            }
+
+            holesVertices.push_back(verts);
+            parCommandBuffer.DrawLines(parMaterial, holesVertices[holesVertices.size() - 1].data(), (u32)verts.size(), 0xFF0000FF, true);
+        }
+    }
 
     verticesForTriangles.clear();
     forrange(i, 0, FTriangles.size())
@@ -208,7 +302,7 @@ bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawComman
 void SceneActionPolygonalPattern::ComputeTriangulation()
 {
     PolygonTriangulator triangulator;
-    FTriangles = triangulator.Triangulate(FPolygon);
+    FTriangles = triangulator.Triangulate(FPolygon, FPolygonHoles, FExtendedPolygon);
 }
 
 } // namespace ECSEngine

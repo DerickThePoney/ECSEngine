@@ -95,6 +95,7 @@ protected:
     void ComputeTriangulation();
 
     const Polygon2D& Polygon() const { return FPolygon; }
+    const std::vector<Polygon2D>& PolygonHoles() const { return FPolygonHoles; }
 
 public:
     template<class Archive>
@@ -104,13 +105,22 @@ public:
         Polygon2D defaultPolygon;
         defaultPolygon.append(std::vector<glm::vec2>({ glm::vec2(0.f, 0.f), glm::vec2(1.f, 0.f), glm::vec2(0.f, 1.f) }));
         PROPERTYFIELD(Polygon, defaultPolygon);
+        PROPERTYFIELD(PolygonHoles, std::vector<Polygon2D>());
     }
 
 private:
     Polygon2D FPolygon;
+
+    Polygon2D FExtendedPolygon;
+
+    std::vector<Polygon2D> FPolygonHoles;
+
     std::vector<Triangle2D> FTriangles;
     std::vector<glm::vec3> vertices;
+    std::vector<std::vector<glm::vec3>> holesVertices;
     std::vector<std::vector<glm::vec3>> verticesForTriangles;
+
+    bool FShowExtentedPolygon = false;
 };
 
 } // namespace ECSEngine
