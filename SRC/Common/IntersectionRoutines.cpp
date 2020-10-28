@@ -3,6 +3,7 @@
 #include "IntersectionRoutines.h"
 
 #include "Frustum.h"
+#include "Polygon.h"
 #include "Triangle.h"
 
 namespace ECSEngine
@@ -63,6 +64,57 @@ bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, 
     outIntersection = t1;
 
     return true;
+}
+
+bool RayPolygonIntersections2D(const Ray2D& parRay, const Polygon2D& parPolygon, std::vector<std::pair<bool, float>>& outIntersections)
+{
+    bool result = false;
+    const u32 polygonSize = (u32)parPolygon.size();
+    Ray2D r = Ray2D(parPolygon[polygonSize - 1], glm::vec2(1.f, 0.f));
+    outIntersections.resize(polygonSize, std::pair<bool, float>{ false, -1.f });
+
+    forrange(i, 1, polygonSize)
+    {
+        Segment2D s = Segment2D(parPolygon[i - 1], parPolygon[i]);
+        outIntersections[i - 1].first = Intersection::RaySegmentIntersection2D(r, s, outIntersections[i - 1].second);
+
+        result = result || outIntersections[i - 1].first;
+    }
+
+    {
+        Segment2D s = Segment2D(parPolygon[polygonSize - 1], parPolygon[0]);
+        outIntersections[polygonSize - 1].first = Intersection::RaySegmentIntersection2D(r, s, outIntersections[polygonSize - 1].second);
+        result = result || outIntersections[polygonSize - 1].first;
+    }
+
+    return result;
+}
+
+bool RayPolygonClosestIntersection2D(const Ray2D& parRay, const Polygon2D& parPolygon, const bool parDoNotConsiderRayOrigin, float& outIntersection)
+{
+    outIntersection = std::numeric_limits<float>::max();
+    std::vector<std::pair<bool, float>> intersections;
+    if (!RayPolygonIntersections2D(parRay, parPolygon, intersections))
+        return false;
+
+    bool result = false;
+    foreachitemconst(inter, intersections)
+    {
+        if (!inter.first)
+            continue;
+
+        if (parDoNotConsiderRayOrigin && inter.second == 0.f)
+            continue;
+
+        if (outIntersection > inter.second)
+        {
+            result = true;
+            outIntersection = inter.second;
+        }
+    }
+
+    AlwaysCheckedAssert(parDoNotConsiderRayOrigin || (result == (outIntersection != std::numeric_limits<float>::max())));
+    return result;
 }
 
 bool FrustumSphereIntersect(const Frustum& parFrustum, const glm::vec4& parSphere)
