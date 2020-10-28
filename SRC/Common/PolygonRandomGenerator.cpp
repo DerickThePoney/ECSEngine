@@ -3,6 +3,7 @@
 #include "PolygonRandomGenerator.h"
 
 #include "IntersectionRoutines.h"
+#include "Polygon.h"
 #include "PolygonTriangulator.h"
 #include "RandomGenerator.h"
 #include "Triangle.h"
@@ -16,6 +17,17 @@ void PolygonRandomGenerator::GenerateRandomPoints(const Polygon2D& parPolygon,
 {
     PolygonTriangulator polyTri;
     std::vector<Triangle2D> polygonTriangulation = polyTri.Triangulate(parPolygon);
+
+    GenerateRandomPoints(polygonTriangulation, parGenerationParameters, parOutRandomPoints);
+}
+
+void PolygonRandomGenerator::GenerateRandomPoints(const Polygon2D& parPolygon,
+      const std::vector<Polygon2D>& parHoles,
+      RandomPolygonGenerationParameters& parGenerationParameters,
+      std::vector<glm::vec2>& parOutRandomPoints)
+{
+    PolygonTriangulator polyTri;
+    std::vector<Triangle2D> polygonTriangulation = polyTri.Triangulate(parPolygon, parHoles);
 
     GenerateRandomPoints(polygonTriangulation, parGenerationParameters, parOutRandomPoints);
 }
