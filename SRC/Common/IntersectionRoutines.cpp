@@ -33,7 +33,7 @@ bool PointTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint)
     return !(has_neg && has_pos);
 }
 
-bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, float& outIntersection)
+bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, LinearComponentIntersection& outIntersection)
 {
     const glm::vec2 w = parRay.FOrigin - parSegment.Start;
     const glm::vec2 segDirNormalised = parSegment.DirectionNormalized();
@@ -51,69 +51,82 @@ bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, 
     if (glm::abs(denom) < 0.01f)
         return false;
 
-    const float t1 = glm::dot(-segDirPerp, w) / denom;
+    const float rayFactor = glm::dot(-segDirPerp, w) / denom;
 
-    if (t1 < 0.f)
+    if (rayFactor < 0.f)
         return false;
 
-    const float s1 = glm::dot(rayDirPerp, w) / (-denom);
+    const float segmentFactor = glm::dot(rayDirPerp, w) / (-denom);
 
-    if (s1 < 0.f || s1 > 1.f)
+    if (segmentFactor < 0.f || segmentFactor > 1.f)
         return false;
 
-    outIntersection = t1;
+    outIntersection.Intersection1 = rayFactor;
+    outIntersection.Intersection2 = segmentFactor;
 
     return true;
 }
 
-bool RayPolygonIntersections2D(const Ray2D& parRay, const Polygon2D& parPolygon, std::vector<std::pair<bool, float>>& outIntersections)
+bool RayPolygonIntersections2D(const Ray2D& parRay, const Polygon2D& parPolygon, std::vector<std::pair<bool, LinearComponentIntersection>>& outIntersections)
 {
     bool result = false;
     const u32 polygonSize = (u32)parPolygon.size();
-    Ray2D r = Ray2D(parPolygon[polygonSize - 1], glm::vec2(1.f, 0.f));
-    outIntersections.resize(polygonSize, std::pair<bool, float>{ false, -1.f });
+    outIntersections.resize(polygonSize, std::pair<bool, LinearComponentIntersection>{ false, LinearComponentIntersection() });
 
     forrange(i, 1, polygonSize)
     {
         Segment2D s = Segment2D(parPolygon[i - 1], parPolygon[i]);
-        outIntersections[i - 1].first = Intersection::RaySegmentIntersection2D(r, s, outIntersections[i - 1].second);
+        outIntersections[i - 1].first = Intersection::RaySegmentIntersection2D(parRay, s, outIntersections[i - 1].second);
 
         result = result || outIntersections[i - 1].first;
     }
 
     {
         Segment2D s = Segment2D(parPolygon[polygonSize - 1], parPolygon[0]);
-        outIntersections[polygonSize - 1].first = Intersection::RaySegmentIntersection2D(r, s, outIntersections[polygonSize - 1].second);
+        outIntersections[polygonSize - 1].first = Intersection::RaySegmentIntersection2D(parRay, s, outIntersections[polygonSize - 1].second);
         result = result || outIntersections[polygonSize - 1].first;
     }
 
     return result;
 }
 
-bool RayPolygonClosestIntersection2D(const Ray2D& parRay, const Polygon2D& parPolygon, const bool parDoNotConsiderRayOrigin, float& outIntersection)
+bool RayPolygonClosestIntersection2D(const Ray2D& parRay,
+      const Polygon2D& parPolygon,
+      const bool parDoNotConsiderRayOrigin,
+      LinearComponentIntersection& outIntersection,
+      u32& outClosestEdgeIndex)
 {
-    outIntersection = std::numeric_limits<float>::max();
-    std::vector<std::pair<bool, float>> intersections;
+    std::vector<std::pair<bool, LinearComponentIntersection>> intersections;
     if (!RayPolygonIntersections2D(parRay, parPolygon, intersections))
         return false;
 
     bool result = false;
+    u32 closestEdgeIndex = -1;
+    u32 currentEdge = 0;
     foreachitemconst(inter, intersections)
     {
         if (!inter.first)
-            continue;
-
-        if (parDoNotConsiderRayOrigin && inter.second == 0.f)
-            continue;
-
-        if (outIntersection > inter.second)
         {
+            currentEdge++;
+            continue;
+        }
+
+        if (parDoNotConsiderRayOrigin && inter.second.Intersection1 == 0.f)
+        {
+            currentEdge++;
+            continue;
+        }
+
+        if (outIntersection.Intersection1 > inter.second.Intersection1)
+        {
+            closestEdgeIndex = currentEdge;
             result = true;
             outIntersection = inter.second;
         }
+        currentEdge++;
     }
-
-    AlwaysCheckedAssert(parDoNotConsiderRayOrigin || (result == (outIntersection != std::numeric_limits<float>::max())));
+    outClosestEdgeIndex = closestEdgeIndex;
+    AlwaysCheckedAssert(parDoNotConsiderRayOrigin || (result == (outIntersection != LinearComponentIntersection())));
     return result;
 }
 
