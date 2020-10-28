@@ -19,16 +19,18 @@ SceneScenario::~SceneScenario()
 void SceneScenario::AddSceneItem(const u32 parSceneItemTypeId)
 {
     const u32 nextId = FSceneItemsIdGenerator.GetNextId();
+    AssertRelease(FSceneItems.find(nextId) == FSceneItems.end());
     std::shared_ptr<BaseSceneItem> sceneItem = std::shared_ptr<BaseSceneItem>(new BaseSceneItem("New scene item", nextId));
-    FSceneItems.push_back(sceneItem);
+
+    FSceneItems[nextId] = sceneItem;
     sceneItem->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
     sceneItem->SetEulerAngles(glm::vec3(0.0f));
 }
 
-void SceneScenario::RemoveSceneItem(const std::vector<std::shared_ptr<BaseSceneItem>>::iterator parWhere)
+void SceneScenario::RemoveSceneItem(const SceneItemsContainer::iterator parWhere)
 {
     AssertRelease(parWhere != FSceneItems.end());
-    const u32 id = (*parWhere)->Id();
+    const u32 id = parWhere->second->Id();
     FSceneItemsIdGenerator.ReleaseId(id);
     FSceneItems.erase(parWhere);
 }
@@ -76,12 +78,12 @@ void SceneScenario::Update()
 
 void SceneScenario::SetItemHovered(const u32 parId)
 {
-    foreachitem(sceneItem, FSceneItems) { sceneItem->SetItemHovered(sceneItem->Id() == parId); }
+    foreachitem(sceneItem, FSceneItems) { sceneItem.second->SetItemHovered(sceneItem.second->Id() == parId); }
 }
 
 void SceneScenario::SetItemSelected(const u32 parId)
 {
-    foreachitem(sceneItem, FSceneItems) { sceneItem->SetItemSelected(sceneItem->Id() == parId); }
+    foreachitem(sceneItem, FSceneItems) { sceneItem.second->SetItemSelected(sceneItem.second->Id() == parId); }
 }
 
 void SceneScenario::AddSceneActionStealOwnership(ISceneAction* parAction)

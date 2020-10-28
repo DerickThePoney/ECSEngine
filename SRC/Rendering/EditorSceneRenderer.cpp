@@ -51,10 +51,11 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
     FDrawCommandBuffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y)));
 
     AssertRelease(parScene != nullptr);
-    const std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItems();
+    const SceneItemsContainer& sceneItems = parScene->GetSceneItems();
 
-    foreachitemconst(sceneItem, sceneItems)
+    foreachitemconst(sceneItemIt, sceneItems)
     {
+        const BaseSceneItem* sceneItem = sceneItemIt.second.get();
         const glm::vec3& position = sceneItem->GetPosition();
 
         const bool isSelected = sceneItem->ItemSelected();

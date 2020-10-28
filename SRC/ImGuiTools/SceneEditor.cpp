@@ -91,10 +91,10 @@ void SceneItemsWindow(SceneScenario* parScene, WindowsToShow& options, const glm
 
         ImGui::BeginChildFrame(ImGui::GetID("Scene items list"), listSize);
 
-        std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = parScene->GetSceneItemsForWriting();
+        SceneItemsContainer& sceneItems = parScene->GetSceneItemsForWriting();
         u32 i = 0;
 
-        std::vector<std::shared_ptr<BaseSceneItem>>::iterator itToErase = sceneItems.end();
+        SceneItemsContainer::iterator itToErase = sceneItems.end();
         for (auto sceneItem = sceneItems.begin(); sceneItem != sceneItems.end(); ++sceneItem)
         {
             ImGui::PushID(i);
@@ -103,7 +103,7 @@ void SceneItemsWindow(SceneScenario* parScene, WindowsToShow& options, const glm
                 itToErase = sceneItem;
             }
             ImGui::SameLine();
-            (*sceneItem)->DrawEditor();
+            sceneItem->second->DrawEditor();
             ImGui::PopID();
             i++;
         }
