@@ -26,7 +26,7 @@ bool RayPolygonClosestIntersection2D(const Ray2D& parRay,
       const bool parDoNotConsiderRayOrigin,
       LinearComponentIntersection& outIntersection,
       u32& outClosestEdgeIndex);
-bool PointTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint);
+bool PointInTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint, const bool parStrictlyInside = false);
 bool FrustumSphereIntersect(const Frustum& parFrustum, const glm::vec4& parSphere);
 } // namespace Intersection
 } // namespace ECSEngine
