@@ -25,7 +25,7 @@ bool EarTest(const u32 i_m1, const u32 i, const u32 i_1, const Polygon2D& parPol
     Triangle2D currentTri(parPolygon[i], parPolygon[i_m1], parPolygon[i_1]);
     while (idx != i_m1)
     {
-        bool thisRes = Intersection::PointTriangle2D(currentTri, parPolygon[idx]);
+        bool thisRes = Intersection::PointInTriangle2D(currentTri, parPolygon[idx], true);
         if (thisRes)
             return false;
 
@@ -76,6 +76,137 @@ void UpdateAdjacentVertex(const u32 idx, std::vector<u32>& convex, std::vector<u
                 ears.push_back(idx);
         }
     }
+}
+
+void InsertHoleIntoPolygon(Polygon2D& parPolygon, const Polygon2D& parHole)
+{
+    if (parHole.empty())
+        return;
+
+    // Check polygon orientation
+    Polygon2D holeToUse = parHole;
+    if (!holeToUse.IsClockWise())
+        holeToUse = holeToUse.Revert();
+
+    // TODO Check inclusion in polygon ?
+
+    // Find mutually visible edges
+    // 1- Get the hole vertex M with max X coordinate
+    const std::vector<glm::vec2>& holeVertices = holeToUse.data();
+    u32 maxXVertex = 0;
+    float maxXCoord = holeVertices[0].x;
+
+    forrange(i, 1, holeVertices.size())
+    {
+        if (holeVertices[i].x > maxXCoord)
+        {
+            maxXCoord = holeVertices[i].x;
+            maxXVertex = (u32)i;
+        }
+    }
+
+    // 2 - Intersect Ray(M, (1,0)) with the edges of the polygon
+    Ray2D ray = Ray2D(holeVertices[maxXVertex], glm::vec2(1.f, 0.f));
+    Intersection::LinearComponentIntersection intersectionResult;
+    u32 closestPolygonEdgeIndex = -1;
+    const bool intersect = Intersection::RayPolygonClosestIntersection2D(ray, parPolygon, true, intersectionResult, closestPolygonEdgeIndex);
+    AlwaysCheckedAssert(intersect);
+    if (!intersect)
+        return;
+
+    AssertRelease(closestPolygonEdgeIndex != -1);
+
+    u32 PIndex = 0;
+    // 3 - If intersection I is vertex (0, 1 on Intersection2) -> terminate
+    if (intersectionResult.Intersection2 == 0.f)
+    {
+        PIndex = closestPolygonEdgeIndex;
+    }
+    else if (intersectionResult.Intersection2 == 1.f)
+    {
+        PIndex = NextIndex(closestPolygonEdgeIndex, (u32)parPolygon.size());
+    }
+    else
+    {
+        // 4 - If intersection I is on the edge, select P the endpoint of max X coord on the edge
+        const u32 nextIndex = NextIndex(closestPolygonEdgeIndex, (u32)parPolygon.size());
+        PIndex = (parPolygon[closestPolygonEdgeIndex].x > parPolygon[nextIndex].x) ? closestPolygonEdgeIndex : nextIndex;
+
+        // 5 - Search all polygon reflex vertices for those in triangle MIP, excluding P. If none, M and P are mutually visible, terminate.
+        Triangle2D mipTriangle = { holeVertices[maxXVertex], holeVertices[maxXVertex] + intersectionResult.Intersection1 * glm::vec2(1.f, 0.f), parPolygon[PIndex] };
+        std::vector<u32> reflexVerticesInMIP;
+        reflexVerticesInMIP.reserve(parPolygon.size());
+        forrange(idx, 0, parPolygon.size())
+        {
+            if (idx == PIndex)
+                continue;
+            const u32 i = (u32)idx;
+            const u32 i_m1 = PreviousIndex(i, (u32)parPolygon.size());
+            const u32 i_p1 = NextIndex(i, (u32)parPolygon.size());
+            const glm::vec3 pi_m1 = glm::vec3(parPolygon[i_m1], 0.f);
+            const glm::vec3 pi = glm::vec3(parPolygon[i], 0.f);
+            const glm::vec3 pi_1 = glm::vec3(parPolygon[i_p1], 0.f);
+
+            float s = glm::sign(glm::cross(pi_m1 - pi, pi_1 - pi).z);
+            if (s >= 0.f)
+            {
+                if (Intersection::PointInTriangle2D(mipTriangle, parPolygon[i]))
+                {
+                    reflexVerticesInMIP.push_back(i);
+                }
+            }
+        }
+        // 6 - Choose the reflex vertex R in MIP minimizing the angle between (1,0) and MR - > terminate
+        if (reflexVerticesInMIP.size() > 1)
+        {
+            float maxDot = -1.f;
+            u32 bestReflexVertex = -1;
+            foreachitemconst(reflexVertex, reflexVerticesInMIP)
+            {
+                Segment2D mr = Segment2D(holeVertices[maxXVertex], parPolygon[reflexVertex]);
+                const float dotRes = glm::dot(glm::vec2(1.f, 0.f), mr.DirectionNormalized());
+                if (dotRes > maxDot)
+                {
+                    maxDot = dotRes;
+                    bestReflexVertex = reflexVertex;
+                }
+            }
+
+            AssertRelease(bestReflexVertex != -1);
+            PIndex = bestReflexVertex;
+        }
+        else if (reflexVerticesInMIP.size() == 1)
+        {
+            PIndex = reflexVerticesInMIP[0];
+        }
+    }
+
+    // insert the hole into the polygon at the right place
+    std::vector<glm::vec2> newPoints;
+    newPoints.reserve(parPolygon.size() + parHole.size() + 2);
+
+    // on rempli jusqu'a PIndex
+    u32 currentPolygonIndex = 0;
+    while (currentPolygonIndex != PIndex)
+    {
+        newPoints.push_back(parPolygon[currentPolygonIndex]);
+        currentPolygonIndex = NextIndex(currentPolygonIndex, (u32)parPolygon.size());
+    }
+    newPoints.push_back(parPolygon[currentPolygonIndex]);
+
+    // On mets le hole en commencant par maxXIndex, que l'on mets deux fois
+    u32 currentHoleIndex = maxXVertex;
+    do
+    {
+        newPoints.push_back(holeToUse[currentHoleIndex]);
+        currentHoleIndex = NextIndex(currentHoleIndex, (u32)holeToUse.size());
+    } while (currentHoleIndex != maxXVertex);
+    newPoints.push_back(holeToUse[currentHoleIndex]);
+
+    // on continue le polygone principal en recommançant par PIndex
+    forrange(i, PIndex, parPolygon.size()) { newPoints.push_back(parPolygon[i]); }
+
+    parPolygon.set_points(std::move(newPoints));
 }
 
 } // namespace
@@ -177,6 +308,33 @@ std::vector<Triangle2D> PolygonTriangulator::Triangulate(const Polygon2D& parPol
     }
 
     return triangles;
+}
+
+std::vector<Triangle2D> PolygonTriangulator::Triangulate(const Polygon2D& parPolygon, const std::vector<Polygon2D> parPolygonHoles, Polygon2D& outExtentedPolygon)
+{
+    if (parPolygonHoles.empty())
+    {
+        outExtentedPolygon = parPolygon;
+        return Triangulate(parPolygon);
+    }
+
+    Polygon2D polygonCopy = parPolygon;
+    const bool isClockwise = polygonCopy.IsClockWise();
+    if (isClockwise)
+    {
+        polygonCopy = polygonCopy.Revert();
+    }
+
+    foreachitemconst(hole, parPolygonHoles) { InsertHoleIntoPolygon(polygonCopy, hole); }
+
+    outExtentedPolygon = polygonCopy;
+    return Triangulate(polygonCopy);
+}
+
+std::vector<ECSEngine::Triangle2D> PolygonTriangulator::Triangulate(const Polygon2D& parPolygon, const std::vector<Polygon2D> parPolygonHoles)
+{
+    Polygon2D dummyOutput;
+    return Triangulate(parPolygon, parPolygonHoles, dummyOutput);
 }
 
 } // namespace ECSEngine
