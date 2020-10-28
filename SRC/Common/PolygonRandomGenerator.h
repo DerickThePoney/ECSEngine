@@ -15,6 +15,10 @@ public:
     PolygonRandomGenerator() { }
 
     void GenerateRandomPoints(const Polygon2D& parPolygon, const RandomPolygonGenerationParameters& parGenerationParameters, std::vector<glm::vec2>& parOutRandomPoints);
+    void GenerateRandomPoints(const Polygon2D& parPolygon,
+          const std::vector<Polygon2D>& parHoles,
+          RandomPolygonGenerationParameters& parGenerationParameters,
+          std::vector<glm::vec2>& parOutRandomPoints);
     void GenerateRandomPoints(const std::vector<Triangle2D>& parPolygonTriangulation,
           const RandomPolygonGenerationParameters& parGenerationParameters,
           std::vector<glm::vec2>& parOutRandomPoints);
