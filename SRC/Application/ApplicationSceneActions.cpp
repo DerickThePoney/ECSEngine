@@ -39,16 +39,17 @@ SceneActionWithBaseSceneItem::~SceneActionWithBaseSceneItem()
 void SceneActionWithBaseSceneItem::SetSceneItem(const BaseSceneItem* parSceneItem)
 {
     FSceneItem = parSceneItem;
-    FSceneItemID = parSceneItem->GetSceneItemTypeId();
+    FSceneItemID = parSceneItem->Id();
 }
 
 void SceneActionWithBaseSceneItem::VirtualInitialise(const SceneScenario* parScene)
 {
     ISceneAction::VirtualInitialise(parScene);
     auto sceneItems = GetScene()->GetSceneItems();
-    if (FSceneItemID < sceneItems.size())
+    auto itFind = sceneItems.find(FSceneItemID);
+    if (itFind != sceneItems.end())
     {
-        FSceneItem = sceneItems[FSceneItemID].get();
+        FSceneItem = itFind->second.get();
         AssertRelease(FSceneItem != nullptr);
     }
 }

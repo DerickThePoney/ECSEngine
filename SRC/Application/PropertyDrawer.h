@@ -301,31 +301,25 @@ public:
 
     void ShowProperty()
     {
-        const std::vector<std::shared_ptr<BaseSceneItem>>& sceneItems = FScene->GetSceneItems();
+        const SceneItemsContainer& sceneItems = FScene->GetSceneItems();
         u32 selected = -1;
 
-        if (*FIdProperty < sceneItems.size())
+        auto itFind = sceneItems.find(*FIdProperty);
+        if (itFind != sceneItems.end())
         {
-            forrange(i, 0, sceneItems.size())
-            {
-                AssertRelease(sceneItems[i] != nullptr);
-                if (sceneItems[i]->Id() == (*FIdProperty))
-                {
-                    selected = (u32)i;
-                    break;
-                }
-            }
+            selected = *FIdProperty;
+            AssertRelease(itFind->second != nullptr);
         }
 
         ImGui::Text(FName.c_str());
         ImGui::SameLine();
-        if (ImGui::BeginCombo(("##SceneItemCombo" + FName).c_str(), (selected == -1) ? "No associated item" : sceneItems[selected]->GetName().c_str()))
+        if (ImGui::BeginCombo(("##SceneItemCombo" + FName).c_str(), (selected == -1) ? "No associated item" : itFind->second->GetName().c_str()))
         {
-            forrange(i, 0, sceneItems.size())
+            foreachitemconst(sceneItem, sceneItems)
             {
-                bool is_selected = (selected == (u32)i);
-                if (ImGui::Selectable(sceneItems[i]->GetName().c_str(), is_selected))
-                    selected = (u32)i;
+                bool is_selected = (selected == sceneItem.first);
+                if (ImGui::Selectable(sceneItem.second->GetName().c_str(), is_selected))
+                    selected = (u32)sceneItem.first;
                 if (is_selected)
                     ImGui::SetItemDefaultFocus();
             }
@@ -334,7 +328,7 @@ public:
 
         if (selected != -1)
         {
-            *FProperty = sceneItems[selected].get();
+            *FProperty = sceneItems.at(selected).get();
             AssertRelease(*FProperty != nullptr);
             *FIdProperty = (*FProperty)->Id();
         }
@@ -347,9 +341,9 @@ private:
     const SceneScenario* const FScene;
 };
 
-#define EDITOR_PROPERTY_SCENE_ITEM(NAME, PROPERTY, NAME_PROPERTY, SCENE)                                                                                                           \
+#define EDITOR_PROPERTY_SCENE_ITEM(NAME, SCENE_ITEM_PTR, SCENE_ITEM_ID, SCENE)                                                                                                     \
     {                                                                                                                                                                              \
-        PropertyDrawer<const BaseSceneItem*> drawer(NAME, &PROPERTY, &NAME_PROPERTY, SCENE);                                                                                       \
+        PropertyDrawer<const BaseSceneItem*> drawer(NAME, &SCENE_ITEM_PTR, &SCENE_ITEM_ID, SCENE);                                                                                 \
         drawer.ShowProperty();                                                                                                                                                     \
     }
 
@@ -357,7 +351,7 @@ template<class T>
 class PropertyDrawer<std::vector<T>>
 {
 public:
-    PropertyDrawer(const std::string& parPropertyName, std::vector<T>* parProperty, bool parFixedSize)
+    PropertyDrawer(const std::string& parPropertyName, std::vector<T>* parProperty, bool parFixedSize = false)
         : FName(parPropertyName)
         , FProperty(parProperty)
         , FFixedSize(parFixedSize)
@@ -388,6 +382,7 @@ private:
     {
         if (ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str()))
         {
+            ImGui::Indent();
             std::vector<T>::iterator itToErase = FProperty->end();
             u32 i = 0;
             u32 action = -1; // 0 erase / 1 up / 2 down
@@ -415,6 +410,7 @@ private:
                 MakeSimpleProperty(fmt::format("Item_{}", i), &(*FProperty)[i]);
                 ImGui::PopID();
             }
+            ImGui::Unindent();
 
             if (itToErase != FProperty->end())
             {
