@@ -150,6 +150,8 @@ void SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawEditor()
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Entity to spawn", FTemplate, FEntityTemplateName);
         EDITOR_PROPERTY_WITH_LIMITS("Number of entities", FNumberOfPoints, 1u, 1000u);
 
+        ImGui::Checkbox("Show entities in editor", &FShowEntitiesInEditor);
+
         if (ImGui::Button("Regenerate"))
         {
             GenerateRandomPoints();
@@ -160,6 +162,9 @@ void SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawEditor()
 bool SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
 {
     parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+
+    if (!FShowEntitiesInEditor)
+        return false;
 
     if (FTemplate == nullptr)
         return false;
@@ -201,7 +206,7 @@ void SpawnEntitiesInPolygonalPatternSceneAction::GenerateRandomPoints()
     FRandomPoints.clear();
     FRandomPoints.reserve(params.NumberOfPoints);
 
-    randomGenerator.GenerateRandomPoints(Polygon(), params, FRandomPoints);
+    randomGenerator.GenerateRandomPoints(Polygon(), PolygonHoles(), params, FRandomPoints);
 }
 
 } // namespace ECSEngine

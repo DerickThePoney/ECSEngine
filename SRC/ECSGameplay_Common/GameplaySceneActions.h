@@ -81,5 +81,7 @@ private:
     std::vector<glm::vec2> FRandomPoints;
 
     u32 FNumberOfPoints = 1000;
+
+    bool FShowEntitiesInEditor = true;
 };
 } // namespace ECSEngine
