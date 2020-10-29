@@ -123,7 +123,7 @@ public:
     FixedSizedArrayInSitu(const FixedSizedArrayInSitu<T, Size>& other) { memcpy(FData, other.FData, sizeof(FData)); }
     FixedSizedArrayInSitu(FixedSizedArrayInSitu<T, Size>&& other) { memcpy(FData, other.FData, sizeof(FData)); }
 
-    virtual ~FixedSizedArrayInSitu() {}
+    virtual ~FixedSizedArrayInSitu() { }
 
     FixedSizedArrayInSitu<T, Size>& operator=(const FixedSizedArrayInSitu<T, Size>& other)
     {
@@ -154,7 +154,7 @@ public:
         return FData[parIdx];
     }
 
-    const u32 GetSize() const { return Size; }
+    const u32 size() const { return Size; }
 
     const T* data() const { return FData; }
 
