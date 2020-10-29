@@ -4,6 +4,7 @@
 
 #include "ApparenceModule.h"
 #include "Application/SceneItems.h"
+#include "Common/NavMeshSolver.h"
 #include "Common/PolygonRandomGenerator.h"
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSCore/EntityFactory.h"
@@ -18,6 +19,9 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionWithBaseSceneItem, EC
 
 CEREAL_REGISTER_TYPE(ECSEngine::SpawnEntitiesInPolygonalPatternSceneAction);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionPolygonalPattern, ECSEngine::SpawnEntitiesInPolygonalPatternSceneAction)
+
+CEREAL_REGISTER_TYPE(ECSEngine::CreateNavMeshSceneAction);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionPolygonalPattern, ECSEngine::CreateNavMeshSceneAction)
 
 namespace ECSEngine
 {
@@ -207,6 +211,54 @@ void SpawnEntitiesInPolygonalPatternSceneAction::GenerateRandomPoints()
     FRandomPoints.reserve(params.NumberOfPoints);
 
     randomGenerator.GenerateRandomPoints(Polygon(), PolygonHoles(), params, FRandomPoints);
+}
+
+/*******************************************/
+/*        CreateNavMeshSceneAction         */
+/*******************************************/
+IMPLEMENT_SCENE_ACTION(CreateNavMeshSceneAction);
+CreateNavMeshSceneAction::CreateNavMeshSceneAction(const std::string& parFName /*= "Dummy"*/)
+    : parent_type(parFName)
+{
+}
+
+void CreateNavMeshSceneAction::VirtualInitialise(const SceneScenario* parScene)
+{
+    parent_type::VirtualInitialise(parScene);
+}
+
+void CreateNavMeshSceneAction::VirtualStart()
+{
+    parent_type::VirtualStart();
+    GenerateNavMesh();
+}
+
+void CreateNavMeshSceneAction::VirtualDrawEditor()
+{
+    parent_type::VirtualDrawEditor();
+
+    if (ShouldShowEditor())
+    {
+        if (ImGui::Button("Generate nav mesh"))
+        {
+            GenerateNavMesh();
+        }
+    }
+}
+
+bool CreateNavMeshSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
+{
+    parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+    return false;
+}
+
+void CreateNavMeshSceneAction::GenerateNavMesh()
+{
+    if (FNavMesh.VerticesCount() > 0)
+        FNavMesh.Cleanup();
+
+    Navigation::NavMeshSolver solver;
+    solver.CreateNavMesh(Polygon(), PolygonHoles(), FNavMesh);
 }
 
 } // namespace ECSEngine

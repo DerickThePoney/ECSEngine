@@ -1,5 +1,6 @@
 #pragma once
 #include "Application/ApplicationSceneActions.h"
+#include "Common/NavMesh.h"
 #include "Common/PoolAllocator.h"
 
 namespace ECSEngine
@@ -83,5 +84,38 @@ private:
     u32 FNumberOfPoints = 1000;
 
     bool FShowEntitiesInEditor = true;
+};
+
+/*******************************************/
+/*        CreateNavMeshSceneAction         */
+/*******************************************/
+class CreateNavMeshSceneAction : public SceneActionPolygonalPattern
+{
+    DECLARE_SCENE_ACTION(CreateNavMeshSceneAction, SceneActionPolygonalPattern);
+
+public:
+    CreateNavMeshSceneAction(const std::string& parFName = "Dummy");
+    virtual ~CreateNavMeshSceneAction() { }
+
+protected:
+    virtual void VirtualInitialise(const SceneScenario* parScene) override;
+
+    virtual void VirtualStart() override;
+
+    virtual void VirtualDrawEditor() override;
+    virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial);
+
+public:
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(cereal::base_class<parent_type>(this));
+    }
+
+protected:
+    void GenerateNavMesh();
+
+private:
+    Navigation::NavMesh FNavMesh;
 };
 } // namespace ECSEngine
