@@ -264,7 +264,7 @@ std::vector<Triangle2D> PolygonTriangulator::Triangulate(const Polygon2D& parPol
 
         ears.erase(ears.begin());
 
-        triangles.push_back(Triangle2D(touse[currentEar], touse[currentEar_m1], touse[currentEar_1]));
+        triangles.push_back(Triangle2D(touse[currentEar_m1], touse[currentEar], touse[currentEar_1]));
         touse.erase(currentEar);
 
         if (touse.size() == 3)
