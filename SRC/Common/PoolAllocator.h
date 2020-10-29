@@ -30,54 +30,6 @@ private:
     alignas(T) PtrType<T> FChunk[ChunkSize];
 };
 
-// struct FreeBlock
-//{
-//    FreeBlock()
-//        : first(0)
-//        , second(0)
-//    {
-//    }
-//
-//    FreeBlock(const u32 parFirst, const u32 parSecond)
-//        : first(parFirst)
-//        , second(parFirst)
-//    {
-//        AssertRelease(second >= first);
-//    }
-//
-//    FreeBlock(const FreeBlock& other)
-//    {
-//        first = other.first;
-//        second = other.second;
-//    }
-//
-//    FreeBlock(FreeBlock&& other)
-//    {
-//        first = other.first;
-//        second = other.second;
-//    }
-//
-//    void operator=(const FreeBlock& other)
-//    {
-//        first = other.first;
-//        second = other.second;
-//    }
-//
-//    void operator=(FreeBlock&& other)
-//    {
-//        first = other.first;
-//        second = other.second;
-//    }
-//
-//    bool operator==(const FreeBlock& other) { return first == other.first && second == other.second; }
-//
-//    u32 size() { return second - first + 1; }
-//
-//    u32 first;
-//    u32 second;
-//};
-
-// TODO Free chunks should be saved in pairs start end, and merged on release.
 template<class T, u32 ChunkSize>
 class PoolAllocator
 {
