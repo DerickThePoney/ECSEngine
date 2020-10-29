@@ -92,34 +92,36 @@ public:
     void SetMouseButtonState(int button, bool value);
     void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtrlDown, bool isAltDown);
 
-    const glm::vec2& GetMousePosition() { return FMouse.MousePosition; }
-    const glm::vec2 GetMousePositionDelta() { return FMouse.MousePosition - FMouse.PreviousMousePosition; }
-    const glm::vec2& GetMouseScrollDelta() { return FMouse.MouseScrollDelta; }
+    void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed);
+
+    const glm::vec2 GetMousePosition() { return (FMouse.AlreadyUsed) ? glm::vec2(0.f) : FMouse.MousePosition; }
+    const glm::vec2 GetMousePositionDelta() { return (FMouse.AlreadyUsed) ? glm::vec2(0.f) : FMouse.MousePosition - FMouse.PreviousMousePosition; }
+    const glm::vec2 GetMouseScrollDelta() { return (FMouse.AlreadyUsed) ? glm::vec2(0.f) : FMouse.MouseScrollDelta; }
     bool GetMouseButtonState(int button)
     {
         AssertRelease(button < FMouse.MouseButtons.ThisFrameValues.size());
-        return FMouse.MouseButtons.ThisFrameValues[button];
+        return !FMouse.AlreadyUsed && FMouse.MouseButtons.ThisFrameValues[button];
     }
     bool GetMouseButtonHasChanged(int button)
     {
         AssertRelease(button < FMouse.MouseButtons.ThisFrameValues.size());
-        return FMouse.MouseButtons.ThisFrameValues[button] != FMouse.MouseButtons.PreviousFrameValues[button];
+        return !FMouse.AlreadyUsed && FMouse.MouseButtons.ThisFrameValues[button] != FMouse.MouseButtons.PreviousFrameValues[button];
     }
 
     bool GetButtonDown(int button)
     {
         AssertRelease(button < FKeyboardState.KeyStates.ThisFrameValues.size());
-        return FKeyboardState.KeyStates.ThisFrameValues[button];
+        return !FKeyboardState.AlreadyUsed && FKeyboardState.KeyStates.ThisFrameValues[button];
     }
     bool GetButtonHasChanged(int button)
     {
         AssertRelease(button < FKeyboardState.KeyStates.ThisFrameValues.size());
-        return FKeyboardState.KeyStates.ThisFrameValues[button] != FKeyboardState.KeyStates.PreviousFrameValues[button];
+        return !FKeyboardState.AlreadyUsed && FKeyboardState.KeyStates.ThisFrameValues[button] != FKeyboardState.KeyStates.PreviousFrameValues[button];
     }
 
-    bool IsShiftDown() { return FKeyboardState.IsShiftDown; }
-    bool IsCtrlDown() { return FKeyboardState.IsCtrlDown; }
-    bool IsAltDown() { return FKeyboardState.IsAltDown; }
+    bool IsShiftDown() { return !FKeyboardState.AlreadyUsed && FKeyboardState.IsShiftDown; }
+    bool IsCtrlDown() { return !FKeyboardState.AlreadyUsed && FKeyboardState.IsCtrlDown; }
+    bool IsAltDown() { return !FKeyboardState.AlreadyUsed && FKeyboardState.IsAltDown; }
 
     void GamepadIsConnected(const int parGamepadId, const char* parGamepadName);
     void GamepadIsDisconnected(const int parGamepadId);
@@ -151,6 +153,8 @@ private:
         bool IsShiftDown = false;
         bool IsCtrlDown = false;
         bool IsAltDown = false;
+
+        bool AlreadyUsed = false;
     };
 
     KeyboardState FKeyboardState;
@@ -163,6 +167,8 @@ private:
         glm::vec2 PreviousMouseScrollDelta;
 
         ButtonsState MouseButtons;
+
+        bool AlreadyUsed = false;
 
         void Initialise(const glm::vec2& parMousePosition, const u32 parNbButtons);
     };
@@ -229,7 +235,12 @@ void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtr
     InputManager::Instance().SetKeyboardButtonState(button, value, isShiftDown, isCtrlDown, isAltDown);
 }
 
-const glm::vec2& GetMousePosition()
+void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed)
+{
+    InputManager::Instance().SetInputsAlreadyUsed(parKeyboardInputUsed, parMouseInputUsed);
+}
+
+const glm::vec2 GetMousePosition()
 {
     return InputManager::Instance().GetMousePosition();
 }
@@ -239,7 +250,7 @@ const glm::vec2 GetMousePositionDelta()
     return InputManager::Instance().GetMousePositionDelta();
 }
 
-const glm::vec2& GetMouseScrollDelta()
+const glm::vec2 GetMouseScrollDelta()
 {
     return InputManager::Instance().GetMouseScrollDelta();
 }
@@ -460,6 +471,12 @@ float InputManager::GetGamepadAxisValueDelta(const int parGamepadId, GamepadAxes
     AssertRelease(FGamepads.find(parGamepadId) != FGamepads.end());
     Gamepad& g = FGamepads.at(parGamepadId);
     return g.AxesStates.ThisFrameValues[parGamepadAxis] - g.AxesStates.PreviousFrameValues[parGamepadAxis];
+}
+
+void InputManager::SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed)
+{
+    FKeyboardState.AlreadyUsed = parKeyboardInputUsed;
+    FMouse.AlreadyUsed = parMouseInputUsed;
 }
 
 void InputManager::ButtonsState::Initialise(const u32 parNbKeys)

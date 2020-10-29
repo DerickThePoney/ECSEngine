@@ -65,9 +65,11 @@ void SetMouseScrollDelta(const glm::vec2& parMouseScrollDelta);
 void SetMouseButtonState(int button, bool value);
 void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtrlDown, bool isAltDown);
 
-const glm::vec2& GetMousePosition();
+void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed);
+
+const glm::vec2 GetMousePosition();
 const glm::vec2 GetMousePositionDelta();
-const glm::vec2& GetMouseScrollDelta();
+const glm::vec2 GetMouseScrollDelta();
 bool GetMouseButtonState(int button);
 bool GetMouseButtonHasChanged(int button);
 
