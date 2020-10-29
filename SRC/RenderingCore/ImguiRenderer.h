@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/Singleton.h"
+#include "RenderPass.h"
 
 namespace ECSEngine
 {
@@ -12,6 +13,7 @@ namespace Rendering
 namespace ImGUI
 {
 void Init();
+void SetImGuiContext(RenderPassId::Type parImGuiPass);
 void NewFrame();
 void Render();
 void Shutdown();

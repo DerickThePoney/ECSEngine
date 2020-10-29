@@ -3,6 +3,8 @@
 #include "ImguiRenderer.h"
 
 #include "BGFXRenderingUtils.h"
+#include "Common/FixedSizedArray.h"
+#include "Common/InputManager.h"
 #include "Common/RenderingHandles.h"
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
@@ -36,16 +38,21 @@ public:
     {
     }
 
-    void Init();
-    void Render(ImDrawData* parData);
+    void Init(const u32 parContext);
+    void Render(ImDrawData* parData, const u16 parViewId);
 
-    void Shutdown();
+    void SetCurrentContext(const u32 parContext);
+
+    void Shutdown(const u32 parContext);
+
+    const u32 GetContextNumber() const { return FImguiContexts.size(); }
 
 private:
     void InitMouseAndButtons(ImGuiIO& io);
 
 private:
-    ImGuiContext* FImguiContext;
+    static constexpr u32 PassesNumber = RenderPassId::IMGUI_PASSES_END - RenderPassId::IMGUI_PASSES_START + 1;
+    FixedSizedArrayInSitu<ImGuiContext*, PassesNumber> FImguiContexts;
     bgfx::VertexLayout FVertexLayout;
     bgfx::ProgramHandle FProgam;
     bgfx::ProgramHandle FImageProgram;
@@ -53,18 +60,21 @@ private:
     bgfx::UniformHandle FTextureSampleUniform;
     bgfx::UniformHandle FImageLodEnabledUniform;
     // ImFont* m_font[ImGui::Font::Count];
-    int64_t m_last;
-    int32_t m_lastScroll;
-    bgfx::ViewId m_viewId;
 };
 
-void ImguiRenderer::Init()
+void ImguiRenderer::Init(const u32 parContext)
 {
-    m_viewId = 255;
-    m_lastScroll = 0;
-    m_last = bx::getHPCounter();
-
-    FImguiContext = ImGui::CreateContext();
+    ImFontAtlas* sharedFontAtlas = nullptr;
+    if (parContext != 0)
+    {
+        AssertRelease(FImguiContexts[0] != nullptr);
+        SetCurrentContext(0);
+        ImGuiIO& io = ImGui::GetIO();
+        sharedFontAtlas = io.Fonts;
+    }
+    AssertRelease(FImguiContexts[parContext] == nullptr);
+    FImguiContexts[parContext] = ImGui::CreateContext(sharedFontAtlas);
+    SetCurrentContext(parContext);
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -72,57 +82,58 @@ void ImguiRenderer::Init()
     io.DeltaTime = 1.0f / 60.0f;
     io.IniFilename = NULL;
 
-    // setupStyle(true);
-
-    bgfx::RendererType::Enum type = bgfx::getRendererType();
-    FProgam = LoadProgram("Shaders\\Perso\\", "ImGUI", "ocornut_imgui");
-
-    FImageLodEnabledUniform = bgfx::createUniform("u_imageLodEnabled", bgfx::UniformType::Vec4);
-    FImageProgram = LoadProgram("Shaders\\Perso\\", "ImGUI", "imgui_image");
-
-    FVertexLayout.begin()
-          .add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
-          .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-          .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-          .end();
-
-    FTextureSampleUniform = bgfx::createUniform("s_tex", bgfx::UniformType::Sampler);
-
-    uint8_t* data;
-    int32_t width;
-    int32_t height;
-
-    ECSEngine::ResourceCache* cache = ECSEngine::GlobalResourceCache::Instance().FCache;
-    ECSEngine::Resource shaderResource("Fonts\\OpenSans-Regular.ttf");
-    std::shared_ptr<ECSEngine::ResourceHandle> shaderDataHandle = cache->GetResourceHandle(&shaderResource);
-    ImFontConfig config;
-    config.FontDataOwnedByAtlas = false;
-    config.MergeMode = false;
-    io.Fonts->AddFontFromMemoryTTF(shaderDataHandle->WritableBuffer(), shaderDataHandle->Size(), 20, &config);
-
-    io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
-
-    FTextureHandle = bgfx::createTexture2D((uint16_t)width, (uint16_t)height, false, 1, bgfx::TextureFormat::BGRA8, 0, bgfx::copy(data, width * height * 4));
-
     GLFWDisplayWindowHandler::Instance().InitInputsForImGui(io);
+
+    if (parContext == 0)
+    {
+        bgfx::RendererType::Enum type = bgfx::getRendererType();
+        FProgam = LoadProgram("Shaders\\Perso\\", "ImGUI", "ocornut_imgui");
+
+        FImageLodEnabledUniform = bgfx::createUniform("u_imageLodEnabled", bgfx::UniformType::Vec4);
+        FImageProgram = LoadProgram("Shaders\\Perso\\", "ImGUI", "imgui_image");
+
+        FVertexLayout.begin()
+              .add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
+              .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+              .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
+              .end();
+
+        FTextureSampleUniform = bgfx::createUniform("s_tex", bgfx::UniformType::Sampler);
+
+        uint8_t* data;
+        int32_t width;
+        int32_t height;
+
+        ECSEngine::ResourceCache* cache = ECSEngine::GlobalResourceCache::Instance().FCache;
+        ECSEngine::Resource shaderResource("Fonts\\OpenSans-Regular.ttf");
+        std::shared_ptr<ECSEngine::ResourceHandle> shaderDataHandle = cache->GetResourceHandle(&shaderResource);
+        ImFontConfig config;
+        config.FontDataOwnedByAtlas = false;
+        config.MergeMode = false;
+        io.Fonts->AddFontFromMemoryTTF(shaderDataHandle->WritableBuffer(), shaderDataHandle->Size(), 20, &config);
+
+        io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
+
+        FTextureHandle = bgfx::createTexture2D((uint16_t)width, (uint16_t)height, false, 1, bgfx::TextureFormat::BGRA8, 0, bgfx::copy(data, width * height * 4));
+    }
 }
 
-void ImguiRenderer::Render(ImDrawData* parDrawData)
+void ImguiRenderer::Render(ImDrawData* parDrawData, const u16 parViewId)
 {
     // SHAMELESSLY STOLEN FROM BGFX EXAMPLES...
     const ImGuiIO& io = ImGui::GetIO();
     const float width = io.DisplaySize.x;
     const float height = io.DisplaySize.y;
 
-    bgfx::setViewName(m_viewId, "ImGui");
-    bgfx::setViewMode(m_viewId, bgfx::ViewMode::Sequential);
+    bgfx::setViewName(parViewId, "ImGui");
+    bgfx::setViewMode(parViewId, bgfx::ViewMode::Sequential);
 
     const bgfx::Caps* caps = bgfx::getCaps();
     {
         float ortho[16];
         bx::mtxOrtho(ortho, 0.0f, width, height, 0.0f, 0.0f, 1000.0f, 0.0f, caps->homogeneousDepth);
-        bgfx::setViewTransform(m_viewId, NULL, ortho);
-        bgfx::setViewRect(m_viewId, 0, 0, uint16_t(width), uint16_t(height));
+        bgfx::setViewTransform(parViewId, NULL, ortho);
+        bgfx::setViewRect(parViewId, 0, 0, uint16_t(width), uint16_t(height));
     }
 
     // Render command lists
@@ -187,7 +198,7 @@ void ImguiRenderer::Render(ImDrawData* parDrawData)
                 bgfx::setTexture(0, FTextureSampleUniform, th);
                 bgfx::setVertexBuffer(0, &tvb, 0, numVertices);
                 bgfx::setIndexBuffer(&tib, offset, cmd->ElemCount);
-                bgfx::submit(m_viewId, program);
+                bgfx::submit(parViewId, program);
             }
 
             offset += cmd->ElemCount;
@@ -195,16 +206,28 @@ void ImguiRenderer::Render(ImDrawData* parDrawData)
     }
 }
 
-void ImguiRenderer::Shutdown()
+void ImguiRenderer::SetCurrentContext(const u32 parContext)
 {
-    ImGui::DestroyContext(FImguiContext);
+    AssertRelease(parContext < PassesNumber);
+    AssertRelease(FImguiContexts[parContext] != nullptr);
+    ImGui::SetCurrentContext(FImguiContexts[parContext]);
+}
 
-    bgfx::destroy(FTextureSampleUniform);
-    bgfx::destroy(FTextureHandle);
+void ImguiRenderer::Shutdown(const u32 parContext)
+{
+    AssertRelease(parContext < PassesNumber);
+    AssertRelease(FImguiContexts[parContext] != nullptr);
+    ImGui::DestroyContext(FImguiContexts[parContext]);
 
-    bgfx::destroy(FImageLodEnabledUniform);
-    bgfx::destroy(FImageProgram);
-    bgfx::destroy(FProgam);
+    if (parContext == 0)
+    {
+        bgfx::destroy(FTextureSampleUniform);
+        bgfx::destroy(FTextureHandle);
+
+        bgfx::destroy(FImageLodEnabledUniform);
+        bgfx::destroy(FImageProgram);
+        bgfx::destroy(FProgam);
+    }
 }
 
 void ImguiRenderer::InitMouseAndButtons(ImGuiIO& io)
@@ -221,41 +244,68 @@ namespace ImGUI
 void Init()
 {
     ECSEngine::Rendering::ImguiRenderer::CreateIFP();
-    ECSEngine::Rendering::ImguiRenderer::Instance().Init();
+
+    for (u16 i = RenderPassId::IMGUI_PASSES_START; i < RenderPassId::IMGUI_PASSES_END + 1; ++i)
+    {
+        ECSEngine::Rendering::ImguiRenderer::Instance().Init(i - RenderPassId::IMGUI_PASSES_START);
+    }
+}
+
+void SetImGuiContext(RenderPassId::Type parImGuiPass)
+{
+    AssertRelease(parImGuiPass >= RenderPassId::IMGUI_PASSES_START && parImGuiPass <= RenderPassId::IMGUI_PASSES_END);
+    ImguiRenderer::Instance().SetCurrentContext(parImGuiPass - RenderPassId::IMGUI_PASSES_START);
 }
 
 void NewFrame()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    io.DeltaTime = ECSEngine::TimeManager::FrameDeltaTime();
-    if (io.DeltaTime == 0.0f)
-        io.DeltaTime = 1.f / 60.f;
-    io.DisplaySize = GLFWDisplayWindowHandler::Instance().GetSize();
+    bool captureKeyboard = false, captureMouse = false;
+    for (u16 i = RenderPassId::IMGUI_PASSES_START; i < RenderPassId::IMGUI_PASSES_END + 1; ++i)
+    {
+        ImguiRenderer::Instance().SetCurrentContext(i - RenderPassId::IMGUI_PASSES_START);
+        ImGuiIO& io = ImGui::GetIO();
+        io.DeltaTime = ECSEngine::TimeManager::FrameDeltaTime();
+        if (io.DeltaTime == 0.0f)
+            io.DeltaTime = 1.f / 60.f;
+        io.DisplaySize = GLFWDisplayWindowHandler::Instance().GetSize();
 
-    if (io.DisplaySize.x > 0 && io.DisplaySize.y > 0)
-        io.DisplayFramebufferScale = ImVec2((float)1.0f, (float)1.0f);
+        if (io.DisplaySize.x > 0 && io.DisplaySize.y > 0)
+            io.DisplayFramebufferScale = ImVec2((float)1.0f, (float)1.0f);
 
-    GLFWDisplayWindowHandler::Instance().UpdateMousePosAndButtonsForImGUI(io);
-    GLFWDisplayWindowHandler::Instance().UpdateMouseCursorForImGUI(io);
-    GLFWDisplayWindowHandler::Instance().UpdateJoysticks(io);
+        GLFWDisplayWindowHandler::Instance().UpdateMousePosAndButtonsForImGUI(io);
+        GLFWDisplayWindowHandler::Instance().UpdateMouseCursorForImGUI(io);
+        GLFWDisplayWindowHandler::Instance().UpdateJoysticks(io);
 
-    //// Update game controllers (if enabled and available)
-    // ImGui_ImplGlfw_UpdateGamepads();
+        //// Update game controllers (if enabled and available)
+        // ImGui_ImplGlfw_UpdateGamepads();
+        captureKeyboard = captureKeyboard || io.WantCaptureKeyboard;
+        captureMouse = captureMouse || io.WantCaptureMouse;
 
-    ImGui::NewFrame();
+        ImGui::NewFrame();
+    }
+
+    Input::SetInputsAlreadyUsed(captureKeyboard, captureMouse);
 }
 
 void Render()
 {
-    ImGui::EndFrame();
-    ImGui::Render();
-    ImDrawData* draw_data = ImGui::GetDrawData();
-    ECSEngine::Rendering::ImguiRenderer::Instance().Render(draw_data);
+    for (u16 i = RenderPassId::IMGUI_PASSES_START; i < RenderPassId::IMGUI_PASSES_END + 1; ++i)
+    {
+        ImguiRenderer::Instance().SetCurrentContext(i - RenderPassId::IMGUI_PASSES_START);
+        ImGui::EndFrame();
+        ImGui::Render();
+        ImDrawData* draw_data = ImGui::GetDrawData();
+        if (draw_data->CmdListsCount > 0)
+            ECSEngine::Rendering::ImguiRenderer::Instance().Render(draw_data, i);
+    }
 }
 
 void Shutdown()
 {
-    ECSEngine::Rendering::ImguiRenderer::Instance().Shutdown();
+    for (u16 i = RenderPassId::IMGUI_PASSES_START; i < RenderPassId::IMGUI_PASSES_END + 1; ++i)
+    {
+        ECSEngine::Rendering::ImguiRenderer::Instance().Shutdown(i - RenderPassId::IMGUI_PASSES_START);
+    }
     ECSEngine::Rendering::ImguiRenderer::Destroy();
 }
 } // namespace ImGUI

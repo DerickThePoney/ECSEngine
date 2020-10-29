@@ -10,6 +10,7 @@
 
 #include "BGFXRenderer.h"
 #include "Common/InputManager.h"
+#include "ImguiRenderer.h"
 
 namespace ECSEngine
 {
@@ -28,38 +29,54 @@ void WindowSizeCallback(GLFWwindow* window, int width, int height)
 
 void WindowScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseWheelH += (float)xoffset;
-    io.MouseWheel += (float)yoffset;
+    for (u16 i = (u16)RenderPassId::IMGUI_PASSES_START; i < (u16)RenderPassId::IMGUI_PASSES_END + 1; i++)
+    {
+        ImGUI::SetImGuiContext((RenderPassId::Type)i);
+        ImGuiIO& io = ImGui::GetIO();
+        io.MouseWheelH += (float)xoffset;
+        io.MouseWheel += (float)yoffset;
+    }
 
     Input::SetMouseScrollDelta(glm::vec2((float)xoffset, (float)yoffset));
 }
 
 void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    ImGuiIO& io = ImGui::GetIO();
-    if (action == GLFW_PRESS)
-        io.KeysDown[key] = true;
-    if (action == GLFW_RELEASE)
-        io.KeysDown[key] = false;
+    bool ctrl = false, shift = false, alt = false;
+    for (u16 i = (u16)RenderPassId::IMGUI_PASSES_START; i < (u16)RenderPassId::IMGUI_PASSES_END + 1; i++)
+    {
+        ImGUI::SetImGuiContext((RenderPassId::Type)i);
+        ImGuiIO& io = ImGui::GetIO();
+        if (action == GLFW_PRESS)
+            io.KeysDown[key] = true;
+        if (action == GLFW_RELEASE)
+            io.KeysDown[key] = false;
 
-    // Modifiers are not reliable across systems
-    io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-    io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-    io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+        // Modifiers are not reliable across systems
+        io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+        io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+        io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
 #ifdef _WIN32
-    io.KeySuper = false;
+        io.KeySuper = false;
 #else
-    io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+        io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 #endif
+        ctrl = ctrl || io.KeyShift;
+        shift = shift || io.KeyShift;
+        alt = alt || io.KeyAlt;
+    }
 
-    Input::SetKeyboardButtonState(key, action == GLFW_PRESS || action == GLFW_REPEAT, io.KeyShift, io.KeyCtrl, io.KeyAlt);
+    Input::SetKeyboardButtonState(key, action == GLFW_PRESS || action == GLFW_REPEAT, shift, ctrl, alt);
 }
 
 void WindowCharCallback(GLFWwindow* window, unsigned int c)
 {
-    ImGuiIO& io = ImGui::GetIO();
-    io.AddInputCharacter(c);
+    for (u16 i = (u16)RenderPassId::IMGUI_PASSES_START; i < (u16)RenderPassId::IMGUI_PASSES_END + 1; i++)
+    {
+        ImGUI::SetImGuiContext((RenderPassId::Type)i);
+        ImGuiIO& io = ImGui::GetIO();
+        io.AddInputCharacter(c);
+    }
 }
 
 void WindowMousePosCallback(GLFWwindow* window, double xpos, double ypos)
@@ -303,8 +320,6 @@ void GLFWDisplayWindowHandler::UpdateMousePosAndButtonsForImGUI(ImGuiIO& io)
             io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);
         }
     }
-
-    Input::SetInputsAlreadyUsed(io.WantCaptureKeyboard, io.WantCaptureMouse);
 }
 
 void GLFWDisplayWindowHandler::UpdateMouseCursorForImGUI(ImGuiIO& io)
