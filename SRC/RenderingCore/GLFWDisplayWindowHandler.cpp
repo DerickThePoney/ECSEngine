@@ -303,6 +303,8 @@ void GLFWDisplayWindowHandler::UpdateMousePosAndButtonsForImGUI(ImGuiIO& io)
             io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);
         }
     }
+
+    Input::SetInputsAlreadyUsed(io.WantCaptureKeyboard, io.WantCaptureMouse);
 }
 
 void GLFWDisplayWindowHandler::UpdateMouseCursorForImGUI(ImGuiIO& io)
