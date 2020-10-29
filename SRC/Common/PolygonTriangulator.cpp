@@ -304,7 +304,7 @@ std::vector<Triangle2D> PolygonTriangulator::Triangulate(const Polygon2D& parPol
         UpdateAdjacentVertex(currentEar_1, convex, reflex, ears, touse);
 
         std::sort(convex.begin(), convex.end());
-        std::sort(ears.end(), ears.end());
+        std::sort(ears.begin(), ears.end());
     }
 
     return triangles;
