@@ -10,6 +10,8 @@
 #include "Rendering/EditorGridRenderer.h"
 #include "Rendering/EditorSceneRenderer.h"
 #include "Rendering/SceneObjectsPickingRenderer.h"
+#include "RenderingCore/ImguiRenderer.h"
+#include "RenderingCore/RenderPass.h"
 
 namespace ECSEngine
 {
@@ -114,6 +116,7 @@ void ScenarioEditor::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedI
 
 void ScenarioEditor::UpdateForSceneEditing()
 {
+    Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_EDITOR_PASS);
     FEditorCamera.Update();
 
     if (!FIOScene.openScene)
@@ -228,6 +231,7 @@ void ScenarioEditor::UpdateForInEditorPlaying()
 
 void ScenarioEditor::UpdateSceneEditorStatus()
 {
+    Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_EDITOR_PASS);
     if (!FIOScene.openScene)
     {
         bool isPlaying = FState == ScenarioEditorStatus::PLAYING_SCENARIO;
