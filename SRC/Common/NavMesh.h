@@ -37,6 +37,8 @@ public:
 };
 
 using VerticesDataBase = std::vector<NavMeshVertex*>;
+using NeighbourVerticesSet = std::set<NavMeshVertex*>;
+using ConnectedComponents = std::unordered_map<NavMeshVertex*, NeighbourVerticesSet>;
 using EdgesDataBase = std::vector<NavMeshEdge*>;
 using FacesDataBase = std::vector<NavMeshFace*>;
 class NavMesh
@@ -57,11 +59,16 @@ public:
     u32 FacesCount() const { return (u32)FFaces.size(); }
 
     const NavMeshFace* FindContainingFace(const glm::vec2 parPoint) const;
+    const NeighbourVerticesSet& GetNeighbours(NavMeshVertex* parVertex) const;
+
+private:
+    void FindNeighbourgingVertices(const NavMeshVertex* parVertex, std::set<NavMeshVertex*>& outVertices) const;
 
 private:
     VerticesDataBase FVertices;
     EdgesDataBase FEdges;
     FacesDataBase FFaces;
+    ConnectedComponents FConnectedComponents;
 };
 } // namespace Navigation
 } // namespace ECSEngine
