@@ -103,6 +103,10 @@ void NavMeshSolver::CreateNavMesh(const Polygon2D& parWorldExtents, const std::v
         e2->Next = e3;
         e3->Next = e1;
 
+        e1->Prev = e3;
+        e2->Prev = e1;
+        e3->Prev = e2;
+
         // Connect edge to vertices
         e1->Vertex = v1;
         e2->Vertex = v2;
