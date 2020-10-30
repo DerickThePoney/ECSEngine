@@ -14,6 +14,7 @@ struct NavMeshVertex
 public:
     glm::vec2 Position = glm::vec2(0.f);
     std::vector<NavMeshEdge*> Edge;
+    u32 Id = 0;
 };
 
 struct NavMeshEdge
@@ -37,8 +38,9 @@ public:
 };
 
 using VerticesDataBase = std::vector<NavMeshVertex*>;
-using NeighbourVerticesSet = std::set<NavMeshVertex*>;
-using ConnectedComponents = std::unordered_map<NavMeshVertex*, NeighbourVerticesSet>;
+using NeighbourVerticesSet = std::set<u32>;
+using NeighbourFacesSet = std::set<NavMeshFace*>;
+using ConnectedComponents = std::unordered_map<u32, NeighbourVerticesSet>;
 using EdgesDataBase = std::vector<NavMeshEdge*>;
 using FacesDataBase = std::vector<NavMeshFace*>;
 class NavMesh
@@ -59,10 +61,12 @@ public:
     u32 FacesCount() const { return (u32)FFaces.size(); }
 
     const NavMeshFace* FindContainingFace(const glm::vec2 parPoint) const;
-    const NeighbourVerticesSet& GetNeighbours(NavMeshVertex* parVertex) const;
+    const NeighbourVerticesSet& NeighbourVertices(const NavMeshVertex* parVertex) const;
+
+    void NeighbourFaces(const NavMeshVertex* parVertex, NeighbourFacesSet& outFaces) const;
 
 private:
-    void FindNeighbourgingVertices(const NavMeshVertex* parVertex, std::set<NavMeshVertex*>& outVertices) const;
+    void FindNeighbourgingVertices(const NavMeshVertex* parVertex, NeighbourVerticesSet& outVertices) const;
 
 private:
     VerticesDataBase FVertices;

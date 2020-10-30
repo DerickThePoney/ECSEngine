@@ -22,10 +22,10 @@ void NavMesh::Initialize(VerticesDataBase&& parVertices, EdgesDataBase&& parEdge
     // Build Connected Component
     foreachitemconst(vertex, FVertices)
     {
-        AssertRelease(FConnectedComponents.find(vertex) == FConnectedComponents.end());
+        AssertRelease(FConnectedComponents.find(vertex->Id) == FConnectedComponents.end());
         NeighbourVerticesSet neighbours;
         FindNeighbourgingVertices(vertex, neighbours);
-        FConnectedComponents.insert_or_assign(vertex, neighbours);
+        FConnectedComponents.insert_or_assign(vertex->Id, neighbours);
     }
 }
 
@@ -60,17 +60,21 @@ const NavMeshFace* NavMesh::FindContainingFace(const glm::vec2 parPoint) const
     return nullptr;
 }
 
-const NeighbourVerticesSet& NavMesh::GetNeighbours(NavMeshVertex* parVertex) const
+const NeighbourVerticesSet& NavMesh::NeighbourVertices(const NavMeshVertex* parVertex) const
 {
-    AssertRelease(FConnectedComponents.find(parVertex) != FConnectedComponents.end());
-    return FConnectedComponents.at(parVertex);
+    AssertRelease(FConnectedComponents.find(parVertex->Id) != FConnectedComponents.end());
+    return FConnectedComponents.at(parVertex->Id);
 }
 
-void NavMesh::FindNeighbourgingVertices(const NavMeshVertex* parVertex, std::set<NavMeshVertex*>& outVertices) const
+void NavMesh::NeighbourFaces(const NavMeshVertex* parVertex, NeighbourFacesSet& outFaces) const
+{
+    foreachitemconst(edge, parVertex->Edge) { outFaces.insert(edge->Face); }
+}
+
+void NavMesh::FindNeighbourgingVertices(const NavMeshVertex* parVertex, NeighbourVerticesSet& outVertices) const
 {
     std::set<NavMeshFace*> neighBouringFaces;
-
-    foreachitemconst(edge, parVertex->Edge) { neighBouringFaces.insert(edge->Face); }
+    NeighbourFaces(parVertex, neighBouringFaces);
 
     foreachitemconst(face, neighBouringFaces)
     {
@@ -84,7 +88,7 @@ void NavMesh::FindNeighbourgingVertices(const NavMeshVertex* parVertex, std::set
             }
 
             if (currentEdge->Next->Vertex == parVertex || currentEdge->Prev->Vertex == parVertex)
-                outVertices.insert(currentEdge->Vertex);
+                outVertices.insert(currentEdge->Vertex->Id);
 
             currentEdge = currentEdge->Next;
         } while (currentEdge != face->Edge);
