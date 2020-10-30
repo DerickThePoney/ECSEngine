@@ -25,6 +25,7 @@ public:
     NavMeshEdge* Pair = nullptr;
     NavMeshFace* Face = nullptr;
     NavMeshEdge* Next = nullptr;
+    NavMeshEdge* Prev = nullptr;
 };
 
 struct NavMeshFace
