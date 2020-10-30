@@ -48,9 +48,15 @@ public:
     void Initialize(VerticesDataBase&& parVertices, EdgesDataBase&& parEdges, FacesDataBase&& parFaces);
     void Cleanup();
 
+    const VerticesDataBase& Vertices() const { return FVertices; }
+    const EdgesDataBase& Edges() const { return FEdges; }
+    const FacesDataBase& Faces() const { return FFaces; }
+
     u32 VerticesCount() const { return (u32)FVertices.size(); }
     u32 EdgesCount() const { return (u32)FEdges.size(); }
     u32 FacesCount() const { return (u32)FFaces.size(); }
+
+    const NavMeshFace* FindContainingFace(const glm::vec2 parPoint) const;
 
 private:
     VerticesDataBase FVertices;

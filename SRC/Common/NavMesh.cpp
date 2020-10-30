@@ -2,6 +2,9 @@
 
 #include "NavMesh.h"
 
+#include "IntersectionRoutines.h"
+#include "Triangle.h"
+
 namespace ECSEngine
 {
 namespace Navigation
@@ -27,6 +30,23 @@ void NavMesh::Cleanup()
 
     forrange(i, 0, FFaces.size()) { delete FFaces[i]; }
     FFaces.clear();
+}
+
+const NavMeshFace* NavMesh::FindContainingFace(const glm::vec2 parPoint) const
+{
+    foreachitemconst(face, FFaces)
+    {
+        Triangle2D faceTri;
+        faceTri.A = face->Edge->Vertex->Position;
+        faceTri.B = face->Edge->Next->Vertex->Position;
+        faceTri.C = face->Edge->Next->Next->Vertex->Position;
+
+        if (Intersection::PointInTriangle2D(faceTri, parPoint))
+        {
+            return face;
+        }
+    }
+    return nullptr;
 }
 
 } // namespace Navigation
