@@ -144,7 +144,11 @@ void NavMeshSolver::CreateNavMesh(const Polygon2D& parWorldExtents, const std::v
     }
 
     vertices.reserve(verticesMap.size());
-    foreachitemconst(vertex, verticesMap) { vertices.push_back(vertex.second); }
+    foreachitem(vertex, verticesMap)
+    {
+        vertex.second->Id = (u32)vertices.size();
+        vertices.push_back(vertex.second);
+    }
 
     outNavMesh.Initialize(std::move(vertices), std::move(edges), std::move(faces));
 }
