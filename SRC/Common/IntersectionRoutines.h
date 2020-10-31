@@ -19,7 +19,12 @@ struct LinearComponentIntersection
     bool operator!=(const LinearComponentIntersection& parOther) const { return Intersection1 != parOther.Intersection1 || Intersection2 != parOther.Intersection2; }
 };
 
-bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, float& outIntersection);
+bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, LinearComponentIntersection& outIntersection);
+bool SegmentSegmentIntersection2D(const Segment2D& parSegment1, const Segment2D& parSegment2, LinearComponentIntersection& outIntersection);
+bool SegmentPolygonIntersections2D_StopAtFirstIntersection(const Segment2D& parSegment,
+      const Polygon2D& parPolygon,
+      bool parDoNotConsiderSegmentEndPoints,
+      bool parDoNotConsiderBorder);
 bool RayPolygonIntersections2D(const Ray2D& parRay, const Polygon2D& parPolygon, std::vector<std::pair<bool, LinearComponentIntersection>>& outIntersections);
 bool RayPolygonClosestIntersection2D(const Ray2D& parRay,
       const Polygon2D& parPolygon,

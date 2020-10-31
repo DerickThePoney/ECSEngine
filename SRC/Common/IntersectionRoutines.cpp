@@ -41,6 +41,35 @@ bool PointInTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint, 
     }
 }
 
+bool LinearComponentIntersection2D(const glm::vec2& parPointsDifference,
+      const glm::vec2& parDirectionA,
+      const glm::vec2& parDirectionB,
+      LinearComponentIntersection& outIntersection)
+{
+    const glm::vec2 rayDirPerp = glm::vec2(-parDirectionA.y, parDirectionA.x);
+    const glm::vec2 segDirPerp = glm::vec2(-parDirectionB.y, parDirectionB.x);
+
+    const float denom = glm::dot(segDirPerp, parDirectionA);
+
+    if (glm::abs(denom) < 0.01f)
+        return false;
+
+    const float aFactor = glm::dot(-segDirPerp, parPointsDifference) / denom;
+
+    if (aFactor < 0.f)
+        return false;
+
+    const float bFactor = glm::dot(rayDirPerp, parPointsDifference) / (-denom);
+
+    if (bFactor < 0.f)
+        return false;
+
+    outIntersection.Intersection1 = aFactor;
+    outIntersection.Intersection2 = bFactor;
+
+    return true;
+}
+
 bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, LinearComponentIntersection& outIntersection)
 {
     const glm::vec2 w = parRay.FOrigin - parSegment.Start;
@@ -50,29 +79,68 @@ bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, 
     {
         return false;
     }
-    const glm::vec2 segDir = parSegment.Direction();
-    const glm::vec2 rayDirPerp = glm::vec2(-parRay.FDirection.y, parRay.FDirection.x);
-    const glm::vec2 segDirPerp = glm::vec2(-segDir.y, segDir.x);
 
-    const float denom = glm::dot(segDirPerp, parRay.FDirection);
+    const bool res = LinearComponentIntersection2D(w, parRay.FDirection, parSegment.Direction(), outIntersection);
 
-    if (glm::abs(denom) < 0.01f)
+    if (res && outIntersection.Intersection2 > 1.0f)
         return false;
 
-    const float rayFactor = glm::dot(-segDirPerp, w) / denom;
+    return res;
+}
 
-    if (rayFactor < 0.f)
+bool SegmentSegmentIntersection2D(const Segment2D& parSegment1, const Segment2D& parSegment2, LinearComponentIntersection& outIntersection)
+{
+    const glm::vec2 w = parSegment1.Start - parSegment2.Start;
+    const glm::vec2 seg1DirNormalised = parSegment1.DirectionNormalized();
+    const glm::vec2 seg2DirNormalised = parSegment2.DirectionNormalized();
+
+    if (glm::abs(glm::dot(seg1DirNormalised, seg2DirNormalised)) > 0.99f)
+    {
+        return false;
+    }
+
+    const bool res = LinearComponentIntersection2D(w, parSegment1.Direction(), parSegment2.Direction(), outIntersection);
+
+    if (res && (outIntersection.Intersection1 > 1.0f || outIntersection.Intersection2 > 1.0f))
         return false;
 
-    const float segmentFactor = glm::dot(rayDirPerp, w) / (-denom);
+    return res;
+}
 
-    if (segmentFactor < 0.f || segmentFactor > 1.f)
-        return false;
+bool SegmentPolygonIntersections2D_StopAtFirstIntersection(const Segment2D& parSegment,
+      const Polygon2D& parPolygon,
+      bool parDoNotConsiderSegmentEndPoints,
+      bool parDoNotConsiderBorder)
+{
+    const u32 polygonSize = (u32)parPolygon.size();
+    forrange(i, 1, polygonSize)
+    {
+        Segment2D s = Segment2D(parPolygon[i - 1], parPolygon[i]);
+        LinearComponentIntersection intersection;
+        if (Intersection::SegmentSegmentIntersection2D(parSegment, s, intersection))
+        {
+            if (parDoNotConsiderSegmentEndPoints && (intersection.Intersection1 == 0.0f || intersection.Intersection1 == 1.0f))
+                continue;
+            if (parDoNotConsiderBorder && (intersection.Intersection1 == 1.0f || intersection.Intersection2 == 1.0f || intersection.Intersection2 == 0.0f))
+                continue;
+            return true;
+        }
+    }
 
-    outIntersection.Intersection1 = rayFactor;
-    outIntersection.Intersection2 = segmentFactor;
+    {
+        Segment2D s = Segment2D(parPolygon[polygonSize - 1], parPolygon[0]);
+        LinearComponentIntersection intersection;
+        if (Intersection::SegmentSegmentIntersection2D(parSegment, s, intersection))
+        {
+            if (parDoNotConsiderSegmentEndPoints && (intersection.Intersection1 == 0.0f || intersection.Intersection1 == 1.0f))
+                return false;
+            if (parDoNotConsiderBorder && (intersection.Intersection1 == 1.0f || intersection.Intersection2 == 1.0f || intersection.Intersection2 == 0.0f))
+                return false;
+            return true;
+        }
+    }
 
-    return true;
+    return false;
 }
 
 bool RayPolygonIntersections2D(const Ray2D& parRay, const Polygon2D& parPolygon, std::vector<std::pair<bool, LinearComponentIntersection>>& outIntersections)
