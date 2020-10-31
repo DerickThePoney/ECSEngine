@@ -13,7 +13,11 @@ IMPLEMENT_POOL_ALLOCATED(NavMeshVertex);
 IMPLEMENT_POOL_ALLOCATED(NavMeshEdge);
 IMPLEMENT_POOL_ALLOCATED(NavMeshFace);
 
-void NavMesh::Initialize(VerticesDataBase&& parVertices, EdgesDataBase&& parEdges, FacesDataBase&& parFaces)
+void NavMesh::Initialize(VerticesDataBase&& parVertices,
+      EdgesDataBase&& parEdges,
+      FacesDataBase&& parFaces,
+      const Polygon2D& parPolygon,
+      const std::vector<Polygon2D>& parPolygonHoles)
 {
     FVertices = parVertices;
     FEdges = parEdges;
@@ -27,6 +31,9 @@ void NavMesh::Initialize(VerticesDataBase&& parVertices, EdgesDataBase&& parEdge
         FindNeighbourgingVertices(vertex, neighbours);
         FConnectedComponents.insert_or_assign(vertex->Id, neighbours);
     }
+
+    FMainPolygon = parPolygon;
+    FHoles = parPolygonHoles;
 }
 
 void NavMesh::Cleanup()

@@ -1,4 +1,6 @@
 #pragma once
+#include "MemoryView.h"
+#include "Polygon.h"
 #include "PoolAllocator.h"
 
 namespace ECSEngine
@@ -49,7 +51,7 @@ public:
     NavMesh() { }
     ~NavMesh() { Cleanup(); }
 
-    void Initialize(VerticesDataBase&& parVertices, EdgesDataBase&& parEdges, FacesDataBase&& parFaces);
+    void Initialize(VerticesDataBase&& parVertices, EdgesDataBase&& parEdges, FacesDataBase&& parFaces, const Polygon2D& parPolygon, const std::vector<Polygon2D>& parPolygonHoles);
     void Cleanup();
 
     const VerticesDataBase& Vertices() const { return FVertices; }
@@ -65,6 +67,9 @@ public:
 
     void NeighbourFaces(const NavMeshVertex* parVertex, NeighbourFacesSet& outFaces) const;
 
+    const Polygon2D& MainPolygon() const { return FMainPolygon; }
+    const MemoryView<const Polygon2D> Holes() const { return MemoryView<const Polygon2D>(FHoles.data(), (u32)FHoles.size()); }
+
 private:
     void FindNeighbourgingVertices(const NavMeshVertex* parVertex, NeighbourVerticesSet& outVertices) const;
 
@@ -73,6 +78,9 @@ private:
     EdgesDataBase FEdges;
     FacesDataBase FFaces;
     ConnectedComponents FConnectedComponents;
+
+    Polygon2D FMainPolygon;
+    std::vector<Polygon2D> FHoles;
 };
 } // namespace Navigation
 } // namespace ECSEngine
