@@ -150,7 +150,7 @@ void NavMeshSolver::CreateNavMesh(const Polygon2D& parWorldExtents, const std::v
         vertices.push_back(vertex.second);
     }
 
-    outNavMesh.Initialize(std::move(vertices), std::move(edges), std::move(faces));
+    outNavMesh.Initialize(std::move(vertices), std::move(edges), std::move(faces), parWorldExtents, parObstacles);
 }
 
 } // namespace Navigation
