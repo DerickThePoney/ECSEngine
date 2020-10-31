@@ -34,6 +34,7 @@ public:
     std::vector<NavMeshVertex*>::const_reverse_iterator crend() const { return FWaypoints.crend(); }
 
     std::size_t size() const { return (FStart == FEnd) ? 0 : FWaypoints.size() + 2; }
+    std::size_t waypoints_size() const { return FWaypoints.size(); }
     bool empty() const { return FStart == FEnd && FWaypoints.empty(); }
 
     NavMeshVertex*& operator[](const size_t at) { return FWaypoints[at]; }
