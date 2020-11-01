@@ -8,6 +8,7 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/WorldManager.h"
+#include "PathfindingManager.h"
 #include "WorldDeclaration.h"
 
 namespace ECSEngine
@@ -38,6 +39,8 @@ bool ECSLoader::VirtualInitialise()
         archive(NAMEDPROPERTY("EntityTemplatesList", EntityTemplateManager::Instance()));
     }
 
+    Pathfinding::CreatePathfinder();
+
     return true;
 }
 
@@ -45,9 +48,11 @@ void ECSLoader::VirtualShutdown()
 {
     ILoader::VirtualShutdown();
 
-    WorldManager::Destroy();
+    Pathfinding::DestroyPathfinder();
+
     EntityTemplateManagerMethods::Cleanup();
     EntityTemplateManager::Destroy();
+    WorldManager::Destroy();
     ECSEngine::ModuleParameters::DestroyParameterIdentifiersTraits();
 
     RandomNumbers::DestroyRandomNumberGenerator();
