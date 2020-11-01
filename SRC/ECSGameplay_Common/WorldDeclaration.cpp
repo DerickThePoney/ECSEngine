@@ -7,6 +7,7 @@
 #include "ECSCore/EntityWorld.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/WorldManager.h"
+#include "MovementModule.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
 
@@ -14,7 +15,7 @@
 
 namespace ECSEngine
 {
-using Controllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::CameraMoverModule>;
+using Controllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::CameraMoverModule, ECSEngine::MovementModule>;
 
 struct f
 {
@@ -42,7 +43,7 @@ void InitModuleTemplateFactories()
 {
 #define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE)                                                                                                                                \
     {                                                                                                                                                                              \
-        FModuleTemplateFactories[TEMPLATE::GetId()] = &TEMPLATE::CreateTemplate;                                                                                                   \
+        FModuleTemplateFactories[ModuleTraits<NAME>::GetModuleId()] = &TEMPLATE::CreateTemplate;                                                                                   \
     }
 #include "ECSCore/ModuleList.inl"
 #undef DECLARE_MODULE_AND_TEMPLATE
