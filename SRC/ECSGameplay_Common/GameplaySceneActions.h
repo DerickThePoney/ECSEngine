@@ -1,6 +1,7 @@
 #pragma once
 #include "Application/ApplicationSceneActions.h"
 #include "Common/NavMesh.h"
+#include "Common/NavMeshPath.h"
 #include "Common/PoolAllocator.h"
 
 namespace ECSEngine
@@ -70,6 +71,7 @@ public:
     void serialize(Archive& ar)
     {
         ar(cereal::base_class<parent_type>(this), PROPERTY(EntityTemplateName));
+        PROPERTYFIELD(NumberOfEntities, 500);
     }
 
 protected:
@@ -81,7 +83,7 @@ private:
 
     std::vector<glm::vec2> FRandomPoints;
 
-    u32 FNumberOfPoints = 1000;
+    u32 FNumberOfEntities = 1000;
 
     bool FShowEntitiesInEditor = true;
 };
@@ -111,11 +113,5 @@ public:
     {
         ar(cereal::base_class<parent_type>(this));
     }
-
-protected:
-    void GenerateNavMesh();
-
-private:
-    Navigation::NavMesh FNavMesh;
 };
 } // namespace ECSEngine
