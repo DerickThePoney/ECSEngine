@@ -1,6 +1,7 @@
 #pragma once
 #include "CameraMoverSystem.h"
 #include "IScenarioUpdater.h"
+#include "MovementSystem.h"
 #include "OrientationSystem.h"
 #include "Rendering/RenderingSystem.h"
 
@@ -24,6 +25,7 @@ private:
     SceneScenario* FScenario;
 
     CameraMoverSystem FCameraMoverSystem;
+    MovementSystem FMovementSystem;
     RenderingSystem FRenderingSystem;
 };
 } // namespace ECSEngine
