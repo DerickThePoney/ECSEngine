@@ -92,6 +92,7 @@ void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPat
     } while (currentEdge != startFace->Edge);
 
     u32 lastVertex = -1;
+    u32 bestLastVertex = -1;
     bool success = false;
     while (!openList.empty())
     {
@@ -101,6 +102,7 @@ void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPat
         lastVertex = current.Id;
 
         // check connected faces then break
+        bool localSuccess = false;
         NeighbourFacesSet neighbouringFaces;
         parNavMesh.NeighbourFaces(vertices[lastVertex], neighbouringFaces);
         foreachitemconst(face, neighbouringFaces)
@@ -108,12 +110,17 @@ void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPat
             // On est concomitant à la face finale, yeah!!
             if (face == endFace)
             {
+                if (bestLastVertex == -1 || pathFindingNodes[lastVertex].Score() < pathFindingNodes[bestLastVertex].Score())
+                {
+                    bestLastVertex = lastVertex;
+                }
+                localSuccess = true;
                 success = true;
                 break;
             }
         }
 
-        if (success)
+        if (localSuccess)
             break;
 
         // loop neighbours
@@ -140,10 +147,10 @@ void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPat
     std::vector<u32> path;
     path.reserve(vertices.size());
 
-    while (lastVertex != -1)
+    while (bestLastVertex != -1)
     {
-        path.push_back(lastVertex);
-        lastVertex = pathFindingNodes[lastVertex].From;
+        path.push_back(bestLastVertex);
+        bestLastVertex = pathFindingNodes[bestLastVertex].From;
     }
 
     // fill out the path in reserve
