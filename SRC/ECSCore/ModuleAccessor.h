@@ -1,5 +1,6 @@
 #pragma once
 #include "EntityId.h"
+#include "WorldIds.h"
 
 namespace ECSEngine
 {
@@ -11,7 +12,7 @@ template<typename T>
 class ModuleAccessor
 {
 public:
-    ModuleAccessor();
+    ModuleAccessor(const Worlds::Type parWorld = Worlds::STANDARD);
     ModuleAccessor(EntityWorld* world);
 
     T* operator[](const EntityId& parId);
