@@ -4,12 +4,15 @@
 
 #include "ApparenceModule.h"
 #include "Application/SceneItems.h"
+#include "Common/NavMeshPathSmoother.h"
+#include "Common/NavMeshPathSolver.h"
 #include "Common/NavMeshSolver.h"
 #include "Common/PolygonRandomGenerator.h"
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
+#include "PathfindingManager.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
@@ -152,7 +155,7 @@ void SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawEditor()
     if (ShouldShowEditor())
     {
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Entity to spawn", FTemplate, FEntityTemplateName);
-        EDITOR_PROPERTY_WITH_LIMITS("Number of entities", FNumberOfPoints, 1u, 1000u);
+        EDITOR_PROPERTY_WITH_LIMITS("Number of entities", FNumberOfEntities, 1u, 1000u);
 
         ImGui::Checkbox("Show entities in editor", &FShowEntitiesInEditor);
 
@@ -205,7 +208,7 @@ bool SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawInSceneEditor(Render
 void SpawnEntitiesInPolygonalPatternSceneAction::GenerateRandomPoints()
 {
     PolygonRandomGenerator randomGenerator;
-    RandomPolygonGenerationParameters params = { FNumberOfPoints };
+    RandomPolygonGenerationParameters params = { FNumberOfEntities };
 
     FRandomPoints.clear();
     FRandomPoints.reserve(params.NumberOfPoints);
@@ -225,40 +228,22 @@ CreateNavMeshSceneAction::CreateNavMeshSceneAction(const std::string& parFName /
 void CreateNavMeshSceneAction::VirtualInitialise(const SceneScenario* parScene)
 {
     parent_type::VirtualInitialise(parScene);
+    Pathfinding::InitialisePathfinder(Polygon(), PolygonHoles());
 }
 
 void CreateNavMeshSceneAction::VirtualStart()
 {
     parent_type::VirtualStart();
-    GenerateNavMesh();
+    Finish();
 }
 
 void CreateNavMeshSceneAction::VirtualDrawEditor()
 {
     parent_type::VirtualDrawEditor();
-
-    if (ShouldShowEditor())
-    {
-        if (ImGui::Button("Generate nav mesh"))
-        {
-            GenerateNavMesh();
-        }
-    }
 }
 
 bool CreateNavMeshSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
 {
-    parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
-    return false;
+    return parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 }
-
-void CreateNavMeshSceneAction::GenerateNavMesh()
-{
-    if (FNavMesh.VerticesCount() > 0)
-        FNavMesh.Cleanup();
-
-    Navigation::NavMeshSolver solver;
-    solver.CreateNavMesh(Polygon(), PolygonHoles(), FNavMesh);
-}
-
 } // namespace ECSEngine
