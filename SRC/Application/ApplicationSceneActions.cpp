@@ -96,7 +96,7 @@ void SceneActionCreateMainCamera::VirtualInitialise(const SceneScenario* parScen
 
     const u32 camId = CameraManager::Instance().CreateCameraIFN(FCameraName);
     Camera* cam = CameraManager::Instance().GetCamera(camId);
-    cam->Init(worldViewMatrix, glm::radians(FFov), FNearPlane, FFarPlane);
+    cam->Init(worldViewMatrix, FFov, FNearPlane, FFarPlane);
 }
 
 void SceneActionCreateMainCamera::VirtualStart()
@@ -113,7 +113,7 @@ void SceneActionCreateMainCamera::VirtualDrawEditor()
     if (ShouldShowEditor())
     {
         EDITOR_PROPERTY_STRING("Camera name", FCameraName, false, "");
-        EDITOR_PROPERTY_WITH_LIMITS("FoV", FFov, 0.0f, 180.0f);
+        EDITOR_PROPERTY_ANGLE("FoV", FFov, 0.0f, 180.0f);
         EDITOR_PROPERTY_WITH_LIMITS("Near Plane", FNearPlane, 0.0f, FFarPlane);
         EDITOR_PROPERTY_WITH_LIMITS("Far Plane", FFarPlane, FNearPlane, 10000.0f);
     }
@@ -124,7 +124,7 @@ bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawComman
     parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
-    const glm::mat4 perspectiveMatrix = glm::perspective(glm::radians(FFov), aspectRatio, FNearPlane, FFarPlane);
+    const glm::mat4 perspectiveMatrix = glm::perspective(FFov, aspectRatio, FNearPlane, FFarPlane);
     const BaseSceneItem* item = GetSceneItem();
     if (item != nullptr)
     {

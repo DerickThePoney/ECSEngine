@@ -176,9 +176,7 @@ public:
         {
             if (FIsAngle)
             {
-                float valueInDegrees = glm::degrees(*FProperty);
-                ImGui::SliderAngle(FName.c_str(), &valueInDegrees, FMin, FMax);
-                *FProperty = glm::radians(valueInDegrees);
+                ImGui::SliderAngle(FName.c_str(), FProperty, FMin, FMax);
             }
             else
             {
