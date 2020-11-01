@@ -7,10 +7,10 @@ namespace ECSEngine
 {
 
 template<typename T>
-ModuleAccessor<T>::ModuleAccessor()
+ModuleAccessor<T>::ModuleAccessor(const Worlds::Type parWorld /*= Worlds::STANDARD*/)
 {
     AssertRelease(WorldManager::HasInstance());
-    EntityWorld* world = WorldManager::Instance().GetWorldIFP(Worlds::STANDARD);
+    EntityWorld* world = WorldManager::Instance().GetWorldIFP(parWorld);
     AssertRelease(world != nullptr);
     FController = dynamic_cast<ModuleController<T>*>(world->GetControllerIFP<T>());
     AssertRelease(FController != nullptr);
