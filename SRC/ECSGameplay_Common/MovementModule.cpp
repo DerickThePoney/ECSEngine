@@ -2,6 +2,7 @@
 
 #include "MovementModule.h"
 
+#include "Application/PropertyDrawer.h"
 #include "ECSCore/EntityId.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
@@ -20,6 +21,11 @@ Module* MovementModuleTemplate::CreateInstance(const EntityId& parUnitId, const 
 
 void MovementModuleTemplate::VirtualDrawEditor()
 {
+    EDITOR_PROPERTY_SIMPLE("Max speed", FMaxSpeed);
+    if (FMaxSpeed < 0.f)
+        FMaxSpeed = 0.f;
+
+    EDITOR_PROPERTY_ANGLE("Max rotation speed", FMaxRotationSpeed, 0, 2000);
 }
 
 MovementModule::MovementModule()
