@@ -9,9 +9,11 @@
 #include "Common/NavMeshSolver.h"
 #include "Common/Polygon.h"
 #include "Common/Singleton.h"
+#include "RenderingCore/DrawCommands.h"
 
 namespace ECSEngine
 {
+
 class PathfindingManager : public Singleton<PathfindingManager>
 {
 public:
@@ -20,9 +22,13 @@ public:
 
     void PushRequest(PathfindingRequest&& parRequest);
 
+    PathfindingResult ComputeRequestsSynchrone(PathfindingRequest&& parRequest);
+
     void ComputeRequests();
 
     void RetrieveResults(std::vector<PathfindingResult>& outResults);
+
+    void Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial);
 
 private:
     void ProcessOneRequest(const PathfindingRequest& parRequest);
@@ -53,6 +59,15 @@ void PathfindingManager::PushRequest(PathfindingRequest&& parRequest)
     FRequests.push(parRequest);
 }
 
+PathfindingResult PathfindingManager::ComputeRequestsSynchrone(PathfindingRequest&& parRequest)
+{
+    const PathfindingRequest request = parRequest;
+    ProcessOneRequest(parRequest);
+    PathfindingResult res = FResults.back();
+    FResults.pop_back();
+    return res;
+}
+
 void PathfindingManager::ComputeRequests()
 {
     while (!FRequests.empty())
@@ -67,6 +82,15 @@ void PathfindingManager::RetrieveResults(std::vector<PathfindingResult>& outResu
 {
     outResults.swap(FResults);
     FResults.clear();
+}
+
+void PathfindingManager::Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial)
+{
+    const glm::vec2* mainPolygon = FNavMesh.MainPolygon().data().data();
+    parBuffer.DrawLines(parMaterial, mainPolygon, (u32)FNavMesh.MainPolygon().size(), 0.0f, 0xFF00FF00, true);
+
+    MemoryView<const Polygon2D> memView = FNavMesh.Holes();
+    foreachitemconst(hole, memView) { parBuffer.DrawLines(parMaterial, hole.data().data(), (u32)hole.size(), 0.0f, 0xFF0000FF, true); }
 }
 
 void PathfindingManager::ProcessOneRequest(const PathfindingRequest& parRequest)
@@ -115,6 +139,11 @@ void PushRequest(PathfindingRequest&& parRequest)
     PathfindingManager::Instance().PushRequest(std::move(parRequest));
 }
 
+PathfindingResult ComputeRequestSynchrone(PathfindingRequest&& parRequest)
+{
+    return PathfindingManager::Instance().ComputeRequestsSynchrone(std::move(parRequest));
+}
+
 void ComputeRequests()
 {
     PathfindingManager::Instance().ComputeRequests();
@@ -123,6 +152,11 @@ void ComputeRequests()
 void RetrieveResults(std::vector<PathfindingResult>& outResults)
 {
     PathfindingManager::Instance().RetrieveResults(outResults);
+}
+
+void Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial)
+{
+    PathfindingManager::Instance().Debug(parBuffer, parMaterial);
 }
 
 } // namespace Pathfinding

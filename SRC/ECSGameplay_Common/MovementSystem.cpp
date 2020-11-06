@@ -3,11 +3,13 @@
 #include "MovementSystem.h"
 
 #include "Common/RandomGenerator.h"
+#include "Common/RenderingHandles.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "MovementModule.h"
 #include "PathfindingManager.h"
 #include "PositionModule.h"
+#include "RenderingCore/DrawCommands.h"
 
 #include <glm/gtx/vec_swizzle.hpp>
 
@@ -79,6 +81,11 @@ MovementSystem::~MovementSystem()
 {
 }
 
+void MovementSystem::VirtualInit()
+{
+    parent_type::VirtualInit();
+}
+
 void MovementSystem::VirtualUpdate()
 {
     parent_type::VirtualUpdate();
@@ -98,6 +105,8 @@ void MovementSystem::VirtualUpdate()
         {
             if (result.Waypoints.size() > 0)
                 movementModule->SetNewPath(result.Waypoints);
+            else
+                movementModule->ClearPath();
             movementModule->SetRequestIsPending(false);
         }
     }
@@ -123,9 +132,30 @@ void MovementSystem::VirtualUpdate()
     }
 }
 
-void MovementSystem::VirtualInit()
+void MovementSystem::VisualDebug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial)
 {
-    parent_type::VirtualInit();
+    LockControllers();
+
+    ModuleAccessor<MovementModule> movementModuleAccessor;
+    ModuleAccessor<PositionModule> positionModuleAccessor;
+
+    foreachitem(movementModule, movementModuleAccessor)
+    {
+        const PositionModule* positionModule = positionModuleAccessor[movementModule.UnitId()];
+        AssertRelease(positionModule != nullptr);
+        if (!movementModule.RequestIsPending())
+        {
+            u32 size = 0;
+            const glm::vec3* path = movementModule.GetPathForDebug(positionModule->GetPosition3D(), size);
+
+            if (size == 0)
+                continue;
+
+            parBuffer.DrawLines(parMaterial, path, size, 0xFF00FFFF, false);
+        }
+    }
+
+    UnlockControllers();
 }
 
 } // namespace ECSEngine

@@ -112,6 +112,7 @@ bool SegmentPolygonIntersections2D_StopAtFirstIntersection(const Segment2D& parS
       bool parDoNotConsiderSegmentEndPoints,
       bool parDoNotConsiderBorder)
 {
+    // TODO Add a check for goes through if segment in on endpoints
     const u32 polygonSize = (u32)parPolygon.size();
     forrange(i, 1, polygonSize)
     {
@@ -119,7 +120,8 @@ bool SegmentPolygonIntersections2D_StopAtFirstIntersection(const Segment2D& parS
         LinearComponentIntersection intersection;
         if (Intersection::SegmentSegmentIntersection2D(parSegment, s, intersection))
         {
-            if (parDoNotConsiderSegmentEndPoints && (intersection.Intersection1 == 0.0f || intersection.Intersection1 == 1.0f))
+            if (parDoNotConsiderSegmentEndPoints && (intersection.Intersection1 == 0.0f || intersection.Intersection1 == 1.0f) &&
+                  (intersection.Intersection2 > 0.0f && intersection.Intersection2 < 1.0f))
                 continue;
             if (parDoNotConsiderBorder && (intersection.Intersection1 == 1.0f || intersection.Intersection2 == 1.0f || intersection.Intersection2 == 0.0f))
                 continue;

@@ -63,6 +63,12 @@ public:
           const u32 parNormalsColor /*= 0xFFFFFFFF*/);
 
     void DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3* parVertices, const u32 parVerticesSize, const u32 parColor, const bool parClose);
+    void DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const glm::vec2* parVertices,
+          const u32 parVerticesSize,
+          const float parHeight,
+          const u32 parColor,
+          const bool parClose);
 
     void Submit();
 
