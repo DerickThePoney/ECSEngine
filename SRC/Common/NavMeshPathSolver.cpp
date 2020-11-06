@@ -48,13 +48,6 @@ static_assert(std::is_trivially_copyable<PathFindNode>(), "PathFindNode must be 
 
 void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPath)
 {
-    // quick n dirty bailout check
-    if (!NavMeshHelpers::NavMeshSegmentIntersection2D(parNavMesh, Segment2D(outPath.Start(), outPath.End())))
-    {
-        outPath.SetValid(true);
-        return;
-    }
-
     const glm::vec2 start = outPath.Start();
     const NavMeshFace* startFace = parNavMesh.FindContainingFace(start);
     if (startFace == nullptr)
@@ -67,6 +60,13 @@ void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPat
 
     // same face -> we're good stop there
     if (startFace == endFace)
+    {
+        outPath.SetValid(true);
+        return;
+    }
+
+    // quick n dirty bailout check
+     if (!NavMeshHelpers::NavMeshSegmentIntersection2D(parNavMesh, Segment2D(outPath.Start(), outPath.End())))
     {
         outPath.SetValid(true);
         return;

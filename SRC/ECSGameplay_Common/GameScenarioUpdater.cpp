@@ -3,7 +3,14 @@
 #include "GameScenarioUpdater.h"
 
 #include "Application/SceneScenario.h"
+#include "Common/CameraManager.h"
 #include "ECSCore/WorldManager.h"
+#include "PathfindingManager.h"
+#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/MaterialManager.h"
+#include "RenderingCore/RenderPass.h"
 
 namespace ECSEngine
 {
@@ -55,6 +62,17 @@ void GameScenarioUpdater::Render()
     // FScenario->Render();
 
     FRenderingSystem.Update();
+
+    Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
+    u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+    Camera* camera = CameraManager::Instance().GetCamera(camId);
+    buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
+    Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+    Pathfinding::Debug(*buffer, handle);
+    FMovementSystem.VisualDebug(*buffer, handle);
+    buffer->Submit();
+    buffer->clear();
+    delete buffer;
 }
 
 void GameScenarioUpdater::SetScenario(const std::string& parScenarioFile)

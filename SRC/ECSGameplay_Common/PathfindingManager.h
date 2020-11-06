@@ -18,6 +18,12 @@ struct PathfindingResult
     std::vector<glm::vec2> Waypoints;
 };
 
+namespace Rendering
+{
+class DrawCommandBuffer;
+class MaterialInstanceHandle;
+} // namespace Rendering
+
 namespace Pathfinding
 {
 void CreatePathfinder();
@@ -25,7 +31,10 @@ void InitialisePathfinder(const Polygon2D& parWorldExtent, const std::vector<Pol
 void DestroyPathfinder();
 
 void PushRequest(PathfindingRequest&& parRequest);
+PathfindingResult ComputeRequestSynchrone(PathfindingRequest&& parRequest);
 void ComputeRequests();
 void RetrieveResults(std::vector<PathfindingResult>& outResults);
+
+void Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial);
 } // namespace Pathfinding
 } // namespace ECSEngine

@@ -14,7 +14,7 @@ namespace NavMeshHelpers
 
 bool NavMeshSegmentIntersection2D(const NavMesh& parNavMesh, const Segment2D& parSegment)
 {
-    if (Intersection::SegmentPolygonIntersections2D_StopAtFirstIntersection(parSegment, parNavMesh.MainPolygon(), true, true))
+    if (Intersection::SegmentPolygonIntersections2D_StopAtFirstIntersection(parSegment, parNavMesh.MainPolygon(), true, false))
         return true;
 
     MemoryView<const Polygon2D> holes = parNavMesh.Holes();

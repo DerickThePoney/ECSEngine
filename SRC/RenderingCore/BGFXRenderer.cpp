@@ -43,7 +43,8 @@ void BGFXRenderer::Init()
     bgfx::RendererType::Enum chosenType = bgfx::getRendererType();
 
     bgfx::setViewClear(RenderPassId::GEOMETRY_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
-    bgfx::setViewRect(0, 0, 0, window.GetSize().x, window.GetSize().y);
+    bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, window.GetSize().x, window.GetSize().y);
+    bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, window.GetSize().x, window.GetSize().y);
 }
 
 void BGFXRenderer::Shutdown()
@@ -68,7 +69,8 @@ void BGFXRenderer::RenderFrame()
 void BGFXRenderer::Resize(u32 width, u32 height)
 {
     bgfx::reset(width, height, BGFX_RESET_VSYNC);
-    bgfx::setViewRect(0, 0, 0, width, height);
+    bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, width, height);
+    bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, width, height);
 }
 
 bool BGFXRenderer::IsInstancingEnabled()

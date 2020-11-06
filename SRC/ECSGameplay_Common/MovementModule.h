@@ -43,6 +43,7 @@ public:
     ~MovementModule() { }
 
     void SetNewPath(const std::vector<glm::vec2>& parNewPath);
+    void ClearPath();
     void SetCurrentFollowedWaypoint(const u32 parNewValue) { FCurrentFollowedWaypoint = parNewValue; }
     void SetRequestIsPending(const bool parValue) { FRequestIsPending = parValue; }
     void SetCurrentSpeed(const glm::vec3 parNewSpeed) { FCurrentSpeed = parNewSpeed; }
@@ -52,12 +53,15 @@ public:
     bool RequestIsPending() const { return FRequestIsPending; }
     glm::vec3 CurrentSpeed() const { return FCurrentSpeed; }
 
+    const glm::vec3* GetPathForDebug(const glm::vec3& parPosition, u32& outSize);
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
 private:
     glm::vec3 FCurrentSpeed = glm::vec3(0.f);
 
+    std::vector<glm::vec3> FPathForDebug;
     std::vector<glm::vec2> FPath;
     u32 FCurrentFollowedWaypoint = -1;
     bool FRequestIsPending = false;
