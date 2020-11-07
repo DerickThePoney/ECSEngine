@@ -392,6 +392,9 @@ public:
 
     virtual void SubmitCommand() const override;
 
+protected:
+    virtual const glm::vec2* Vertices() const { return FVertices; }
+
 private:
     const glm::vec2* FVertices;
     u32 FVerticesSize;
@@ -443,7 +446,7 @@ void DrawLines2DCommand::SubmitCommand() const
 
     forrange(i, 0, FVerticesSize)
     {
-        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FVertices[i].x, FHeight, FVertices[i].y));
+        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(Vertices()[i].x, FHeight, Vertices()[i].y));
         stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
         stream.Advance();
     }
@@ -484,6 +487,43 @@ void DrawLines2DCommand::SubmitCommand() const
 
 IMPLEMENT_POOL_ALLOCATED(DrawLines2DCommand);
 
+//----------------------------------------------------------------
+//          DrawLines2DKeepDataCommand
+//----------------------------------------------------------------
+
+class DrawLines2DKeepDataCommand : public DrawLines2DCommand
+{
+    DECLARE_POOL_ALLOCATED(DrawLines2DKeepDataCommand);
+
+public:
+    DrawLines2DKeepDataCommand(const u16 parViewId,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const std::vector<glm::vec2>& parVertices,
+          const u32 parVerticesSize,
+          const float parHeight,
+          const u32 parColor,
+          const bool parClose);
+
+protected:
+    const glm::vec2* Vertices() const override { return FLineVertices.data(); }
+
+private:
+    std::vector<glm::vec2> FLineVertices;
+};
+
+DrawLines2DKeepDataCommand::DrawLines2DKeepDataCommand(const u16 parViewId,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const std::vector<glm::vec2>& parVertices,
+      const u32 parVerticesSize,
+      const float parHeight,
+      const u32 parColor,
+      const bool parClose)
+    : FLineVertices(parVertices)
+    , DrawLines2DCommand(parViewId, parMaterialInstanceHandle, nullptr, parVerticesSize, parHeight, parColor, parClose)
+{
+}
+
+IMPLEMENT_POOL_ALLOCATED(DrawLines2DKeepDataCommand);
 //----------------------------------------------------------------
 //          DrawFrustumCommand
 //----------------------------------------------------------------
@@ -962,6 +1002,17 @@ void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInsta
 {
     FCommandVector.push_back(
           std::unique_ptr<IDrawCommand>(new DrawLines2DCommand(FViewId, parMaterialInstanceHandle, parVertices, parVerticesSize, parHeight, parColor, parClose)));
+}
+
+void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const std::vector<glm::vec2>& parVertices,
+      const u32 parVerticesSize,
+      const float parHeight,
+      const u32 parColor,
+      const bool parClose)
+{
+    FCommandVector.push_back(
+          std::unique_ptr<IDrawCommand>(new DrawLines2DKeepDataCommand(FViewId, parMaterialInstanceHandle, parVertices, parVerticesSize, parHeight, parColor, parClose)));
 }
 
 void DrawCommandBuffer::Submit()

@@ -69,6 +69,12 @@ public:
           const float parHeight,
           const u32 parColor,
           const bool parClose);
+    void DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const std::vector<glm::vec2>& parVertices,
+          const u32 parVerticesSize,
+          const float parHeight,
+          const u32 parColor,
+          const bool parClose);
 
     void Submit();
 
