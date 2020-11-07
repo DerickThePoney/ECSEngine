@@ -48,3 +48,8 @@ ReverseWrapper<T> reverse(T&& container)
 
 #define reverseforeachitem(VAR, CONTAINER) for (auto& VAR : ECSEngine::ForEach::reverse(CONTAINER))
 #define reverseforeachitemconst(VAR, CONTAINER) for (const auto& VAR : ECSEngine::ForEach::reverse(CONTAINER))
+
+#ifdef PERFORM_SECURITY_CHECKS
+#define ENABLE_DEBUG_PARAMETERS
+
+#endif
