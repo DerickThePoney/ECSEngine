@@ -4,6 +4,7 @@
 
 #include "Common/RandomGenerator.h"
 #include "Common/ResourceCache.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/EntityTemplate.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
@@ -17,6 +18,8 @@ namespace ECSEngine
 bool ECSLoader::VirtualInitialise()
 {
     ILoader::VirtualInitialise();
+
+    CreateAdjustables();
 
     RandomNumbers::InitRandomNumberGenerator(772);
 
@@ -56,6 +59,8 @@ void ECSLoader::VirtualShutdown()
     ECSEngine::ModuleParameters::DestroyParameterIdentifiersTraits();
 
     RandomNumbers::DestroyRandomNumberGenerator();
+
+    DestroyAdjustables();
 }
 
 } // namespace ECSEngine
