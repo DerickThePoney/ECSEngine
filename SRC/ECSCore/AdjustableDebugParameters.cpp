@@ -66,10 +66,15 @@ public:
     }
     virtual ~IAdjustableDebugParameter() { }
 
+    void DrawAdjustableDebug()
+    {
+        ImGui::PushID(ImGui::GetID(this));
+        VirtualDrawAdjustableDebug();
+        ImGui::PopID();
+    }
+
 protected:
     const char* Name() const { return FName; }
-
-    void DrawAdjustableDebug() { VirtualDrawAdjustableDebug(); }
 
 protected:
     virtual void VirtualDrawAdjustableDebug() = 0;
@@ -125,7 +130,7 @@ public:
     bool GetValue() const { return FValue; }
 
 protected:
-    virtual void VirtualDrawAdjustableDebug() override { ImGui::Checkbox(fmt::format("#{}", Name()).c_str(), &FValue); }
+    virtual void VirtualDrawAdjustableDebug() override { ImGui::Checkbox(fmt::format("##{}", Name()).c_str(), &FValue); }
 
 private:
     bool FValue;
@@ -152,7 +157,7 @@ public:
     bool GetValue() const { return FValue; }
 
 protected:
-    virtual void VirtualDrawAdjustableDebug() override { ImGui::SliderFloat(fmt::format("#{}", Name()).c_str(), &FValue, FMin, FMax); }
+    virtual void VirtualDrawAdjustableDebug() override { ImGui::SliderFloat(fmt::format("##{}", Name()).c_str(), &FValue, FMin, FMax); }
 
 private:
     float FValue;
@@ -183,7 +188,7 @@ public:
 protected:
     virtual void VirtualDrawAdjustableDebug() override
     {
-        ImGui::InputDouble(fmt::format("#{}", Name()).c_str(), &FValue);
+        ImGui::InputDouble(fmt::format("##{}", Name()).c_str(), &FValue);
         FValue = glm::clamp(FValue, FMin, FMax);
     }
 
@@ -311,6 +316,7 @@ bool GetOrCreateAdjustableVisitor<ReturnType, ParameterType>::visit(FamilyNode* 
     if (parFamilyNode->Family != FFamilyIterator.GetCurrentFamily())
         return false;
 
+    const bool isDone = FFamilyIterator.Done();
     FFamilyIterator.Advance();
     foreachitem(node, parFamilyNode->Children)
     {
@@ -319,7 +325,7 @@ bool GetOrCreateAdjustableVisitor<ReturnType, ParameterType>::visit(FamilyNode* 
     }
 
     bool res = false;
-    if (FFamilyIterator.Done())
+    if (isDone)
     {
         ParameterNode* newParameterNode = new ParameterNode();
         newParameterNode->Name = FName;
@@ -349,6 +355,35 @@ GetOrCreateAdjustableVisitor<ReturnType, ParameterType>::GetOrCreateAdjustableVi
 }
 
 //----------------------------------------------------------------
+//          DrawAdjustablesVisitor
+//----------------------------------------------------------------
+class DrawAdjustablesVisitor : public IVisitor
+{
+public:
+    virtual bool visit(FamilyNode* parFamilyNode) override;
+    virtual bool visit(ParameterNode* parParameterNode) override;
+};
+
+bool DrawAdjustablesVisitor::visit(FamilyNode* parFamilyNode)
+{
+    if (ImGui::CollapsingHeader(parFamilyNode->Family.c_str()))
+    {
+        ImGui::Indent();
+        foreachitem(child, parFamilyNode->Children) { child->accept(this); }
+        ImGui::Unindent();
+    }
+    return true;
+}
+
+bool DrawAdjustablesVisitor::visit(ParameterNode* parParameterNode)
+{
+    ImGui::Text(parParameterNode->Name);
+    ImGui::SameLine();
+    parParameterNode->FNode->DrawAdjustableDebug();
+    return true;
+}
+
+//----------------------------------------------------------------
 //          AdjustableDebugParametersManager
 //----------------------------------------------------------------
 class AdjustableDebugParametersManager : public Singleton<AdjustableDebugParametersManager>
@@ -360,6 +395,8 @@ public:
     float GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, float parDefaultValue, float parMinValue, float parMaxValue);
     double GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, double parDefaultValue, double parMinValue, double parMaxValue);
     bool GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, bool parDefaultValue);
+
+    void DrawDebugs();
 
 private:
     void UseGetOrCreateVisitor(const char* parName, const char* parFamily, IVisitor* parVisitor);
@@ -423,6 +460,12 @@ double AdjustableDebugParametersManager::GetOrCreateAdjustableDebugParameter(con
     return visitor.GetValue();
 }
 
+void AdjustableDebugParametersManager::DrawDebugs()
+{
+    DrawAdjustablesVisitor visitor;
+    foreachitem(node, FAdjustables) { node->accept(&visitor); }
+}
+
 void AdjustableDebugParametersManager::UseGetOrCreateVisitor(const char* parName, const char* parFamily, IVisitor* parVisitor)
 {
     foreachitem(node, FAdjustables)
@@ -460,6 +503,14 @@ void DestroyAdjustables()
 {
     if (AdjustableDebugParametersManager::HasInstance())
         AdjustableDebugParametersManager::Destroy();
+}
+
+void DrawAdjustables()
+{
+    static bool open = true;
+    ImGui::Begin("Debug values", &open, ImGuiWindowFlags_AlwaysAutoResize);
+    GetOrCreate().DrawDebugs();
+    ImGui::End();
 }
 
 u32 GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, u32 parDefaultValue, u32 parMinValue, u32 parMaxValue)
