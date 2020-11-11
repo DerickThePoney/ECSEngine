@@ -7,6 +7,52 @@
 #include "Common/Singleton.h"
 namespace ECSEngine
 {
+//----------------------------------------------------------------
+//          FamilyIterator
+//----------------------------------------------------------------
+class FamilyIterator
+{
+public:
+    FamilyIterator(const char* parFamily);
+
+    void Advance()
+    {
+        if (FCurrentLevel < (u32)FSubFamilies.size() - 1)
+            FCurrentLevel++;
+    }
+    void Back()
+    {
+        if (FCurrentLevel > 0)
+            FCurrentLevel--;
+    }
+    bool Done() const { return FCurrentLevel >= (u32)FSubFamilies.size() - 1; }
+
+    const std::string& GetCurrentFamily()
+    {
+        AssertRelease(FCurrentLevel < (u32)FSubFamilies.size());
+        return FSubFamilies[FCurrentLevel];
+    }
+
+private:
+    std::vector<std::string> FSubFamilies;
+    u32 FCurrentLevel = 0;
+};
+
+FamilyIterator::FamilyIterator(const char* parFamily)
+{
+    std::string temp(parFamily);
+
+    auto p = temp.find_first_of('/');
+
+    while (p != temp.npos)
+    {
+        std::string newFamily = temp.substr(0, p);
+        temp = temp.substr(p + 1);
+        p = temp.find_first_of('/');
+        FSubFamilies.push_back(newFamily);
+    }
+    FSubFamilies.push_back(temp);
+}
 
 //----------------------------------------------------------------
 //          IAdjustableDebugParameter
@@ -49,7 +95,6 @@ public:
         , IAdjustableDebugParameter(parName)
     {
     }
-    ~UnsignedAdjustableDebug() { }
 
     u32 GetValue() const { return FValue; }
 
@@ -156,7 +201,9 @@ IMPLEMENT_POOL_ALLOCATED(DoubleAdjustableDebug);
 class IVisitor;
 struct IBaseNode
 {
-    virtual bool visit(IVisitor* parVisitor) = 0;
+    virtual ~IBaseNode() { }
+    virtual bool accept(IVisitor* parVisitor) = 0;
+    virtual void cleanup() = 0;
 };
 
 //----------------------------------------------------------------
@@ -168,7 +215,7 @@ struct ParameterNode;
 class IVisitor
 {
 public:
-    bool visit(IBaseNode* parBaseNode) { return parBaseNode->visit(this); }
+    bool visit(IBaseNode* parBaseNode) { return parBaseNode->accept(this); }
     virtual bool visit(FamilyNode* parFamilyNode) = 0;
     virtual bool visit(ParameterNode* parParameterNode) = 0;
 };
@@ -181,20 +228,42 @@ struct FamilyNode : public IBaseNode
     DECLARE_POOL_ALLOCATED(FamilyNode);
 
 public:
-    const char* Family = nullptr;
+    ~FamilyNode();
+    std::string Family;
     std::vector<std::unique_ptr<IBaseNode>> Children;
-    bool visit(IVisitor* parVisitor) override { return parVisitor->visit(this); }
-};
+    bool accept(IVisitor* parVisitor) override { return parVisitor->visit(this); }
+    void cleanup() override
+    {
+        foreachitem(child, Children)
+        {
+            child->cleanup();
+            child.reset(nullptr);
+        }
+        Children.clear();
+    }
+}; // namespace ECSEngine
+
+FamilyNode::~FamilyNode()
+{
+    cleanup();
+}
 
 struct ParameterNode : public IBaseNode
 {
     DECLARE_POOL_ALLOCATED(ParameterNode);
 
 public:
+    ~ParameterNode();
     const char* Name = nullptr;
     std::unique_ptr<IAdjustableDebugParameter> FNode;
-    bool visit(IVisitor* parVisitor) override { return parVisitor->visit(this); };
+    bool accept(IVisitor* parVisitor) override { return parVisitor->visit(this); };
+    void cleanup() override { FNode.reset(nullptr); }
 };
+
+ParameterNode::~ParameterNode()
+{
+    cleanup();
+}
 
 IMPLEMENT_POOL_ALLOCATED(FamilyNode);
 IMPLEMENT_POOL_ALLOCATED(ParameterNode);
@@ -216,6 +285,7 @@ public:
 private:
     ReturnType FResult;
     const char* FName;
+    FamilyIterator FFamilyIterator;
     const char* FFamily;
     std::unique_ptr<ParameterType> FParameterType;
 };
@@ -238,22 +308,33 @@ bool GetOrCreateAdjustableVisitor<ReturnType, ParameterType>::visit(ParameterNod
 template<class ReturnType, class ParameterType>
 bool GetOrCreateAdjustableVisitor<ReturnType, ParameterType>::visit(FamilyNode* parFamilyNode)
 {
-    if (parFamilyNode->Family != FFamily)
+    if (parFamilyNode->Family != FFamilyIterator.GetCurrentFamily())
         return false;
 
+    FFamilyIterator.Advance();
     foreachitem(node, parFamilyNode->Children)
     {
-        if (node->visit(this))
+        if (node->accept(this))
             return true;
     }
 
-    ParameterNode* newParameterNode = new ParameterNode();
-    newParameterNode->Name = FName;
-    newParameterNode->FNode = std::move(FParameterType);
+    bool res = false;
+    if (FFamilyIterator.Done())
+    {
+        ParameterNode* newParameterNode = new ParameterNode();
+        newParameterNode->Name = FName;
+        newParameterNode->FNode = std::move(FParameterType);
+        parFamilyNode->Children.push_back(std::unique_ptr<IBaseNode>(newParameterNode));
+        res = newParameterNode->accept(this);
+    }
+    else
+    {
+        FamilyNode* newFamilyNode = new FamilyNode();
+        newFamilyNode->Family = FFamilyIterator.GetCurrentFamily();
+        parFamilyNode->Children.push_back(std::unique_ptr<IBaseNode>(newFamilyNode));
+        res = newFamilyNode->accept(this);
+    }
 
-    parFamilyNode->Children.push_back(std::unique_ptr<ParameterNode>(newParameterNode));
-
-    bool res = newParameterNode->visit(this);
     AlwaysCheckedAssert(res);
     return true;
 }
@@ -262,6 +343,7 @@ template<class ReturnType, class ParameterType>
 GetOrCreateAdjustableVisitor<ReturnType, ParameterType>::GetOrCreateAdjustableVisitor(const char* parName, const char* parFamily, std::unique_ptr<ParameterType>&& parParameterType)
     : FName(parName)
     , FFamily(parFamily)
+    , FFamilyIterator(parFamily)
     , FParameterType(std::move(parParameterType))
 {
 }
@@ -273,6 +355,7 @@ class AdjustableDebugParametersManager : public Singleton<AdjustableDebugParamet
 {
 
 public:
+    ~AdjustableDebugParametersManager();
     u32 GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, u32 parDefaultValue, u32 parMinValue, u32 parMaxValue);
     float GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, float parDefaultValue, float parMinValue, float parMaxValue);
     double GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, double parDefaultValue, double parMinValue, double parMaxValue);
@@ -284,6 +367,16 @@ private:
 private:
     std::vector<std::unique_ptr<IBaseNode>> FAdjustables;
 };
+
+AdjustableDebugParametersManager::~AdjustableDebugParametersManager()
+{
+    foreachitem(node, FAdjustables)
+    {
+        node->cleanup();
+        node.reset(nullptr);
+    }
+    FAdjustables.clear();
+}
 
 // TODO TEMPLATE THIS
 u32 AdjustableDebugParametersManager::GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, u32 parDefaultValue, u32 parMinValue, u32 parMaxValue)
@@ -334,15 +427,16 @@ void AdjustableDebugParametersManager::UseGetOrCreateVisitor(const char* parName
 {
     foreachitem(node, FAdjustables)
     {
-        if (node->visit(parVisitor))
+        if (node->accept(parVisitor))
             return;
     }
 
+    FamilyIterator tempIt = FamilyIterator(parFamily);
     FamilyNode* newFamily = new FamilyNode();
     FAdjustables.push_back(std::unique_ptr<IBaseNode>(newFamily));
-    newFamily->Family = parFamily;
+    newFamily->Family = tempIt.GetCurrentFamily();
 
-    newFamily->visit(parVisitor);
+    newFamily->accept(parVisitor);
 }
 
 //----------------------------------------------------------------
