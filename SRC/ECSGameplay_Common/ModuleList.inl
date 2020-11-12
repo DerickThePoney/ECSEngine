@@ -4,3 +4,5 @@ DECLARE_MODULE_AND_TEMPLATE(OrientationModule, OrientationModuleTemplate)
 DECLARE_MODULE_AND_TEMPLATE(ApparenceModule, ApparenceModuleTemplate)
 DECLARE_MODULE_AND_TEMPLATE(CameraMoverModule, CameraMoverModuleTemplate)
 DECLARE_MODULE_AND_TEMPLATE(MovementModule, MovementModuleTemplate)
+
+#include "ECSGameplay_Specific/ModuleList.inl"

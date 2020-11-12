@@ -35,6 +35,7 @@ group ""
 
 group "Gameplay"
     include("PremakeScripts/ecsgameplay_common.lua")
+    include("PremakeScripts/ecsgameplay_specific.lua")
 group ""
 
 group "ImGuiTools"
