@@ -545,6 +545,10 @@ void CreateAdjustables()
 void DestroyAdjustables()
 {
 }
+
+void DrawAdjustables()
+{
+}
 } // namespace ECSEngine
 
 #endif // ENABLE_DEBUG_PARAMETERS
