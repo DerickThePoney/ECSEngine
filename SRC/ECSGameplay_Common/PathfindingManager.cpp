@@ -9,6 +9,7 @@
 #include "Common/NavMeshSolver.h"
 #include "Common/Polygon.h"
 #include "Common/Singleton.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "RenderingCore/DrawCommands.h"
 
 namespace ECSEngine
@@ -86,6 +87,10 @@ void PathfindingManager::RetrieveResults(std::vector<PathfindingResult>& outResu
 
 void PathfindingManager::Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial)
 {
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showPathfindingDebug, false, "Show navmesh", "Pathfinding/NavMesh");
+    if (!showPathfindingDebug || FNavMesh.FacesCount() == 0)
+        return;
+
     const glm::vec2* mainPolygon = FNavMesh.MainPolygon().data().data();
     parBuffer.DrawLines(parMaterial, mainPolygon, (u32)FNavMesh.MainPolygon().size(), 0.0f, 0xFF00FF00, true);
 

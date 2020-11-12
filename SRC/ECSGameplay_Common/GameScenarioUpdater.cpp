@@ -4,11 +4,13 @@
 
 #include "Application/SceneScenario.h"
 #include "Common/CameraManager.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
 #include "PathfindingManager.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/RenderPass.h"
 
@@ -54,6 +56,9 @@ void GameScenarioUpdater::Update()
     FScenario->Update();
     FCameraMoverSystem.Update();
     FMovementSystem.Update();
+
+    Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
+    DrawAdjustables();
 }
 
 void GameScenarioUpdater::Render()
