@@ -5,6 +5,7 @@
 #include "Common/RandomGenerator.h"
 #include "Common/RenderingHandles.h"
 #include "Common/TimeManager.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "MovementModule.h"
 #include "PathfindingManager.h"
@@ -134,6 +135,10 @@ void MovementSystem::VirtualUpdate()
 
 void MovementSystem::VisualDebug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial)
 {
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showUnitPath, false, "Show Unit Path", "Movement/Path");
+    if (!showUnitPath)
+        return;
+
     LockControllers();
 
     ModuleAccessor<MovementModule> movementModuleAccessor;
@@ -146,12 +151,26 @@ void MovementSystem::VisualDebug(Rendering::DrawCommandBuffer& parBuffer, const 
         if (!movementModule.RequestIsPending())
         {
             u32 size = 0;
-            const glm::vec3* path = movementModule.GetPathForDebug(positionModule->GetPosition3D(), size);
+            const glm::vec3* pathForDebug = movementModule.GetPathForDebug(positionModule->GetPosition3D(), size);
 
             if (size == 0)
                 continue;
 
-            parBuffer.DrawLines(parMaterial, path, size, 0xFF00FFFF, false);
+            parBuffer.DrawLines(parMaterial, pathForDebug, size, 0xFF00FFFF, false);
+
+            std::vector<glm::vec2> passedWaypoints;
+            const std::vector<glm::vec2>& path = movementModule.Path();
+            const u32 followedWaypoint = movementModule.CurrentFollowedWayPoint();
+
+            if (followedWaypoint != -1)
+            {
+                forrange(i, 0, followedWaypoint) passedWaypoints.push_back(path[i]);
+                passedWaypoints.push_back(glm::xz(positionModule->GetPosition3D()));
+
+                parBuffer.DrawLines(parMaterial, passedWaypoints, (u32)passedWaypoints.size(), 0.0f, 0xFFFF00FF, false);
+            }
+
+            parBuffer.DrawLines(parMaterial, { path.front(), path.back() }, 2, 0.f, 0xFF0000FF, false);
         }
     }
 
