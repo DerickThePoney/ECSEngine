@@ -4,7 +4,7 @@
 
 #include "ApplicationSceneActions.h"
 #include "Common/Singleton.h"
-#include "ECSGameplay_Common/GameplaySceneActions.h"
+#include "ECSGameplay_Specific/SpecificGameplaySceneActions.h"
 
 namespace ECSEngine
 {
@@ -16,7 +16,7 @@ public:
     {
     }
 
-    ~SceneActionsFactoryManager() {}
+    ~SceneActionsFactoryManager() { }
 
     bool RegisterSceneActionFactory(const u32 parId, ISceneAction* (*parFactory)());
     ISceneAction* CreateSceneAction(const u32 parId);
