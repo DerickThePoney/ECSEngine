@@ -21,6 +21,7 @@ bool GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFam
 #else
 void CreateAdjustables();
 void DestroyAdjustables();
+void DrawAdjustables();
 #define ADJUSTABLE_DEBUG_PARAMETER_UNSIGNED(VARNAME, DEFAULT, NAME, FAMILY, MIN, MAX) static constexpr u32 VARNAME = DEFAULT;
 #define ADJUSTABLE_DEBUG_PARAMETER_SINGLE(VARNAME, DEFAULT, NAME, FAMILY, MIN, MAX) static constexpr float VARNAME = DEFAULT;
 #define ADJUSTABLE_DEBUG_PARAMETER_DOUBLE(VARNAME, DEFAULT, NAME, FAMILY, MIN, MAX) static constexpr double VARNAME = DEFAULT;
