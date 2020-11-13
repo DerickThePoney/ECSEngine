@@ -51,6 +51,16 @@ void EntityTemplate::DrawEditor()
     ImGui::InputText("", text, 256);
     FName = std::string(text);
 
+    if (ImGui::BeginCombo("Entity world", Worlds::GetName(FWorld)))
+    {
+        for (u32 i = Worlds::STANDARD; i < Worlds::LENGTH; ++i)
+        {
+            if (ImGui::Selectable(Worlds::GetName((Worlds::Type)i), i == FWorld))
+                FWorld = (Worlds::Type)i;
+        }
+        ImGui::EndCombo();
+    }
+
     std::vector<u32> modulesToRemove;
     foreachitem(itModulesTemplates, FModuleTemplates)
     {

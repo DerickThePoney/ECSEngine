@@ -16,10 +16,11 @@
 
 namespace ECSEngine
 {
-using StandardControllers =
-      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::CameraMoverModule, ECSEngine::MovementModule>;
+using StandardControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::MovementModule>;
 
-using ColonyControllers = brigand::list<ECSEngine::ColonyModule>;
+using ColonyControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::ColonyModule>;
+
+using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 
 struct f
 {
@@ -42,8 +43,14 @@ void CreateWorlds()
 
     {
         EntityWorld* world = new EntityWorld(Worlds::COLONY);
-        auto r = brigand::for_each<StandardControllers>(f{ world });
+        auto r = brigand::for_each<ColonyControllers>(f{ world });
         WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::COLONY, world);
+    }
+
+    {
+        EntityWorld* world = new EntityWorld(Worlds::CAMERA);
+        auto r = brigand::for_each<CameraControllers>(f{ world });
+        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::CAMERA, world);
     }
 }
 
