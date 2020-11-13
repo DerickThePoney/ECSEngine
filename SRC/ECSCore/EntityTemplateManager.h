@@ -39,7 +39,7 @@ public:
     void load(Archive& ar)
     {
         ar(PROPERTY(EntityTemplates));
-        foreachitem(temp, FEntityTemplates) temp->Initialise();
+        foreachitem(temp, FEntityTemplates) { temp->Initialise(); }
     }
 
 private:

@@ -38,5 +38,11 @@ bool ModuleTemplate::DrawEditor()
 
     return false;
 }
+#ifdef PERFORM_SECURITY_CHECKS
+void ModuleTemplate::VerifyTemplate()
+{
+    VirtualVerifyTemplate();
+}
+#endif
 
 } // namespace ECSEngine

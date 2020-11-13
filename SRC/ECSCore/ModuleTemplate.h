@@ -45,10 +45,16 @@ public:
 
     bool DrawEditor();
 
+#ifdef PERFORM_SECURITY_CHECKS
+    void VerifyTemplate();
+#endif
+
 protected:
     virtual void VirtualDrawEditor() = 0;
 
 #ifdef PERFORM_SECURITY_CHECKS
+    virtual void VirtualVerifyTemplate() const { }
+
     bool IsInitialised() const { return FHasBeenInit; }
 #endif
 
