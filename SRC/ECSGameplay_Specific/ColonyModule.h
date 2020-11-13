@@ -23,11 +23,6 @@ public:
 
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
-    template<class Archive>
-    void serialize(Archive& ar)
-    {
-    }
-
 protected:
     void VirtualDrawEditor() override;
 };

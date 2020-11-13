@@ -1,2 +1,4 @@
 
 DECLARE_MODULE_AND_TEMPLATE(ColonyModule, ColonyModuleTemplate)
+DECLARE_MODULE_AND_TEMPLATE(ResourceStorageModule, ResourceStorageModuleTemplate)
+DECLARE_MODULE_AND_TEMPLATE(ResourceProductionModule, ResourceProductionModuleTemplate)

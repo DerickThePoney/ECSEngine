@@ -8,6 +8,8 @@
 #include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Specific/ColonyModule.h"
+#include "ECSGameplay_Specific/ResourceProductionModule.h"
+#include "ECSGameplay_Specific/ResourceStorageModule.h"
 #include "MovementModule.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"

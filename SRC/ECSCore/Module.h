@@ -18,7 +18,7 @@ class Module
 public:
 protected:
     Module();
-    virtual ~Module() {}
+    virtual ~Module() { }
 
 public:
     void Init(const ModuleTemplate* parTemplate, const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
@@ -33,7 +33,7 @@ public:
     const EntityId& UnitId() const { return FUnitId; }
 
     template<typename T>
-    const T* Template();
+    const T* Template() const;
 
 protected:
     virtual void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
