@@ -6,6 +6,7 @@ namespace Worlds
 enum Type
 {
     STANDARD,
+    COLONY,
     LENGTH
 };
 }
