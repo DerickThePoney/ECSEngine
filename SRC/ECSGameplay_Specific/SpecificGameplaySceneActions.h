@@ -38,12 +38,14 @@ public:
     void serialize(Archive& ar)
     {
         ar(cereal::base_class<parent_type>(this));
-        PROPERTYFIELD(WorldParameters, WorldGenerationParameters());
+        PROPERTYFIELD(WorldParametersDescriptor, WorldGenerationParametersDescriptor());
     }
 
 private:
-    WorldGenerationParameters FWorldParameters;
+    WorldGenerationParametersDescriptor FWorldParametersDescriptor;
 
+    const EntityTemplate* FColonyTemplate = nullptr;
     const EntityTemplate* FFirePlaceTemplate = nullptr;
+    const EntityTemplate* FFoodTemplate = nullptr;
 };
 } // namespace ECSEngine
