@@ -34,10 +34,17 @@ void EntityTemplate::AddModule(const u32 parId)
         auto& it = FModuleTemplates.emplace(parId, EntityTemplateManagerMethods::CreateModuleTemplate(parId));
         AssertRelease(it.first->second != nullptr);
         it.first->second->Init(this);
+
+#ifdef PERFORM_SECURITY_CHECKS
+        it.first->second->VerifyTemplate();
+#endif
     }
     else
     {
         itFind->second->Init(this);
+#ifdef PERFORM_SECURITY_CHECKS
+        itFind->second->VerifyTemplate();
+#endif
     }
 }
 
