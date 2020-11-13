@@ -27,7 +27,9 @@ void CreateWorldSceneAction::VirtualDrawEditor()
 
     if (ShouldShowEditor())
     {
-        EDITOR_PROPERTY_ENTITY_TEMPLATE("Fire place template", FFirePlaceTemplate, FWorldParameters.FFirePlaceTemplateName);
+        EDITOR_PROPERTY_ENTITY_TEMPLATE("Colony template", FColonyTemplate, FWorldParametersDescriptor.FColonyTemplateName);
+        EDITOR_PROPERTY_ENTITY_TEMPLATE("Fire place template", FFirePlaceTemplate, FWorldParametersDescriptor.FFirePlaceTemplateName);
+        EDITOR_PROPERTY_ENTITY_TEMPLATE("Food template", FFoodTemplate, FWorldParametersDescriptor.FFoodTemplateName);
     }
 }
 
@@ -56,7 +58,9 @@ bool CreateWorldSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuff
 void CreateWorldSceneAction::VirtualInitialise(const SceneScenario* parScene)
 {
     parent_type::VirtualInitialise(parScene);
-    FFirePlaceTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParameters.FFirePlaceTemplateName);
+    FColonyTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FColonyTemplateName);
+    FFirePlaceTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FFirePlaceTemplateName);
+    FFoodTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FFoodTemplateName);
 }
 
 void CreateWorldSceneAction::VirtualShutdown()
