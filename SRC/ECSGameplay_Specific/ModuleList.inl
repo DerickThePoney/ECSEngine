@@ -1,1 +1,2 @@
 
+DECLARE_MODULE_AND_TEMPLATE(ColonyModule, ColonyModuleTemplate)

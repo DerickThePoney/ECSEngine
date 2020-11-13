@@ -7,6 +7,7 @@
 #include "ECSCore/EntityWorld.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/WorldManager.h"
+#include "ECSGameplay_Specific/ColonyModule.h"
 #include "MovementModule.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
