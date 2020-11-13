@@ -16,7 +16,10 @@
 
 namespace ECSEngine
 {
-using Controllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::CameraMoverModule, ECSEngine::MovementModule>;
+using StandardControllers =
+      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::CameraMoverModule, ECSEngine::MovementModule>;
+
+using ColonyControllers = brigand::list<ECSEngine::ColonyModule>;
 
 struct f
 {
@@ -31,9 +34,17 @@ struct f
 
 void CreateWorlds()
 {
-    EntityWorld* world = new EntityWorld(Worlds::STANDARD);
-    auto r = brigand::for_each<Controllers>(f{ world });
-    WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::STANDARD, world);
+    {
+        EntityWorld* world = new EntityWorld(Worlds::STANDARD);
+        auto r = brigand::for_each<StandardControllers>(f{ world });
+        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::STANDARD, world);
+    }
+
+    {
+        EntityWorld* world = new EntityWorld(Worlds::COLONY);
+        auto r = brigand::for_each<StandardControllers>(f{ world });
+        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::COLONY, world);
+    }
 }
 
 namespace ModuleTemplates
