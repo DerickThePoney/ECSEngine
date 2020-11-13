@@ -3,7 +3,7 @@
 namespace ECSEngine
 {
 template<typename T>
-const T* Module::Template()
+const T* Module::Template() const
 {
     AssertRelease(FTemplate != nullptr);
 

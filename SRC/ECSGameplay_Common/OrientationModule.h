@@ -18,7 +18,7 @@ public:
         : ModuleTemplate()
     {
     }
-    virtual ~OrientationModuleTemplate() {}
+    virtual ~OrientationModuleTemplate() { }
 
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
@@ -37,7 +37,7 @@ public:
     {
     }
 
-    ~OrientationModule() {}
+    ~OrientationModule() { }
 
     const glm::quat& GetOrientation() const { return FOrientation; }
     const glm::vec3 GetOrientationAsYawPitchRoll() const;
