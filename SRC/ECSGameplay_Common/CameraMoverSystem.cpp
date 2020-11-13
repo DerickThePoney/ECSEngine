@@ -16,9 +16,9 @@ namespace ECSEngine
 
 CameraMoverSystem::CameraMoverSystem()
 {
-    RegisterDepency<CameraMoverModule>(Worlds::STANDARD);
-    RegisterDepency<PositionModule>(Worlds::STANDARD);
-    RegisterDepency<OrientationModule>(Worlds::STANDARD);
+    RegisterDepency<CameraMoverModule>(Worlds::CAMERA);
+    RegisterDepency<PositionModule>(Worlds::CAMERA);
+    RegisterDepency<OrientationModule>(Worlds::CAMERA);
 
     FForward.FKeyboardKey = InputKeyNames::INPUT_KEY_W;
     FForward.FInputType = EInputType::REPEATED;
@@ -48,9 +48,9 @@ void CameraMoverSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<CameraMoverModule> cameraMoverAccessor;
-    ModuleAccessor<PositionModule> positionAccessor;
-    ModuleAccessor<OrientationModule> orientationAccessor;
+    ModuleAccessor<CameraMoverModule> cameraMoverAccessor(Worlds::CAMERA);
+    ModuleAccessor<PositionModule> positionAccessor(Worlds::CAMERA);
+    ModuleAccessor<OrientationModule> orientationAccessor(Worlds::CAMERA);
     AssertRelease(cameraMoverAccessor.size() <= 1); // Pour l'instant on en prend qu'un !!
 
     const float deltaTime = TimeManager::FrameDeltaTime();
