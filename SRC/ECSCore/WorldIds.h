@@ -8,6 +8,8 @@ enum Type
     STANDARD = 0,
     COLONY,
     CAMERA,
+    RESOURCE_PROD,
+    PEONS,
     LENGTH
 };
 
