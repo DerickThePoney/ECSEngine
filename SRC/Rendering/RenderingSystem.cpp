@@ -38,13 +38,19 @@ RenderingSystem::RenderingSystem()
     RegisterDepency<ApparenceModule>(Worlds::STANDARD);
     RegisterDepency<PositionModule>(Worlds::STANDARD);
     RegisterDepency<OrientationModule>(Worlds::STANDARD);
+
+    RegisterDepency<ApparenceModule>(Worlds::RESOURCE_PROD);
+    RegisterDepency<PositionModule>(Worlds::RESOURCE_PROD);
+    RegisterDepency<OrientationModule>(Worlds::RESOURCE_PROD);
+
+    RegisterDepency<ApparenceModule>(Worlds::PEONS);
+    RegisterDepency<PositionModule>(Worlds::PEONS);
+    RegisterDepency<OrientationModule>(Worlds::PEONS);
 }
 
 RenderingSystem::~RenderingSystem()
 {
 }
-// Rendering::MaterialInstanceHandle kHandle;
-// bgfx::ProgramHandle kProgramInstancing;
 
 void RenderingSystem::VirtualInit()
 {
@@ -55,16 +61,40 @@ void RenderingSystem::VirtualInit()
     FDrawBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
 }
 
+template<Worlds::Type world>
+void RenderObjects(Rendering::DrawCommandBuffer* parCommandBuffer, const Frustum& parFrustum)
+{
+    ModuleAccessor<ApparenceModule> apparenceController(world);
+    ModuleAccessor<PositionModule> positionController(world);
+    ModuleAccessor<OrientationModule> orientationController(world);
+
+    foreachitem(apparenceModule, apparenceController)
+    {
+        const EntityId& unitId = apparenceModule.UnitId();
+        const Rendering::MeshHandle& meshHandle = apparenceModule.GetMeshHandle();
+        const Rendering::MaterialInstanceHandle& materialHandle = apparenceModule.GetMaterialHandle();
+
+        const PositionModule* positionModule = positionController[unitId];
+        AssertRelease(positionModule != nullptr);
+
+        const OrientationModule* orientationModule = orientationController[unitId];
+        AssertRelease(orientationModule != nullptr);
+        glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
+        mtx = mtx * (glm::mat4)orientationModule->GetOrientation();
+
+        if (Rendering::MeshFrustumCulling::CullApparenceModule(apparenceModule, mtx, parFrustum))
+        {
+            parCommandBuffer->DrawMesh(meshHandle, materialHandle, mtx);
+        }
+    }
+}
+
 void RenderingSystem::VirtualUpdate()
 {
     parent_type::VirtualUpdate();
 
     AssertRelease(FDrawBuffer != nullptr);
     FDrawBuffer->clear();
-
-    ModuleAccessor<ApparenceModule> apparenceController;
-    ModuleAccessor<PositionModule> positionController;
-    ModuleAccessor<OrientationModule> orientationController;
 
     const float timepoint = TimeManager::DurationSinceStartRealTime();
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
@@ -80,28 +110,11 @@ void RenderingSystem::VirtualUpdate()
     glm::mat4 proj = c->GetProjectionMatrix(aspectRatio);
     FDrawBuffer->SetViewTranform(view, proj);
 
-    if (1)
-    {
-        foreachitem(apparenceModule, apparenceController)
-        {
-            const EntityId& unitId = apparenceModule.UnitId();
-            const Rendering::MeshHandle& meshHandle = apparenceModule.GetMeshHandle();
-            const Rendering::MaterialInstanceHandle& materialHandle = apparenceModule.GetMaterialHandle();
+    RenderObjects<Worlds::STANDARD>(FDrawBuffer, frustum);
+    RenderObjects<Worlds::RESOURCE_PROD>(FDrawBuffer, frustum);
+    RenderObjects<Worlds::PEONS>(FDrawBuffer, frustum);
 
-            const PositionModule* positionModule = positionController[unitId];
-            AssertRelease(positionModule != nullptr);
-
-            const OrientationModule* orientationModule = orientationController[unitId];
-            AssertRelease(orientationModule != nullptr);
-            glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
-            mtx = mtx * (glm::mat4)orientationModule->GetOrientation();
-
-            if (Rendering::MeshFrustumCulling::CullApparenceModule(apparenceModule, mtx, frustum))
-            {
-                FDrawBuffer->DrawMesh(meshHandle, materialHandle, mtx);
-            }
-        }
-    }
+    if (1) { }
     else
     {
         //// 80 bytes stride = 64 bytes for 4x4 matrix + 16 bytes for RGBA color.
