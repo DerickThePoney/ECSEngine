@@ -7,6 +7,7 @@
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
+#include "WorldBuilder.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::CreateWorldSceneAction);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ISceneAction, ECSEngine::CreateWorldSceneAction)
@@ -29,7 +30,11 @@ void CreateWorldSceneAction::VirtualDrawEditor()
     {
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Colony template", FColonyTemplate, FWorldParametersDescriptor.FColonyTemplateName);
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Fire place template", FFirePlaceTemplate, FWorldParametersDescriptor.FFirePlaceTemplateName);
+        ImGui::Separator();
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Food template", FFoodTemplate, FWorldParametersDescriptor.FFoodTemplateName);
+        EDITOR_PROPERTY_WITH_LIMITS("Min radius for spawn", FWorldParametersDescriptor.FMinFoodRadius, 0.f, FWorldParametersDescriptor.FMaxFoodRadius);
+        EDITOR_PROPERTY_WITH_LIMITS("Max radius for spawn", FWorldParametersDescriptor.FMaxFoodRadius, FWorldParametersDescriptor.FMinFoodRadius, 10000.0f);
+        EDITOR_PROPERTY_WITH_LIMITS("Nb food to spawn", FWorldParametersDescriptor.FNbFoodEntities, 0u, 200u);
     }
 }
 
@@ -71,6 +76,8 @@ void CreateWorldSceneAction::VirtualShutdown()
 void CreateWorldSceneAction::VirtualStart()
 {
     parent_type::VirtualStart();
+    WorldBuilder worldBuilder(FWorldParametersDescriptor);
+    worldBuilder.CreateWorld();
     Finish();
 }
 
