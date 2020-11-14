@@ -15,6 +15,8 @@ const char* GetName(const Type parResource)
         return #NAME;
 #include "GameResources.inl"
 #undef RESOURCE
+    case LENGTH:
+        return "UNKNOWN RESOURCE";
     default:
         AssertNotReached();
         return "UNKNOWN RESOURCE";

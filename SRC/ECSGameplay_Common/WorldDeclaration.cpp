@@ -20,7 +20,13 @@ namespace ECSEngine
 {
 using StandardControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::MovementModule>;
 
-using ColonyControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::ColonyModule>;
+using PeonsControllers =
+      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::MovementModule, ECSEngine::ResourceStorageModule>;
+
+using ResourceProducerControllers =
+      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule, ECSEngine::ResourceProductionModule>;
+
+using ColonyControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::ColonyModule, ECSEngine::ResourceStorageModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 
@@ -53,6 +59,18 @@ void CreateWorlds()
         EntityWorld* world = new EntityWorld(Worlds::CAMERA);
         auto r = brigand::for_each<CameraControllers>(f{ world });
         WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::CAMERA, world);
+    }
+
+    {
+        EntityWorld* world = new EntityWorld(Worlds::RESOURCE_PROD);
+        auto r = brigand::for_each<ResourceProducerControllers>(f{ world });
+        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::RESOURCE_PROD, world);
+    }
+
+    {
+        EntityWorld* world = new EntityWorld(Worlds::PEONS);
+        auto r = brigand::for_each<PeonsControllers>(f{ world });
+        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::PEONS, world);
     }
 }
 
