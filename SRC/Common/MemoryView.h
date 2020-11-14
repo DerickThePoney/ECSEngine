@@ -115,6 +115,13 @@ public:
     {
     }
 
+    MemoryView(T* parData, const std::size_t parSize)
+        : FData(parData)
+        , FSize((u32)parSize)
+    {
+        AlwaysCheckedAssert(std::numeric_limits<u32>::max() >= parSize);
+    }
+
     iterator begin() { return iterator(this, 0); }
     const_iterator cbegin() { return const_iterator(this, 0); }
     reverse_iterator rbegin() { return reverse_iterator(this, FSize - 1); }
