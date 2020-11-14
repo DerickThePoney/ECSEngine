@@ -7,6 +7,7 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
+#include "ECSGameplaySpecificPropertyDrawers.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::ResourceStorageModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::ResourceStorageModuleTemplate)
@@ -26,7 +27,6 @@ void ResourceStorageModuleTemplate::VirtualDrawEditor()
 
     if (ImGui::CollapsingHeader("Starting resources"))
     {
-        ImGui::Indent();
         auto itToErase = FStartingResources.end();
         u32 i = 0;
         for (auto it = FStartingResources.begin(); it != FStartingResources.end(); it++)
@@ -36,22 +36,10 @@ void ResourceStorageModuleTemplate::VirtualDrawEditor()
                 itToErase = it;
             ImGui::SameLine();
 
-            ImGui::Text("%s", GameResource::GetName(it->first));
+            EDITOR_PROPERTY_GAME_RESOURCES("Resource", it->first, false);
             ImGui::SameLine();
 
-            int val = it->first;
-            ImGui::InputInt("##RESNAME", &val);
-            val = glm::clamp(val, 0, (int)GameResource::LENGTH - 1);
-            it->first = (GameResource::Type)val;
-            ImGui::SameLine();
-
-            ImGui::Text("Qty");
-            ImGui::SameLine();
-
-            int val2 = it->second;
-            ImGui::InputInt("##Qty", &val2);
-            val2 = glm::clamp(val2, 0, (int)FMaxResourceQuantity);
-            it->second = (u32)val2;
+            EDITOR_PROPERTY_WITH_LIMITS("Qty", it->second, 0u, FMaxResourceQuantity);
             ImGui::PopID();
             ++i;
         }
@@ -63,8 +51,6 @@ void ResourceStorageModuleTemplate::VirtualDrawEditor()
 
         if (ImGui::Button("Add starting resource"))
             FStartingResources.push_back({ GameResource::FOOD, 0 });
-
-        ImGui::Unindent();
     }
 }
 #ifdef PERFORM_SECURITY_CHECKS
