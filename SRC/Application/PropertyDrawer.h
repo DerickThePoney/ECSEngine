@@ -172,6 +172,9 @@ public:
 
     void ShowProperty()
     {
+        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        ImGui::SetNextItemWidth(availableSize.x * 0.4f);
+
         if (FUseLimits)
         {
             if (FIsAngle)
@@ -213,6 +216,9 @@ public:
 
     void ShowProperty()
     {
+        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        ImGui::SetNextItemWidth(availableSize.x * 0.4f);
+
         if (FUseLimits)
             ImGui::DragInt(FName.c_str(), FProperty, .5f, FMin, FMax);
         else
@@ -242,6 +248,9 @@ public:
 
     void ShowProperty()
     {
+        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        ImGui::SetNextItemWidth(availableSize.x * 0.4f);
+
         if (FUseLimits)
             ImGui::DragInt(FName.c_str(), (i32*)FProperty, .5f, (i32)FMin, (i32)FMax);
         else
