@@ -1,5 +1,7 @@
 #pragma once
 #include "CameraMoverSystem.h"
+#include "ECSGameplay_Specific/ColonyPeonsTaskAsignmentSystem.h"
+#include "ECSGameplay_Specific/PeonsHarvestingSystem.h"
 #include "IScenarioUpdater.h"
 #include "MovementSystem.h"
 #include "OrientationSystem.h"
@@ -27,5 +29,8 @@ private:
     CameraMoverSystem FCameraMoverSystem;
     MovementSystem FMovementSystem;
     RenderingSystem FRenderingSystem;
+
+    ColonyPeonsTaskAssignmentSystem FColonyManagementSystem;
+    PeonsHaverstingSystem FPeonHarvestingSytem;
 };
 } // namespace ECSEngine
