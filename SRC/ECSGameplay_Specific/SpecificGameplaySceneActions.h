@@ -47,5 +47,6 @@ private:
     const EntityTemplate* FColonyTemplate = nullptr;
     const EntityTemplate* FFirePlaceTemplate = nullptr;
     const EntityTemplate* FFoodTemplate = nullptr;
+    const EntityTemplate* FPeonTemplate = nullptr;
 };
 } // namespace ECSEngine

@@ -18,20 +18,6 @@ namespace ECSEngine
 {
 namespace MovementHelpers
 {
-void GenerateNewPathfindRequest(MovementModule& parMovementModule, const PositionModule& parPositionModule)
-{
-    const float rx = RandomNumbers::NextFloat() * 200.0f - 100.0f;
-    const float ry = RandomNumbers::NextFloat() * 200.0f - 100.0f;
-
-    PathfindingRequest request;
-    request.UnitId = parMovementModule.UnitId();
-    request.Start = glm::xz(parPositionModule.GetPosition3D());
-    request.End = glm::vec2(rx, ry);
-
-    Pathfinding::PushRequest(std::move(request));
-    parMovementModule.SetRequestIsPending(true);
-}
-
 void FollowPath(MovementModule& parMovementModule, PositionModule& parPositionModule, const float parDT)
 {
     glm::vec3 currentPosition = parPositionModule.GetPosition3D();
@@ -74,8 +60,8 @@ void FollowPath(MovementModule& parMovementModule, PositionModule& parPositionMo
 MovementSystem::MovementSystem()
     : parent_type()
 {
-    RegisterDepency<PositionModule>(Worlds::STANDARD);
-    RegisterDepency<MovementModule>(Worlds::STANDARD);
+    RegisterDepency<PositionModule>(Worlds::PEONS);
+    RegisterDepency<MovementModule>(Worlds::PEONS);
 }
 
 MovementSystem::~MovementSystem()
@@ -90,8 +76,8 @@ void MovementSystem::VirtualInit()
 void MovementSystem::VirtualUpdate()
 {
     parent_type::VirtualUpdate();
-    ModuleAccessor<MovementModule> movementModuleAccessor;
-    ModuleAccessor<PositionModule> positionModuleAccessor;
+    ModuleAccessor<MovementModule> movementModuleAccessor(Worlds::PEONS);
+    ModuleAccessor<PositionModule> positionModuleAccessor(Worlds::PEONS);
 
     Pathfinding::ComputeRequests();
     std::vector<PathfindingResult> results;
@@ -122,7 +108,6 @@ void MovementSystem::VirtualUpdate()
             u32 followedWaypoint = movementModule.CurrentFollowedWayPoint();
             if (path.size() == 0 || followedWaypoint == -1)
             {
-                MovementHelpers::GenerateNewPathfindRequest(movementModule, *positionModule);
                 movementModule.SetCurrentSpeed(glm::vec3(0.f));
             }
             else

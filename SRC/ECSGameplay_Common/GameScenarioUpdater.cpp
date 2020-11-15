@@ -34,6 +34,7 @@ void GameScenarioUpdater::Initialise()
     FMovementSystem.Init();
     FRenderingSystem.Init();
     FColonyManagementSystem.Init();
+    FPeonHarvestingSytem.Init();
 
     FScenario->Initialise();
 }
@@ -46,6 +47,7 @@ void GameScenarioUpdater::Destroy()
     delete FScenario;
     FScenario = nullptr;
 
+    FPeonHarvestingSytem.Destroy();
     FColonyManagementSystem.Destroy();
     FRenderingSystem.Destroy();
     FMovementSystem.Destroy();
@@ -60,8 +62,12 @@ void GameScenarioUpdater::Update()
     FMovementSystem.Update();
 
     FColonyManagementSystem.Update();
+    FPeonHarvestingSytem.Update();
+
     Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
     DrawAdjustables();
+
+    FPeonHarvestingSytem.Debug();
 }
 
 void GameScenarioUpdater::Render()

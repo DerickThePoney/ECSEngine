@@ -8,6 +8,8 @@
 #include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Specific/ColonyModule.h"
+#include "ECSGameplay_Specific/ColonyPeonsManagementModule.h"
+#include "ECSGameplay_Specific/ResourceHarvesterModule.h"
 #include "ECSGameplay_Specific/ResourceProductionModule.h"
 #include "ECSGameplay_Specific/ResourceStorageModule.h"
 #include "EntityLinksModules.h"
@@ -26,12 +28,13 @@ using PeonsControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::ApparenceModule,
       ECSEngine::MovementModule,
       ECSEngine::ResourceStorageModule,
-      ECSEngine::LinkToOwnerModule>;
+      ECSEngine::LinkToOwnerModule,
+      ECSEngine::ResourceHarvesterModule>;
 
 using ResourceProducerControllers =
       brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule, ECSEngine::ResourceProductionModule>;
 
-using ColonyControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::ColonyModule, ECSEngine::ResourceStorageModule>;
+using ColonyControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::ColonyModule, ECSEngine::ResourceStorageModule, ECSEngine::ColonyPeonsManagementModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 

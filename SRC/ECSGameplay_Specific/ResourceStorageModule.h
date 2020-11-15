@@ -62,6 +62,8 @@ public:
     u32 AddResource(const GameResource::Type parResource, const u32 parQuantity);
     u32 RemoveResource(const GameResource::Type parResource, const u32 parQuantity);
 
+    GameResource::Type GetMainResource() const;
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 

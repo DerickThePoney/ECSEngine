@@ -35,6 +35,10 @@ void CreateWorldSceneAction::VirtualDrawEditor()
         EDITOR_PROPERTY_WITH_LIMITS("Min radius for spawn", FWorldParametersDescriptor.FMinFoodRadius, 0.f, FWorldParametersDescriptor.FMaxFoodRadius);
         EDITOR_PROPERTY_WITH_LIMITS("Max radius for spawn", FWorldParametersDescriptor.FMaxFoodRadius, FWorldParametersDescriptor.FMinFoodRadius, 10000.0f);
         EDITOR_PROPERTY_WITH_LIMITS("Nb food to spawn", FWorldParametersDescriptor.FNbFoodEntities, 0u, 200u);
+        ImGui::Separator();
+        EDITOR_PROPERTY_ENTITY_TEMPLATE("Peon template", FPeonTemplate, FWorldParametersDescriptor.FPeonTemplateName);
+        EDITOR_PROPERTY_WITH_LIMITS("Radius for peons spawn", FWorldParametersDescriptor.FSpawnRadius, 0.f, FWorldParametersDescriptor.FSpawnRadius);
+        EDITOR_PROPERTY_WITH_LIMITS("Nb peons to spawn at start", FWorldParametersDescriptor.FStartingPeonsNumber, 0u, 20u);
     }
 }
 
@@ -66,6 +70,7 @@ void CreateWorldSceneAction::VirtualInitialise(const SceneScenario* parScene)
     FColonyTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FColonyTemplateName);
     FFirePlaceTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FFirePlaceTemplateName);
     FFoodTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FFoodTemplateName);
+    FPeonTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FPeonTemplateName);
 }
 
 void CreateWorldSceneAction::VirtualShutdown()

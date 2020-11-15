@@ -90,10 +90,10 @@ u32 ResourceStorageModule::GetResourceQuantity(const GameResource::Type parResou
         sum += resource.second;
     }
 
-    AlwaysCheckedAssert(parResource == GameResource::LENGTH);
     if (parResource != GameResource::LENGTH)
         return 0;
 
+    AlwaysCheckedAssert(parResource == GameResource::LENGTH);
     return sum;
 }
 
@@ -140,6 +140,22 @@ u32 ResourceStorageModule::RemoveResource(const GameResource::Type parResource, 
     }
 
     return 0;
+}
+
+GameResource::Type ResourceStorageModule::GetMainResource() const
+{
+    i32 maxResourceSize = -1;
+    GameResource::Type maxResource = GameResource::LENGTH;
+
+    foreachitemconst(res, FCarriedResources)
+    {
+        if ((i32)res.second > maxResourceSize)
+        {
+            maxResourceSize = (i32)maxResourceSize;
+            maxResource = res.first;
+        }
+    }
+    return maxResource;
 }
 
 } // namespace ECSEngine
