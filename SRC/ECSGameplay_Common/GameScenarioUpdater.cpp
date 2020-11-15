@@ -33,6 +33,7 @@ void GameScenarioUpdater::Initialise()
     FCameraMoverSystem.Init();
     FMovementSystem.Init();
     FRenderingSystem.Init();
+    FColonyManagementSystem.Init();
 
     FScenario->Initialise();
 }
@@ -45,6 +46,7 @@ void GameScenarioUpdater::Destroy()
     delete FScenario;
     FScenario = nullptr;
 
+    FColonyManagementSystem.Destroy();
     FRenderingSystem.Destroy();
     FMovementSystem.Destroy();
     FCameraMoverSystem.Destroy();
@@ -57,6 +59,7 @@ void GameScenarioUpdater::Update()
     FCameraMoverSystem.Update();
     FMovementSystem.Update();
 
+    FColonyManagementSystem.Update();
     Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
     DrawAdjustables();
 }
