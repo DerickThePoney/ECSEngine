@@ -10,6 +10,7 @@
 #include "ECSGameplay_Specific/ColonyModule.h"
 #include "ECSGameplay_Specific/ResourceProductionModule.h"
 #include "ECSGameplay_Specific/ResourceStorageModule.h"
+#include "EntityLinksModules.h"
 #include "MovementModule.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
@@ -20,8 +21,12 @@ namespace ECSEngine
 {
 using StandardControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::MovementModule>;
 
-using PeonsControllers =
-      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::MovementModule, ECSEngine::ResourceStorageModule>;
+using PeonsControllers = brigand::list<ECSEngine::PositionModule,
+      ECSEngine::OrientationModule,
+      ECSEngine::ApparenceModule,
+      ECSEngine::MovementModule,
+      ECSEngine::ResourceStorageModule,
+      ECSEngine::LinkToOwnerModule>;
 
 using ResourceProducerControllers =
       brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule, ECSEngine::ResourceProductionModule>;
