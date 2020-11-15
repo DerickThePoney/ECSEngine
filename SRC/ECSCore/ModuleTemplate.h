@@ -25,6 +25,12 @@ public:
 
     virtual const std::string GetName() const = 0;
 
+    virtual u32 GetModuleId() const
+    {
+        AssertNotReached();
+        return -1;
+    }
+
     void Init(const EntityTemplate* parTemplate);
 
     const EntityTemplate* GetTemplate() const
@@ -72,9 +78,10 @@ private:
 public:                                                                                                                                                                            \
     using parent_type = ModuleTemplate;                                                                                                                                            \
     const std::string GetName() const override { return #TYPE; }                                                                                                                   \
+    virtual u32 GetModuleId() const override { return ECSEngine::ModuleTraits<TYPE>::GetModuleId(); }                                                                              \
     static ModuleTemplate* CreateTemplate() { return new TEMPLATE; }                                                                                                               \
     static const std::string StaticGetName() { return #TYPE; }                                                                                                                     \
-    static const u32 GetId() { return ECSEngine::ModuleTraits<TYPE>::GetModuleId(); }
+    static const u32 StaticGetId() { return ECSEngine::ModuleTraits<TYPE>::GetModuleId(); }
 
 #define IMPLEMENT_MODULE_TEMPLATE(TYPE, TEMPLATE)                                                                                                                                  \
     IMPLEMENT_POOL_ALLOCATED(TEMPLATE);                                                                                                                                            \

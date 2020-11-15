@@ -69,9 +69,27 @@ public:
 #endif
 
     template<class Archive>
-    void serialize(Archive& ar)
+    void save(Archive& ar) const
     {
         ar(PROPERTY(Name), PROPERTY(World), PROPERTY(Key), NAMEDPROPERTY("ModuleTemplatesList", FModuleTemplates));
+    }
+
+    template<class Archive>
+    void load(Archive& ar)
+    {
+        ar(PROPERTY(Name), PROPERTY(World), PROPERTY(Key), NAMEDPROPERTY("ModuleTemplatesList", FModuleTemplates));
+
+        EntityModuleKey key;
+        std::map<u32, std::unique_ptr<ModuleTemplate>> moduleTemplates;
+        foreachitem(modTemplate, FModuleTemplates)
+        {
+            const u32 moduleId = modTemplate.second->GetModuleId();
+            key.SetHasModule(moduleId);
+            moduleTemplates.insert_or_assign(moduleId, std::move(modTemplate.second));
+        }
+
+        FKey = key;
+        FModuleTemplates = std::move(moduleTemplates);
     }
 
     void DrawEditor();

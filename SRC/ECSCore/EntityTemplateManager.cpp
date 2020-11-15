@@ -22,6 +22,8 @@ const ECSEngine::EntityTemplate* EntityTemplateManager::GetEntityTemplate(const 
     std::transform(parTemplateName.begin(), parTemplateName.end(), lowered.begin(), [](uc8 c) { return std::tolower(c); });
     foreachitemconst(entityTemplate, FEntityTemplates)
     {
+        if (entityTemplate == nullptr)
+            continue;
         const std::string& templateName = entityTemplate->GetName();
         std::string loweredTemplate(templateName.size(), ' ');
         std::transform(templateName.begin(), templateName.end(), loweredTemplate.begin(), [](uc8 c) { return std::tolower(c); });
