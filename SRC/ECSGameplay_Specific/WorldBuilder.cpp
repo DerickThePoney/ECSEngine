@@ -2,11 +2,13 @@
 
 #include "WorldBuilder.h"
 
+#include "ColonyPeonsManagementModule.h"
 #include "Common/RandomGenerator.h"
 #include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityId.h"
 #include "ECSCore/EntityTemplate.h"
 #include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/WorldIds.h"
 
@@ -14,7 +16,7 @@ namespace ECSEngine
 {
 namespace
 {
-EntityId CreateEntityInCircle(const float parMinRadius, const float parMaxRadius, const EntityTemplate* parTemplate)
+EntityId CreateEntityInCircle(const float parMinRadius, const float parMaxRadius, const EntityTemplate* parTemplate, ModuleParameters::ParameterContainer& parContainer)
 {
     AlwaysCheckedAssert(parMaxRadius >= parMinRadius);
     // Get radius
@@ -29,15 +31,19 @@ EntityId CreateEntityInCircle(const float parMinRadius, const float parMaxRadius
     const glm::vec3 position = glm::vec3(glm::cos(angle) * radius, 0.f, glm::sin(angle) * radius);
 
     // spawn entity
-    ModuleParameters::ParameterContainer container;
-    container.Set<ModuleParameters::Position>(position);
+    parContainer.Set<ModuleParameters::Position>(position);
 
-    return EntityFactory::CreateEntity(parTemplate, container);
+    return EntityFactory::CreateEntity(parTemplate, parContainer);
 }
 
-void CreateNEntityInCicle(const float parMinRadius, const float parMaxRadius, const u32 parQuantity, const EntityTemplate* parTemplate, std::vector<EntityId>& outCreatedEntities)
+void CreateNEntityInCicle(const float parMinRadius,
+      const float parMaxRadius,
+      const u32 parQuantity,
+      const EntityTemplate* parTemplate,
+      std::vector<EntityId>& outCreatedEntities,
+      ModuleParameters::ParameterContainer& parContainer)
 {
-    forrange(i, 0, parQuantity) { outCreatedEntities.push_back(CreateEntityInCircle(parMinRadius, parMaxRadius, parTemplate)); }
+    forrange(i, 0, parQuantity) { outCreatedEntities.push_back(CreateEntityInCircle(parMinRadius, parMaxRadius, parTemplate, parContainer)); }
 }
 } // namespace
 
@@ -68,7 +74,29 @@ void WorldBuilder::CreateWorld() const
     AssertRelease(foodTemplate->GetWorldId() == Worlds::RESOURCE_PROD);
     std::vector<EntityId> createdEntities;
     createdEntities.reserve(FGenerationParameters.FNbFoodEntities);
-    CreateNEntityInCicle(FGenerationParameters.FMinFoodRadius, FGenerationParameters.FMaxFoodRadius, FGenerationParameters.FNbFoodEntities, foodTemplate, createdEntities);
+    ModuleParameters::ParameterContainer foodParamContainer;
+    CreateNEntityInCicle(
+          FGenerationParameters.FMinFoodRadius, FGenerationParameters.FMaxFoodRadius, FGenerationParameters.FNbFoodEntities, foodTemplate, createdEntities, foodParamContainer);
+
+    const EntityTemplate* peonTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FPeonTemplateName);
+    AssertRelease(peonTemplate != nullptr);
+    AssertRelease(peonTemplate->GetWorldId() == Worlds::PEONS);
+    std::vector<EntityId> createdPeons;
+    createdPeons.reserve(FGenerationParameters.FStartingPeonsNumber);
+    ModuleParameters::ParameterContainer peonsParamContainer;
+    peonsParamContainer.Set<ModuleParameters::OwnerId>(colonyId);
+    CreateNEntityInCicle(
+          FGenerationParameters.FSpawnRadius, FGenerationParameters.FSpawnRadius, FGenerationParameters.FStartingPeonsNumber, peonTemplate, createdPeons, peonsParamContainer);
+
+    {
+        ManualLockModuleAccessor<ColonyPeonsManagementModule> colonyPeonsManagementModuleAccessor(Worlds::COLONY);
+        colonyPeonsManagementModuleAccessor.LockIFN();
+        ColonyPeonsManagementModule* colonyPeonsModule = colonyPeonsManagementModuleAccessor[colonyId];
+        AssertRelease(colonyPeonsModule != nullptr);
+        colonyPeonsManagementModuleAccessor.UnlockIFN();
+
+        colonyPeonsModule->IdlePeons().assign(createdPeons.begin(), createdPeons.end());
+    }
 }
 
 } // namespace ECSEngine
