@@ -4,7 +4,7 @@ namespace ECSEngine
 {
 struct WorldGenerationParametersDescriptor
 {
-    std::string FColonyTemplateName = "Colony template";
+    std::string FColonyTemplateName = "Colony template name";
 
     std::string FFirePlaceTemplateName = "Starting fire place template name";
 
@@ -13,14 +13,22 @@ struct WorldGenerationParametersDescriptor
     float FMaxFoodRadius = 0.f;
     u32 FNbFoodEntities = 0;
 
+    std::string FPeonTemplateName = "Peon template name";
+    u32 FStartingPeonsNumber = 2;
+    float FSpawnRadius = 10.0f;
+
     SERIALIZE()
     {
-        PROPERTYFIELD(ColonyTemplateName, "Colony template");
+        PROPERTYFIELD(ColonyTemplateName, "Colony template name");
         PROPERTYFIELD(FirePlaceTemplateName, "Starting fire place template name");
         PROPERTYFIELD(FoodTemplateName, "Food entity template");
         PROPERTYFIELD(MinFoodRadius, 0.f);
         PROPERTYFIELD(MaxFoodRadius, 0.f);
         PROPERTYFIELD(NbFoodEntities, 0);
+
+        PROPERTYFIELD(PeonTemplateName, "Peon template name");
+        PROPERTYFIELD(StartingPeonsNumber, 2);
+        PROPERTYFIELD(SpawnRadius, 10.0f);
     }
 };
 
