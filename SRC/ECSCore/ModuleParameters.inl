@@ -1,5 +1,6 @@
 #ifdef DECLARING_PARAMETERS
 #include "Common/RenderingHandles.h"
+#include "EntityId.h"
 namespace ECSEngine
 {
 namespace Rendering
@@ -15,6 +16,7 @@ DECLARE_MODULE_PARAMETER(YawPitchRoll, glm::vec3)
 DECLARE_MODULE_PARAMETER(Orientation, glm::quat)
 DECLARE_MODULE_PARAMETER(EulerAngles, glm::vec3)
 DECLARE_MODULE_PARAMETER(Mesh, Rendering::MeshHandle)
+DECLARE_MODULE_PARAMETER(OwnerId, EntityId)
 // DECLARE_MODULE_PARAMETER(Material, bgfx::ProgramHandle)
 
 #ifdef DECLARING_PARAMETERS
