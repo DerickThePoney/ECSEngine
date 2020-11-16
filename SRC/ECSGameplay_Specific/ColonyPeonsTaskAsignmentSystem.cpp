@@ -3,12 +3,15 @@
 #include "ColonyPeonsTaskAsignmentSystem.h"
 
 #include "ColonyPeonsManagementModule.h"
+#include "Common/RandomGenerator.h"
 #include "ECSCore/EntityId.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSGameplay_Common/PositionModule.h"
 #include "GameResources.h"
 #include "ResourceHarvesterModule.h"
 #include "ResourceStorageModule.h"
+
+#include <random>
 
 namespace ECSEngine
 {
@@ -40,7 +43,11 @@ EntityId GetTargetForPeon(const PositionModule& parPeonPositionModule,
     }
 
     if (!res.Valid() && !parAssignedTargets.empty())
-        res = *parAssignedTargets.begin();
+    {
+        std::vector<EntityId> result;
+        std::sample(parAssignedTargets.begin(), parAssignedTargets.end(), std::back_inserter(result), 1, std::mt19937{ std::random_device{}() });
+        res = result[0];
+    }
 
     return res;
 }
