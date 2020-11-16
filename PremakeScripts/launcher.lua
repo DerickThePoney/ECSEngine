@@ -9,9 +9,10 @@ project "Launcher"
 
    vpaths {
       ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"},
-      ["Sources"] = {srcfiles.."*.cpp"}
+      ["Sources"] = {srcfiles.."*.cpp"},
+      ["Debug"] = {srcfiles.."*.natvis"}
       }
-   files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
+   files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl", srcfiles.. "*.natvis"}
    pchheader (srcfiles.."stdafx.h")
    filter {"action:vs*", "options:not clang"}
       pchheader ("stdafx.h")
