@@ -126,8 +126,8 @@ void MovementSystem::VisualDebug(Rendering::DrawCommandBuffer& parBuffer, const 
 
     LockControllers();
 
-    ModuleAccessor<MovementModule> movementModuleAccessor;
-    ModuleAccessor<PositionModule> positionModuleAccessor;
+    ModuleAccessor<MovementModule> movementModuleAccessor(Worlds::PEONS);
+    ModuleAccessor<PositionModule> positionModuleAccessor(Worlds::PEONS);
 
     foreachitem(movementModule, movementModuleAccessor)
     {

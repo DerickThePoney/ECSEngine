@@ -97,7 +97,7 @@ void PeonsHaverstingSystem::Debug()
         foreachitemconst(storage, colonyStorageAccessor)
         {
             ImGui::PushID(ImGui::GetID(&storage));
-            if (ImGui::CollapsingHeader(fmt::format("Colony_{}", storage.UnitId().GetSequentialId()).c_str()))
+            if (ImGui::CollapsingHeader(fmt::format("Colony_{}", storage.UnitId().GetSequentialId()).c_str(), ImGuiTreeNodeFlags_DefaultOpen))
             {
                 forrange(i, 0, GameResource::LENGTH)
                 {
@@ -122,7 +122,7 @@ void PeonsHaverstingSystem::Debug()
         foreachitemconst(storage, peonsStorageAccessor)
         {
             ImGui::PushID(ImGui::GetID(&storage));
-            if (ImGui::CollapsingHeader(fmt::format("Peon_{}", storage.UnitId().GetSequentialId()).c_str()))
+            if (ImGui::CollapsingHeader(fmt::format("Peon_{}", storage.UnitId().GetSequentialId()).c_str(), ImGuiTreeNodeFlags_DefaultOpen))
             {
                 forrange(i, 0, GameResource::LENGTH)
                 {
@@ -147,7 +147,7 @@ void PeonsHaverstingSystem::Debug()
         foreachitemconst(storage, producerStorageAccessor)
         {
             ImGui::PushID(ImGui::GetID(&storage));
-            if (ImGui::CollapsingHeader(fmt::format("Producer_{}", storage.UnitId().GetSequentialId()).c_str()))
+            if (ImGui::CollapsingHeader(fmt::format("Producer_{}", storage.UnitId().GetSequentialId()).c_str(), ImGuiTreeNodeFlags_DefaultOpen))
             {
                 forrange(i, 0, GameResource::LENGTH)
                 {
