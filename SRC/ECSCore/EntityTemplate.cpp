@@ -21,6 +21,8 @@ void EntityTemplate::Initialise()
         }
     }
 
+    foreachitem(modIt, FModuleTemplates) { modIt.second->PostLoad(); }
+
 #ifdef PERFORM_SECURITY_CHECKS
     FHasBeenInit = true;
 #endif
