@@ -9,6 +9,7 @@
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Specific/ColonyModule.h"
 #include "ECSGameplay_Specific/ColonyPeonsManagementModule.h"
+#include "ECSGameplay_Specific/PeonSpawnModule.h"
 #include "ECSGameplay_Specific/ResourceHarvesterModule.h"
 #include "ECSGameplay_Specific/ResourceProductionModule.h"
 #include "ECSGameplay_Specific/ResourceStorageModule.h"
@@ -34,7 +35,8 @@ using PeonsControllers = brigand::list<ECSEngine::PositionModule,
 using ResourceProducerControllers =
       brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule, ECSEngine::ResourceProductionModule>;
 
-using ColonyControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::ColonyModule, ECSEngine::ResourceStorageModule, ECSEngine::ColonyPeonsManagementModule>;
+using ColonyControllers =
+      brigand::list<ECSEngine::PositionModule, ECSEngine::ColonyModule, ECSEngine::ResourceStorageModule, ECSEngine::ColonyPeonsManagementModule, ECSEngine::PeonSpawnModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 
