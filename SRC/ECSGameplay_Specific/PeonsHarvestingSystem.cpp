@@ -105,7 +105,7 @@ void PeonsHaverstingSystem::Debug()
 
                     if (resQ > 0)
                     {
-                        ImGui::PushID(i);
+                        ImGui::PushID((i32)i);
                         ImGui::Text("%s : %d", GameResource::GetName((GameResource::Type)i), resQ);
                         ImGui::PopID();
                     }
@@ -130,7 +130,7 @@ void PeonsHaverstingSystem::Debug()
 
                     if (resQ > 0)
                     {
-                        ImGui::PushID(i);
+                        ImGui::PushID((i32)i);
                         ImGui::Text("%s : %d", GameResource::GetName((GameResource::Type)i), resQ);
                         ImGui::PopID();
                     }
@@ -155,7 +155,7 @@ void PeonsHaverstingSystem::Debug()
 
                     if (resQ > 0)
                     {
-                        ImGui::PushID(i);
+                        ImGui::PushID((i32)i);
                         ImGui::Text("%s : %d", GameResource::GetName((GameResource::Type)i), resQ);
                         ImGui::PopID();
                     }
