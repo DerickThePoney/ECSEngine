@@ -60,4 +60,21 @@ void ColonyPeonsManagementModule::SetPeonIdleIFN(const EntityId& parPeon)
     FIdlePeons.push_back(parPeon);
 }
 
+void ColonyPeonsManagementModule::AddNewPeon(const EntityId& parPeon)
+{
+    AssertRelease(parPeon.GetWorldId() == Worlds::PEONS);
+#ifdef PERFORM_SECURITY_CHECKS
+    {
+        auto it = std::find(FIdlePeons.begin(), FIdlePeons.end(), parPeon);
+        AssertRelease(it == FIdlePeons.end());
+    }
+    {
+        auto it = std::find(FOccupiedPeons.begin(), FOccupiedPeons.end(), parPeon);
+        AssertRelease(it == FOccupiedPeons.end());
+    }
+#endif
+
+    FIdlePeons.push_back(parPeon);
+}
+
 } // namespace ECSEngine

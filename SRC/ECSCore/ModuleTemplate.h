@@ -55,8 +55,11 @@ public:
     void VerifyTemplate();
 #endif
 
+    void PostLoad();
+
 protected:
     virtual void VirtualDrawEditor() = 0;
+    virtual void VirtualPostLoad() { }
 
 #ifdef PERFORM_SECURITY_CHECKS
     virtual void VirtualVerifyTemplate() const { }
