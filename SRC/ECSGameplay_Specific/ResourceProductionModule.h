@@ -60,6 +60,8 @@ public:
         return MemoryView<const ProducedResourceTiming>(FRemainingProductionTimes.data(), (u32)FRemainingProductionTimes.size());
     }
 
+    void ResetTimingForResource(const GameResource::Type parResource);
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 

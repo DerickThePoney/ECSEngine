@@ -66,4 +66,27 @@ void ResourceProductionModule::VirtualInit(const EntityId& parUnitId, const Modu
     foreachitemconst(res, producedResources) { FRemainingProductionTimes.push_back({ res.first, res.second }); }
 }
 
+void ResourceProductionModule::ResetTimingForResource(const GameResource::Type parResource)
+{
+    MemoryView<const ResourceProductionModuleTemplate::ProducedResource> producedResources = Template<ResourceProductionModuleTemplate>()->ProducedResources();
+
+    foreachitemconst(res, producedResources)
+    {
+        if (res.first == parResource)
+        {
+            foreachitem(resP, FRemainingProductionTimes)
+            {
+                if (resP.first == parResource)
+                {
+                    resP.second = res.second;
+                    return;
+                }
+            }
+        }
+    }
+
+    AssertNotReached();
+    return;
+}
+
 } // namespace ECSEngine
