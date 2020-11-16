@@ -45,6 +45,8 @@ public:
     void SetPeonOccupied(const EntityId& parPeon);
     void SetPeonIdleIFN(const EntityId& parPeon);
 
+    u32 PeonsInColony() const { return (u32)(FOccupiedPeons.size() + FIdlePeons.size()); }
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
