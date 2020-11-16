@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="ECSEngine::EntityId">
+    <DisplayString>{{[{(ECSEngine::Worlds::Type)(FId.FId >> 24 &amp; 0xFF)} : {FId.FId &amp; 0xFFFFFF}]}}</DisplayString>
+  </Type>
+</AutoVisualizer>
