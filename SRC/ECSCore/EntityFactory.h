@@ -12,5 +12,6 @@ class ParameterContainer;
 namespace EntityFactory
 {
 const EntityId CreateEntity(const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameters);
-}
+void MarkEntityAsDead(const EntityId& parId);
+} // namespace EntityFactory
 } // namespace ECSEngine
