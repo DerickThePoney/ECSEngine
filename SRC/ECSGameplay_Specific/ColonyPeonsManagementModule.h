@@ -45,6 +45,7 @@ public:
     void SetPeonOccupied(const EntityId& parPeon);
     void SetPeonIdleIFN(const EntityId& parPeon);
     void AddNewPeon(const EntityId& parPeon);
+    void RemovePeon(const EntityId& parPeon);
 
     u32 PeonsInColony() const { return (u32)(FOccupiedPeons.size() + FIdlePeons.size()); }
 
