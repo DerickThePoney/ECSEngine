@@ -77,4 +77,28 @@ void ColonyPeonsManagementModule::AddNewPeon(const EntityId& parPeon)
     FIdlePeons.push_back(parPeon);
 }
 
+void ColonyPeonsManagementModule::RemovePeon(const EntityId& parPeon)
+{
+    AssertRelease(parPeon.GetWorldId() == Worlds::PEONS);
+
+    {
+        auto it = std::find(FIdlePeons.begin(), FIdlePeons.end(), parPeon);
+        if (it != FIdlePeons.end())
+        {
+            FIdlePeons.erase(it);
+            return;
+        }
+    }
+    {
+        auto it = std::find(FOccupiedPeons.begin(), FOccupiedPeons.end(), parPeon);
+        if (it != FOccupiedPeons.end())
+        {
+            FOccupiedPeons.erase(it);
+            return;
+        }
+    }
+
+    AssertNotReached();
+}
+
 } // namespace ECSEngine
