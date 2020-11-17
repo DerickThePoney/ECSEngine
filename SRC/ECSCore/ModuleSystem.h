@@ -55,7 +55,7 @@ protected:
 };
 
 template<class T>
-void ECSEngine::ModuleSystem::RegisterDepency(const Worlds::Type parEntityWorld)
+void ModuleSystem::RegisterDepency(const Worlds::Type parEntityWorld)
 {
     AssertRelease(WorldManager::HasInstance());
     EntityWorld* world = WorldManager::Instance().GetWorldIFP(parEntityWorld);
