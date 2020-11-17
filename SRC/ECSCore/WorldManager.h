@@ -15,12 +15,17 @@ public:
     void Shutdown();
 
     void AddEntityWorldStealOwnership(Worlds::Type parType, EntityWorld* parWorld);
+    void ProcessDestroyEntities();
     void DestroyAllRemainingEntities();
 
     EntityWorld& GetWorld(Worlds::Type parWorld);
     EntityWorld* GetWorldIFP(Worlds::Type parWorld);
 
+    void MarkAsDead(const EntityId& parId);
+
 private:
     std::vector<std::unique_ptr<EntityWorld>> FWorlds;
+
+    std::set<EntityId> FDeadEntities;
 };
 } // namespace ECSEngine

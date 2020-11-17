@@ -49,4 +49,26 @@ void WorldManager::DestroyAllRemainingEntities()
     foreachitem(world, FWorlds) { world->DestroyAllRemainingEntities(); }
 }
 
+void WorldManager::MarkAsDead(const EntityId& parId)
+{
+    AssertRelease(parId.Valid());
+#ifdef PERFORM_SECURITY_CHECKS
+    EntityWorld* world = WorldManager::Instance().GetWorldIFP((Worlds::Type)parId.GetWorldId());
+    AssertRelease(world != nullptr);
+#endif
+    FDeadEntities.insert(parId);
+}
+
+void WorldManager::ProcessDestroyEntities()
+{
+    foreachitemconst(id, FDeadEntities)
+    {
+        EntityWorld* world = WorldManager::Instance().GetWorldIFP((Worlds::Type)id.GetWorldId());
+        AssertRelease(world != nullptr);
+
+        world->DestroyEntity(id);
+    }
+    FDeadEntities.clear();
+}
+
 } // namespace ECSEngine

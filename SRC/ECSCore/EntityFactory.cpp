@@ -20,5 +20,13 @@ const EntityId CreateEntity(const EntityTemplate* parTemplate, const ModuleParam
     return unitId;
 }
 
+void MarkEntityAsDead(const EntityId& parId)
+{
+    if (!parId.Valid())
+        return;
+
+    WorldManager::Instance().MarkAsDead(parId);
+}
+
 } // namespace EntityFactory
 } // namespace ECSEngine

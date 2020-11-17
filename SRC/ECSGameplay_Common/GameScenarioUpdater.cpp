@@ -72,6 +72,8 @@ void GameScenarioUpdater::Update()
     FProductionSystem.Update();
     FPeonSpawnSystem.Update();
 
+    WorldManager::Instance().ProcessDestroyEntities();
+
     Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
     DrawAdjustables();
 
