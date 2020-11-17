@@ -13,7 +13,7 @@ class ParameterContainer;
 namespace ECSEngine
 {
 class ModuleTemplate;
-class Module
+class alignas(16) Module
 {
 public:
 protected:
