@@ -43,12 +43,11 @@ void ModuleTemplate::VerifyTemplate()
 {
     VirtualVerifyTemplate();
 }
+#endif
 
 void ModuleTemplate::PostLoad()
 {
     VirtualPostLoad();
 }
-
-#endif
 
 } // namespace ECSEngine
