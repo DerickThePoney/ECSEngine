@@ -18,6 +18,7 @@ enum Type : u16
     IMGUI_PASSES_START = IMGUI_EDITOR_PASS,
     IMGUI_PASSES_END = IMGUI_DEBUG_PASS
 };
-}
+const char* GetName(Type parPass);
+} // namespace RenderPassId
 } // namespace Rendering
 } // namespace ECSEngine
