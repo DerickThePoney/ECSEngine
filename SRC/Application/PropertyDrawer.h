@@ -265,6 +265,29 @@ private:
     u32 FMax;
 };
 
+template<>
+class PropertyDrawer<bool>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, bool* parProperty)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+    {
+    }
+
+    void ShowProperty()
+    {
+        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        ImGui::SetNextItemWidth(availableSize.x * 0.4f);
+
+        ImGui::Checkbox(FName.c_str(), FProperty);
+    }
+
+private:
+    std::string FName;
+    bool* FProperty = nullptr;
+};
+
 template<typename T>
 void MakeSimpleProperty(const std::string& parName, T* parProperty)
 {
@@ -284,6 +307,12 @@ void MakePropertyWithLimits(const std::string& parName, T* parProperty, const T&
 #define EDITOR_PROPERTY_ANGLE(NAME, PROPERTY, MIN, MAX)                                                                                                                            \
     {                                                                                                                                                                              \
         PropertyDrawer<float> drawer(NAME, &PROPERTY, MIN, MAX, true);                                                                                                             \
+        drawer.ShowProperty();                                                                                                                                                     \
+    }
+
+#define EDITOR_PROPERTY_BOOL(NAME, PROPERTY)                                                                                                                                       \
+    {                                                                                                                                                                              \
+        PropertyDrawer<bool> drawer(NAME, &PROPERTY);                                                                                                                              \
         drawer.ShowProperty();                                                                                                                                                     \
     }
 
