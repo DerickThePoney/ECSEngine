@@ -29,6 +29,7 @@ void PeonSpawnModuleTemplate::VirtualDrawEditor()
     EDITOR_PROPERTY_ENTITY_TEMPLATE("Peon template", FPeonTemplate, FPeonTemplateName);
     EDITOR_PROPERTY_WITH_LIMITS("Base peon cost", FBaseCost, 1u, 1000u);
     EDITOR_PROPERTY_WITH_LIMITS("Cost multiplier", FMultiplier, 1.f, 2.f);
+    EDITOR_PROPERTY_BOOL("Auto spawn", FAutoSpawn);
 }
 
 void PeonSpawnModuleTemplate::VirtualPostLoad()
@@ -50,6 +51,11 @@ PeonSpawnModule::~PeonSpawnModule()
 {
 }
 
+const EntityTemplate* PeonSpawnModule::PeonTemplate() const
+{
+    return Template<PeonSpawnModuleTemplate>()->PeonTemplate();
+}
+
 u32 PeonSpawnModule::CostForNextSpawn(const u32 parCurrentPeonsQuantity) const
 {
     return Template<PeonSpawnModuleTemplate>()->CostForNextSpawn(parCurrentPeonsQuantity);
@@ -58,6 +64,11 @@ u32 PeonSpawnModule::CostForNextSpawn(const u32 parCurrentPeonsQuantity) const
 GameResource::Type PeonSpawnModule::ResourceToPay() const
 {
     return Template<PeonSpawnModuleTemplate>()->ResourceToPay();
+}
+
+bool PeonSpawnModule::AutoSpawn() const
+{
+    return Template<PeonSpawnModuleTemplate>()->AutoSpawn();
 }
 
 void PeonSpawnModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parContainer)
