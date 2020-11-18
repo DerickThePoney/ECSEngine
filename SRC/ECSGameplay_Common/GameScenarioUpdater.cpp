@@ -38,6 +38,7 @@ void GameScenarioUpdater::Initialise()
     FProductionSystem.Init();
     FPeonSpawnSystem.Init();
     FPeonLifeSpanSystem.Init();
+    FUserInterfaceSystem.Init();
 
     FScenario->Initialise();
 }
@@ -50,6 +51,7 @@ void GameScenarioUpdater::Destroy()
     delete FScenario;
     FScenario = nullptr;
 
+    FUserInterfaceSystem.Update();
     FPeonLifeSpanSystem.Destroy();
     FPeonSpawnSystem.Destroy();
     FProductionSystem.Destroy();
@@ -76,6 +78,9 @@ void GameScenarioUpdater::Update()
     FPeonLifeSpanSystem.Update();
 
     WorldManager::Instance().ProcessDestroyEntities();
+
+    Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
+    FUserInterfaceSystem.Update();
 
     Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
     DrawAdjustables();
