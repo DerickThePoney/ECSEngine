@@ -35,8 +35,11 @@ void PeonSpawnSystem::VirtualUpdate()
     ModuleAccessor<ResourceStorageModule> colonyResourceStorageAccessor(Worlds::COLONY);
     ModuleAccessor<PositionModule> colonyPositionAccessor(Worlds::COLONY);
 
-    foreachitemconst(spawnModule, colonySpawnModuleAccessor)
+    foreachitem(spawnModule, colonySpawnModuleAccessor)
     {
+        if (!spawnModule.AutoSpawn() && !spawnModule.RequestedPawnCreation())
+            continue;
+
         ColonyPeonsManagementModule* colonyPeons = colonyPeonsAccessor[spawnModule.UnitId()];
         AssertRelease(colonyPeons != nullptr);
         ResourceStorageModule* colonyStorage = colonyResourceStorageAccessor[spawnModule.UnitId()];
@@ -55,12 +58,14 @@ void PeonSpawnSystem::VirtualUpdate()
             container.Set<ModuleParameters::Position>(colonyPos->GetPosition3D());
             container.Set<ModuleParameters::OwnerId>(spawnModule.UnitId());
 
-            EntityId newPeon = EntityFactory::CreateEntity(spawnModule.Template<PeonSpawnModuleTemplate>()->PeonTemplate(), container);
+            EntityId newPeon = EntityFactory::CreateEntity(spawnModule.PeonTemplate(), container);
             colonyPeons->AddNewPeon(newPeon);
 
             const u32 payed = colonyStorage->RemoveResource(spawnModule.ResourceToPay(), costForNextSpawn);
             AlwaysCheckedAssert(payed == costForNextSpawn);
         }
+
+        spawnModule.SetRequestedPawnCreation(false);
     }
 }
 
