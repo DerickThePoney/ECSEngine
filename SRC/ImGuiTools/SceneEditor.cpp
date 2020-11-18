@@ -15,6 +15,7 @@
 #include "LoggerGUI.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/TexturesManager.h"
 
 namespace ECSEngine
@@ -58,6 +59,12 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
         ImGui::Separator();
         ImGui::MenuItem("Editor camera", NULL, &options.showEditorCameraParameters);
 
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Tools"))
+    {
+        ImGui::MenuItem("UI Style Editor", NULL, &options.showUIStyleEditor);
         ImGui::EndMenu();
     }
     ImGui::EndMainMenuBar();
@@ -212,6 +219,35 @@ void SceneActionsWindow(SceneScenario* parScene, WindowsToShow& options, const g
     }
     ImGui::End();
 }
+
+void UIStyleEditor(bool* parOpen)
+{
+    static Rendering::RenderPassId::Type passToEdit = Rendering::RenderPassId::IMGUI_PASSES_START;
+
+    Rendering::ImGUI::SetImGuiContext(passToEdit);
+
+    ImGui::Begin("UI Style Editor", parOpen);
+    if (ImGui::BeginCombo("ImGui context style to edit", Rendering::RenderPassId::GetName(passToEdit)))
+    {
+        for (u16 i = Rendering::RenderPassId::IMGUI_PASSES_START; i <= Rendering::RenderPassId::IMGUI_PASSES_END; ++i)
+        {
+            bool selected = i == passToEdit;
+            if (ImGui::Selectable(Rendering::RenderPassId::GetName((Rendering::RenderPassId::Type)i), selected))
+                passToEdit = (Rendering::RenderPassId::Type)i;
+
+            if (selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    // TODO GET CURRENT STYLE, UPDATE THE STYLE OF THE WINDOWS, SAVE IT AND THEN SETUP THE STYLES CORRECTLY
+    ImGui::ShowStyleEditor();
+
+    ImGui::End();
+    Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_EDITOR_PASS);
+}
+
 } // namespace
 
 void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindowsToShow, IOScene& parOutIOScene)
@@ -240,6 +276,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showBGFXStatistics)
         Rendering::BGFXRenderer::Instance().DrawStats(&parOutWindowsToShow.showBGFXStatistics);
+
+    if (parOutWindowsToShow.showUIStyleEditor)
+        UIStyleEditor(&parOutWindowsToShow.showUIStyleEditor);
 }
 
 void DrawPlayScenarioWindow(bool& parOutPlayScenario)
@@ -252,16 +291,16 @@ void DrawPlayScenarioWindow(bool& parOutPlayScenario)
 
     AssertRelease(playHandle.IsValid());
     AssertRelease(pauseHandle.IsValid());
-    /*const Rendering::Texture* playTexture = Rendering::TextureManager::Instance().GetTexture(playHandle);
-    const Rendering::Texture* pauseTexture = Rendering::TextureManager::Instance().GetTexture(pauseHandle);
-    AssertRelease(playTexture != nullptr);
-    AssertRelease(pauseTexture != nullptr);*/
 
     const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
-    ImGui::BeginMainMenuBar();
-    const glm::vec2 menuBarHeight = ImGui::GetWindowSize();
-    ImGui::EndMainMenuBar();
+    glm::vec2 menuBarHeight(0.f);
+    if (!parOutPlayScenario)
+    {
+        ImGui::BeginMainMenuBar();
+        menuBarHeight = ImGui::GetWindowSize();
+        ImGui::EndMainMenuBar();
+    }
 
     ImGui::Begin("PlayButton", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground);
     const float thisWindowSize = ImGui::GetWindowWidth();
