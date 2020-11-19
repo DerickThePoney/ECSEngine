@@ -82,6 +82,17 @@ void ImguiRenderer::Init(const u32 parContext)
     io.DeltaTime = 1.0f / 60.0f;
     io.IniFilename = NULL;
 
+    {
+        ECSEngine::Resource styleResource(
+              fmt::format("Styles\\Style_{}.style", Rendering::RenderPassId::GetName((Rendering::RenderPassId::Type)(parContext + Rendering::RenderPassId::IMGUI_PASSES_START))));
+        if (GlobalResourceCache::Instance().FCache->FileExists(&styleResource))
+        {
+            std::shared_ptr<ECSEngine::ResourceHandle> styleResHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&styleResource);
+            AssertRelease(styleResHandle != nullptr);
+            memcpy(&ImGui::GetStyle(), styleResHandle->WritableBuffer(), sizeof(ImGuiStyle));
+        }
+    }
+
     GLFWDisplayWindowHandler::Instance().InitInputsForImGui(io);
 
     if (parContext == 0)
