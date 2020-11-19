@@ -226,7 +226,38 @@ void UIStyleEditor(bool* parOpen)
 
     Rendering::ImGUI::SetImGuiContext(passToEdit);
 
-    ImGui::Begin("UI Style Editor", parOpen);
+    ImGui::Begin("UI Style Editor", parOpen, ImGuiWindowFlags_MenuBar);
+    if (ImGui::BeginMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("Save"))
+            {
+                const std::string& basePath = GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName();
+                const std::string filename = fmt::format("{}\\Styles\\Style_{}.style", basePath, Rendering::RenderPassId::GetName(passToEdit));
+                bool isNewFile = false;
+                {
+
+                    std::ifstream ifstr(filename, std::ios::binary);
+                    isNewFile = ifstr.good();
+                }
+                {
+                    std::ofstream ofstr(filename, std::ios::binary);
+                    AlwaysCheckedAssert(ofstr.good());
+                    if (ofstr.good())
+                    {
+                        ofstr.write(reinterpret_cast<char*>(&ImGui::GetStyle()), sizeof(ImGuiStyle));
+                    }
+                }
+
+                if (isNewFile)
+                    GlobalResourceCache::Instance().FCache->ReOpenFileSystem();
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+
     if (ImGui::BeginCombo("ImGui context style to edit", Rendering::RenderPassId::GetName(passToEdit)))
     {
         for (u16 i = Rendering::RenderPassId::IMGUI_PASSES_START; i <= Rendering::RenderPassId::IMGUI_PASSES_END; ++i)
