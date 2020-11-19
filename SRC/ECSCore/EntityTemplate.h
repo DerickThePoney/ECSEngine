@@ -47,6 +47,7 @@ public:
     void AddModule(const u32 parId);
 
     const Worlds::Type& GetWorldId() const { return FWorld; }
+    void SetWorldId_IKnowWhatImDoing(Worlds::Type parWorld) { FWorld = parWorld; }
 
     template<typename Module>
     const ModuleTemplate* GetModuleTemplate() const
