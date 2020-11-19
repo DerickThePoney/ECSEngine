@@ -4,6 +4,7 @@
 #include "Application/CommonLoaders.h"
 #include "ApplicationUpdater.h"
 #include "ECSGameplay_Common/ECSLoader.h"
+#include "ECSGameplay_Specific/GameplaySpecificLoader.h"
 #include "RenderingCore/RenderingLoader.h"
 
 int main(int argc, char** argv)
@@ -22,6 +23,7 @@ int main(int argc, char** argv)
             app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>("..\\Assets");
             app.AddNewLoader<ECSEngine::ECSLoader>("\\Configuration\\EntityTemplates.json");
             app.AddNewLoader<ECSEngine::RenderingLoader>("Base Application");
+            app.AddNewLoader<ECSEngine::ECSGameplaySpecificLoader>("\\Configuration\\GameplayRules.json");
             app.SetGameplayUpdater_StealOwnership(new ECSEngine::ApplicationUpdaterWrapper());
 
             {
