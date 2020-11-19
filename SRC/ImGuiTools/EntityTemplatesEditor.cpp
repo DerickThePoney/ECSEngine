@@ -10,7 +10,7 @@ namespace ECSEngine
 {
 namespace ImGUITools
 {
-void DrawEditorMenu()
+void DrawEditorMenu(Worlds::Type parWorldFilter)
 {
     if (ImGui::BeginMenuBar())
     {
@@ -19,7 +19,8 @@ void DrawEditorMenu()
         {
             if (ImGui::MenuItem("Add template", "Ctrl+N"))
             {
-                EntityTemplateManager::Instance().CreateNewEntityTemplate();
+                EntityTemplate* newTemplate = EntityTemplateManager::Instance().CreateNewEntityTemplate();
+                newTemplate->SetWorldId_IKnowWhatImDoing(parWorldFilter);
             }
 
             ImGui::Separator();
@@ -43,23 +44,42 @@ void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/, const float parMen
         return;
     AssertRelease(EntityTemplateManager::HasInstance());
     const u32 templatesToDraw = EntityTemplateManager::Instance().GetEntityTemplatesNumber();
+    static Worlds::Type worldIdFilter = Worlds::LENGTH;
 
     glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     ImGui::SetNextWindowSize(windowSize * glm::vec2(1.0f, 1.0f - (parMenuBarHeight / windowSize.y)));
     ImGui::SetNextWindowPos(glm::vec2(0.0f, parMenuBarHeight));
 
     ImGui::Begin("Entity templates editor", parOutOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
-    DrawEditorMenu();
+    DrawEditorMenu(worldIdFilter);
     const glm::vec2 currentWindowSize = ImGui::GetContentRegionAvail();
     const glm::vec2 utilityPlace = currentWindowSize - 50.0f;
     const float listProportion = 0.30f;
     const glm::vec2 listSize = utilityPlace * glm::vec2(listProportion, 1.0f);
     ImGui::SetCursorPosX(((currentWindowSize - utilityPlace) * 0.5f).x);
     ImGui::BeginChild(ImGui::GetID("Entity templates list"), listSize, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+    if (ImGui::BeginCombo("Filter by world", (worldIdFilter == Worlds::LENGTH) ? "NO" : Worlds::GetName(worldIdFilter)))
+    {
+        for (u32 i = Worlds::STANDARD; i < Worlds::LENGTH; ++i)
+        {
+            if (ImGui::Selectable(Worlds::GetName((Worlds::Type)i), i == worldIdFilter))
+                worldIdFilter = (Worlds::Type)i;
+        }
+
+        if (ImGui::Selectable("NO", Worlds::LENGTH == worldIdFilter))
+            worldIdFilter = Worlds::LENGTH;
+
+        ImGui::EndCombo();
+    }
+
     static u32 selected = -1;
     forrange(i, 0, templatesToDraw)
     {
         const EntityTemplate* et = EntityTemplateManager::Instance().GetEntityTemplate((u32)i);
+        if (worldIdFilter != Worlds::LENGTH && et->GetWorldId() != worldIdFilter)
+            continue;
+
         if (ImGui::Selectable(et->GetName().c_str(), selected == i))
             selected = (u32)i;
     }
