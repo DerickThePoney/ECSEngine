@@ -10,10 +10,11 @@ template<>
 class PropertyDrawer<const EntityTemplate*>
 {
 public:
-    PropertyDrawer(const std::string& parPropertyName, const EntityTemplate** parProperty, std::string* parNameProperty)
+    PropertyDrawer(const std::string& parPropertyName, const EntityTemplate** parProperty, std::string* parNameProperty, Worlds::Type parFilter = Worlds::LENGTH)
         : FName(parPropertyName)
         , FProperty(parProperty)
         , FNameProperty(parNameProperty)
+        , FFilter(parFilter)
     {
     }
 
@@ -40,6 +41,10 @@ public:
             forrange(i, 0, templatesNumber)
             {
                 const EntityTemplate* temp = EntityTemplateManager::Instance().GetEntityTemplate((u32)i);
+
+                if (FFilter != Worlds::LENGTH && temp->GetWorldId() != FFilter)
+                    continue;
+
                 bool is_selected = (selected == (u32)i);
                 if (ImGui::Selectable(temp->GetName().c_str(), is_selected))
                     selected = (u32)i;
@@ -62,11 +67,18 @@ private:
     std::string FName;
     const EntityTemplate** FProperty = nullptr;
     std::string* FNameProperty = nullptr;
+    Worlds::Type FFilter = Worlds::LENGTH;
 };
 
 #define EDITOR_PROPERTY_ENTITY_TEMPLATE(NAME, PROPERTY, NAME_PROPERTY)                                                                                                             \
     {                                                                                                                                                                              \
         PropertyDrawer<const EntityTemplate*> drawer(NAME, &PROPERTY, &NAME_PROPERTY);                                                                                             \
+        drawer.ShowProperty();                                                                                                                                                     \
+    }
+
+#define EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED(NAME, PROPERTY, NAME_PROPERTY, FILTER)                                                                                            \
+    {                                                                                                                                                                              \
+        PropertyDrawer<const EntityTemplate*> drawer(NAME, &PROPERTY, &NAME_PROPERTY, FILTER);                                                                                     \
         drawer.ShowProperty();                                                                                                                                                     \
     }
 
