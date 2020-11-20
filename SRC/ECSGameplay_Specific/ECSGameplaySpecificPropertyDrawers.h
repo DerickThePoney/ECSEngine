@@ -19,8 +19,11 @@ public:
     {
         u32 lastIndex = (FAllowLength) ? GameResource::LENGTH + 1 : GameResource::LENGTH;
 
-        ImGui::Text(FPropertyName.c_str());
-        ImGui::SameLine();
+        if (!FPropertyName.empty())
+        {
+            ImGui::Text(FPropertyName.c_str());
+            ImGui::SameLine();
+        }
 
         const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);

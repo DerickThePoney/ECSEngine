@@ -15,6 +15,9 @@ public:
         PROPERTYFIELD(ResourceToPay, GameResource::FOOD);
     }
 
+    static void DrawEditingHeader();
+    void DrawEditor();
+
     u32 FBaseCost = 10;
     float FMultiplier = 1.05f;
     GameResource::Type FResourceToPay = GameResource::FOOD;
