@@ -17,6 +17,7 @@ struct WindowsToShow
     bool showEditorCameraParameters = false;
     bool showBGFXStatistics = false;
     bool showUIStyleEditor = false;
+    bool showGameplayRulesEditor = false;
 };
 
 struct IOScene

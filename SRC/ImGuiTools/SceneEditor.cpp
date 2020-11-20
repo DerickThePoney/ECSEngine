@@ -11,6 +11,7 @@
 #include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "ECSGameplay_Common/ScenarioEditor.h"
 #include "EntityTemplatesEditor.h"
+#include "GameRulesEditor.h"
 #include "InputDebug.h"
 #include "LoggerGUI.h"
 #include "RenderingCore/BGFXRenderer.h"
@@ -42,8 +43,6 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
         ImGui::MenuItem("Scene items", NULL, &options.showSceneItemsList);
         ImGui::MenuItem("Scene actions", NULL, &options.showActionManager);
         ImGui::Separator();
-        ImGui::MenuItem("Scene templates", NULL, &options.showEntityTemplateEditor);
-        ImGui::Separator();
         if (ImGui::BeginMenu("Debug windows"))
         {
             ImGui::MenuItem("Imgui Demo", NULL, &options.showImGuiDemo);
@@ -64,7 +63,17 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
 
     if (ImGui::BeginMenu("Tools"))
     {
-        ImGui::MenuItem("UI Style Editor", NULL, &options.showUIStyleEditor);
+        if (ImGui::BeginMenu("UI"))
+        {
+            ImGui::MenuItem("UI Style Editor", NULL, &options.showUIStyleEditor);
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Gameplay"))
+        {
+            ImGui::MenuItem("Scene templates", NULL, &options.showEntityTemplateEditor);
+            ImGui::MenuItem("Gameplay rules", NULL, &options.showGameplayRulesEditor);
+            ImGui::EndMenu();
+        }
         ImGui::EndMenu();
     }
     ImGui::EndMainMenuBar();
@@ -310,6 +319,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showUIStyleEditor)
         UIStyleEditor(&parOutWindowsToShow.showUIStyleEditor);
+
+    if (parOutWindowsToShow.showGameplayRulesEditor)
+        DrawGameRulesEditor(&parOutWindowsToShow.showGameplayRulesEditor, menuBarHeight.y);
 }
 
 void DrawPlayScenarioWindow(bool& parOutPlayScenario)
