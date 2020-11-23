@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Common/ModifiableValue.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
 
@@ -24,15 +25,15 @@ public:
 
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
-    float InitialLifeSpan() const { return FInitialLifeSpan; }
+    float TimeBetweenTwoFeedTime() const { return FTimeBetweenTwoFeedTime; }
 
-    SERIALIZE() { PROPERTYFIELD(InitialLifeSpan, 90.f); }
+    SERIALIZE() { PROPERTYFIELD(TimeBetweenTwoFeedTime, 90.f); }
 
 protected:
     void VirtualDrawEditor() override;
 
 private:
-    float FInitialLifeSpan = 90.f;
+    float FTimeBetweenTwoFeedTime = 90.f;
 };
 
 class PeonFeedingTimeModule final : public Module
@@ -43,13 +44,16 @@ public:
     PeonFeedingTimeModule();
     ~PeonFeedingTimeModule() { }
 
-    float RemainingLifeSpan() const { return FRemainingLifeSpan; }
-    void SetRemainingLifeSpan(float parLifeTime) { FRemainingLifeSpan = parLifeTime; }
+    float RemainTimeBeforeNextFeedAsRatio() const { return FRemainingTimeBetweenTwoFeedTimes / FTimeBetweenFeedingTimes.ComputedValue(); }
+    float RemainingTimeBeforeNextFeed() const { return FRemainingTimeBetweenTwoFeedTimes; }
+    void ResetFeedingTime() { FRemainingTimeBetweenTwoFeedTimes = FTimeBetweenFeedingTimes.ComputedValue(); }
+    void SetRemainingTimeBeforeNextFeedingTime(float parLifeTime) { FRemainingTimeBetweenTwoFeedTimes = parLifeTime; }
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
 private:
-    float FRemainingLifeSpan = 0.f;
+    ModifiableValue<float> FTimeBetweenFeedingTimes;
+    float FRemainingTimeBetweenTwoFeedTimes = 0.f;
 };
 } // namespace ECSEngine

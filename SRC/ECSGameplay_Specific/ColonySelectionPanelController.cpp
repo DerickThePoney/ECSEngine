@@ -60,7 +60,7 @@ void ColonySelectionPanelController::VirtualUpdate()
     if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
     {
         const PeonFeedingTimeModule* peonFeedingTimeModule = GetModule<PeonFeedingTimeModule>(colonyId);
-        const float progress = peonFeedingTimeModule->RemainingLifeSpan() / peonFeedingTimeModule->Template<PeonFeedingTimeModuleTemplate>()->InitialLifeSpan();
+        const float progress = peonFeedingTimeModule->RemainingTimeBeforeNextFeed() / peonFeedingTimeModule->Template<PeonFeedingTimeModuleTemplate>()->TimeBetweenTwoFeedTime();
         ImGui::PushID("feedingTimeProgress");
         ImGui::Text("Next feeding time: ");
         ImGui::SameLine();
@@ -70,7 +70,7 @@ void ColonySelectionPanelController::VirtualUpdate()
         else
             ImGui::Text("Needs %d food", peonsInColony * GameplayConstants::PeonFeeding::PeonEatQuantity);
 
-        ImGui::ProgressBar(progress, ImVec2(-1.f, 0.f), fmt::format("{:.2f}s remaining", peonFeedingTimeModule->RemainingLifeSpan()).c_str());
+        ImGui::ProgressBar(progress, ImVec2(-1.f, 0.f), fmt::format("{:.2f}s remaining", peonFeedingTimeModule->RemainingTimeBeforeNextFeed()).c_str());
         ImGui::PopID();
 
         constexpr static u32 maxResourcesPerColumns = 4;

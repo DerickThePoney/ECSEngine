@@ -46,8 +46,8 @@ void PeonFeedingTimeSystem::VirtualUpdate()
     std::vector<EntityId> deadIds;
     foreachitem(lifeSpan, lifeSpanAccessor)
     {
-        const float newLifeSpan = lifeSpan.RemainingLifeSpan() - TimeManager::FrameDeltaTime();
-        lifeSpan.SetRemainingLifeSpan(newLifeSpan);
+        const float newLifeSpan = lifeSpan.RemainingTimeBeforeNextFeed() - TimeManager::FrameDeltaTime();
+        lifeSpan.SetRemainingTimeBeforeNextFeedingTime(newLifeSpan);
 
         if (newLifeSpan <= 0.f)
         {
@@ -72,7 +72,7 @@ void PeonFeedingTimeSystem::VirtualUpdate()
             const u32 eaten = colonyStorage->RemoveResource(GameResource::FOOD, foodToEat);
             AlwaysCheckedAssert(eaten == foodToEat);
 
-            lifeSpan.SetRemainingLifeSpan(lifeSpan.Template<PeonFeedingTimeModuleTemplate>()->InitialLifeSpan());
+            lifeSpan.ResetFeedingTime();
 
             if (peonsToKill == 0)
                 continue;
