@@ -7,6 +7,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSGameplay_Common/PositionModule.h"
+#include "GameplayRulesManager.h"
 #include "PeonSpawnModule.h"
 #include "ResourceStorageModule.h"
 
@@ -37,35 +38,13 @@ void PeonSpawnSystem::VirtualUpdate()
 
     foreachitem(spawnModule, colonySpawnModuleAccessor)
     {
-        if (!spawnModule.AutoSpawn() && !spawnModule.RequestedPawnCreation())
+        if (!GameplayRulesManager::Instance().FPeonSpawningRulesManager.AutoSpawn() && !spawnModule.RequestedPeonCreation())
             continue;
 
-        ColonyPeonsManagementModule* colonyPeons = colonyPeonsAccessor[spawnModule.UnitId()];
-        AssertRelease(colonyPeons != nullptr);
-        ResourceStorageModule* colonyStorage = colonyResourceStorageAccessor[spawnModule.UnitId()];
-        AssertRelease(colonyStorage != nullptr);
+        SpawnPeonOrder order = spawnModule.PopPeonSpawnOrder();
 
-        const u32 currentPeons = colonyPeons->PeonsInColony();
-        const u32 resourceInStorage = colonyStorage->GetResourceQuantity(spawnModule.ResourceToPay());
-        const u32 costForNextSpawn = spawnModule.CostForNextSpawn(currentPeons);
-
-        if (costForNextSpawn <= resourceInStorage)
-        {
-            const PositionModule* colonyPos = colonyPositionAccessor[spawnModule.UnitId()];
-            AssertRelease(colonyPos != nullptr);
-
-            ModuleParameters::ParameterContainer container;
-            container.Set<ModuleParameters::Position>(colonyPos->GetPosition3D());
-            container.Set<ModuleParameters::OwnerId>(spawnModule.UnitId());
-
-            EntityId newPeon = EntityFactory::CreateEntity(spawnModule.PeonTemplate(), container);
-            colonyPeons->AddNewPeon(newPeon);
-
-            const u32 payed = colonyStorage->RemoveResource(spawnModule.ResourceToPay(), costForNextSpawn);
-            AlwaysCheckedAssert(payed == costForNextSpawn);
-        }
-
-        spawnModule.SetRequestedPawnCreation(false);
+        OrderExecutor<SpawnPeonOrder> executor(std::move(order));
+        executor.ExecuteOrder();
     }
 }
 

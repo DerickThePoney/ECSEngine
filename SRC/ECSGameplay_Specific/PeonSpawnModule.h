@@ -2,6 +2,7 @@
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "GameResources.h"
+#include "GameplayActions.h"
 
 namespace ECSEngine
 {
@@ -19,35 +20,10 @@ public:
 
     Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
-    SERIALIZE()
-    {
-        PROPERTYFIELD(PeonTemplateName, "Default peon template");
-        PROPERTYFIELD(BaseCost, 10);
-        PROPERTYFIELD(Multiplier, 1.05f);
-        PROPERTYFIELD(ResourceToPay, GameResource::FOOD);
-        PROPERTYFIELD(AutoSpawn, false);
-    }
-
-    const EntityTemplate* PeonTemplate() const { return FPeonTemplate; }
-    u32 CostForNextSpawn(const u32 parCurrentPeonsQuantity) const;
-    GameResource::Type ResourceToPay() const { return FResourceToPay; }
-    bool AutoSpawn() const { return FAutoSpawn; }
+    SERIALIZE() { }
 
 protected:
     void VirtualDrawEditor() override;
-    void VirtualPostLoad() override;
-
-private:
-    void SetUpTemplate();
-
-private:
-    std::string FPeonTemplateName = "Default peon template";
-    const EntityTemplate* FPeonTemplate = nullptr;
-
-    u32 FBaseCost = 10;
-    float FMultiplier = 1.05f;
-    GameResource::Type FResourceToPay = GameResource::FOOD;
-    bool FAutoSpawn = false;
 };
 
 class PeonSpawnModule : public Module
@@ -57,18 +33,25 @@ public:
     PeonSpawnModule();
     ~PeonSpawnModule();
 
-    const EntityTemplate* PeonTemplate() const;
-    u32 CostForNextSpawn(const u32 parCurrentPeonsQuantity) const;
-    GameResource::Type ResourceToPay() const;
-    bool AutoSpawn() const;
+    bool RequestedPeonCreation() const { return FRequestedPeonCreation; }
+    void RequestPeonSapwn(SpawnPeonOrder&& parSpawnOrder)
+    {
+        FSpawnOrder = std::move(parSpawnOrder);
+        FRequestedPeonCreation = true;
+    }
 
-    bool RequestedPawnCreation() const { return FRequestedPawnCreation; }
-    void SetRequestedPawnCreation(bool parValue) { FRequestedPawnCreation = parValue; }
+    SpawnPeonOrder PopPeonSpawnOrder()
+    {
+        AssertRelease(FRequestedPeonCreation);
+        FRequestedPeonCreation = false;
+        return FSpawnOrder;
+    }
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parContainer) override;
 
 private:
-    bool FRequestedPawnCreation = false;
+    SpawnPeonOrder FSpawnOrder;
+    bool FRequestedPeonCreation = false;
 };
 } // namespace ECSEngine
