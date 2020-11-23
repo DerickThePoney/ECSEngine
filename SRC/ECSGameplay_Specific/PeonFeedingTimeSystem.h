@@ -4,11 +4,11 @@
 
 namespace ECSEngine
 {
-class PeonLifeSpanSystem final : public ModuleSystem
+class PeonFeedingTimeSystem final : public ModuleSystem
 {
 public:
-    PeonLifeSpanSystem();
-    ~PeonLifeSpanSystem();
+    PeonFeedingTimeSystem();
+    ~PeonFeedingTimeSystem();
 
 protected:
     void VirtualUpdate() override;

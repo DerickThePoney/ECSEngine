@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "PeonLifeSpanSystem.h"
+#include "PeonFeedingTimeSystem.h"
 
 #include "ColonyPeonsManagementModule.h"
 #include "Common/TimeManager.h"
@@ -16,7 +16,7 @@
 namespace ECSEngine
 {
 
-PeonLifeSpanSystem::PeonLifeSpanSystem()
+PeonFeedingTimeSystem::PeonFeedingTimeSystem()
     : ModuleSystem()
 {
     RegisterDepency<ColonyPeonsManagementModule>(Worlds::COLONY);
@@ -26,11 +26,11 @@ PeonLifeSpanSystem::PeonLifeSpanSystem()
     RegisterDepency<PositionModule>(Worlds::COLONY);
 }
 
-PeonLifeSpanSystem::~PeonLifeSpanSystem()
+PeonFeedingTimeSystem::~PeonFeedingTimeSystem()
 {
 }
 
-void PeonLifeSpanSystem::VirtualUpdate()
+void PeonFeedingTimeSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
