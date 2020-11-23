@@ -20,7 +20,7 @@ Module* PeonFeedingTimeModuleTemplate::CreateInstance(const EntityId& parUnitId,
 
 void PeonFeedingTimeModuleTemplate::VirtualDrawEditor()
 {
-    EDITOR_PROPERTY_WITH_LIMITS("Initial Life Span", FInitialLifeSpan, 0.f, 120.f);
+    EDITOR_PROPERTY_WITH_LIMITS("Time between two feed times", FTimeBetweenTwoFeedTime, 0.f, 120.f); // A push dans un domaine PLAYER DATA ou un machin du genre
 }
 
 PeonFeedingTimeModule::PeonFeedingTimeModule()
@@ -30,7 +30,8 @@ PeonFeedingTimeModule::PeonFeedingTimeModule()
 void PeonFeedingTimeModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
     parent_type::VirtualInit(parUnitId, parParameters);
-    FRemainingLifeSpan = Template<PeonFeedingTimeModuleTemplate>()->InitialLifeSpan();
+    FTimeBetweenFeedingTimes.SetInitialValue(Template<PeonFeedingTimeModuleTemplate>()->TimeBetweenTwoFeedTime());
+    FRemainingTimeBetweenTwoFeedTimes = FTimeBetweenFeedingTimes.ComputedValue();
 }
 
 } // namespace ECSEngine
