@@ -19,6 +19,7 @@ public:
 private:
     void DrawGameRulesMenuBar();
     void DrawSpawnRulesEditor();
+    void DrawConstantsEditor();
 
 private:
     bool isEditingSpawnRules = true;
@@ -37,6 +38,12 @@ void GameRulesEditor::DrawEditor(bool* parOpen, float parMenuBarHeight)
         if (ImGui::BeginTabItem("Peon Spawn Rules", &isEditingSpawnRules))
         {
             DrawSpawnRulesEditor();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Gameplay constants", &isEditingSpawnRules))
+        {
+            DrawConstantsEditor();
             ImGui::EndTabItem();
         }
 
@@ -75,6 +82,18 @@ void GameRulesEditor::DrawSpawnRulesEditor()
     ImGui::BeginChild(ImGui::GetID("Peons templates list"), utilityPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
     GameplayRulesManager::Instance().FPeonSpawningRulesManager.DrawEditor();
+
+    ImGui::EndChild();
+}
+
+void GameRulesEditor::DrawConstantsEditor()
+{
+    const glm::vec2 currentWindowSize = ImGui::GetContentRegionAvail();
+    const glm::vec2 utilityPlace = currentWindowSize - 50.0f;
+    ImGui::SetCursorPosX(((currentWindowSize - utilityPlace) * 0.5f).x);
+    ImGui::BeginChild(ImGui::GetID("Game rules editor"), utilityPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
+    GameplayRulesManager::Instance().DrawConstantsEditor();
 
     ImGui::EndChild();
 }

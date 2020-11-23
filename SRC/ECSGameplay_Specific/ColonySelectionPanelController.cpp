@@ -3,6 +3,8 @@
 #include "ColonySelectionPanelController.h"
 
 #include "ColonyModule.h"
+#include "GameplayRulesManager.h"
+#include "PeonSpawningRulesManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "imgui/imgui_internal.h"
 
@@ -46,15 +48,31 @@ void ColonySelectionPanelController::VirtualUpdate()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));
     ImGui::Begin(colonyModule->Name().c_str(), NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
 
+    const u32 peonsInColony = peonManagerModule->PeonsInColony();
+
     // Show Basic informations
     if (ImGui::CollapsingHeader("Basic information", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::Text("PEONS\t%d", peonManagerModule->PeonsInColony());
+        ImGui::Text("PEONS\t%d", peonsInColony);
     }
 
     // show colony resources
     if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
     {
+        const PeonFeedingTimeModule* peonFeedingTimeModule = GetModule<PeonFeedingTimeModule>(colonyId);
+        const float progress = peonFeedingTimeModule->RemainingLifeSpan() / peonFeedingTimeModule->Template<PeonFeedingTimeModuleTemplate>()->InitialLifeSpan();
+        ImGui::PushID("feedingTimeProgress");
+        ImGui::Text("Next feeding time: ");
+        ImGui::SameLine();
+        const u32 foodInStorage = resourceStorage->GetResourceQuantity(GameResource::FOOD);
+        if (foodInStorage < peonsInColony * GameplayConstants::PeonFeeding::PeonEatQuantity)
+            ImGui::TextColored(ImVec4(255, 0, 0, 255), "Needs %d food", peonsInColony * GameplayConstants::PeonFeeding::PeonEatQuantity);
+        else
+            ImGui::Text("Needs %d food", peonsInColony * GameplayConstants::PeonFeeding::PeonEatQuantity);
+
+        ImGui::ProgressBar(progress, ImVec2(-1.f, 0.f), fmt::format("{:.2f}s remaining", peonFeedingTimeModule->RemainingLifeSpan()).c_str());
+        ImGui::PopID();
+
         constexpr static u32 maxResourcesPerColumns = 4;
         u32 drawnResource = 0;
         forrange(i, 0, GameResource::LENGTH)
@@ -78,32 +96,44 @@ void ColonySelectionPanelController::VirtualUpdate()
     // show colony actions
     if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        const GameResource::Type resourceToPay = peonSpawnModule->ResourceToPay();
-        const u32 costForNextSpawn = peonSpawnModule->CostForNextSpawn(peonManagerModule->PeonsInColony());
-        AssertRelease(peonSpawnModule->PeonTemplate() != nullptr);
-        const std::string& peonTemplateName = peonSpawnModule->PeonTemplate()->GetName();
-        const u32 resourceInStorage = resourceStorage->GetResourceQuantity(resourceToPay);
+        foreachitemconst(spawnRule, GameplayRulesManager::Instance().FPeonSpawningRulesManager.GetCostSpawnRules())
+        {
+            const std::string& peonTemplateName = spawnRule.PeonTemplateName();
 
-        const bool disabled = resourceInStorage < costForNextSpawn;
-        if (disabled)
-        {
-            ImGui::PushItemFlag(ImGuiItemFlags_ReadOnly, true);
-            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-        }
-        if (ImGui::Button(fmt::format("Spawn {}", peonTemplateName).c_str()) && !disabled)
-        {
-            peonSpawnModule->SetRequestedPawnCreation(true);
-        }
-        ImGui::SameLine();
-        if (disabled)
-            ImGui::TextDisabled("Cost: %d %s", costForNextSpawn, GameResource::GetName(resourceToPay));
-        else
-            ImGui::Text("Cost: %d %s", costForNextSpawn, GameResource::GetName(resourceToPay));
+            std::vector<std::pair<GameResource::Type, u32>> costs = spawnRule.CostForNextSpawn(peonManagerModule->PeonsInColony());
 
-        if (disabled)
-        {
-            ImGui::PopItemFlag();
-            ImGui::PopStyleVar();
+            bool disabled = false;
+            foreachitemconst(resQ, costs)
+            {
+                const u32 resourceInStorage = resourceStorage->GetResourceQuantity(resQ.first);
+                disabled = disabled || resourceInStorage < resQ.second;
+            }
+
+            if (disabled)
+            {
+                ImGui::PushItemFlag(ImGuiItemFlags_ReadOnly, true);
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            }
+            if (ImGui::Button(fmt::format("Spawn {}", peonTemplateName).c_str()) && !disabled)
+            {
+                peonSpawnModule->RequestPeonSapwn(SpawnPeonOrder(colonyId, spawnRule));
+            }
+            ImGui::SameLine();
+
+            std::string coststr = "Cost:";
+
+            foreachitemconst(resQ, costs) { coststr = fmt::format("{} {} {} /", coststr, resQ.second, GameResource::GetName(resQ.first)); }
+
+            if (disabled)
+                ImGui::TextDisabled(coststr.c_str());
+            else
+                ImGui::Text(coststr.c_str());
+
+            if (disabled)
+            {
+                ImGui::PopItemFlag();
+                ImGui::PopStyleVar();
+            }
         }
     }
 
