@@ -1,7 +1,7 @@
 #pragma once
 #include "CameraMoverSystem.h"
 #include "ECSGameplay_Specific/ColonyPeonsTaskAsignmentSystem.h"
-#include "ECSGameplay_Specific/PeonLifeSpanSystem.h"
+#include "ECSGameplay_Specific/PeonFeedingTimeSystem.h"
 #include "ECSGameplay_Specific/PeonSpawnSystem.h"
 #include "ECSGameplay_Specific/PeonsHarvestingSystem.h"
 #include "ECSGameplay_Specific/ResourceProductionSystem.h"
@@ -38,7 +38,7 @@ private:
     PeonsHaverstingSystem FPeonHarvestingSytem;
     ResourceProductionSystem FProductionSystem;
     PeonSpawnSystem FPeonSpawnSystem;
-    PeonLifeSpanSystem FPeonLifeSpanSystem;
+    PeonFeedingTimeSystem FPeonLifeSpanSystem;
     UserInterfaceSystem FUserInterfaceSystem;
 };
 } // namespace ECSEngine
