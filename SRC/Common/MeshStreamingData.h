@@ -15,16 +15,17 @@ enum Type
     HAS_NORMALS = HAS_UVS + 5, // 1 bit pour has uv et 4 pour le nombre (max 8 uvs)
     HAS_TANGENTS = HAS_NORMALS + 1,
     HAS_BINORMALS = HAS_TANGENTS + 1,
-    LENGTH = HAS_BINORMALS + 1
+    LENGTH = 13 // HAS_BINORMALS + 1  // Recompute leadHashSizeLeadingZeros if you change this [__builtin_clz(VERTEX_LAYOUT_PARAMS::LENGTH - 1)]
 };
+constexpr u32 leadHashSizeLeadingZeros = 28; // --> Apparently support for __builtin_clz got dropped at some point so take extracare with this kind of shit
 }; // namespace VERTEX_LAYOUT_PARAMS
 
 //----------------------------------------------------------------
 //          VertexLayoutHash
 //----------------------------------------------------------------
 
-constexpr u32 hashSize = ((VERTEX_LAYOUT_PARAMS::LENGTH == 1) ? 1 : 1 << (32 - __builtin_clz(VERTEX_LAYOUT_PARAMS::LENGTH - 1)));
-constexpr u32 hashSizeByte = ((VERTEX_LAYOUT_PARAMS::LENGTH == 1) ? 1 : 1 << (32 - __builtin_clz(VERTEX_LAYOUT_PARAMS::LENGTH - 1))) / 8;
+constexpr u32 hashSize = ((VERTEX_LAYOUT_PARAMS::LENGTH == 1) ? 1 : 1 << (32 - VERTEX_LAYOUT_PARAMS::leadHashSizeLeadingZeros));
+constexpr u32 hashSizeByte = ((VERTEX_LAYOUT_PARAMS::LENGTH == 1) ? 1 : 1 << (32 - VERTEX_LAYOUT_PARAMS::leadHashSizeLeadingZeros)) / 8;
 
 using hash_storage_type = u16;
 
