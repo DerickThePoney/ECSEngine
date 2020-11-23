@@ -12,12 +12,12 @@ class ParameterContainer;
 
 class EntityId;
 
-class PeonLifeSpanModuleTemplate : public ModuleTemplate
+class PeonFeedingTimeModuleTemplate : public ModuleTemplate
 {
-    DECLARE_MODULE_TEMPLATE(PeonLifeSpanModule, PeonLifeSpanModuleTemplate);
+    DECLARE_MODULE_TEMPLATE(PeonFeedingTimeModule, PeonFeedingTimeModuleTemplate);
 
 public:
-    PeonLifeSpanModuleTemplate()
+    PeonFeedingTimeModuleTemplate()
         : ModuleTemplate()
     {
     }
@@ -35,13 +35,13 @@ private:
     float FInitialLifeSpan = 90.f;
 };
 
-class PeonLifeSpanModule final : public Module
+class PeonFeedingTimeModule final : public Module
 {
-    DECLARE_MODULE(PeonLifeSpanModule);
+    DECLARE_MODULE(PeonFeedingTimeModule);
 
 public:
-    PeonLifeSpanModule();
-    ~PeonLifeSpanModule() { }
+    PeonFeedingTimeModule();
+    ~PeonFeedingTimeModule() { }
 
     float RemainingLifeSpan() const { return FRemainingLifeSpan; }
     void SetRemainingLifeSpan(float parLifeTime) { FRemainingLifeSpan = parLifeTime; }

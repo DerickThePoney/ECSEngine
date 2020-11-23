@@ -3,6 +3,7 @@
 #include "ColonyPeonsManagementModule.h"
 #include "ECSCore/UIController.h"
 #include "ECSCore/WorldIds.h"
+#include "PeonFeedingTimeModule.h"
 #include "PeonSpawnModule.h"
 #include "ResourceStorageModule.h"
 
@@ -13,7 +14,8 @@ namespace UI
 class ColonySelectionPanelController : public UIController<MC<ColonyModule, Worlds::COLONY>,
                                              MC<ResourceStorageModule, Worlds::COLONY>,
                                              MC<PeonSpawnModule, Worlds::COLONY>,
-                                             MC<ColonyPeonsManagementModule, Worlds::COLONY>>
+                                             MC<ColonyPeonsManagementModule, Worlds::COLONY>,
+                                             MC<PeonFeedingTimeModule, Worlds::COLONY>>
 {
 public:
     ColonySelectionPanelController();
