@@ -54,13 +54,14 @@ void ColonySelectionPanelController::VirtualUpdate()
     if (ImGui::CollapsingHeader("Basic information", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Text("PEONS\t%d", peonsInColony);
+        ImGui::Text("Idle PEONS\t%d", peonManagerModule->IdlePeons().size());
     }
 
     // show colony resources
     if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
     {
         const PeonFeedingTimeModule* peonFeedingTimeModule = GetModule<PeonFeedingTimeModule>(colonyId);
-        const float progress = peonFeedingTimeModule->RemainingTimeBeforeNextFeed() / peonFeedingTimeModule->Template<PeonFeedingTimeModuleTemplate>()->TimeBetweenTwoFeedTime();
+        const float progress = peonFeedingTimeModule->RemainTimeBeforeNextFeedAsRatio();
         ImGui::PushID("feedingTimeProgress");
         ImGui::Text("Next feeding time: ");
         ImGui::SameLine();
@@ -88,7 +89,8 @@ void ColonySelectionPanelController::VirtualUpdate()
             const u32 resource = resourceStorage->GetResourceQuantity((GameResource::Type)i);
             if (resource > 0)
             {
-                ImGui::Text("%s\t%d", GameResource::GetName((GameResource::Type)i), resource);
+                ImGui::Text("%s\t%d (%.2f/s)", GameResource::GetName((GameResource::Type)i), resource,
+                      resourceStorage->Statistics().GetAverageResourcePerUnitOfTime((GameResource::Type)i));
             }
         }
     }
