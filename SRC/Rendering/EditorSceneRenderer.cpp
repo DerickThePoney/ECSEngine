@@ -44,6 +44,8 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
     AssertRelease(FDrawCommandBuffer != nullptr);
     FDrawCommandBuffer->clear();
 
+    FDrawCommandBuffer->SetDebugMarker("Editor rendering");
+
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
 
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);

@@ -34,6 +34,9 @@ void BGFXRenderer::Init()
     bgfxInit.resolution.width = window.GetSize().x;
     bgfxInit.resolution.height = window.GetSize().y;
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+#ifdef PERFORM_SECURITY_CHECKS
+    bgfxInit.debug = true;
+#endif
     bgfx::init(bgfxInit);
 
 #ifdef ENABLE_BGFX_PROFILING
