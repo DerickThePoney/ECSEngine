@@ -38,6 +38,7 @@ void GameScenarioUpdater::Initialise()
     FProductionSystem.Init();
     FPeonSpawnSystem.Init();
     FPeonLifeSpanSystem.Init();
+    FResourceStatsUpdateSystem.Init();
     FUserInterfaceSystem.Init();
 
     FScenario->Initialise();
@@ -51,7 +52,8 @@ void GameScenarioUpdater::Destroy()
     delete FScenario;
     FScenario = nullptr;
 
-    FUserInterfaceSystem.Update();
+    FUserInterfaceSystem.Destroy();
+    FResourceStatsUpdateSystem.Destroy();
     FPeonLifeSpanSystem.Destroy();
     FPeonSpawnSystem.Destroy();
     FProductionSystem.Destroy();
@@ -76,6 +78,7 @@ void GameScenarioUpdater::Update()
     FProductionSystem.Update();
     FPeonSpawnSystem.Update();
     FPeonLifeSpanSystem.Update();
+    FResourceStatsUpdateSystem.Update();
 
     WorldManager::Instance().ProcessDestroyEntities();
 
