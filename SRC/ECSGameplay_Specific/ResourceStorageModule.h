@@ -48,6 +48,26 @@ private:
     std::vector<StartingResources> FStartingResources;
 };
 
+class ResourcesStatistics
+{
+    constexpr static float MaxTimeForMovingAverage = 5.f;
+
+public:
+    void AddResourceChange(const GameResource::Type parResource, const i32 parQuantity);
+    float GetAverageResourcePerUnitOfTime(const GameResource::Type parResource) const;
+
+    void UpdateStatistics(const float parNow);
+
+private:
+    struct ResourceData
+    {
+        std::list<std::pair<float, i32>> Changes;
+        float AverageResourcePerUnitOfTime = 0.f;
+    };
+
+    std::map<GameResource::Type, ResourceData> FStatistics;
+};
+
 class ResourceStorageModule final : public Module
 {
     DECLARE_MODULE(ResourceStorageModule);
@@ -64,11 +84,16 @@ public:
 
     GameResource::Type GetMainResource() const;
 
+    ResourcesStatistics& Statistics() { return FResourceStatisticsManager; }
+    const ResourcesStatistics& Statistics() const { return FResourceStatisticsManager; }
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
 private:
     using CarriedResource = std::pair<GameResource::Type, u32>;
     std::vector<CarriedResource> FCarriedResources;
+
+    ResourcesStatistics FResourceStatisticsManager;
 };
 } // namespace ECSEngine

@@ -3,6 +3,7 @@
 #include "ResourceStorageModule.h"
 
 #include "Application/PropertyDrawer.h"
+#include "Common/TimeManager.h"
 #include "ECSCore/EntityId.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
@@ -123,6 +124,8 @@ u32 ResourceStorageModule::AddResource(const GameResource::Type parResource, con
     if (!found)
         FCarriedResources.push_back({ parResource, resourceToStore });
 
+    FResourceStatisticsManager.AddResourceChange(parResource, (i32)parQuantity);
+
     return resourceToStore;
 }
 
@@ -135,6 +138,7 @@ u32 ResourceStorageModule::RemoveResource(const GameResource::Type parResource, 
         {
             u32 resRemoved = glm::min(parQuantity, resource.second);
             resource.second -= resRemoved;
+            FResourceStatisticsManager.AddResourceChange(parResource, -((i32)parQuantity));
             return resRemoved;
         }
     }
@@ -156,6 +160,44 @@ GameResource::Type ResourceStorageModule::GetMainResource() const
         }
     }
     return maxResource;
+}
+
+void ResourcesStatistics::AddResourceChange(const GameResource::Type parResource, const i32 parQuantity)
+{
+    auto itFind = FStatistics.find(parResource);
+    if (itFind == FStatistics.end())
+    {
+        ResourceData data;
+        data.Changes.push_back({ TimeManager::FrameStartTime(), parQuantity });
+        FStatistics.insert_or_assign(parResource, data);
+        return;
+    }
+
+    itFind->second.Changes.push_back({ TimeManager::FrameStartTime(), parQuantity });
+}
+
+float ResourcesStatistics::GetAverageResourcePerUnitOfTime(const GameResource::Type parResource) const
+{
+    auto itFind = FStatistics.find(parResource);
+    if (itFind == FStatistics.end())
+        return 0.f;
+
+    return itFind->second.AverageResourcePerUnitOfTime;
+}
+
+void ResourcesStatistics::UpdateStatistics(const float parNow)
+{
+    foreachitem(resStats, FStatistics)
+    {
+        i32 cumulativeChange = 0;
+        // on vire les elements trop loin
+        while (!resStats.second.Changes.empty() && parNow - resStats.second.Changes.begin()->first > MaxTimeForMovingAverage)
+            resStats.second.Changes.pop_front();
+
+        foreachitemconst(change, resStats.second.Changes) { cumulativeChange += change.second; }
+
+        resStats.second.AverageResourcePerUnitOfTime = cumulativeChange / MaxTimeForMovingAverage;
+    }
 }
 
 } // namespace ECSEngine

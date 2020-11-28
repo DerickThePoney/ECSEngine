@@ -5,6 +5,7 @@
 #include "ECSGameplay_Specific/PeonSpawnSystem.h"
 #include "ECSGameplay_Specific/PeonsHarvestingSystem.h"
 #include "ECSGameplay_Specific/ResourceProductionSystem.h"
+#include "ECSGameplay_Specific/ResourceStatisticsUpdateSystem.h"
 #include "ECSGameplay_Specific/UserInterfaceSystem.h"
 #include "IScenarioUpdater.h"
 #include "MovementSystem.h"
@@ -39,6 +40,7 @@ private:
     ResourceProductionSystem FProductionSystem;
     PeonSpawnSystem FPeonSpawnSystem;
     PeonFeedingTimeSystem FPeonLifeSpanSystem;
+    ResourceStatisticsUpdateSystem FResourceStatsUpdateSystem;
     UserInterfaceSystem FUserInterfaceSystem;
 };
 } // namespace ECSEngine
