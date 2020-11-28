@@ -5,6 +5,7 @@
 #include "Common/Camera.h"
 #include "Common/Frustum.h"
 #include "Common/MeshStreamingData.h"
+#include "FeedbackParameters.h"
 #include "Material.h"
 #include "MaterialManager.h"
 #include "Mesh.h"
@@ -19,6 +20,39 @@ namespace ECSEngine
 {
 namespace Rendering
 {
+//----------------------------------------------------------------
+//          SetDebugMarker
+//----------------------------------------------------------------
+class SetDebugMarkerCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(SetDebugMarkerCommand);
+
+public:
+    SetDebugMarkerCommand(const u16 parViewId, const std::string& parDebugMarker);
+    virtual ~SetDebugMarkerCommand();
+
+    virtual void SubmitCommand() const override;
+
+private:
+    std::string FDebugMarker;
+};
+
+IMPLEMENT_POOL_ALLOCATED(SetDebugMarkerCommand);
+SetDebugMarkerCommand::SetDebugMarkerCommand(const u16 parViewId, const std::string& parDebugMarker)
+    : IDrawCommand(parViewId)
+    , FDebugMarker(parDebugMarker)
+{
+}
+
+SetDebugMarkerCommand::~SetDebugMarkerCommand()
+{
+}
+
+void SetDebugMarkerCommand::SubmitCommand() const
+{
+    bgfx::setMarker(FDebugMarker.c_str());
+}
+
 //----------------------------------------------------------------
 //          SetViewTransformCommand
 //----------------------------------------------------------------
@@ -914,6 +948,119 @@ void DrawVerticesCommand::SubmitCommand() const
 }
 
 //----------------------------------------------------------------
+//          DrawCircle
+//----------------------------------------------------------------
+
+class DrawCircleCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(DrawCircleCommand);
+
+public:
+    DrawCircleCommand(const u16 parViewId,
+          const CircleFeedbackParameters& parParams,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const glm::mat4 parTransform = glm::identity<glm::mat4>());
+    virtual ~DrawCircleCommand();
+
+    virtual void SubmitCommand() const override;
+
+private:
+    CircleFeedbackParameters FParams;
+    glm::mat4 FTransform;
+    MaterialInstanceHandle FMaterialInstanceHandle;
+};
+
+IMPLEMENT_POOL_ALLOCATED(DrawCircleCommand);
+
+DrawCircleCommand::DrawCircleCommand(const u16 parViewId,
+      const CircleFeedbackParameters& parParams,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::mat4 parTransform /*= glm::identity<glm::mat4>()*/)
+    : IDrawCommand(parViewId)
+    , FParams(parParams)
+    , FTransform(parTransform)
+    , FMaterialInstanceHandle(parMaterialInstanceHandle)
+{
+}
+
+DrawCircleCommand::~DrawCircleCommand()
+{
+}
+
+void DrawCircleCommand::SubmitCommand() const
+{
+    bgfx::TransientVertexBuffer vertexBuffer;
+    bgfx::TransientIndexBuffer indexBuffer;
+
+    VertexLayoutHash hash;
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
+    hash.SetColorsNb(1);
+
+    bgfx::VertexLayout layout = GetVertexLayout(hash);
+
+    u32 availableVertices = bgfx::getAvailTransientVertexBuffer(4, layout);
+    AssertRelease(availableVertices == 4);
+    u32 availableIndices = bgfx::getAvailTransientIndexBuffer(6);
+    AssertRelease(availableIndices == 6);
+
+    bgfx::allocTransientBuffers(&vertexBuffer, layout, 4, &indexBuffer, 6);
+
+    const u8 a = (u8)(FParams.Color.w * 255.f);
+    const u8 b = (u8)(FParams.Color.z * 255.f);
+    const u8 g = (u8)(FParams.Color.y * 255.f);
+    const u8 r = (u8)(FParams.Color.x * 255.f);
+    const u32 color = a << 24 | b << 16 | g << 8 | r;
+
+    const float effectiveRange = FParams.Range * 1.1f;
+
+    VertexDataStream stream(4, hash.GetByteSize(), hash);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+    stream.Advance();
+
+    std::array<u16, 6> indices;
+    indices[0] = 0;
+    indices[1] = 1;
+    indices[2] = 2;
+
+    indices[3] = 0;
+    indices[4] = 2;
+    indices[5] = 3;
+
+    bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
+
+    bx::memCopy(indexBuffer.data, indices.data(), 6 * sizeof(u16));
+
+    bgfx::setVertexBuffer(0, &vertexBuffer, 0, 4, vertexBuffer.layoutHandle);
+    bgfx::setIndexBuffer(&indexBuffer, 0, 6);
+
+    bgfx::setTransform(&FTransform[0][0]);
+
+    Rendering::RenderingState state;
+    state.PartiallyModifyState(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW | BGFX_STATE_BLEND_ALPHA);
+    state.ApplyState();
+
+    const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
+    AssertRelease(instance != nullptr);
+    Rendering::MaterialManager::SetVec4Uniform("u_circleRadius", glm::vec4(FParams.Range, FParams.Range - FParams.Thickness, 0.f, 0.f));
+
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+}
+
+//----------------------------------------------------------------
 //          DrawCommandBuffer
 //----------------------------------------------------------------
 IMPLEMENT_POOL_ALLOCATED(DrawCommandBuffer);
@@ -935,6 +1082,11 @@ void DrawCommandBuffer::reserve(u32 parSize)
 void DrawCommandBuffer::clear()
 {
     FCommandVector.clear();
+}
+
+void DrawCommandBuffer::SetDebugMarker(const std::string& parDebugMarker)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetDebugMarkerCommand(FViewId, parDebugMarker)));
 }
 
 void DrawCommandBuffer::SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection)
@@ -1013,6 +1165,13 @@ void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInsta
 {
     FCommandVector.push_back(
           std::unique_ptr<IDrawCommand>(new DrawLines2DKeepDataCommand(FViewId, parMaterialInstanceHandle, parVertices, parVerticesSize, parHeight, parColor, parClose)));
+}
+
+void DrawCommandBuffer::DrawCircle(const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const CircleFeedbackParameters& parParams,
+      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawCircleCommand(FViewId, parParams, parMaterialInstanceHandle, parTransform)));
 }
 
 void DrawCommandBuffer::Submit()

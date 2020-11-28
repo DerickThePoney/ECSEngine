@@ -4,7 +4,9 @@
 
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
+#include "GameplayConstants.h"
 #include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/FeedbackParameters.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
 #include "WorldBuilder.h"
@@ -60,6 +62,13 @@ bool CreateWorldSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuff
             return false;
 
         parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial);
+
+        // todo specific feedbackrenderer
+        Rendering::CircleFeedbackParameters params = { GameplayConstants::Colony::ColonyInitialRange, GameplayConstants::Colony::ColonyRangeFeedbackThickness,
+            GameplayConstants::Colony::ColonyRangeFeedbackColor };
+        parCommandBuffer.DrawCircle(Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\feedbackmaterial.material"), params);
+        params.Range = params.Range / 2.f;
+        parCommandBuffer.DrawCircle(Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\feedbackmaterial.material"), params);
     }
 
     return true;

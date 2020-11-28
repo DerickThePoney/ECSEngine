@@ -7,6 +7,7 @@ namespace Rendering
 {
 class MeshHandle;
 class MaterialInstanceHandle;
+struct CircleFeedbackParameters;
 
 //----------------------------------------------------------------
 //          IDrawCommand
@@ -45,6 +46,8 @@ public:
     void reserve(u32 parSize);
     void clear();
 
+    void SetDebugMarker(const std::string& parDebugMarker);
+
     void SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection);
     void DrawVertices(const glm::vec3* parVertices,
           const u32 parVerticesSize,
@@ -75,6 +78,8 @@ public:
           const float parHeight,
           const u32 parColor,
           const bool parClose);
+
+    void DrawCircle(const MaterialInstanceHandle& parMaterialInstanceHandle, const CircleFeedbackParameters& parParams, const glm::mat4& parTransform = glm::identity<glm::mat4>());
 
     void Submit();
 
