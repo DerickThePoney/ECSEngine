@@ -9,6 +9,7 @@ void NewFrame();
 void End();
 
 const float FrameDeltaTime();
+const float FrameStartTime();
 const float DurationSinceStartRealTime();
 const u32 GetFrameNumber();
 

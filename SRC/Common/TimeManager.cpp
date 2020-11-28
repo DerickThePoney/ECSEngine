@@ -19,6 +19,7 @@ public:
     void End();
 
     const float FrameDeltaTime() const { return FFrameDeltaTime; }
+    const float FrameStartTime() const { return FFrameStartTime; }
     const float DurationSinceStartRealTime() const { return FGlobalTimer.PeekDurationSinceStart<ETimePeriod::SECONDS>(); }
     const u32 GetFrameNumber() const { return FFrameNumber; }
 
@@ -26,6 +27,7 @@ private:
     Timer FGlobalTimer;
     Timer FFrameDurationTimer;
 
+    float FFrameStartTime;
     float FFrameDeltaTime;
     u32 FFrameNumber;
 };
@@ -53,6 +55,7 @@ void TimeManagerImpl::NewFrame()
         FFrameDurationTimer.Stop();
     }
 
+    FFrameStartTime = DurationSinceStartRealTime();
     FFrameDeltaTime = FFrameDurationTimer.ElapsedTime<ETimePeriod::SECONDS>();
     FFrameDurationTimer.Start();
     ++FFrameNumber;
@@ -86,6 +89,11 @@ void End()
 const float FrameDeltaTime()
 {
     return TimeManagerImpl::Instance().FrameDeltaTime();
+}
+
+const float FrameStartTime()
+{
+    return TimeManagerImpl::Instance().FrameStartTime();
 }
 
 const float DurationSinceStartRealTime()
