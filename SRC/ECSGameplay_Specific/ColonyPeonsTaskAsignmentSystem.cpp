@@ -42,13 +42,6 @@ EntityId GetTargetForPeon(const PositionModule& parPeonPositionModule,
         }
     }
 
-    if (!res.Valid() && !parAssignedTargets.empty())
-    {
-        std::vector<EntityId> result;
-        std::sample(parAssignedTargets.begin(), parAssignedTargets.end(), std::back_inserter(result), 1, std::mt19937{ std::random_device{}() });
-        res = result[0];
-    }
-
     return res;
 }
 } // namespace
