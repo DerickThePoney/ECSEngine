@@ -130,6 +130,30 @@ private:
 };
 
 template<>
+class PropertyDrawer<glm::vec4>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, glm::vec4* parProperty, bool parUseLimits, glm::vec4 parMin, glm::vec4 parMax)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FUseLimits(parUseLimits)
+        , FMin(parMin)
+        , FMax(parMax)
+    {
+    }
+
+    void ShowProperty() { ImGui::InputFloat4(FName.c_str(), (float*)FProperty); }
+    void EditColor() { ImGui::ColorEdit4(FName.c_str(), (float*)FProperty); }
+
+private:
+    std::string FName;
+    glm::vec4* FProperty = nullptr;
+    bool FUseLimits;
+    glm::vec4 FMin;
+    glm::vec4 FMax;
+};
+
+template<>
 class PropertyDrawer<glm::quat>
 {
 public:
@@ -320,6 +344,12 @@ void MakePropertyWithLimits(const std::string& parName, T* parProperty, const T&
     {                                                                                                                                                                              \
         PropertyDrawer<std::string> drawer(NAME, &PROPERTY);                                                                                                                       \
         drawer.ShowProperty(IS_FILE, PATTERN);                                                                                                                                     \
+    }
+
+#define EDITOR_PROPERTY_COLOR(NAME, PROPERTY)                                                                                                                                      \
+    {                                                                                                                                                                              \
+        PropertyDrawer<glm::vec4> drawer(NAME, &PROPERTY, false, glm::vec4(-1), glm::vec4(-1));                                                                                    \
+        drawer.EditColor();                                                                                                                                                        \
     }
 
 template<>
