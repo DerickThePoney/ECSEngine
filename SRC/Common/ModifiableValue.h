@@ -88,6 +88,13 @@ public:
         FComputedValue = (FInitialValue + flatBonus) * (T(1) + percentBonus);
     }
 
+    void MakeComputedAsInitialAndRemoveModifiers()
+    {
+        FInitialValue = FComputedValue;
+        FModifiers.clear();
+    }
+
+
 private:
     T FInitialValue = T(0);
     T FComputedValue = T(0);
