@@ -3,7 +3,7 @@
 #include "EditorGridRenderer.h"
 
 #include "Common/CameraManager.h"
-#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
@@ -21,14 +21,14 @@ EditorGridRenderer::~EditorGridRenderer()
 
 void EditorGridRenderer::Initialise()
 {
-    FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer();
+    FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer();
     FGridMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\editorgridmaterial.material");
     AssertRelease(FGridMaterial.IsValid());
 }
 
 void EditorGridRenderer::Shutdown()
 {
-    Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
+    Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
 }
 
 void EditorGridRenderer::RenderScene()

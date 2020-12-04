@@ -13,7 +13,7 @@
 #include "ECSGameplay_Common/ApparenceModule.h"
 #include "ECSGameplay_Common/OrientationModule.h"
 #include "ECSGameplay_Common/PositionModule.h"
-#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/BGFXRenderingUtils.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -58,7 +58,7 @@ void RenderingSystem::VirtualInit()
 
     FCamId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
 
-    FDrawBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
+    FDrawBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
 }
 
 template<Worlds::Type world>
@@ -173,7 +173,7 @@ void RenderingSystem::VirtualUpdate()
 void RenderingSystem::VirtualDestroy()
 {
     parent_type::VirtualDestroy();
-    Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FDrawBuffer);
+    Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FDrawBuffer);
     /*bgfx::destroy(kProgramInstancing);*/
 }
 

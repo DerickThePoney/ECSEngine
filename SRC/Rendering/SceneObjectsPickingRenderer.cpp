@@ -9,7 +9,7 @@
 #include "Common/CameraManager.h"
 #include "Common/InputManager.h"
 #include "Common/Ray.h"
-#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/Framebuffer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -38,7 +38,7 @@ void SceneObjectsPickingRenderer::Initialise()
     bgfx::setViewName(Rendering::RenderPassId::SELECTION_PASS, "Picking pass");
     bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 
-    FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_PASS);
+    FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_PASS);
 
     FPickFramebuffer = new Rendering::FramebufferInstance(Rendering::FramebufferSizeType::CUSTOM, glm::uvec2(PickTextureSize, PickTextureSize));
     FPickFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
@@ -58,7 +58,7 @@ void SceneObjectsPickingRenderer::Initialise()
 
 void SceneObjectsPickingRenderer::Shutdown()
 {
-    Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
+    Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
 
     FPickFramebuffer->Destroy();
     delete FPickFramebuffer;
@@ -104,7 +104,7 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
     bgfx::blit(Rendering::RenderPassId::SELECTION_BLIT_PASS, FPickingBlitTexture, 0, 0, FPickFramebuffer->GetTextureHandle(0));
     u32 availableAtFrame = bgfx::readTexture(FPickingBlitTexture, FSelectionData);
     if (!FReadingAvailable)
-        Rendering::BGFXRenderer::Instance().AddRequestOnSpecificFrame(availableAtFrame, DELEGATE(&SceneObjectsPickingRenderer::SetDataIsAvailable, *this));
+        Rendering::BGFXRenderingBackend::Instance().AddRequestOnSpecificFrame(availableAtFrame, DELEGATE(&SceneObjectsPickingRenderer::SetDataIsAvailable, *this));
 
     if (FReadingAvailable)
     {

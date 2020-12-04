@@ -4,7 +4,7 @@
 
 #include "Common/CameraManager.h"
 #include "ECSGameplay_Specific/GameplayConstants.h"
-#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/FeedbackParameters.h"
 #include "RenderingCore/Framebuffer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -40,12 +40,12 @@ void FeedbackRenderer::Initialise()
 
     FFramebuffer->InitFramebuffer();
 
-    FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(RenderPassId::FEEDBACK_PASS);
+    FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::FEEDBACK_PASS);
 }
 
 void FeedbackRenderer::Shutdown()
 {
-    Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
+    Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
 
     FFramebuffer->Destroy();
     delete FFramebuffer;

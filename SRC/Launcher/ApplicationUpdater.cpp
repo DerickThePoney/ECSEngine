@@ -4,7 +4,7 @@
 
 #include "Common/TimeManager.h"
 #include "ECSGameplay_Common/ScenarioEditor.h"
-#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
 
@@ -47,7 +47,7 @@ void ApplicationUpdater::Render()
 
     Rendering::ImGUI::Render();
 
-    Rendering::BGFXRenderer::Instance().RenderFrame();
+    Rendering::BGFXRenderingBackend::Instance().RenderFrame();
 }
 
 void ApplicationUpdater::EndUpdate()

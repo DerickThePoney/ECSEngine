@@ -8,11 +8,11 @@ using SpecificFrameObserver = Delegate<void()>;
 namespace Rendering
 {
 class DrawCommandBuffer;
-class BGFXRenderer final : public Singleton<BGFXRenderer>
+class BGFXRenderingBackend final : public Singleton<BGFXRenderingBackend>
 {
 public:
-    BGFXRenderer();
-    ~BGFXRenderer();
+    BGFXRenderingBackend();
+    ~BGFXRenderingBackend();
 
     void Init();
     void RenderFrame();
