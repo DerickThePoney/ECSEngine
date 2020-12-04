@@ -11,6 +11,8 @@ enum Type : u16
     GEOMETRY_PASS = 0,
     SELECTION_PASS = 1,
     SELECTION_BLIT_PASS = 2,
+    FEEDBACK_PASS = 3,
+    COMBINE_PASS = 4,
     DEBUG_PASS = 252,
     IMGUI_EDITOR_PASS = 253,
     IMGUI_UI_PASS = 254,
@@ -20,5 +22,15 @@ enum Type : u16
 };
 const char* GetName(Type parPass);
 } // namespace RenderPassId
+
+class RenderPassDescriptor
+{
+public:
+    RenderPassDescriptor();
+    ~RenderPassDescriptor();
+
+private:
+};
+
 } // namespace Rendering
 } // namespace ECSEngine
