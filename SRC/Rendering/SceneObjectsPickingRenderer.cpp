@@ -11,6 +11,7 @@
 #include "Common/Ray.h"
 #include "RenderingCore/BGFXRenderer.h"
 #include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/Framebuffer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/RenderingState.h"
@@ -30,11 +31,7 @@ SceneObjectsPickingRenderer::~SceneObjectsPickingRenderer()
 {
 }
 
-bgfx::TextureHandle FPickingTexture;
-bgfx::TextureHandle FPickingDepthTexture;
 bgfx::TextureHandle FPickingBlitTexture;
-
-bgfx::FrameBufferHandle FPickingFramebuffer;
 
 void SceneObjectsPickingRenderer::Initialise()
 {
@@ -42,20 +39,18 @@ void SceneObjectsPickingRenderer::Initialise()
     bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 
     FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_PASS);
-    FBlitCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_BLIT_PASS);
 
-    FPickingTexture = bgfx::createTexture2D(PickTextureSize, PickTextureSize, false, 1, bgfx::TextureFormat::RGBA8,
+    FPickFramebuffer = new Rendering::FramebufferInstance(Rendering::FramebufferSizeType::CUSTOM, glm::uvec2(PickTextureSize, PickTextureSize));
+    FPickFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
           0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
-
-    FPickingDepthTexture = bgfx::createTexture2D(PickTextureSize, PickTextureSize, false, 1, bgfx::TextureFormat::D24S8,
+    FPickFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::D24S8,
           0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
 
     FPickingBlitTexture = bgfx::createTexture2D(PickTextureSize, PickTextureSize, false, 1, bgfx::TextureFormat::RGBA8,
           0 | BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP |
                 BGFX_SAMPLER_V_CLAMP);
 
-    bgfx::TextureHandle rt[2] = { FPickingTexture, FPickingDepthTexture };
-    FPickingFramebuffer = bgfx::createFrameBuffer(2, rt, true);
+    FPickFramebuffer->InitFramebuffer();
 
     FDrawIdMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\objectpickingmaterial.material");
     AssertRelease(FDrawIdMaterial.IsValid());
@@ -63,28 +58,24 @@ void SceneObjectsPickingRenderer::Initialise()
 
 void SceneObjectsPickingRenderer::Shutdown()
 {
-    Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FBlitCommandBuffer);
     Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
 
-    bgfx::destroy(FPickingFramebuffer);
+    FPickFramebuffer->Destroy();
+    delete FPickFramebuffer;
     bgfx::destroy(FPickingBlitTexture);
-    bgfx::destroy(FPickingDepthTexture);
-    bgfx::destroy(FPickingTexture);
 }
 
 void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
 {
     AssertRelease(FDrawCommandBuffer != nullptr);
-    AssertRelease(FBlitCommandBuffer != nullptr);
 
     FDrawCommandBuffer->clear();
-    FBlitCommandBuffer->clear();
 
     u32 cameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
     Camera* c = CameraManager::Instance().GetCamera(cameraId);
     AssertRelease(c);
 
-    bgfx::setViewFrameBuffer(Rendering::RenderPassId::SELECTION_PASS, FPickingFramebuffer);
+    bgfx::setViewFrameBuffer(Rendering::RenderPassId::SELECTION_PASS, FPickFramebuffer->GetHandle());
     bgfx::setViewRect(Rendering::RenderPassId::SELECTION_PASS, 0, 0, PickTextureSize, PickTextureSize);
 
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
@@ -110,7 +101,7 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
     FDrawCommandBuffer->Submit();
 
     // Blit and read
-    bgfx::blit(Rendering::RenderPassId::SELECTION_BLIT_PASS, FPickingBlitTexture, 0, 0, FPickingTexture);
+    bgfx::blit(Rendering::RenderPassId::SELECTION_BLIT_PASS, FPickingBlitTexture, 0, 0, FPickFramebuffer->GetTextureHandle(0));
     u32 availableAtFrame = bgfx::readTexture(FPickingBlitTexture, FSelectionData);
     if (!FReadingAvailable)
         Rendering::BGFXRenderer::Instance().AddRequestOnSpecificFrame(availableAtFrame, DELEGATE(&SceneObjectsPickingRenderer::SetDataIsAvailable, *this));

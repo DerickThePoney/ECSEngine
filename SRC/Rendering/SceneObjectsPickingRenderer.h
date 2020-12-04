@@ -6,7 +6,8 @@ class SceneScenario;
 namespace Rendering
 {
 class DrawCommandBuffer;
-}
+class FramebufferInstance;
+} // namespace Rendering
 constexpr u32 PickTextureSize = 8;
 class SceneObjectsPickingRenderer
 {
@@ -26,7 +27,7 @@ public:
 
 private:
     Rendering::DrawCommandBuffer* FDrawCommandBuffer;
-    Rendering::DrawCommandBuffer* FBlitCommandBuffer;
+    Rendering::FramebufferInstance* FPickFramebuffer;
 
     Rendering::MaterialInstanceHandle FDrawIdMaterial;
 
