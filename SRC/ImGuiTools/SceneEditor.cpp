@@ -14,7 +14,7 @@
 #include "GameRulesEditor.h"
 #include "InputDebug.h"
 #include "LoggerGUI.h"
-#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/TexturesManager.h"
@@ -315,7 +315,7 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
         InputDebug(&parOutWindowsToShow.showInputDebug);
 
     if (parOutWindowsToShow.showBGFXStatistics)
-        Rendering::BGFXRenderer::Instance().DrawStats(&parOutWindowsToShow.showBGFXStatistics);
+        Rendering::BGFXRenderingBackend::Instance().DrawStats(&parOutWindowsToShow.showBGFXStatistics);
 
     if (parOutWindowsToShow.showUIStyleEditor)
         UIStyleEditor(&parOutWindowsToShow.showUIStyleEditor);

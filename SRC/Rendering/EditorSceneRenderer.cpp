@@ -4,7 +4,7 @@
 
 #include "Application/SceneScenario.h"
 #include "Common/CameraManager.h"
-#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
@@ -30,12 +30,12 @@ void EditorSceneRenderer::Initialise(const std::string& parHandleFileName, const
 
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
 
-    FDrawCommandBuffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
+    FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::GEOMETRY_PASS);
 }
 
 void EditorSceneRenderer::Shutdown()
 {
-    Rendering::BGFXRenderer::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
+    Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
     CameraManager::Instance().DestroyCamera(FCameraId);
 }
 

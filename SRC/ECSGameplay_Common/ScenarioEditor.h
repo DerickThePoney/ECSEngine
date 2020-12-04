@@ -42,6 +42,11 @@ class EditorSceneRenderer;
 class EditorGridRenderer;
 class GameScenarioUpdater;
 
+namespace Rendering
+{
+class FeedbackRenderer;
+}
+
 class ScenarioEditor final : public IScenarioUpdater
 {
 public:

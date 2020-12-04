@@ -7,7 +7,7 @@
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
 #include "PathfindingManager.h"
-#include "RenderingCore/BGFXRenderer.h"
+#include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
@@ -98,7 +98,7 @@ void GameScenarioUpdater::Render()
 
     FRenderingSystem.Update();
 
-    Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderer::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
+    Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
     u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
     Camera* camera = CameraManager::Instance().GetCamera(camId);
     buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));

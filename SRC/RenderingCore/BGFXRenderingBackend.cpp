@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "BGFXRenderer.h"
+#include "BGFXRenderingBackend.h"
 
 #include "Common/Logger.h"
 #include "DrawCommands.h"
@@ -12,16 +12,16 @@ namespace ECSEngine
 {
 namespace Rendering
 {
-BGFXRenderer::BGFXRenderer()
+BGFXRenderingBackend::BGFXRenderingBackend()
     : FCurrentFrame(0)
 {
 }
 
-BGFXRenderer::~BGFXRenderer()
+BGFXRenderingBackend::~BGFXRenderingBackend()
 {
 }
 
-void BGFXRenderer::Init()
+void BGFXRenderingBackend::Init()
 {
     AssertRelease(GLFWDisplayWindowHandler::HasInstance());
     GLFWDisplayWindowHandler& window = GLFWDisplayWindowHandler::Instance();
@@ -34,9 +34,9 @@ void BGFXRenderer::Init()
     bgfxInit.resolution.width = window.GetSize().x;
     bgfxInit.resolution.height = window.GetSize().y;
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-#ifdef PERFORM_SECURITY_CHECKS
-    bgfxInit.debug = true;
-#endif
+    //#ifdef PERFORM_SECURITY_CHECKS
+    //    bgfxInit.debug = true;
+    //#endif
     bgfx::init(bgfxInit);
 
 #ifdef ENABLE_BGFX_PROFILING
@@ -50,11 +50,11 @@ void BGFXRenderer::Init()
     bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, window.GetSize().x, window.GetSize().y);
 }
 
-void BGFXRenderer::Shutdown()
+void BGFXRenderingBackend::Shutdown()
 {
     bgfx::shutdown();
 }
-void BGFXRenderer::RenderFrame()
+void BGFXRenderingBackend::RenderFrame()
 {
     // Set view 0 default viewport.
     bgfx::touch(0);
@@ -69,38 +69,38 @@ void BGFXRenderer::RenderFrame()
     }
 }
 
-void BGFXRenderer::Resize(u32 width, u32 height)
+void BGFXRenderingBackend::Resize(u32 width, u32 height)
 {
     bgfx::reset(width, height, BGFX_RESET_VSYNC);
     bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, width, height);
     bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, width, height);
 }
 
-bool BGFXRenderer::IsInstancingEnabled()
+bool BGFXRenderingBackend::IsInstancingEnabled()
 {
     // Get renderer capabilities info.
     const bgfx::Caps* caps = bgfx::getCaps();
     return !(0 == (BGFX_CAPS_INSTANCING & caps->supported));
 }
 
-DrawCommandBuffer* BGFXRenderer::CreateCommandBuffer(RenderPassId::Type parViewId /*= RenderPassId::GEOMETRY_PASS */)
+DrawCommandBuffer* BGFXRenderingBackend::CreateCommandBuffer(RenderPassId::Type parViewId /*= RenderPassId::GEOMETRY_PASS */)
 {
     DrawCommandBuffer* buffer = new DrawCommandBuffer(parViewId);
 
     return buffer;
 }
 
-void BGFXRenderer::ReleaseCommandBuffer(DrawCommandBuffer* buffer)
+void BGFXRenderingBackend::ReleaseCommandBuffer(DrawCommandBuffer* buffer)
 {
     delete buffer;
 }
 
-void BGFXRenderer::AddRequestOnSpecificFrame(const u32 parFrameNumber, const SpecificFrameObserver& parObserver)
+void BGFXRenderingBackend::AddRequestOnSpecificFrame(const u32 parFrameNumber, const SpecificFrameObserver& parObserver)
 {
     FSpecificFrameObserver[parFrameNumber].push_back(parObserver);
 }
 
-void BGFXRenderer::DrawStats(bool* outOpen)
+void BGFXRenderingBackend::DrawStats(bool* outOpen)
 {
     const bgfx::Stats* stats = bgfx::getStats();
     AssertRelease(stats != nullptr);

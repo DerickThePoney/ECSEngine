@@ -9,6 +9,7 @@
 #include "ImGuiTools/SceneEditor.h"
 #include "Rendering/EditorGridRenderer.h"
 #include "Rendering/EditorSceneRenderer.h"
+#include "Rendering/FeedbackRenderer.h"
 #include "Rendering/SceneObjectsPickingRenderer.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/RenderPass.h"
@@ -40,6 +41,8 @@ void ScenarioEditor::Initialise()
     FEditorSceneRenderer->Initialise("meshes\\testobjects\\movehandle_v2.fbx.gen", "materials\\vertexcolormaterial.material");
     FEditorGridRenderer = new EditorGridRenderer();
     FEditorGridRenderer->Initialise();
+    Rendering::FeedbackRenderer::CreateIFP();
+    Rendering::FeedbackRenderer::Instance().Initialise();
 
     FEditorCamera.Initialise();
 }
@@ -49,6 +52,8 @@ void ScenarioEditor::Destroy()
     if (FCurrentScenario != nullptr)
         FCurrentScenario->Destroy();
 
+    Rendering::FeedbackRenderer::Instance().Shutdown();
+    Rendering::FeedbackRenderer::Destroy();
     FEditorGridRenderer->Shutdown();
     FEditorSceneRenderer->Shutdown();
     FEditorSceneObjectPickingRenderer->Shutdown();
@@ -269,6 +274,7 @@ void ScenarioEditor::RenderForSceneEditing()
     }
 
     FEditorGridRenderer->RenderScene();
+    Rendering::FeedbackRenderer::Instance().Render();
 }
 
 void ScenarioEditor::RenderForEditorPlaying()

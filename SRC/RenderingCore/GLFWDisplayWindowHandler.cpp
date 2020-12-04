@@ -8,7 +8,7 @@
 #include <GLFW/glfw3native.h>
 //clang-format on
 
-#include "BGFXRenderer.h"
+#include "BGFXRenderingBackend.h"
 #include "Common/InputManager.h"
 #include "ImguiRenderer.h"
 
@@ -23,8 +23,8 @@ void WindowSizeCallback(GLFWwindow* window, int width, int height)
 {
     AssertRelease(GLFWDisplayWindowHandler::HasInstance());
     GLFWDisplayWindowHandler::Instance().ResizeWindow(window, width, height);
-    AssertRelease(BGFXRenderer::HasInstance());
-    BGFXRenderer::Instance().Resize(width, height);
+    AssertRelease(BGFXRenderingBackend::HasInstance());
+    BGFXRenderingBackend::Instance().Resize(width, height);
 }
 
 void WindowScrollCallback(GLFWwindow* window, double xoffset, double yoffset)

@@ -2,7 +2,7 @@
 
 #include "RenderingLoader.h"
 
-#include "BGFXRenderer.h"
+#include "BGFXRenderingBackend.h"
 #include "GLFWDisplayWindowHandler.h"
 #include "ImguiRenderer.h"
 #include "MaterialManager.h"
@@ -20,8 +20,8 @@ bool RenderingLoader::VirtualInitialise()
     Rendering::GLFWDisplayWindowHandler::Instance().SetName(FApplicationName);
     Rendering::GLFWDisplayWindowHandler::Instance().Init();
 
-    Rendering::BGFXRenderer::CreateIFP();
-    Rendering::BGFXRenderer& rendererInstance = Rendering::BGFXRenderer::Instance();
+    Rendering::BGFXRenderingBackend::CreateIFP();
+    Rendering::BGFXRenderingBackend& rendererInstance = Rendering::BGFXRenderingBackend::Instance();
     rendererInstance.Init();
 
     Rendering::TextureManager::CreateIFP();
@@ -49,8 +49,8 @@ void RenderingLoader::VirtualShutdown()
     Rendering::TextureManager::Instance().Shutdown();
     Rendering::TextureManager::Destroy();
 
-    Rendering::BGFXRenderer::Instance().Shutdown();
-    Rendering::BGFXRenderer::Destroy();
+    Rendering::BGFXRenderingBackend::Instance().Shutdown();
+    Rendering::BGFXRenderingBackend::Destroy();
 
     Rendering::GLFWDisplayWindowHandler::Instance().Shutdown();
     Rendering::GLFWDisplayWindowHandler::Destroy();
