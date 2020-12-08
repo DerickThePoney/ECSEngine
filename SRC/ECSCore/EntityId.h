@@ -40,7 +40,7 @@ private:
 
 static bool operator<(const EntityId& left, const EntityId& right)
 {
-    return left.GetSequentialId() < right.GetSequentialId();
+    return left.GetWorldId() < right.GetWorldId() || left.GetSequentialId() < right.GetSequentialId();
 }
 
 } // namespace ECSEngine
