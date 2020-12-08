@@ -3,13 +3,15 @@
 #include "Common/RenderingHandles.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
+#include "RenderingCore/GFXRepresentationProxy.h"
 
 namespace ECSEngine
 {
 namespace Rendering
 {
-class MeshHandle;
-}
+class Carrier;
+} // namespace Rendering
+
 class ApparenceModuleTemplate : public ModuleTemplate
 {
     DECLARE_MODULE_TEMPLATE(ApparenceModule, ApparenceModuleTemplate);
@@ -20,7 +22,7 @@ public:
     {
     }
 
-    virtual ~ApparenceModuleTemplate() {}
+    virtual ~ApparenceModuleTemplate() { }
 
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
@@ -48,10 +50,11 @@ class ApparenceModule final : public Module
 
 public:
     ApparenceModule();
-    ~ApparenceModule() {}
+    ~ApparenceModule() { }
 
     const Rendering::MeshHandle& GetMeshHandle() const;
     const Rendering::MaterialInstanceHandle& GetMaterialHandle() const;
+    Rendering::GFXRepresentationProxy* Proxy() const { return FProxy; }
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
@@ -61,5 +64,6 @@ private:
     // bgfx::ProgramHandle FProgram;
     Rendering::MeshHandle FMeshHandle;
     Rendering::MaterialInstanceHandle FMaterialHandle;
+    Rendering::GFXRepresentationProxy* FProxy = nullptr;
 };
 } // namespace ECSEngine

@@ -15,7 +15,9 @@
 #include "ECSGameplay_Common/PositionModule.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/BGFXRenderingUtils.h"
+#include "RenderingCore/Carrier.h"
 #include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/GFXKeyHelper.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/Material.h"
 #include "RenderingCore/MaterialManager.h"
@@ -81,6 +83,10 @@ void RenderObjects(Rendering::DrawCommandBuffer* parCommandBuffer, const Frustum
         AssertRelease(orientationModule != nullptr);
         glm::mat4 mtx = glm::translate(glm::vec3(positionModule->GetPosition3D()));
         mtx = mtx * (glm::mat4)orientationModule->GetOrientation();
+
+        Rendering::GFXRepresentationProxy* proxy = apparenceModule.Proxy();
+        proxy->PushMessage<glm::vec3>(GFXKeyHelper::Instance().Position, positionModule->GetPosition3D(), TimeManager::FrameStartTime());
+        proxy->PushMessage<glm::quat>(GFXKeyHelper::Instance().Orientation, orientationModule->GetOrientation(), TimeManager::FrameStartTime());
 
         if (Rendering::MeshFrustumCulling::CullApparenceModule(apparenceModule, mtx, parFrustum))
         {

@@ -4,11 +4,13 @@
 
 #include "Application/SceneScenario.h"
 #include "Common/CameraManager.h"
+#include "Common/TimeManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
 #include "PathfindingManager.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/GFXRepresentationManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/MaterialManager.h"
@@ -96,7 +98,11 @@ void GameScenarioUpdater::Render()
     AssertRelease(FScenario != nullptr);
     // FScenario->Render();
 
+    // TODO push that into update when refacto is done
     FRenderingSystem.Update();
+    Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
+
+    Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
 
     Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
     u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
