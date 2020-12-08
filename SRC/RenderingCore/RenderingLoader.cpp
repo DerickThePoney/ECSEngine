@@ -3,6 +3,8 @@
 #include "RenderingLoader.h"
 
 #include "BGFXRenderingBackend.h"
+#include "GFXKeyHelper.h"
+#include "GFXRepresentationManager.h"
 #include "GLFWDisplayWindowHandler.h"
 #include "ImguiRenderer.h"
 #include "MaterialManager.h"
@@ -33,12 +35,19 @@ bool RenderingLoader::VirtualInitialise()
 
     Rendering::MeshManager::CreateIFP();
 
+    GFXKeyHelper::CreateIFP();
+    GFXKeyHelper::Instance().Initialise();
+
+    Rendering::GFXRepresentationManager::CreateIFP();
+
     return true;
 }
 
 void RenderingLoader::VirtualShutdown()
 {
     ILoader::VirtualShutdown();
+
+    Rendering::GFXRepresentationManager::Destroy();
 
     Rendering::MeshManager::Destroy();
 

@@ -1,0 +1,13 @@
+#pragma once
+#include "Common/Singleton.h"
+namespace ECSEngine
+{
+class GFXKeyHelper : public Singleton<GFXKeyHelper>
+{
+public:
+    void Initialise();
+
+    u32 Position;
+    u32 Orientation;
+};
+} // namespace ECSEngine
