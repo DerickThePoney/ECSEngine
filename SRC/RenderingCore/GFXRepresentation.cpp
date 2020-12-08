@@ -16,8 +16,11 @@ GFXRepresentation::GFXRepresentation()
 
 GFXRepresentation::~GFXRepresentation()
 {
-    delete FCarrier;
-    delete FVisualModel;
+    if (FCarrier != nullptr)
+        delete FCarrier;
+
+    if (FVisualModel != nullptr)
+        delete FVisualModel;
 }
 
 void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
