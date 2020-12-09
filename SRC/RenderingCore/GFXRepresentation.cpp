@@ -35,6 +35,8 @@ void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
     if (parInit.HasVisuals)
     {
         FVisualModel = new VisualModel();
+        AssertRelease(FVisualModel != nullptr);
+        FVisualModel->Init(parInit.FMaterialFilename, parInit.FMeshFileName);
     }
 }
 
@@ -42,7 +44,7 @@ void GFXRepresentation::Update(float parCurrentTime)
 {
     if (FMessages[FCurrentMessageQueue].HasMessages())
     {
-        // ProcessMessages(parCurrentTime) -- TODO
+        ProcessMessages();
         FMessages[FCurrentMessageQueue].ClearMessages();
     }
 

@@ -43,8 +43,6 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
     AssertRelease(FMeshHandle.IsValid());
     AssertRelease(FMaterialHandle.IsValid());
 
-    const ApparenceModuleTemplate* temp = Template<ApparenceModuleTemplate>();
-
     FProxy = new Rendering::GFXRepresentationProxy();
 
     glm::vec3 pos = parParameters.Get_IFP<ModuleParameters::Position>(glm::vec3(0.0f));
@@ -69,6 +67,9 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
     init.FOrientation = orient;
     init.HasCarier = true;
     init.FCurrentTime = TimeManager::FrameStartTime();
+    init.FMaterialFilename = Template<ApparenceModuleTemplate>()->GetMaterialFileName();
+    init.FMeshFileName = Template<ApparenceModuleTemplate>()->GetMeshFileName();
+    init.HasVisuals = true;
 
     FProxy->Initialise(UnitId(), init);
 }
