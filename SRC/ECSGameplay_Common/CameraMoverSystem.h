@@ -12,13 +12,12 @@ public:
 protected:
     void VirtualUpdate() override;
 
-    KeyboardCommand FForward;
-    KeyboardCommand FBackward;
     KeyboardCommand FLeft;
     KeyboardCommand FRight;
     KeyboardCommand FUp;
     KeyboardCommand FDown;
 
     MouseButtonCommand FMiddleMouseRotation;
+    MouseScrollCommand FMiddleMouseScroll;
 };
 } // namespace ECSEngine

@@ -36,7 +36,7 @@ struct MessageRecord
 
 namespace Logger
 {
-void LogMessage(ELoggingCategory::Type parCategory, const std::string parMessageToLog);
+void LogMessage(ELoggingCategory::Type parCategory, const std::string& parMessageToLog);
 void InitLogger();
 void ShutdownLogger();
 const std::vector<MessageRecord>& GetLoggedMessages();
