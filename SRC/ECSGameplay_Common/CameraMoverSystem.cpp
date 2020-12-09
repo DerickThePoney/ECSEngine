@@ -20,12 +20,6 @@ CameraMoverSystem::CameraMoverSystem()
     RegisterDepency<PositionModule>(Worlds::CAMERA);
     RegisterDepency<OrientationModule>(Worlds::CAMERA);
 
-    FForward.FKeyboardKey = InputKeyNames::INPUT_KEY_W;
-    FForward.FInputType = EInputType::REPEATED;
-
-    FBackward.FKeyboardKey = InputKeyNames::INPUT_KEY_S;
-    FBackward.FInputType = EInputType::REPEATED;
-
     FRight.FKeyboardKey = InputKeyNames::INPUT_KEY_A;
     FRight.FInputType = EInputType::REPEATED;
 
@@ -34,11 +28,9 @@ CameraMoverSystem::CameraMoverSystem()
 
     FUp.FKeyboardKey = InputKeyNames::INPUT_KEY_W;
     FUp.FInputType = EInputType::REPEATED;
-    FUp.FShift = true;
 
     FDown.FKeyboardKey = InputKeyNames::INPUT_KEY_S;
     FDown.FInputType = EInputType::REPEATED;
-    FDown.FShift = true;
 
     FMiddleMouseRotation.FMouseButton = MouseButtons::MOUSE_BUTTON_3;
     FMiddleMouseRotation.FInputType = EInputType::REPEATED;
@@ -97,11 +89,11 @@ void CameraMoverSystem::VirtualUpdate()
             }
         }
 
-        if (FForward.Evaluate())
-            movementCommand.z += speedFactor;
+        if (FUp.Evaluate())
+            movementCommand.y += speedFactor;
 
-        if (FBackward.Evaluate())
-            movementCommand.z -= speedFactor;
+        if (FDown.Evaluate())
+            movementCommand.y -= speedFactor;
 
         if (FLeft.Evaluate())
             movementCommand.x += speedFactor;
@@ -109,11 +101,14 @@ void CameraMoverSystem::VirtualUpdate()
         if (FRight.Evaluate())
             movementCommand.x -= speedFactor;
 
-        if (FUp.Evaluate())
-            movementCommand.y += speedFactor;
+        if (FMiddleMouseScroll.Evaluate())
+        {
+            glm::vec2 mouseScroll = Input::GetMouseScrollDelta();
 
-        if (FDown.Evaluate())
-            movementCommand.y -= speedFactor;
+            float delta = mouseScroll.y;
+
+            movementCommand.z += 10.0f * delta * speedFactor;
+        }
 
         if (movementCommand != glm::vec3(.0f))
         {

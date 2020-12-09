@@ -86,4 +86,15 @@ bool MouseButtonCommand::Evaluate() const
     return buttonState && (ctrl == FControl) && (shift == FShift) && (alt == FAlt);
 }
 
+bool MouseScrollCommand::Evaluate() const
+{
+    const glm::vec2 scrollDelta = Input::GetMouseScrollDelta();
+    return std::max(std::abs(scrollDelta.x), std::abs(scrollDelta.y)) > 0.f;
+}
+
+bool MouseMoveCommand::Evaluate() const
+{
+    return glm::length2(Input::GetMousePositionDelta()) > 0.f;
+}
+
 } // namespace ECSEngine

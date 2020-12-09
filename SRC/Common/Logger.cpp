@@ -16,7 +16,7 @@ public:
         FMessageRecords.reserve(16384);
     }
 
-    void LogMessage(ELoggingCategory::Type parCategory, const std::string parMessageToLog);
+    void LogMessage(ELoggingCategory::Type parCategory, const std::string& parMessageToLog);
 
     const std::vector<MessageRecord>& GetLoggedMessages() const { return FMessageRecords; }
 
@@ -24,7 +24,7 @@ private:
     std::vector<MessageRecord> FMessageRecords;
 };
 
-void LogManager::LogMessage(ELoggingCategory::Type parCategory, const std::string parMessageToLog)
+void LogManager::LogMessage(ELoggingCategory::Type parCategory, const std::string& parMessageToLog)
 {
     if (FMessageRecords.size() >= FMessageRecords.capacity())
         return;
@@ -76,7 +76,7 @@ const char* GetName(Type parValue)
 namespace Logger
 {
 
-void LogMessage(ELoggingCategory::Type parCategory, const std::string parMessageToLog)
+void LogMessage(ELoggingCategory::Type parCategory, const std::string& parMessageToLog)
 {
     if (!LogManager::HasInstance())
         return;

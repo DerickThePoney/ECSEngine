@@ -5,7 +5,7 @@ namespace ECSEngine
 {
 struct IInputCommand
 {
-    virtual bool Evaluate() const = 0;
+    virtual bool Evaluate() const { return false; };
 };
 
 namespace EInputType
@@ -53,6 +53,26 @@ struct MouseButtonCommand : public IInputCommand
     void serialize(Archive& ar)
     {
         ar(PROPERTY(MouseButton), PROPERTY(InputType), NAMEDPROPERTY("Control pressed", FControl), NAMEDPROPERTY("Shift pressed", FShift), NAMEDPROPERTY("Alt pressed", FAlt));
+    }
+};
+
+struct MouseScrollCommand : public IInputCommand
+{
+    virtual bool Evaluate() const override;
+
+    template<typename Archive>
+    void serialize(Archive& ar)
+    {
+    }
+};
+
+struct MouseMoveCommand : public IInputCommand
+{
+    virtual bool Evaluate() const override;
+
+    template<typename Archive>
+    void serialize(Archive& ar)
+    {
     }
 };
 } // namespace ECSEngine
