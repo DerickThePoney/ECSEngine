@@ -3,6 +3,7 @@
 #include "GFXRepresentation.h"
 
 #include "Carrier.h"
+#include "GFXKeyHelper.h"
 #include "VisualModel.h"
 
 namespace ECSEngine
@@ -61,5 +62,19 @@ void GFXRepresentation::SwapQueues()
 {
     FCurrentMessageQueue = 1 - FCurrentMessageQueue;
 }
+
+void GFXRepresentation::ProcessMessages()
+{
+    GFXMessage& currentMessages = FMessages[FCurrentMessageQueue];
+
+    if (FCarrier != nullptr && currentMessages.HasMessage(GFXKeyHelper::Instance().Position) && currentMessages.HasMessage(GFXKeyHelper::Instance().Orientation))
+    {
+        auto newPositionKeyframe = currentMessages.GetValueIFP<glm::vec3>(GFXKeyHelper::Instance().Position);
+        auto newOrientationKeyframe = currentMessages.GetValueIFP<glm::quat>(GFXKeyHelper::Instance().Orientation);
+        AlwaysCheckedAssert(newPositionKeyframe.second == newOrientationKeyframe.second);
+        FCarrier->PushNewKeyframe(newPositionKeyframe.first, newOrientationKeyframe.first, newPositionKeyframe.second);
+    }
+}
+
 } // namespace Rendering
 } // namespace ECSEngine
