@@ -33,9 +33,8 @@ public:
         std::scoped_lock<std::mutex> lock(FMutex);
         auto itFind = FMessages.find(parKey);
         if (itFind == FMessages.end())
-            return T();
+            return { T(), -1.f };
 
-        *((T*)FData);
         return { *((T*)itFind->second.Data), itFind->second.Time };
     }
 

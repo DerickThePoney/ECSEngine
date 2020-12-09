@@ -38,6 +38,9 @@ public:
     GFXMessage& GetCurrentQueueForPushingMessage() { return FMessages[1 - FCurrentMessageQueue]; }
 
 private:
+    void ProcessMessages();
+
+private:
     Carrier* FCarrier = nullptr;
     VisualModel* FVisualModel = nullptr;
 
