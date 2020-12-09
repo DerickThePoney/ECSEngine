@@ -13,6 +13,7 @@ struct PackedEntityId
 
     const u8 GetWorldId() const { return FId >> 24 & 0xFF; }
     const u32 GetSequentialId() const { return FId & 0xFFFFFF; }
+    const u32 GetRawId() const { return FId; }
 
     bool operator==(const PackedEntityId& other) const { return FId == other.FId; }
 
@@ -28,6 +29,7 @@ public:
     const u8 GetWorldId() const { return FId.GetWorldId(); }
     const Worlds::Type GetWorld() const { return (Worlds::Type)GetWorldId(); }
     const u32 GetSequentialId() const { return FId.GetSequentialId(); }
+    const u32 GetRawId() const { return FId.GetRawId(); }
     bool Valid() const { return FId.GetWorldId() != 0xFF && FId.GetSequentialId() != 0xFFFFFF; }
 
     bool operator==(const EntityId& other) const { return FId == other.FId; }
@@ -40,7 +42,7 @@ private:
 
 static bool operator<(const EntityId& left, const EntityId& right)
 {
-    return left.GetWorldId() < right.GetWorldId() || left.GetSequentialId() < right.GetSequentialId();
+    return left.GetRawId() < right.GetRawId();
 }
 
 } // namespace ECSEngine
