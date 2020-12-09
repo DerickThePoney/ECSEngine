@@ -80,6 +80,9 @@ void* PoolAllocator<T, ChunkSize>::Allocate(const u32 parNumber)
 template<class T, u32 ChunkSize>
 void PoolAllocator<T, ChunkSize>::Free(void* parPtr, const u32 parNumber)
 {
+    if (parPtr == nullptr)
+        return;
+
     ChunkIndexPair foundPosition = GetChunkAndIndexNumberForPtr(parPtr);
     AssertRelease((foundPosition.first != -1) && (foundPosition.second != -1));
 
