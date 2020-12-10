@@ -11,7 +11,7 @@
 #include "MovementSystem.h"
 #include "OrientationSystem.h"
 #include "Rendering/GameRenderer.h"
-#include "Rendering/RenderingSystem.h"
+#include "SynchroWithRenderSystem.h"
 
 namespace ECSEngine
 {
@@ -36,7 +36,7 @@ private:
 
     CameraMoverSystem FCameraMoverSystem;
     MovementSystem FMovementSystem;
-    RenderingSystem FRenderingSystem;
+    SynchroWithRenderSystem FRenderingSystem;
 
     ColonyPeonsTaskAssignmentSystem FColonyManagementSystem;
     PeonsHaverstingSystem FPeonHarvestingSytem;
