@@ -6,6 +6,8 @@ namespace ECSEngine
 namespace Rendering
 {
 
+IMPLEMENT_POOL_ALLOCATED(FramebufferInstance);
+
 FramebufferInstance::FramebufferInstance(const FramebufferSizeType::Type parSizeType, const glm::vec2 parSize)
     : FFramebufferSizeType(parSizeType)
     , FSize(parSize)
