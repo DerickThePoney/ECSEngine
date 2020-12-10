@@ -2,11 +2,20 @@
 
 #include "GameRenderer.h"
 
+#include "Common/CameraManager.h"
+#include "Common/Frustum.h"
+#include "ECSGameplay_Specific/GameplayConstants.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
+#include "RenderingCore/Carrier.h"
 #include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/FeedbackParameters.h"
 #include "RenderingCore/Framebuffer.h"
+#include "RenderingCore/GFXRepresentationManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/MaterialManager.h"
+#include "RenderingCore/MeshCuller.h"
 #include "RenderingCore/RenderPass.h"
+#include "RenderingCore/VisualModel.h"
 
 namespace ECSEngine
 {
@@ -16,6 +25,9 @@ namespace Rendering
 void GameRenderer::Initialise()
 {
     auto& size = GLFWDisplayWindowHandler::Instance().GetSize();
+
+    FGameplayCameraId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+    AssertRelease(FGameplayCameraId != -1);
 
     // geometry pass initialize
     FGeometryFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, size);
@@ -28,6 +40,7 @@ void GameRenderer::Initialise()
 
     FGeometryCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::GEOMETRY_PASS);
 
+    bgfx::setViewFrameBuffer(RenderPassId::GEOMETRY_PASS, FGeometryFramebuffer->GetHandle());
     bgfx::setViewClear(RenderPassId::GEOMETRY_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 
     // Feedback pass initialize
@@ -39,9 +52,11 @@ void GameRenderer::Initialise()
     FFeedbackFramebuffer->InitFramebuffer();
 
     FFeedbackCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::FEEDBACK_PASS);
+    bgfx::setViewFrameBuffer(RenderPassId::FEEDBACK_PASS, FFeedbackFramebuffer->GetHandle());
     bgfx::setViewClear(RenderPassId::FEEDBACK_PASS, BGFX_CLEAR_COLOR, 0x00000000);
 
     // Combine pass
+    FCombineCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::COMBINE_PASS);
     bgfx::setViewClear(RenderPassId::COMBINE_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 
     bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, size.x, size.y);
@@ -52,8 +67,13 @@ void GameRenderer::Initialise()
 
 void GameRenderer::Shutdown()
 {
+    FGeometryCommandBuffer->clear();
+    FFeedbackCommandBuffer->clear();
+    FCombineCommandBuffer->clear();
+
     Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FGeometryCommandBuffer);
     Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FFeedbackCommandBuffer);
+    Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FCombineCommandBuffer);
 
     delete FGeometryFramebuffer;
     FGeometryFramebuffer = nullptr;
@@ -66,17 +86,64 @@ void GameRenderer::Render()
     // Clear command buffers
     FGeometryCommandBuffer->clear();
     FFeedbackCommandBuffer->clear();
+    FCombineCommandBuffer->clear();
 
     // Resize framebuffers
     auto& size = GLFWDisplayWindowHandler::Instance().GetSize();
     FGeometryFramebuffer->ResizeIFN(size);
     FFeedbackFramebuffer->ResizeIFN(size);
 
+    // Gameplay Camera fetch
+    const float aspectRatio = GLFWDisplayWindowHandler::Instance().AspectRatio();
+
+    Camera* c = CameraManager::Instance().GetCamera(FGameplayCameraId);
+    AssertRelease(c != nullptr);
+
+    Frustum frustum;
+    frustum.InitFromCamera(*c, aspectRatio);
+
+    glm::mat4 view = c->GetWorldViewMatrix();
+    glm::mat4 proj = c->GetProjectionMatrix(aspectRatio);
+
     // Geometry pass
+    FGeometryCommandBuffer->SetViewTranform(view, proj);
+
+    foreachitemconst(gfxRep, GFXRepresentationManager::Instance())
+    {
+        const Carrier* carrier = gfxRep.second->GetCarrier();
+        if (carrier == nullptr)
+            continue;
+
+        const VisualModel* visuals = gfxRep.second->GetVisualModel();
+        if (visuals == nullptr)
+            continue;
+
+        if (Rendering::MeshFrustumCulling::CullMesh(visuals->GetMeshHandle(), carrier->LocalToWorld(), frustum))
+        {
+            FGeometryCommandBuffer->DrawMesh(visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
+        }
+    }
+
+    FGeometryCommandBuffer->Submit();
 
     // feedback pass
+    FFeedbackCommandBuffer->SetViewTranform(view, proj);
+
+    // TODO THIS IS JUST FOR THE LOLS AS OF NOW!! WE SHOULD MAKE THIS BETTER! USE THE SAME TRICK AS FOR CARRIER AND ALL? MAYBE FEEDING DIRECTLY INTO A GLOBAL QUEUE?
+    Rendering::CircleFeedbackParameters params = { GameplayConstants::Colony::ColonyInitialRange, GameplayConstants::Colony::ColonyRangeFeedbackThickness,
+        GameplayConstants::Colony::ColonyRangeFeedbackColor };
+    FFeedbackCommandBuffer->DrawCircle(Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\feedbackmaterial.material"), params);
+    params.Range = params.Range / 2.f;
+    FFeedbackCommandBuffer->DrawCircle(Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\feedbackmaterial.material"), params);
+    FFeedbackCommandBuffer->Submit();
 
     // combine pass
+    MaterialInstanceHandle combineMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\combinepass.material");
+    MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_GeometryTexture", FGeometryFramebuffer->GetTextureHandle(0).idx, 0);
+    MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_FeedbackTexture", FFeedbackFramebuffer->GetTextureHandle(0).idx, 1);
+
+    FCombineCommandBuffer->BlitWithMaterial(combineMaterial);
+    FCombineCommandBuffer->Submit();
 }
 
 } // namespace Rendering
