@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/PoolAllocator.h"
 
 namespace ECSEngine
 {
@@ -24,6 +25,8 @@ enum Type : u8
 
 class FramebufferInstance
 {
+    DECLARE_POOL_ALLOCATED(FramebufferInstance);
+
 public:
     FramebufferInstance(const FramebufferSizeType::Type parSizeType, const glm::vec2 parSize);
     ~FramebufferInstance();
