@@ -30,6 +30,7 @@ public:
     const bgfx::UniformHandle& GetUniform(const std::string& parName, bgfx::UniformType::Enum parType) const;
     const MaterialInstance* GetMaterialInstance(const MaterialInstanceHandle& parHandle) const;
 
+    void SetSamplerUniform(const std::string& parUniformName, const u16& parTextureHandle, const u32 parSlot) const;
     void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parTextureHandle, const u32 parSlot) const;
     void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue) const;
     void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue) const;
@@ -218,6 +219,16 @@ void MaterialManagerSingleton::SetSamplerUniform(const std::string& parUniformNa
     bgfx::setTexture(parSlot, handle, texture->Handle());
 }
 
+void MaterialManagerSingleton::SetSamplerUniform(const std::string& parUniformName, const u16& parTextureHandle, const u32 parSlot) const
+{
+    const bgfx::UniformHandle& handle = MaterialManagerSingleton::Instance().GetUniform(parUniformName, bgfx::UniformType::Sampler);
+    AssertRelease(bgfx::isValid(handle));
+    bgfx::TextureHandle texture;
+    texture.idx = parTextureHandle;
+    AssertRelease(bgfx::isValid(texture));
+    bgfx::setTexture(parSlot, handle, texture);
+}
+
 void MaterialManagerSingleton::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue) const
 {
     const bgfx::UniformHandle& handle = MaterialManagerSingleton::Instance().GetUniform(parUniformName, bgfx::UniformType::Vec4);
@@ -268,6 +279,12 @@ const MaterialInstance* GetMaterialInstance(const MaterialInstanceHandle& parHan
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     return MaterialManagerSingleton::Instance().GetMaterialInstance(parHandle);
+}
+
+void SetSamplerUniform_IKNOWWHATIMDOING(const std::string& parUniformName, const u16& parTextureHandle, const u32 parSlot)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::Instance().SetSamplerUniform(parUniformName, parTextureHandle, parSlot);
 }
 
 void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parTextureHandle, const u32 parSlot)
