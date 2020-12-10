@@ -37,6 +37,9 @@ public:
 
     GFXMessage& GetCurrentQueueForPushingMessage() { return FMessages[1 - FCurrentMessageQueue]; }
 
+    const Carrier* GetCarrier() const { return FCarrier; }
+    const VisualModel* GetVisualModel() const { return FVisualModel; }
+
 private:
     void ProcessMessages();
 
