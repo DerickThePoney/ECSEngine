@@ -26,6 +26,9 @@ public:
         itFind->second->GetCurrentQueueForPushingMessage().PushMessage(parKey, parData, parTime);
     }
 
+    std::map<EntityId, std::unique_ptr<GFXRepresentation>>::const_iterator begin() const { return FGFXRepresentations.begin(); }
+    std::map<EntityId, std::unique_ptr<GFXRepresentation>>::const_iterator end() const { return FGFXRepresentations.end(); }
+
 private:
     std::map<EntityId, std::unique_ptr<GFXRepresentation>> FGFXRepresentations;
 
