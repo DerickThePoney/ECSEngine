@@ -16,10 +16,15 @@ namespace MeshFrustumCulling
 
 bool CullApparenceModule(const ApparenceModule& parApparenceModule, const glm::mat4& parLocalToWorldMatrix, const Frustum& parFrustum)
 {
-    const Rendering::MeshHandle& meshHandle = parApparenceModule.GetMeshHandle();
+    const MeshHandle& meshHandle = parApparenceModule.GetMeshHandle();
     AlwaysCheckedAssert(meshHandle.IsValid());
 
-    const Mesh* mesh = MeshManager::Instance().GetMesh(meshHandle);
+    return CullMesh(meshHandle, parLocalToWorldMatrix, parFrustum);
+}
+
+bool CullMesh(const MeshHandle& parMeshHandle, const glm::mat4& parLocalToWorldMatrix, const Frustum& parFrustum)
+{
+    const Mesh* mesh = MeshManager::Instance().GetMesh(parMeshHandle);
     AssertRelease(mesh != nullptr);
 
     glm::vec4 sphere = mesh->BoundingCircle();
@@ -34,6 +39,7 @@ bool CullApparenceModule(const ApparenceModule& parApparenceModule, const glm::m
 
     return Intersection::FrustumSphereIntersect(parFrustum, sphere);
 }
+
 } // namespace MeshFrustumCulling
 } // namespace Rendering
 } // namespace ECSEngine
