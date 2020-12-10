@@ -1049,13 +1049,103 @@ void DrawCircleCommand::SubmitCommand() const
 
     bgfx::setTransform(&FTransform[0][0]);
 
-    Rendering::RenderingState state;
-    state.PartiallyModifyState(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW | BGFX_STATE_BLEND_ALPHA);
+    Rendering::RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW | BGFX_STATE_BLEND_ALPHA);
     state.ApplyState();
 
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
     Rendering::MaterialManager::SetVec4Uniform("u_circleRadius", glm::vec4(FParams.Range, FParams.Range - FParams.Thickness, 0.f, 0.f));
+
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+}
+
+//----------------------------------------------------------------
+//          BlitWithMaterialCommand
+//----------------------------------------------------------------
+
+class BlitWithMaterialCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(BlitWithMaterialCommand);
+
+public:
+    BlitWithMaterialCommand(const u16 parViewId, const MaterialInstanceHandle& parMaterialInstanceHandle);
+    virtual ~BlitWithMaterialCommand();
+
+    virtual void SubmitCommand() const override;
+
+private:
+    MaterialInstanceHandle FMaterialInstanceHandle;
+};
+
+IMPLEMENT_POOL_ALLOCATED(BlitWithMaterialCommand);
+
+BlitWithMaterialCommand::BlitWithMaterialCommand(const u16 parViewId, const MaterialInstanceHandle& parMaterialInstanceHandle)
+    : IDrawCommand(parViewId)
+    , FMaterialInstanceHandle(parMaterialInstanceHandle)
+{
+}
+
+BlitWithMaterialCommand::~BlitWithMaterialCommand()
+{
+}
+
+void BlitWithMaterialCommand::SubmitCommand() const
+{
+    bgfx::TransientVertexBuffer vertexBuffer;
+    bgfx::TransientIndexBuffer indexBuffer;
+
+    VertexLayoutHash hash;
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_UVS, true);
+    hash.SetUVsNb(1);
+
+    bgfx::VertexLayout layout = GetVertexLayout(hash);
+
+    u32 availableVertices = bgfx::getAvailTransientVertexBuffer(4, layout);
+    AssertRelease(availableVertices == 4);
+    u32 availableIndices = bgfx::getAvailTransientIndexBuffer(6);
+    AssertRelease(availableIndices == 6);
+
+    bgfx::allocTransientBuffers(&vertexBuffer, layout, 4, &indexBuffer, 6);
+
+    VertexDataStream stream(4, hash.GetByteSize(), hash);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.f, -1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, glm::vec2(0.f, 1.f));
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.f, -1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, glm::vec2(1.f, 1.f));
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.f, 1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, glm::vec2(1.f, 0.f));
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.f, 1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, glm::vec2(0.f, 0.f));
+    stream.Advance();
+
+    std::array<u16, 6> indices;
+    indices[0] = 0;
+    indices[1] = 1;
+    indices[2] = 2;
+
+    indices[3] = 0;
+    indices[4] = 2;
+    indices[5] = 3;
+
+    bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
+
+    bx::memCopy(indexBuffer.data, indices.data(), 6 * sizeof(u16));
+
+    bgfx::setVertexBuffer(0, &vertexBuffer, 0, 4, vertexBuffer.layoutHandle);
+    bgfx::setIndexBuffer(&indexBuffer, 0, 6);
+
+    /*Rendering::RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW);
+    state.ApplyState();*/
+
+    const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
+    AssertRelease(instance != nullptr);
 
     bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
 }
@@ -1172,6 +1262,11 @@ void DrawCommandBuffer::DrawCircle(const MaterialInstanceHandle& parMaterialInst
       const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawCircleCommand(FViewId, parParams, parMaterialInstanceHandle, parTransform)));
+}
+
+void DrawCommandBuffer::BlitWithMaterial(const MaterialInstanceHandle& parMaterialInstanceHandle)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new BlitWithMaterialCommand(FViewId, parMaterialInstanceHandle)));
 }
 
 void DrawCommandBuffer::Submit()
