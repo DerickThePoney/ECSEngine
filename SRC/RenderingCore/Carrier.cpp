@@ -18,6 +18,8 @@ void Carrier::Update(const float parCurrentTime)
 {
     FPosition.Update(parCurrentTime);
     FOrientation.Update(parCurrentTime);
+
+    FLocalToWorld = glm::translate(FPosition.GetCurrentValue()) * (glm::mat4)FOrientation.GetCurrentValue();
 }
 
 void Carrier::PushNewKeyframe(const glm::vec3& parNewPosition, const glm::quat& parNewOrientation, const float parTime)
