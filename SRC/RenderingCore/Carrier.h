@@ -19,10 +19,12 @@ public:
 
     const glm::vec3& Position() const { return FPosition.GetCurrentValue(); }
     const glm::quat& Orientation() const { return FOrientation.GetCurrentValue(); }
+    const glm::mat4& LocalToWorld() const { return FLocalToWorld; }
 
 private:
     ValueInterpolator<glm::vec3> FPosition;
     ValueInterpolator<glm::quat> FOrientation;
+    glm::mat4 FLocalToWorld = glm::identity<glm::mat4>();
 };
 } // namespace Rendering
 } // namespace ECSEngine
