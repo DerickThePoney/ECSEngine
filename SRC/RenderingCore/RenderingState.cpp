@@ -13,6 +13,12 @@ RenderingState::RenderingState()
 {
 }
 
+RenderingState::RenderingState(const u64 parInitState)
+    : FRenderingState(parInitState)
+    , FBlendingWeights(0)
+{
+}
+
 RenderingState::~RenderingState()
 {
 }

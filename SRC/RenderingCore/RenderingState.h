@@ -8,6 +8,7 @@ class RenderingState
 {
 public:
     RenderingState();
+    RenderingState(const u64 initState);
     ~RenderingState();
 
     void PartiallyModifyState(const u64 additionalState);
