@@ -21,7 +21,7 @@ EditorGridRenderer::~EditorGridRenderer()
 
 void EditorGridRenderer::Initialise()
 {
-    FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer();
+    FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::EDITOR_PASS);
     FGridMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\editorgridmaterial.material");
     AssertRelease(FGridMaterial.IsValid());
 }
