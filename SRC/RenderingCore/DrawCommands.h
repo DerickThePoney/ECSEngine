@@ -81,6 +81,8 @@ public:
 
     void DrawCircle(const MaterialInstanceHandle& parMaterialInstanceHandle, const CircleFeedbackParameters& parParams, const glm::mat4& parTransform = glm::identity<glm::mat4>());
 
+    void BlitWithMaterial(const MaterialInstanceHandle& parMaterialInstanceHandle);
+
     void Submit();
 
 private:
