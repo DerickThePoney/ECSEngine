@@ -88,6 +88,8 @@ void GameScenarioUpdater::Update()
 
     WorldManager::Instance().ProcessDestroyEntities();
 
+    FRenderingSystem.Update();
+
     Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
     FUserInterfaceSystem.Update();
 
@@ -102,8 +104,6 @@ void GameScenarioUpdater::Render()
     AssertRelease(FScenario != nullptr);
     // FScenario->Render();
 
-    // TODO push that into update when refacto is done
-    FRenderingSystem.Update();
     Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
 
     Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());

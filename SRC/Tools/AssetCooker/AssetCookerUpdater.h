@@ -1,6 +1,5 @@
 #pragma once
 #include "Application/IGameplayUpdater.h"
-#include "Rendering/RenderingSystem.h"
 
 namespace ECSEngine
 {
