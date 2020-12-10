@@ -10,6 +10,7 @@
 #include "IScenarioUpdater.h"
 #include "MovementSystem.h"
 #include "OrientationSystem.h"
+#include "Rendering/GameRenderer.h"
 #include "Rendering/RenderingSystem.h"
 
 namespace ECSEngine
@@ -30,6 +31,8 @@ public:
 
 private:
     SceneScenario* FScenario;
+
+    Rendering::GameRenderer FGameRenderer;
 
     CameraMoverSystem FCameraMoverSystem;
     MovementSystem FMovementSystem;

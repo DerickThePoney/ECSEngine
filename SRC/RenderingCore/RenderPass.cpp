@@ -2,7 +2,13 @@
 
 #include "RenderPass.h"
 
-const char* ECSEngine::Rendering::RenderPassId::GetName(Type parPass)
+namespace ECSEngine
+{
+namespace Rendering
+{
+namespace RenderPassId
+{
+const char* RenderPassId::GetName(Type parPass)
 {
 #define CASE_ENUM_TO_CHAR(NAME)                                                                                                                                                    \
     case NAME:                                                                                                                                                                     \
@@ -21,3 +27,15 @@ const char* ECSEngine::Rendering::RenderPassId::GetName(Type parPass)
         return "UNKNOWN PASS";
     }
 }
+} // namespace RenderPassId
+
+RenderPassDescriptor::RenderPassDescriptor()
+{
+}
+
+RenderPassDescriptor::~RenderPassDescriptor()
+{
+}
+
+} // namespace Rendering
+} // namespace ECSEngine

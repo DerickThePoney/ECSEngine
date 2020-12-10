@@ -13,6 +13,7 @@ enum Type : u16
     SELECTION_BLIT_PASS = 2,
     FEEDBACK_PASS = 3,
     COMBINE_PASS = 4,
+    EDITOR_PASS = 5,
     DEBUG_PASS = 252,
     IMGUI_EDITOR_PASS = 253,
     IMGUI_UI_PASS = 254,
@@ -30,6 +31,11 @@ public:
     ~RenderPassDescriptor();
 
 private:
+    // pass in a frame buffer ?
+    // pass in a material for the whole pass ?
+    // pass in renderstate ?
+    // Filter for objects ?
+    // Culling parameters ?
 };
 
 } // namespace Rendering
