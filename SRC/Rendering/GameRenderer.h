@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/Singleton.h"
 
 namespace ECSEngine
 {
@@ -7,9 +8,15 @@ namespace Rendering
 class FramebufferInstance;
 class DrawCommandBuffer;
 
-class GameRenderer
+class GameRenderer : public Singleton<GameRenderer>
 {
 public:
+    GameRenderer()
+        : Singleton()
+    {
+    }
+    ~GameRenderer() { }
+
     void Initialise();
     void Shutdown();
 

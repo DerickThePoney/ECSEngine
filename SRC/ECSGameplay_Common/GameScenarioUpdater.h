@@ -32,8 +32,6 @@ public:
 private:
     SceneScenario* FScenario;
 
-    Rendering::GameRenderer FGameRenderer;
-
     CameraMoverSystem FCameraMoverSystem;
     MovementSystem FMovementSystem;
     SynchroWithRenderSystem FRenderingSystem;

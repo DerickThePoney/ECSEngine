@@ -31,7 +31,8 @@ GameScenarioUpdater::~GameScenarioUpdater()
 
 void GameScenarioUpdater::Initialise()
 {
-    FGameRenderer.Initialise();
+    Rendering::GameRenderer::CreateIFP();
+    Rendering::GameRenderer::Instance().Initialise();
 
     AssertRelease(FScenario != nullptr);
     FCameraMoverSystem.Init();
@@ -69,7 +70,8 @@ void GameScenarioUpdater::Destroy()
 
     WorldManager::Instance().DestroyAllRemainingEntities();
 
-    FGameRenderer.Shutdown();
+    Rendering::GameRenderer::Instance().Shutdown();
+    Rendering::GameRenderer::Destroy();
 }
 
 void GameScenarioUpdater::Update()
@@ -101,14 +103,11 @@ void GameScenarioUpdater::Update()
 
 void GameScenarioUpdater::Render()
 {
-    AssertRelease(FScenario != nullptr);
-    // FScenario->Render();
-
     Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
 
     Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
 
-    FGameRenderer.Render();
+    Rendering::GameRenderer::Instance().Render();
 
     Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
     u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
