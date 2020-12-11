@@ -17,25 +17,22 @@ GFXRepresentation::GFXRepresentation()
 
 GFXRepresentation::~GFXRepresentation()
 {
-    if (FCarrier != nullptr)
-        delete FCarrier;
-
-    if (FVisualModel != nullptr)
-        delete FVisualModel;
+    FCarrier.reset(nullptr);
+    FVisualModel.reset(nullptr);
 }
 
 void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
 {
     if (parInit.HasCarier)
     {
-        FCarrier = new Carrier();
+        FCarrier.reset(new Carrier());
         AssertRelease(FCarrier != nullptr);
         FCarrier->Init(parInit.FPosition, parInit.FOrientation, parInit.FCurrentTime);
     }
 
     if (parInit.HasVisuals)
     {
-        FVisualModel = new VisualModel();
+        FVisualModel.reset(new VisualModel());
         AssertRelease(FVisualModel != nullptr);
         FVisualModel->Init(parInit.FMaterialFilename, parInit.FMeshFileName);
     }
