@@ -37,15 +37,15 @@ public:
 
     GFXMessage& GetCurrentQueueForPushingMessage() { return FMessages[1 - FCurrentMessageQueue]; }
 
-    const Carrier* GetCarrier() const { return FCarrier; }
-    const VisualModel* GetVisualModel() const { return FVisualModel; }
+    const Carrier* GetCarrier() const { return FCarrier.get(); }
+    const VisualModel* GetVisualModel() const { return FVisualModel.get(); }
 
 private:
     void ProcessMessages();
 
 private:
-    Carrier* FCarrier = nullptr;
-    VisualModel* FVisualModel = nullptr;
+    std::unique_ptr<Carrier> FCarrier = nullptr;
+   std::unique_ptr<VisualModel> FVisualModel = nullptr;
 
     GFXMessage FMessages[2];
     u32 FCurrentMessageQueue = 0;
