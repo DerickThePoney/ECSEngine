@@ -3,6 +3,7 @@
 #include "ColonyPeonsTaskAsignmentSystem.h"
 
 #include "ColonyPeonsManagementModule.h"
+#include "ColonyTraitsModule.h"
 #include "Common/RandomGenerator.h"
 #include "ECSCore/EntityId.h"
 #include "ECSCore/ModuleAccessor.h"
@@ -21,17 +22,19 @@ namespace
 EntityId GetTargetForPeon(const PositionModule& parPeonPositionModule,
       ModuleAccessor<PositionModule>& parResourcesPositionAccessor,
       ModuleAccessor<ResourceStorageModule>& parProducerResourceStorageAccessor,
-      const std::set<EntityId>& parAssignedTargets)
+      const std::set<EntityId>& parAssignedTargets,
+      const float parMaxInfluence)
 {
     EntityId res;
     float closestDistance = std::numeric_limits<float>::max();
+    const float maxInfSq = parMaxInfluence * parMaxInfluence;
     foreachitemconst(position, parResourcesPositionAccessor)
     {
         if (parAssignedTargets.find(position.UnitId()) != parAssignedTargets.end())
             continue;
 
         const float sqDist = glm::length2(glm::xz(parPeonPositionModule.GetPosition3D() - position.GetPosition3D()));
-        if (sqDist < closestDistance)
+        if (sqDist <= (maxInfSq) && sqDist < closestDistance)
         {
             const ResourceStorageModule* storage = parProducerResourceStorageAccessor[position.UnitId()];
             if (storage->GetResourceQuantity(GameResource::LENGTH) > 0)
@@ -50,6 +53,7 @@ ColonyPeonsTaskAssignmentSystem::ColonyPeonsTaskAssignmentSystem()
 {
     // Colony
     RegisterDepency<ColonyPeonsManagementModule>(Worlds::COLONY);
+    RegisterDepency<ColonyTraitsModule>(Worlds::COLONY);
 
     // resource producers
     RegisterDepency<PositionModule>(Worlds::RESOURCE_PROD);
@@ -69,6 +73,7 @@ void ColonyPeonsTaskAssignmentSystem::VirtualUpdate()
     ModuleSystem::VirtualUpdate();
 
     ModuleAccessor<ColonyPeonsManagementModule> colonyPeonsModuleAccessor(Worlds::COLONY);
+    ModuleAccessor<ColonyTraitsModule> colonyTraitsAccessor(Worlds::COLONY);
 
     ModuleAccessor<PositionModule> resourcesPositionModuleAccessor(Worlds::RESOURCE_PROD);
     ModuleAccessor<PositionModule> peonsPositionModuleAccessor(Worlds::PEONS);
@@ -83,6 +88,10 @@ void ColonyPeonsTaskAssignmentSystem::VirtualUpdate()
         unIdlePeons.reserve(idlePeons.size());
         std::set<EntityId> assignedTargets;
 
+        const ColonyTraitsModule* colonyTraitsModule = colonyTraitsAccessor[colonyPeonsModule.UnitId()];
+        AssertRelease(colonyTraitsModule != nullptr);
+        const float maxInfluence = colonyTraitsModule->InfluenceRange();
+
         foreachitemconst(occupiedPeon, colonyPeonsModule.OccupiedPeons())
         {
             const ResourceHarvesterModule* harvesterModule = peonHarvesterAccessor[occupiedPeon];
@@ -94,7 +103,7 @@ void ColonyPeonsTaskAssignmentSystem::VirtualUpdate()
         {
             const PositionModule* peonPositionModule = peonsPositionModuleAccessor[peon];
             AssertRelease(peonPositionModule != nullptr);
-            EntityId newTarget = GetTargetForPeon(*peonPositionModule, resourcesPositionModuleAccessor, producerResourceStorageAccessor, assignedTargets);
+            EntityId newTarget = GetTargetForPeon(*peonPositionModule, resourcesPositionModuleAccessor, producerResourceStorageAccessor, assignedTargets, maxInfluence);
             if (!newTarget.Valid())
                 continue;
 

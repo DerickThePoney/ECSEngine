@@ -4,7 +4,9 @@
 
 #include "Common/CameraManager.h"
 #include "Common/Frustum.h"
+#include "Common/IFeedbackDrawer.h"
 #include "ECSGameplay_Specific/GameplayConstants.h"
+#include "ECSGameplay_Specific/GameplayFeedbackDrawer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/Carrier.h"
 #include "RenderingCore/DrawCommands.h"
@@ -129,12 +131,7 @@ void GameRenderer::Render()
     // feedback pass
     FFeedbackCommandBuffer->SetViewTranform(view, proj);
 
-    // TODO THIS IS JUST FOR THE LOLS AS OF NOW!! WE SHOULD MAKE THIS BETTER! USE THE SAME TRICK AS FOR CARRIER AND ALL? MAYBE FEEDING DIRECTLY INTO A GLOBAL QUEUE?
-    Rendering::CircleFeedbackParameters params = { GameplayConstants::Colony::ColonyInitialRange, GameplayConstants::Colony::ColonyRangeFeedbackThickness,
-        GameplayConstants::Colony::ColonyRangeFeedbackColor };
-    FFeedbackCommandBuffer->DrawCircle(Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\feedbackmaterial.material"), params);
-    params.Range = params.Range / 2.f;
-    FFeedbackCommandBuffer->DrawCircle(Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\feedbackmaterial.material"), params);
+    GameplayFeedbackDrawer::Instance().DrawFeedback(FFeedbackCommandBuffer);
     FFeedbackCommandBuffer->Submit();
 
     // combine pass

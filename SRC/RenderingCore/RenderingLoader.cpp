@@ -3,6 +3,7 @@
 #include "RenderingLoader.h"
 
 #include "BGFXRenderingBackend.h"
+#include "ECSGameplay_Specific/GameplayFeedbackDrawer.h"
 #include "GFXKeyHelper.h"
 #include "GFXRepresentationManager.h"
 #include "GLFWDisplayWindowHandler.h"
@@ -40,12 +41,18 @@ bool RenderingLoader::VirtualInitialise()
 
     Rendering::GFXRepresentationManager::CreateIFP();
 
+    GameplayFeedbackDrawer::CreateIFP();
+    GameplayFeedbackDrawer::Instance().Initialise();
+
     return true;
 }
 
 void RenderingLoader::VirtualShutdown()
 {
     ILoader::VirtualShutdown();
+
+    GameplayFeedbackDrawer::Instance().Shutdown();
+    GameplayFeedbackDrawer::Destroy();
 
     Rendering::GFXRepresentationManager::Destroy();
 

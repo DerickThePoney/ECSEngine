@@ -44,6 +44,7 @@ void GameScenarioUpdater::Initialise()
     FPeonSpawnSystem.Init();
     FPeonLifeSpanSystem.Init();
     FResourceStatsUpdateSystem.Init();
+    FColonyFeedbackSystem.Init();
     FUserInterfaceSystem.Init();
 
     FScenario->Initialise();
@@ -58,6 +59,7 @@ void GameScenarioUpdater::Destroy()
     FScenario = nullptr;
 
     FUserInterfaceSystem.Destroy();
+    FColonyFeedbackSystem.Destroy();
     FResourceStatsUpdateSystem.Destroy();
     FPeonLifeSpanSystem.Destroy();
     FPeonSpawnSystem.Destroy();
@@ -87,6 +89,7 @@ void GameScenarioUpdater::Update()
     FPeonSpawnSystem.Update();
     FPeonLifeSpanSystem.Update();
     FResourceStatsUpdateSystem.Update();
+    FColonyFeedbackSystem.Update();
 
     WorldManager::Instance().ProcessDestroyEntities();
 
