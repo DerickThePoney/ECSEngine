@@ -2,6 +2,7 @@
 
 #include "ResourceCache.h"
 
+#include "../ECSCore/AdjustableDebugParameters.h"
 #include "Resource.h"
 #include "ResourceFile.h"
 #include "ResourceHandle.h"

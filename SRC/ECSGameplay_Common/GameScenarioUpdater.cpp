@@ -7,6 +7,7 @@
 #include "Common/TimeManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
+#include "ImGuiTools/ResourceCacheDebug.h"
 #include "PathfindingManager.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
@@ -117,6 +118,14 @@ void GameScenarioUpdater::Render()
     Camera* camera = CameraManager::Instance().GetCamera(camId);
     buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
     Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showDebugForCacheDebug, false, "show debug", "ResourceCache");
+    if (showDebugForCacheDebug)
+    {
+        bool dummy = showDebugForCacheDebug;
+        ImGUITools::DrawResourceCacheDebug(&dummy);
+    }
+
     Pathfinding::Debug(*buffer, handle);
     FMovementSystem.VisualDebug(*buffer, handle);
     buffer->Submit();
