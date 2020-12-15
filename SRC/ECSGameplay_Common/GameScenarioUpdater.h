@@ -1,5 +1,6 @@
 #pragma once
 #include "CameraMoverSystem.h"
+#include "ECSGameplay_Specific/ColonyFeedbackSystem.h"
 #include "ECSGameplay_Specific/ColonyPeonsTaskAsignmentSystem.h"
 #include "ECSGameplay_Specific/PeonFeedingTimeSystem.h"
 #include "ECSGameplay_Specific/PeonSpawnSystem.h"
@@ -42,6 +43,9 @@ private:
     PeonSpawnSystem FPeonSpawnSystem;
     PeonFeedingTimeSystem FPeonLifeSpanSystem;
     ResourceStatisticsUpdateSystem FResourceStatsUpdateSystem;
+
+    ColonyFeedbackSystem FColonyFeedbackSystem;
+
     UserInterfaceSystem FUserInterfaceSystem;
 };
 } // namespace ECSEngine
