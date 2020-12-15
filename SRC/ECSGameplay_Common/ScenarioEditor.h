@@ -18,6 +18,7 @@ struct WindowsToShow
     bool showBGFXStatistics = false;
     bool showUIStyleEditor = false;
     bool showGameplayRulesEditor = false;
+    bool showResourceCache = false;
 };
 
 struct IOScene

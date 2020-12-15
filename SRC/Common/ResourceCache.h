@@ -36,6 +36,11 @@ public:
 
     const IResourceFile* GetFileSystem() const { return FFileSystem; }
 
+    u32 CacheSize() const { return FCacheSize; }
+    u32 Allocated() const { return FAllocated; }
+
+    const ResourceHandleMap& AllocatedResources() const { return FResources; }
+
 private:
     std::shared_ptr<ResourceHandle> Find(Resource* parResource);
     void Update(std::shared_ptr<ResourceHandle> parHandle);

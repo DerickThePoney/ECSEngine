@@ -18,6 +18,7 @@
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/TexturesManager.h"
+#include "ResourceCacheDebug.h"
 
 namespace ECSEngine
 {
@@ -51,6 +52,8 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
             ImGui::MenuItem("Picking debug", NULL, &options.showPickingDebug);
             ImGui::Separator();
             ImGui::MenuItem("BGFX statistics", NULL, &options.showBGFXStatistics);
+            ImGui::Separator();
+            ImGui::MenuItem("Resource cache debug", NULL, &options.showResourceCache);
             ImGui::EndMenu();
         }
         ImGui::Separator();
@@ -322,6 +325,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showGameplayRulesEditor)
         DrawGameRulesEditor(&parOutWindowsToShow.showGameplayRulesEditor, menuBarHeight.y);
+
+    if (parOutWindowsToShow.showResourceCache)
+        DrawResourceCacheDebug(&parOutWindowsToShow.showResourceCache);
 }
 
 void DrawPlayScenarioWindow(bool& parOutPlayScenario)
