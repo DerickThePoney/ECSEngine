@@ -1,9 +1,12 @@
 #pragma once
+#include "Common/BoundingBox.h"
 
 namespace ECSEngine
 {
 struct WorldGenerationParametersDescriptor
 {
+    AABB2f FWorldBoundingBox;
+
     std::string FColonyTemplateName = "Colony template name";
 
     std::string FFirePlaceTemplateName = "Starting fire place template name";
@@ -19,6 +22,7 @@ struct WorldGenerationParametersDescriptor
 
     SERIALIZE()
     {
+        PROPERTYFIELD(WorldBoundingBox, AABB2f());
         PROPERTYFIELD(ColonyTemplateName, "Colony template name");
         PROPERTYFIELD(FirePlaceTemplateName, "Starting fire place template name");
         PROPERTYFIELD(FoodTemplateName, "Food entity template");
