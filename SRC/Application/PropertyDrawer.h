@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/BoundingBox.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
 #include "SceneItems.h"
@@ -312,6 +313,39 @@ private:
     bool* FProperty = nullptr;
 };
 
+template<>
+class PropertyDrawer<AABB2f>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, AABB2f* parProperty)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+    {
+    }
+
+    void ShowProperty()
+    {
+        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        ImGui::SetNextItemWidth(availableSize.x * 0.4f);
+
+        glm::vec2 min = FProperty->Min();
+        glm::vec2 max = FProperty->Max();
+
+        ImGui::Text(FName.c_str());
+        ImGui::Indent();
+        ImGui::InputFloat2(fmt::format("Min##{}", (void*)FProperty).c_str(), (float*)&min, 2);
+        ImGui::InputFloat2(fmt::format("Max##{}", (void*)FProperty).c_str(), (float*)&max, 2);
+        ImGui::Unindent();
+
+        FProperty->SetMin(min);
+        FProperty->SetMax(max);
+    }
+
+private:
+    std::string FName;
+    AABB2f* FProperty = nullptr;
+};
+
 template<typename T>
 void MakeSimpleProperty(const std::string& parName, T* parProperty)
 {
@@ -350,6 +384,12 @@ void MakePropertyWithLimits(const std::string& parName, T* parProperty, const T&
     {                                                                                                                                                                              \
         PropertyDrawer<glm::vec4> drawer(NAME, &PROPERTY, false, glm::vec4(-1), glm::vec4(-1));                                                                                    \
         drawer.EditColor();                                                                                                                                                        \
+    }
+
+#define EDITOR_PROPERTY_BOUNDING_BOX_2D(NAME, PROPERTY)                                                                                                                            \
+    {                                                                                                                                                                              \
+        PropertyDrawer<AABB2f> drawer(NAME, &PROPERTY);                                                                                                                            \
+        drawer.ShowProperty();                                                                                                                                                     \
     }
 
 template<>

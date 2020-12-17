@@ -30,6 +30,8 @@ void CreateWorldSceneAction::VirtualDrawEditor()
 
     if (ShouldShowEditor())
     {
+        EDITOR_PROPERTY_BOUNDING_BOX_2D("World extents", FWorldParametersDescriptor.FWorldBoundingBox);
+        ImGui::Separator();
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Colony template", FColonyTemplate, FWorldParametersDescriptor.FColonyTemplateName);
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Fire place template", FFirePlaceTemplate, FWorldParametersDescriptor.FFirePlaceTemplateName);
         ImGui::Separator();
@@ -66,8 +68,6 @@ bool CreateWorldSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuff
         // todo specific feedbackrenderer
         Rendering::CircleFeedbackParameters params = { GameplayConstants::Colony::ColonyInitialRange, GameplayConstants::Colony::ColonyRangeFeedbackThickness,
             GameplayConstants::Colony::ColonyRangeFeedbackColor };
-        parCommandBuffer.DrawCircle(Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\feedbackmaterial.material"), params);
-        params.Range = params.Range / 2.f;
         parCommandBuffer.DrawCircle(Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\feedbackmaterial.material"), params);
     }
 
