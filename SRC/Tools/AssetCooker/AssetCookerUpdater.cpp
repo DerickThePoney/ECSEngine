@@ -25,6 +25,9 @@ void AssetCookerUpdater::Initialise()
 
     LOG_COOKING("Retrieve texture files");
     GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.texturebank", FTextureBanksFiles);
+
+    LOG_COOKING("Retrieve shader files");
+    GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.sc", FShaderFiles);
 }
 
 void AssetCookerUpdater::Shutdown()
@@ -55,6 +58,13 @@ void AssetCookerUpdater::Update()
         CookTextures(FTextureBanksFiles);
         const float textureCookingTimings = t.Stop();
         timings.push_back({ "Texture cooking", textureCookingTimings });
+    }
+
+    {
+        Timer t(true);
+        CompileShaders(FShaderFiles);
+        const float shaderCompilingTimings = t.Stop();
+        timings.push_back({ "Shader compiling", shaderCompilingTimings });
     }
 
     foreachitemconst(t, timings) { std::cout << t.first << ": \t" << t.second << " seconds\n"; }

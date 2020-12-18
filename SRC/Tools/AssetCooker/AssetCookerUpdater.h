@@ -32,6 +32,7 @@ private:
     bool FShouldClose;
     std::vector<std::string> FMeshFiles;
     std::vector<std::string> FTextureBanksFiles;
+    std::vector<std::string> FShaderFiles;
 };
 
 class AssetCookerUpdaterWrapper final : public IGameplayUpdater
