@@ -33,23 +33,40 @@ void CookMesh(const std::string& parMeshFile)
 
 void CookMeshes(const std::vector<std::string>& parMeshFiles)
 {
+#if 0
+
+    std::vector<std::thread> threads;
+    threads.reserve(parMeshFiles.size());
+    foreachitemconst(meshFile, parMeshFiles)
+    {
+        LOG_COOKING("Cooking mesh " + meshFile);
+
+        threads.push_back(std::move(std::thread([meshFile] { MeshCooking::CookMesh(meshFile); })));
+    }
+
+    foreachitem(th, threads)
+    {
+        AssertRelease(th.joinable());
+        th.join();
+    }
+#else
     foreachitemconst(meshFile, parMeshFiles)
     {
         LOG_COOKING("Cooking mesh " + meshFile);
 
         MeshCooking::CookMesh(meshFile);
     }
+#endif
 }
 
 namespace TextureCooking
 {
-void CookTexture(const std::string& parCookedTextureName, const Rendering::TextureDescriptor& parTextureDescriptor)
+void CookTexture(const std::string& parCookedTextureName, const Rendering::TextureDescriptor& parTextureDescriptor, PROCESS_INFORMATION& pi)
 {
     std::cout << "cooking " << parTextureDescriptor.TextureFile() << std::endl;
 
     // additional information
     STARTUPINFO si;
-    PROCESS_INFORMATION pi;
 
     // set the size of the structures
     ZeroMemory(&si, sizeof(si));
@@ -87,20 +104,6 @@ void CookTexture(const std::string& parCookedTextureName, const Rendering::Textu
         printf("CreateProcess failed (%d).\n", GetLastError());
         return;
     }
-    // Wait until child process exits.
-    WaitForSingleObject(pi.hProcess, INFINITE);
-
-    // TODO GetExitCodeProcess().
-
-    DWORD exitCode;
-    if (GetExitCodeProcess(pi.hProcess, &exitCode))
-    {
-        std::cout << exitCode << std::endl;
-    }
-
-    // Close process and thread handles.
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
 }
 
 void CookTextureBank(const std::string& parTextureBankFile)
@@ -118,8 +121,30 @@ void CookTextureBank(const std::string& parTextureBankFile)
         cereal::JSONInputArchive ar(isstr);
         ar(NAMEDPROPERTY("TextureBank", textureBank));
     }
+    std::vector<PROCESS_INFORMATION> processes;
+    processes.reserve(textureBank.Descriptors().size());
+    foreachitemconst(textureDesc, textureBank.Descriptors())
+    {
+        processes.push_back(PROCESS_INFORMATION());
+        CookTexture(textureDesc.first, textureDesc.second, processes.back());
+    }
 
-    foreachitemconst(textureDesc, textureBank.Descriptors()) { CookTexture(textureDesc.first, textureDesc.second); }
+    foreachitem(pi, processes)
+    { // Wait until child process exits.
+        WaitForSingleObject(pi.hProcess, INFINITE);
+
+        // TODO GetExitCodeProcess().
+
+        DWORD exitCode;
+        if (GetExitCodeProcess(pi.hProcess, &exitCode))
+        {
+            std::cout << exitCode << std::endl;
+        }
+
+        // Close process and thread handles.
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    }
 }
 } // namespace TextureCooking
 
@@ -134,13 +159,12 @@ void CookTextures(const std::vector<std::string>& parTexturesDescriptorFiles)
 
 namespace ShaderCompiling
 {
-void CompileShader(const std::string& parFileName, int type)
+void CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION& pi)
 {
     std::cout << "Compiling " << parFileName << std::endl;
 
     // additional information
     STARTUPINFO si;
-    PROCESS_INFORMATION pi;
 
     // set the size of the structures
     ZeroMemory(&si, sizeof(si));
@@ -193,25 +217,13 @@ void CompileShader(const std::string& parFileName, int type)
         printf("CreateProcess failed (%d).\n", GetLastError());
         return;
     }
-    // Wait until child process exits.
-    WaitForSingleObject(pi.hProcess, INFINITE);
-
-    // TODO GetExitCodeProcess().
-
-    DWORD exitCode;
-    if (GetExitCodeProcess(pi.hProcess, &exitCode))
-    {
-        std::cout << exitCode << std::endl;
-    }
-
-    // Close process and thread handles.
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
 }
 } // namespace ShaderCompiling
 
 void CompileShaders(const std::vector<std::string>& parShadersFiles)
 {
+    std::vector<PROCESS_INFORMATION> processes;
+    processes.reserve(parShadersFiles.size());
     foreachitemconst(file, parShadersFiles)
     {
         auto pos = file.find_last_of('\\');
@@ -233,7 +245,25 @@ void CompileShaders(const std::vector<std::string>& parShadersFiles)
         if (type == -1)
             continue;
 
-        ShaderCompiling::CompileShader(file, type);
+        processes.push_back(PROCESS_INFORMATION());
+        ShaderCompiling::CompileShader(file, type, processes.back());
+    }
+
+    foreachitem(pi, processes)
+    { // Wait until child process exits.
+        WaitForSingleObject(pi.hProcess, INFINITE);
+
+        // TODO GetExitCodeProcess().
+
+        DWORD exitCode;
+        if (GetExitCodeProcess(pi.hProcess, &exitCode))
+        {
+            std::cout << exitCode << std::endl;
+        }
+
+        // Close process and thread handles.
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
     }
 }
 
