@@ -2,6 +2,7 @@
 
 #include "SpecificGameplaySceneActions.h"
 
+#include "CircularBuildingGrid.h"
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
 #include "GameplayConstants.h"
@@ -80,11 +81,26 @@ void CreateWorldSceneAction::VirtualInitialise(const SceneScenario* parScene)
     FFirePlaceTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FFirePlaceTemplateName);
     FFoodTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FFoodTemplateName);
     FPeonTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FWorldParametersDescriptor.FPeonTemplateName);
+
+    if (CircularBuildingGrid::HasInstance())
+    {
+        CircularBuildingGrid::Instance().Shutdown();
+    }
+    else
+    {
+        CircularBuildingGrid::CreateIFP();
+    }
+    CircularBuildingGrid::Instance().Initialise();
 }
 
 void CreateWorldSceneAction::VirtualShutdown()
 {
     parent_type::VirtualShutdown();
+    if (CircularBuildingGrid::HasInstance())
+    {
+        CircularBuildingGrid::Instance().Shutdown();
+        CircularBuildingGrid::Destroy();
+    }
 }
 
 void CreateWorldSceneAction::VirtualStart()
