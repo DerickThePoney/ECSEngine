@@ -56,7 +56,7 @@ void CircularBuildingGrid::CreateNewGridChunk()
 
     chunk.Index = gridChunkIndex;
 
-    chunk.GridCells = new CircularGridCell[chunk.CellNumber];
+    chunk.GridCells.resize(chunk.CellNumber);
 
     forrange(i, 0, chunk.CellNumber)
     {

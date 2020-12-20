@@ -24,9 +24,7 @@ private:
     };
     struct CircularGridChunk
     {
-        ~CircularGridChunk() { delete[] GridCells; }
-
-        CircularGridCell* GridCells = nullptr;
+        std::vector<CircularGridCell> GridCells;
         float ActualArcLength = 0;
         u32 CellNumber = 0;
         u32 Index = 0;
