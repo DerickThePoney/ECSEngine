@@ -7,6 +7,7 @@
 #include "ECSGameplay_Common/PositionModule.h"
 #include "GameplayConstants.h"
 #include "GameplayFeedbackDrawer.h"
+#include "CircularBuildingGrid.h"
 
 namespace ECSEngine
 {
@@ -32,6 +33,11 @@ void ColonyFeedbackSystem::VirtualUpdate()
         GameplayFeedbackDrawer::Instance().AddCircle(
               { traits.InfluenceRange(), GameplayConstants::Colony::ColonyRangeFeedbackThickness, GameplayConstants::Colony::ColonyRangeFeedbackColor },
               glm::translate(colonyPositionModule->GetPosition3D()));
+    }
+
+    if (CircularBuildingGrid::HasInstance())
+    {
+        CircularBuildingGrid::Instance().DrawFeedback();
     }
 }
 

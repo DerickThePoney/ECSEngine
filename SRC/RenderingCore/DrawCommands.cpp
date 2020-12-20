@@ -1060,6 +1060,126 @@ void DrawCircleCommand::SubmitCommand() const
 }
 
 //----------------------------------------------------------------
+//          DrawCircularChunkCommand
+//----------------------------------------------------------------
+
+class DrawCircularChunkCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(DrawCircularChunkCommand);
+
+public:
+    DrawCircularChunkCommand(const u16 parViewId,
+          const float parInnerCircleRadius,
+          const float parOuterCircleRadius,
+          const float parThickness,
+          const u32 parColor,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const glm::mat4 parTransform = glm::identity<glm::mat4>());
+    virtual ~DrawCircularChunkCommand();
+
+    virtual void SubmitCommand() const override;
+
+private:
+    float FInnerCircleRadius;
+    float FOuterCircleRadius;
+    float FThickness;
+    u32 FColor;
+    glm::mat4 FTransform;
+    MaterialInstanceHandle FMaterialInstanceHandle;
+};
+
+IMPLEMENT_POOL_ALLOCATED(DrawCircularChunkCommand);
+
+DrawCircularChunkCommand::DrawCircularChunkCommand(const u16 parViewId,
+      const float parInnerCircleRadius,
+      const float parOuterCircleRadius,
+      const float parThickness,
+      const u32 parColor,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::mat4 parTransform /*= glm::identity<glm::mat4>()*/)
+    : IDrawCommand(parViewId)
+    , FInnerCircleRadius(parInnerCircleRadius)
+    , FOuterCircleRadius(parOuterCircleRadius)
+    , FThickness(parThickness)
+    , FColor(parColor)
+    , FTransform(parTransform)
+    , FMaterialInstanceHandle(parMaterialInstanceHandle)
+{
+    AlwaysCheckedAssert(FOuterCircleRadius > FInnerCircleRadius);
+}
+
+DrawCircularChunkCommand::~DrawCircularChunkCommand()
+{
+}
+
+void DrawCircularChunkCommand::SubmitCommand() const
+{
+    bgfx::TransientVertexBuffer vertexBuffer;
+    bgfx::TransientIndexBuffer indexBuffer;
+
+    VertexLayoutHash hash;
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
+    hash.SetColorsNb(1);
+
+    bgfx::VertexLayout layout = GetVertexLayout(hash);
+
+    u32 availableVertices = bgfx::getAvailTransientVertexBuffer(4, layout);
+    AssertRelease(availableVertices == 4);
+    u32 availableIndices = bgfx::getAvailTransientIndexBuffer(6);
+    AssertRelease(availableIndices == 6);
+
+    bgfx::allocTransientBuffers(&vertexBuffer, layout, 4, &indexBuffer, 6);
+
+    const float effectiveRange = FOuterCircleRadius * 1.1f;
+
+    VertexDataStream stream(4, hash.GetByteSize(), hash);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    stream.Advance();
+
+    std::array<u16, 6> indices;
+    indices[0] = 0;
+    indices[1] = 1;
+    indices[2] = 2;
+
+    indices[3] = 0;
+    indices[4] = 2;
+    indices[5] = 3;
+
+    bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
+
+    bx::memCopy(indexBuffer.data, indices.data(), 6 * sizeof(u16));
+
+    bgfx::setVertexBuffer(0, &vertexBuffer, 0, 4, vertexBuffer.layoutHandle);
+    bgfx::setIndexBuffer(&indexBuffer, 0, 6);
+
+    bgfx::setTransform(&FTransform[0][0]);
+
+    Rendering::RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW | BGFX_STATE_BLEND_ALPHA);
+    state.ApplyState();
+
+    const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
+    AssertRelease(instance != nullptr);
+    Rendering::MaterialManager::SetVec4Uniform(
+          "u_innerOuterCircles", glm::vec4(FInnerCircleRadius + 0.5f * FThickness, FInnerCircleRadius, FOuterCircleRadius, FOuterCircleRadius - 0.5f * FThickness));
+
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+}
+
+//----------------------------------------------------------------
 //          BlitWithMaterialCommand
 //----------------------------------------------------------------
 
@@ -1262,6 +1382,17 @@ void DrawCommandBuffer::DrawCircle(const MaterialInstanceHandle& parMaterialInst
       const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawCircleCommand(FViewId, parParams, parMaterialInstanceHandle, parTransform)));
+}
+
+void DrawCommandBuffer::DrawCircularChunk(const float parInnerCircleRadius,
+      const float parOuterCircleRadius,
+      const float parThickness,
+      const u32 parColor,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::mat4 parTransform /*= glm::identity<glm::mat4>()*/)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
+          new DrawCircularChunkCommand(FViewId, parInnerCircleRadius, parOuterCircleRadius, parThickness, parColor, parMaterialInstanceHandle, parTransform)));
 }
 
 void DrawCommandBuffer::BlitWithMaterial(const MaterialInstanceHandle& parMaterialInstanceHandle)

@@ -19,6 +19,7 @@ public:
     void Initialise();
     void Shutdown();
     void AddCircle(const Rendering::CircleFeedbackParameters& parCircleParameters, const glm::mat4& parTransform);
+    void AddGridChunk(const float parInnerCircleRadius, const float parOuterCircleRadius, float parThickness, const u32 parColor);
 
 protected:
     virtual void VirtualDrawFeedback(Rendering::DrawCommandBuffer* parCommandBuffer) override;
@@ -32,6 +33,16 @@ private:
 
     std::vector<Circle> FCircles;
     Rendering::MaterialInstanceHandle FCircleMaterial;
+
+    struct GridChunk
+    {
+        float InnerCircleRadius;
+        float OuterCircleRadius;
+        float Thickness;
+        u32 Color;
+    };
+    std::vector<GridChunk> FGridChunks;
+    Rendering::MaterialInstanceHandle FGridChunkMaterial;
 
     std::mutex FMutex;
 };
