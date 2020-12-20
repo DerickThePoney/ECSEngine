@@ -47,10 +47,11 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
     FDrawCommandBuffer->SetDebugMarker("Editor rendering");
 
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
 
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
-    FDrawCommandBuffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(float(windowSize.x) / float(windowSize.y)));
+    FDrawCommandBuffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(aspectRatio));
 
     AssertRelease(parScene != nullptr);
     const SceneItemsContainer& sceneItems = parScene->GetSceneItems();
