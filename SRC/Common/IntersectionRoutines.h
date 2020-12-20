@@ -1,6 +1,7 @@
 #pragma once
 #include "Ray.h"
 #include "Segment.h"
+#include "Plane.h"
 
 namespace ECSEngine
 {
@@ -31,6 +32,8 @@ bool RayPolygonClosestIntersection2D(const Ray2D& parRay,
       const bool parDoNotConsiderRayOrigin,
       LinearComponentIntersection& outIntersection,
       u32& outClosestEdgeIndex);
+bool RayPlaneIntersection3D(const Ray3D& parRay, const Plane& parPlane, float& outIntersection);
+
 bool PointInTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint, const bool parStrictlyInside = false);
 bool FrustumSphereIntersect(const Frustum& parFrustum, const glm::vec4& parSphere);
 } // namespace Intersection

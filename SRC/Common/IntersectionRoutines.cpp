@@ -208,6 +208,19 @@ bool RayPolygonClosestIntersection2D(const Ray2D& parRay,
     return result;
 }
 
+bool RayPlaneIntersection3D(const Ray3D& parRay, const Plane& parPlane, float& outIntersection)
+{
+    const float rndotpn = glm::dot(parRay.FDirection, parPlane.Normal);
+    if (std::abs(rndotpn) < 1e-3)
+    {
+        outIntersection = -1.f;
+        return false;
+    }
+
+    outIntersection = glm::dot((parPlane.Position - parRay.FOrigin), parPlane.Normal) / rndotpn;
+    return outIntersection >= 0.f;
+}
+
 bool FrustumSphereIntersect(const Frustum& parFrustum, const glm::vec4& parSphere)
 {
     MemoryView<const glm::vec4> frustumPlane = parFrustum.GetPlanes();
