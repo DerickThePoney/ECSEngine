@@ -2,6 +2,7 @@
 
 #include "CircularBuildingGrid.h"
 
+#include "Common/AngleRange.h"
 #include "Common/ColorUtils.h"
 #include "GameplayConstants.h"
 #include "GameplayFeedbackDrawer.h"
@@ -19,16 +20,59 @@ void CircularBuildingGrid::Shutdown()
     FChunks.clear();
 }
 
-void CircularBuildingGrid::DrawFeedback()
+void CircularBuildingGrid::DrawFeedback() const
 {
     const u32 color = ColorUtils::ConvertToU32(GameplayConstants::CircularBuildingGrid::GridFeedbackColor);
-    foreachitem(chunk, FChunks)
+    foreachitemconst(chunk, FChunks)
     {
         const float chunkRadius = GetRadiusForChunk(chunk.Index);
         const float innerRadius = chunkRadius - 0.5f * GameplayConstants::CircularBuildingGrid::GridChunkWidth;
         const float outerRadius = chunkRadius + 0.5f * GameplayConstants::CircularBuildingGrid::GridChunkWidth;
-        GameplayFeedbackDrawer::Instance().AddGridChunk(innerRadius, outerRadius, GameplayConstants::CircularBuildingGrid::GridChunkFeedbackThickness, color);
+        GameplayFeedbackDrawer::Instance().AddGridChunk(innerRadius, outerRadius, GameplayConstants::CircularBuildingGrid::GridChunkFeedbackThickness, chunk.ActualArcAngle, color);
     }
+}
+
+CircularGridAccessor CircularBuildingGrid::GetAccessorForWorldPosition(const glm::vec3& parWorldPosition) const
+{
+    glm::vec2 worldPos2D = glm::xz(parWorldPosition);
+    const float distanceToCenter = glm::length(worldPos2D);
+
+    // detect chunk
+    foreachitemconst(chunk, FChunks)
+    {
+        const float radius = GetRadiusForChunk(chunk.Index);
+        const float minR = radius - 0.5f * GameplayConstants::CircularBuildingGrid::GridChunkWidth;
+        const float maxR = radius + 0.5f * GameplayConstants ::CircularBuildingGrid::GridChunkWidth;
+
+        // we are less than the current chunk, abort
+        if (distanceToCenter < minR)
+            break;
+
+        // we are further than the current chunk, continue
+        if (distanceToCenter > maxR)
+            continue;
+
+        // We are in this circular chunk
+        // now actually get the input angle
+        float inputAngle = glm::atan2(worldPos2D.y, worldPos2D.x);
+        if (inputAngle < 0.f)
+            inputAngle += 2.f * glm::pi<float>();
+
+        foreachitemconst(cell, chunk.GridCells)
+        {
+            AngleRange cellAngleRange(GetCellAngleRange(cell.index, chunk.ActualArcAngle));
+
+            if (!cellAngleRange.Contains(inputAngle))
+                continue;
+
+            const float centerAngle = GetCellCenterAngle(cell.index, chunk.ActualArcAngle);
+            const glm::vec3 cellPosition = glm::vec3(radius * glm::cos(centerAngle), parWorldPosition.y, radius * glm::sin(centerAngle));
+            return CircularGridAccessor(cellPosition, true);
+        }
+        AssertNotReached();
+    }
+
+    return CircularGridAccessor();
 }
 
 void CircularBuildingGrid::CreateNewGridChunk()
@@ -49,10 +93,10 @@ void CircularBuildingGrid::CreateNewGridChunk()
 
     // round the cell number and compute the actual arclength using this number
     chunk.CellNumber = (u32)std::roundf(nbSubdiv);
-    chunk.ActualArcLength = 2.0f * glm::pi<float>() / chunk.CellNumber;
+    chunk.ActualArcAngle = 2.0f * glm::pi<float>() / chunk.CellNumber;
 
     AssertRelease(chunk.CellNumber != 0);
-    AssertRelease(chunk.ActualArcLength != 0);
+    AssertRelease(chunk.ActualArcAngle != 0);
 
     chunk.Index = gridChunkIndex;
 
@@ -69,6 +113,23 @@ float CircularBuildingGrid::GetRadiusForChunk(const u32 parChunkIndex) const
 {
     return GameplayConstants::CircularBuildingGrid::GridStartRadius + parChunkIndex * GameplayConstants::CircularBuildingGrid::GridChunkWidth +
           parChunkIndex * GameplayConstants::CircularBuildingGrid::InterChunkLength + 0.5f * GameplayConstants::CircularBuildingGrid::GridChunkWidth;
+}
+
+float CircularBuildingGrid::GetCellCenterAngle(const u32 parIndex, const float parCellAngleRange) const
+{
+    return parIndex * parCellAngleRange;
+}
+
+std::pair<float, float> CircularBuildingGrid::GetCellAngleRange(const u32 parIndex, float parCellAngleRange) const
+{
+    const float centerAngle = GetCellCenterAngle(parIndex, parCellAngleRange);
+    return { centerAngle - 0.5f * parCellAngleRange, centerAngle + 0.5f * parCellAngleRange };
+}
+
+CircularGridAccessor::CircularGridAccessor(const glm::vec3 parGridCellPosition, const bool parValid)
+    : FGridCellPosition(parGridCellPosition)
+    , FValid(parValid)
+{
 }
 
 } // namespace ECSEngine
