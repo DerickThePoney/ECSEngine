@@ -8,6 +8,7 @@ namespace Rendering
 class MeshHandle;
 class MaterialInstanceHandle;
 struct CircleFeedbackParameters;
+struct CircularGridChunkFeedbackParameters;
 
 //----------------------------------------------------------------
 //          IDrawCommand
@@ -81,10 +82,7 @@ public:
 
     void DrawCircle(const MaterialInstanceHandle& parMaterialInstanceHandle, const CircleFeedbackParameters& parParams, const glm::mat4& parTransform = glm::identity<glm::mat4>());
 
-    void DrawCircularChunk(const float parInnerCircleRadius,
-          const float parOuterCircleRadius,
-          const float parThickness,
-          const u32 parColor,
+    void DrawCircularChunk(const CircularGridChunkFeedbackParameters& parParameters,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
           const glm::mat4 parTransform = glm::identity<glm::mat4>());
 

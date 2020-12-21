@@ -19,7 +19,8 @@ public:
     void Initialise();
     void Shutdown();
     void AddCircle(const Rendering::CircleFeedbackParameters& parCircleParameters, const glm::mat4& parTransform);
-    void AddGridChunk(const float parInnerCircleRadius, const float parOuterCircleRadius, float parThickness, const u32 parColor);
+    void AddAABB(const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor, const glm::mat4& parTransform, bool parAsCubes);
+    void AddGridChunk(const float parInnerCircleRadius, const float parOuterCircleRadius, const float parThickness, const float parArcAngle, const u32 parColor);
 
 protected:
     virtual void VirtualDrawFeedback(Rendering::DrawCommandBuffer* parCommandBuffer) override;
@@ -34,15 +35,20 @@ private:
     std::vector<Circle> FCircles;
     Rendering::MaterialInstanceHandle FCircleMaterial;
 
-    struct GridChunk
-    {
-        float InnerCircleRadius;
-        float OuterCircleRadius;
-        float Thickness;
-        u32 Color;
-    };
-    std::vector<GridChunk> FGridChunks;
+    std::vector<Rendering::CircularGridChunkFeedbackParameters> FGridChunks;
     Rendering::MaterialInstanceHandle FGridChunkMaterial;
+
+    struct AABB
+    {
+        glm::vec3 Min;
+        glm::vec3 Max;
+        u32 Color;
+        glm::mat4 FTransfrom;
+        bool AsCube;
+    };
+    std::vector<AABB> FAABB;
+
+    Rendering::MaterialInstanceHandle FVertexColorMaterial;
 
     std::mutex FMutex;
 };
