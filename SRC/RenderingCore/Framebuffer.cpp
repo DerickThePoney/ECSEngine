@@ -32,6 +32,7 @@ bool FramebufferInstance::ShouldResizeWithScreen() const
 void FramebufferInstance::InitFramebuffer()
 {
     FFramebufferHandle = bgfx::createFrameBuffer((u8)FAttachments.size(), FAttachments.data(), true);
+    AssertRelease(bgfx::isValid(FFramebufferHandle));
 }
 
 void FramebufferInstance::Destroy()
@@ -69,10 +70,10 @@ void FramebufferInstance::AddAttachement(bool parHasMips,
     FAttachments[idx].init(handle, parAccess, parLayer, parMip);
 }
 
-void FramebufferInstance::ResizeIFN(const glm::uvec2 parNewSize)
+bool FramebufferInstance::ResizeIFN(const glm::uvec2 parNewSize)
 {
     if (!ShouldResizeWithScreen() || parNewSize == FSize)
-        return;
+        return false;
 
     SetSize(parNewSize);
     std::vector<FBAttachmentInfos> attachementsInfos = FFBAttachementsInfos;
@@ -80,6 +81,7 @@ void FramebufferInstance::ResizeIFN(const glm::uvec2 parNewSize)
 
     foreachitemconst(att, attachementsInfos) { AddAttachement(att.parHasMips, att.parNumLayers, att.parFormat, att.parFlags, att.parAccess, att.parLayer, att.parHasMips); }
     InitFramebuffer();
+    return true;
 }
 
 const bgfx::TextureHandle FramebufferInstance::GetTextureHandle(u32 parAttachment)

@@ -46,7 +46,7 @@ public:
           u16 parLayer = 0,
           u16 parMip = 0);
 
-    void ResizeIFN(const glm::uvec2 parNewSize);
+    bool ResizeIFN(const glm::uvec2 parNewSize);
 
     const bgfx::TextureHandle GetTextureHandle(u32 parAttachment);
     const bgfx::FrameBufferHandle GetHandle() const { return FFramebufferHandle; }
