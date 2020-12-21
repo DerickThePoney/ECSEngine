@@ -3,7 +3,11 @@
 #include "EditorSceneRenderer.h"
 
 #include "Application/SceneScenario.h"
+#include "Common/CameraHelpers.h"
 #include "Common/CameraManager.h"
+#include "Common/InputManager.h"
+#include "Common/IntersectionRoutines.h"
+#include "Common/Plane.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -83,6 +87,14 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
 
     std::vector<std::shared_ptr<ISceneAction>> sceneActions = parScene->GetSceneActions();
     foreachitem(sceneAction, sceneActions) { sceneAction->DrawInSceneEditor(*FDrawCommandBuffer, FHandleMaterial); }
+
+    bool foundPos = false;
+    glm::vec3 mouseWorldPosition = GetWorldPositionFromScreenPosition(*camera, aspectRatio, windowSize, Input::GetMousePosition(), foundPos);
+
+    if (foundPos)
+    {
+        FDrawCommandBuffer->DrawAABBAsCube(FHandleMaterial, mouseWorldPosition + glm::vec3(-0.1f), mouseWorldPosition + glm::vec3(0.1f), 0xFF00FFFF);
+    }
 
     FDrawCommandBuffer->Submit();
 }

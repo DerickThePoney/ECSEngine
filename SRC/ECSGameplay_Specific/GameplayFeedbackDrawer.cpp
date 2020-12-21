@@ -16,6 +16,9 @@ void GameplayFeedbackDrawer::Initialise()
 
     FGridChunkMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\circulargridchunk.material");
     AssertRelease(FGridChunkMaterial.IsValid());
+
+    FVertexColorMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+    AssertRelease(FVertexColorMaterial.IsValid());
 }
 
 void GameplayFeedbackDrawer::Shutdown()
@@ -28,10 +31,16 @@ void GameplayFeedbackDrawer::AddCircle(const Rendering::CircleFeedbackParameters
     FCircles.push_back({ parCircleParameters, parTransform });
 }
 
-void GameplayFeedbackDrawer::AddGridChunk(const float parInnerCircleRadius, const float parOuterCircleRadius, float parThickness, const u32 parColor)
+void GameplayFeedbackDrawer::AddAABB(const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor, const glm::mat4& parTransform, bool parAsCubes)
 {
     std::scoped_lock<std::mutex> lock(FMutex);
-    FGridChunks.push_back({ parInnerCircleRadius, parOuterCircleRadius, parThickness, parColor });
+    FAABB.push_back({ parMin, parMax, parColor, parTransform, parAsCubes });
+}
+
+void GameplayFeedbackDrawer::AddGridChunk(const float parInnerCircleRadius, const float parOuterCircleRadius, const float parThickness, const float parArcAngle, const u32 parColor)
+{
+    std::scoped_lock<std::mutex> lock(FMutex);
+    FGridChunks.push_back({ parInnerCircleRadius, parOuterCircleRadius, parThickness, parArcAngle, parColor });
 }
 
 void GameplayFeedbackDrawer::VirtualDrawFeedback(Rendering::DrawCommandBuffer* parCommandBuffer)
@@ -45,11 +54,19 @@ void GameplayFeedbackDrawer::VirtualDrawFeedback(Rendering::DrawCommandBuffer* p
 
     // grid chunks
     AssertRelease(FGridChunkMaterial.IsValid());
-    foreachitemconst(gridChunk, FGridChunks)
-    {
-        parCommandBuffer->DrawCircularChunk(gridChunk.InnerCircleRadius, gridChunk.OuterCircleRadius, gridChunk.Thickness, gridChunk.Color, FGridChunkMaterial);
-    }
+    foreachitemconst(gridChunk, FGridChunks) { parCommandBuffer->DrawCircularChunk(gridChunk, FGridChunkMaterial); }
     FGridChunks.clear();
+
+    // aabbs
+    AssertRelease(FVertexColorMaterial.IsValid());
+    foreachitemconst(aabb, FAABB)
+    {
+        if (aabb.AsCube)
+            parCommandBuffer->DrawAABBAsCube(FVertexColorMaterial, aabb.Min, aabb.Max, aabb.Color);
+        else
+            parCommandBuffer->DrawAABB(FVertexColorMaterial, aabb.Min, aabb.Max, aabb.Color);
+    }
+    FAABB.clear();
 }
 
 } // namespace ECSEngine
