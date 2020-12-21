@@ -44,7 +44,6 @@
 #include <glm/ext/vector_uint2.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/vec_swizzle.hpp>
-#include <glm/gtx/compatibility.hpp>
 
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/binary.hpp>
