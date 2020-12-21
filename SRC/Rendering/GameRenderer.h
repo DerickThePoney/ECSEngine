@@ -23,6 +23,9 @@ public:
     void Render();
 
 private:
+    void SetViewFramebuffers(const glm::uvec2 parSize);
+
+private:
     u32 FGameplayCameraId = -1;
 
     FramebufferInstance* FGeometryFramebuffer = nullptr;

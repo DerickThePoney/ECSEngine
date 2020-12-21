@@ -42,7 +42,6 @@ void GameRenderer::Initialise()
 
     FGeometryCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::GEOMETRY_PASS);
 
-    bgfx::setViewFrameBuffer(RenderPassId::GEOMETRY_PASS, FGeometryFramebuffer->GetHandle());
     bgfx::setViewClear(RenderPassId::GEOMETRY_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 
     // Feedback pass initialize
@@ -54,17 +53,24 @@ void GameRenderer::Initialise()
     FFeedbackFramebuffer->InitFramebuffer();
 
     FFeedbackCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::FEEDBACK_PASS);
-    bgfx::setViewFrameBuffer(RenderPassId::FEEDBACK_PASS, FFeedbackFramebuffer->GetHandle());
     bgfx::setViewClear(RenderPassId::FEEDBACK_PASS, BGFX_CLEAR_COLOR, 0x00000000);
 
     // Combine pass
     FCombineCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::COMBINE_PASS);
     bgfx::setViewClear(RenderPassId::COMBINE_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 
-    bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, size.x, size.y);
-    bgfx::setViewRect(RenderPassId::FEEDBACK_PASS, 0, 0, size.x, size.y);
-    bgfx::setViewRect(RenderPassId::COMBINE_PASS, 0, 0, size.x, size.y);
-    bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, size.x, size.y);
+    SetViewFramebuffers(size);
+}
+
+void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
+{
+    bgfx::setViewFrameBuffer(RenderPassId::GEOMETRY_PASS, FGeometryFramebuffer->GetHandle());
+    bgfx::setViewFrameBuffer(RenderPassId::FEEDBACK_PASS, FFeedbackFramebuffer->GetHandle());
+
+    bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, parSize.x, parSize.y);
+    bgfx::setViewRect(RenderPassId::FEEDBACK_PASS, 0, 0, parSize.x, parSize.y);
+    bgfx::setViewRect(RenderPassId::COMBINE_PASS, 0, 0, parSize.x, parSize.y);
+    bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, parSize.x, parSize.y);
 }
 
 void GameRenderer::Shutdown()
@@ -92,8 +98,11 @@ void GameRenderer::Render()
 
     // Resize framebuffers
     auto& size = GLFWDisplayWindowHandler::Instance().GetSize();
-    FGeometryFramebuffer->ResizeIFN(size);
-    FFeedbackFramebuffer->ResizeIFN(size);
+    bool hasResized = FGeometryFramebuffer->ResizeIFN(size);
+    hasResized = hasResized || FFeedbackFramebuffer->ResizeIFN(size);
+
+    if (hasResized)
+        SetViewFramebuffers(size);
 
     // Gameplay Camera fetch
     const float aspectRatio = GLFWDisplayWindowHandler::Instance().AspectRatio();
