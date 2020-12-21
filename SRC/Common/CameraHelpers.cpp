@@ -3,6 +3,8 @@
 #include "CameraHelpers.h"
 
 #include "Camera.h"
+#include "IntersectionRoutines.h"
+#include "Plane.h"
 
 namespace ECSEngine
 {
@@ -22,6 +24,26 @@ Ray3D GetCameraRayFromMouseInput(const Camera& parCamera, const float parAspectR
     const glm::vec3 pickAt = viewWorldMatrix * pickAtH / pickAtH.w;
 
     return Ray3D(pickEye, glm::normalize(pickAt - pickEye));
+}
+
+glm::vec3 GetWorldPositionFromScreenPosition(const Camera& parCamera,
+      const float parAspectRatio,
+      const glm::uvec2 parWindowSize,
+      const glm::vec2 parMousePosition,
+      bool& outInWorld)
+{
+    Ray3D r = GetCameraRayFromMouseInput(parCamera, parAspectRatio, parWindowSize, parMousePosition);
+    Plane p{ glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f) };
+
+    float inter = -1.f;
+    outInWorld = false;
+    if (Intersection::RayPlaneIntersection3D(r, p, inter))
+    {
+        const glm::vec3 posInter = r.FOrigin + r.FDirection * inter;
+        outInWorld = true;
+        return posInter;
+    }
+    return glm::vec3(0.f);
 }
 
 } // namespace ECSEngine
