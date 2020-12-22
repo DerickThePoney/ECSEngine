@@ -6,13 +6,20 @@ namespace ECSEngine
 class CircularGridAccessor
 {
 public:
-    CircularGridAccessor(const glm::vec3 parGridCellPosition = glm::vec3(0.f), const bool parValid = false);
+    CircularGridAccessor();
+    CircularGridAccessor(const glm::vec3 parGridCellPosition, const u32 parChunkId, const u32 parCellId);
 
     bool Valid() const { return FValid; }
     glm::vec3 CellPosition() const { return FGridCellPosition; }
+    bool IsFree() const;
+
+    u32 ChunkId() const { return FChunkId; }
+    u32 CellId() const { return FCellId; }
 
 private:
     glm::vec3 FGridCellPosition = glm::vec3(0.f);
+    u32 FChunkId = -1;
+    u32 FCellId = -1;
     bool FValid = false;
 };
 
@@ -25,6 +32,7 @@ public:
     void DrawFeedback() const;
 
     CircularGridAccessor GetAccessorForWorldPosition(const glm::vec3& parWorldPosition) const;
+    bool IsPositionFree(const u32 parChunkId, const u32 parCellId) const;
 
 private:
     void CreateNewGridChunk();
@@ -35,8 +43,8 @@ private:
 private:
     struct CircularGridCell
     {
-        u32 index = 0;
-        bool occupied = false;
+        u32 Index = 0;
+        bool Occupied = false;
     };
     struct CircularGridChunk
     {
