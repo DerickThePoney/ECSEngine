@@ -60,19 +60,27 @@ CircularGridAccessor CircularBuildingGrid::GetAccessorForWorldPosition(const glm
 
         foreachitemconst(cell, chunk.GridCells)
         {
-            AngleRange cellAngleRange(GetCellAngleRange(cell.index, chunk.ActualArcAngle));
+            AngleRange cellAngleRange(GetCellAngleRange(cell.Index, chunk.ActualArcAngle));
 
             if (!cellAngleRange.Contains(inputAngle))
                 continue;
 
-            const float centerAngle = GetCellCenterAngle(cell.index, chunk.ActualArcAngle);
+            const float centerAngle = GetCellCenterAngle(cell.Index, chunk.ActualArcAngle);
             const glm::vec3 cellPosition = glm::vec3(radius * glm::cos(centerAngle), parWorldPosition.y, radius * glm::sin(centerAngle));
-            return CircularGridAccessor(cellPosition, true);
+            return CircularGridAccessor(cellPosition, chunk.Index, cell.Index);
         }
         AssertNotReached();
     }
 
     return CircularGridAccessor();
+}
+
+bool CircularBuildingGrid::IsPositionFree(const u32 parChunkId, const u32 parCellId) const
+{
+    AssertRelease(parChunkId < FChunks.size());
+    const CircularGridChunk& chunk = FChunks[parChunkId];
+    AssertRelease(parCellId < chunk.CellNumber);
+    return !chunk.GridCells[parCellId].Occupied;
 }
 
 void CircularBuildingGrid::CreateNewGridChunk()
@@ -105,7 +113,7 @@ void CircularBuildingGrid::CreateNewGridChunk()
     forrange(i, 0, chunk.CellNumber)
     {
         CircularGridCell& cell = chunk.GridCells[i];
-        cell.index = (u32)i;
+        cell.Index = (u32)i;
     }
 }
 
@@ -126,10 +134,24 @@ std::pair<float, float> CircularBuildingGrid::GetCellAngleRange(const u32 parInd
     return { centerAngle - 0.5f * parCellAngleRange, centerAngle + 0.5f * parCellAngleRange };
 }
 
-CircularGridAccessor::CircularGridAccessor(const glm::vec3 parGridCellPosition, const bool parValid)
-    : FGridCellPosition(parGridCellPosition)
-    , FValid(parValid)
+CircularGridAccessor::CircularGridAccessor()
 {
+}
+
+CircularGridAccessor::CircularGridAccessor(const glm::vec3 parGridCellPosition, const u32 parChunkId, const u32 parCellId)
+    : FGridCellPosition(parGridCellPosition)
+    , FChunkId(parChunkId)
+    , FCellId(parCellId)
+    , FValid(true)
+{
+}
+
+bool CircularGridAccessor::IsFree() const
+{
+    if (!FValid)
+        return false;
+
+    return CircularBuildingGrid::Instance().IsPositionFree(FChunkId, FCellId);
 }
 
 } // namespace ECSEngine
