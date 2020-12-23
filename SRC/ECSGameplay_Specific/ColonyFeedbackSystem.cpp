@@ -48,7 +48,6 @@ void ColonyFeedbackSystem::VirtualUpdate()
 
         bool foundPos = false;
         glm::vec3 mouseWorldPosition = GetWorldPositionFromScreenPosition(*camera, aspectRatio, windowSize, Input::GetMousePosition(), foundPos);
-
         CircularGridAccessor accessor = CircularBuildingGrid::Instance().GetAccessorForWorldPosition(mouseWorldPosition);
 
         CircularBuildingGrid::Instance().DrawFeedback();
