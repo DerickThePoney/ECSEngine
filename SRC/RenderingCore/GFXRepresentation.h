@@ -45,7 +45,7 @@ private:
 
 private:
     std::unique_ptr<Carrier> FCarrier = nullptr;
-   std::unique_ptr<VisualModel> FVisualModel = nullptr;
+    std::unique_ptr<VisualModel> FVisualModel = nullptr;
 
     GFXMessage FMessages[2];
     u32 FCurrentMessageQueue = 0;

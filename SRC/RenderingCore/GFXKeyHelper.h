@@ -9,5 +9,6 @@ public:
 
     u32 Position;
     u32 Orientation;
+    u32 Visible;
 };
 } // namespace ECSEngine

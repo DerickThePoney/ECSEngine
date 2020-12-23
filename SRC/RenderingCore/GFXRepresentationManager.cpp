@@ -34,24 +34,21 @@ void GFXRepresentationManager::OnGameplayFrameEnded()
     // swap the queues here? transfer queue from proxy to representations?
 }
 
-void GFXRepresentationManager::CreateGFXRepresentation(const EntityId& parId, const GFXRepresentationInitialiser& parInit)
+u32 GFXRepresentationManager::CreateGFXRepresentation(const GFXRepresentationInitialiser& parInit)
 {
-    auto itFind = FGFXRepresentations.find(parId);
-    AlwaysCheckedAssert(itFind == FGFXRepresentations.end());
-    if (itFind != FGFXRepresentations.end())
-        return;
-
     GFXRepresentation* newRep = new GFXRepresentation();
     newRep->Initialise(parInit);
-    FGFXRepresentations.insert_or_assign(parId, std::unique_ptr<GFXRepresentation>(newRep));
+    const u32 newId = (u32)FGFXRepresentations.size();
+    FGFXRepresentations.insert_or_assign(newId, std::unique_ptr<GFXRepresentation>(newRep));
+    return newId;
 }
 
-void GFXRepresentationManager::DeleteGFXRepresentation(const EntityId& parId)
+void GFXRepresentationManager::DeleteGFXRepresentation(const u32 parId)
 {
+    AssertRelease(parId != -1);
     auto itFind = FGFXRepresentations.find(parId);
-    if (itFind == FGFXRepresentations.end())
-        return;
-
+    AssertRelease(itFind != FGFXRepresentations.end());
+    AssertRelease(itFind->second != nullptr);
     FGFXRepresentations.erase(itFind);
 }
 

@@ -22,9 +22,19 @@ void Carrier::Update(const float parCurrentTime)
     FLocalToWorld = glm::translate(FPosition.GetCurrentValue()) * (glm::mat4)FOrientation.GetCurrentValue();
 }
 
-void Carrier::PushNewKeyframe(const glm::vec3& parNewPosition, const glm::quat& parNewOrientation, const float parTime)
+void Carrier::PushNewFullKeyframe(const glm::vec3& parNewPosition, const glm::quat& parNewOrientation, const float parTime)
 {
     FPosition.AddNewKeyframe(parNewPosition, parTime);
+    FOrientation.AddNewKeyframe(parNewOrientation, parTime);
+}
+
+void Carrier::PushNewPositionKeyframe(const glm::vec3& parNewPosition, const float parTime)
+{
+    FPosition.AddNewKeyframe(parNewPosition, parTime);
+}
+
+void Carrier::PushNewRotationKeyframe(const glm::quat& parNewOrientation, const float parTime)
+{
     FOrientation.AddNewKeyframe(parNewOrientation, parTime);
 }
 

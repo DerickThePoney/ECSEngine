@@ -1,6 +1,5 @@
 #pragma once
 #include "Common/Singleton.h"
-#include "ECSCore/EntityId.h"
 #include "GFXRepresentation.h"
 
 namespace ECSEngine
@@ -14,23 +13,24 @@ public:
 
     void OnGameplayFrameEnded();
 
-    void CreateGFXRepresentation(const EntityId& parId, const GFXRepresentationInitialiser& parInit);
-    void DeleteGFXRepresentation(const EntityId& parId);
+    u32 CreateGFXRepresentation(const GFXRepresentationInitialiser& parInit);
+    void DeleteGFXRepresentation(const u32 parId);
 
     template<typename T>
-    void PushMessage(const EntityId& parId, u32 parKey, const T& parData, const float parTime)
+    void PushMessage(const u32& parId, u32 parKey, const T& parData, const float parTime)
     {
-        AssertRelease(parId != EntityId());
+        AssertRelease(parId != -1);
         auto itFind = FGFXRepresentations.find(parId);
         AssertRelease(itFind != FGFXRepresentations.end());
-        itFind->second->GetCurrentQueueForPushingMessage().PushMessage(parKey, parData, parTime);
+        AssertRelease(itFind->second != nullptr);
+        FGFXRepresentations[parId]->GetCurrentQueueForPushingMessage().PushMessage(parKey, parData, parTime);
     }
 
-    std::map<EntityId, std::unique_ptr<GFXRepresentation>>::const_iterator begin() const { return FGFXRepresentations.begin(); }
-    std::map<EntityId, std::unique_ptr<GFXRepresentation>>::const_iterator end() const { return FGFXRepresentations.end(); }
+    std::map<u32, std::unique_ptr<GFXRepresentation>>::const_iterator begin() const { return FGFXRepresentations.begin(); }
+    std::map<u32, std::unique_ptr<GFXRepresentation>>::const_iterator end() const { return FGFXRepresentations.end(); }
 
 private:
-    std::map<EntityId, std::unique_ptr<GFXRepresentation>> FGFXRepresentations;
+    std::map<u32, std::unique_ptr<GFXRepresentation>> FGFXRepresentations;
 
     std::atomic_bool FGameplayFrameEnded = false;
     std::mutex FMutex;
