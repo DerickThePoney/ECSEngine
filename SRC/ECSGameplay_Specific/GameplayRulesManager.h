@@ -1,4 +1,5 @@
 #pragma once
+#include "BuildingCostManager.h"
 #include "Common/Singleton.h"
 #include "GameplayConstants.h"
 #include "PeonSpawningRulesManager.h"
@@ -12,9 +13,11 @@ public:
     {
         NAMEDPROPERTYFIELD("GameplayConstants", FConstants, GameplayConstantsLoader());
         PROPERTYFIELD(PeonSpawningRulesManager, PeonSpawningRulesManager());
+        PROPERTYFIELD(BuildingCostManager, BuildingCostManager());
     }
 
     PeonSpawningRulesManager FPeonSpawningRulesManager;
+    BuildingCostManager FBuildingCostManager;
 
     void DrawConstantsEditor() { FConstants.DrawEditor(); }
 
