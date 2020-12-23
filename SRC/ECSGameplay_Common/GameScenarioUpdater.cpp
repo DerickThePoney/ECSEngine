@@ -7,6 +7,7 @@
 #include "Common/TimeManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
+#include "ECSGameplay_Specific/MousePolicyManager.h"
 #include "ImGuiTools/ResourceCacheDebug.h"
 #include "PathfindingManager.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
@@ -34,6 +35,9 @@ void GameScenarioUpdater::Initialise()
 {
     Rendering::GameRenderer::CreateIFP();
     Rendering::GameRenderer::Instance().Initialise();
+
+    MousePolicyManager::CreateIFP();
+    MousePolicyManager::Instance().Initialise();
 
     AssertRelease(FScenario != nullptr);
     FCameraMoverSystem.Init();
@@ -73,6 +77,9 @@ void GameScenarioUpdater::Destroy()
 
     WorldManager::Instance().DestroyAllRemainingEntities();
 
+    MousePolicyManager::Instance().Shutdown();
+    MousePolicyManager::Destroy();
+
     Rendering::GameRenderer::Instance().Shutdown();
     Rendering::GameRenderer::Destroy();
 }
@@ -91,6 +98,7 @@ void GameScenarioUpdater::Update()
     FPeonLifeSpanSystem.Update();
     FResourceStatsUpdateSystem.Update();
     FColonyFeedbackSystem.Update();
+    MousePolicyManager::Instance().Update();
 
     WorldManager::Instance().ProcessDestroyEntities();
 
