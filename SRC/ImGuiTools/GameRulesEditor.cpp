@@ -19,6 +19,7 @@ public:
 private:
     void DrawGameRulesMenuBar();
     void DrawSpawnRulesEditor();
+    void DrawBuildingCostsEditor();
     void DrawConstantsEditor();
 
 private:
@@ -44,6 +45,12 @@ void GameRulesEditor::DrawEditor(bool* parOpen, float parMenuBarHeight)
         if (ImGui::BeginTabItem("Gameplay constants", &isEditingSpawnRules))
         {
             DrawConstantsEditor();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Building costs rules", &isEditingSpawnRules))
+        {
+            DrawBuildingCostsEditor();
             ImGui::EndTabItem();
         }
 
@@ -82,6 +89,18 @@ void GameRulesEditor::DrawSpawnRulesEditor()
     ImGui::BeginChild(ImGui::GetID("Peons templates list"), utilityPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
     GameplayRulesManager::Instance().FPeonSpawningRulesManager.DrawEditor();
+
+    ImGui::EndChild();
+}
+
+void GameRulesEditor::DrawBuildingCostsEditor()
+{
+    const glm::vec2 currentWindowSize = ImGui::GetContentRegionAvail();
+    const glm::vec2 utilityPlace = currentWindowSize - 50.0f;
+    ImGui::SetCursorPosX(((currentWindowSize - utilityPlace) * 0.5f).x);
+    ImGui::BeginChild(ImGui::GetID("Building cost editor"), utilityPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
+    GameplayRulesManager::Instance().FBuildingCostManager.DrawEditor();
 
     ImGui::EndChild();
 }
