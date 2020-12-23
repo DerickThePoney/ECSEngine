@@ -71,7 +71,7 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
     init.FMeshFileName = Template<ApparenceModuleTemplate>()->GetMeshFileName();
     init.HasVisuals = true;
 
-    FProxy->Initialise(UnitId(), init);
+    FProxy->Initialise(init);
 }
 
 void ApparenceModule::VirtualDeinit()
