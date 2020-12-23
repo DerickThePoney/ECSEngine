@@ -83,6 +83,15 @@ bool CircularBuildingGrid::IsPositionFree(const u32 parChunkId, const u32 parCel
     return !chunk.GridCells[parCellId].Occupied;
 }
 
+void CircularBuildingGrid::SetPositionOccupied(const u32 parChunkId, const u32 parCellId, const bool parOccupied)
+{
+    AssertRelease(parChunkId < FChunks.size());
+    CircularGridChunk& chunk = FChunks[parChunkId];
+    AssertRelease(parCellId < chunk.CellNumber);
+    AlwaysCheckedAssert(chunk.GridCells[parCellId].Occupied != parOccupied);
+    chunk.GridCells[parCellId].Occupied = parOccupied;
+}
+
 void CircularBuildingGrid::CreateNewGridChunk()
 {
     // wanted arc length
@@ -152,6 +161,12 @@ bool CircularGridAccessor::IsFree() const
         return false;
 
     return CircularBuildingGrid::Instance().IsPositionFree(FChunkId, FCellId);
+}
+
+void CircularGridAccessor::SetOccupied(bool parOccupied) const
+{
+    AssertRelease(FValid);
+    CircularBuildingGrid::Instance().SetPositionOccupied(FChunkId, FCellId, parOccupied);
 }
 
 } // namespace ECSEngine
