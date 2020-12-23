@@ -13,6 +13,8 @@ public:
     glm::vec3 CellPosition() const { return FGridCellPosition; }
     bool IsFree() const;
 
+    void SetOccupied(bool parOccupied) const;
+
     u32 ChunkId() const { return FChunkId; }
     u32 CellId() const { return FCellId; }
 
@@ -33,6 +35,8 @@ public:
 
     CircularGridAccessor GetAccessorForWorldPosition(const glm::vec3& parWorldPosition) const;
     bool IsPositionFree(const u32 parChunkId, const u32 parCellId) const;
+
+    void SetPositionOccupied(const u32 parChunkId, const u32 parCellId, const bool parOccupied);
 
 private:
     void CreateNewGridChunk();
