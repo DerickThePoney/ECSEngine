@@ -64,12 +64,30 @@ void GFXRepresentation::ProcessMessages()
 {
     GFXMessage& currentMessages = FMessages[FCurrentMessageQueue];
 
-    if (FCarrier != nullptr && currentMessages.HasMessage(GFXKeyHelper::Instance().Position) && currentMessages.HasMessage(GFXKeyHelper::Instance().Orientation))
+    if (FCarrier != nullptr)
     {
         auto newPositionKeyframe = currentMessages.GetValueIFP<glm::vec3>(GFXKeyHelper::Instance().Position);
         auto newOrientationKeyframe = currentMessages.GetValueIFP<glm::quat>(GFXKeyHelper::Instance().Orientation);
-        AlwaysCheckedAssert(newPositionKeyframe.second == newOrientationKeyframe.second);
-        FCarrier->PushNewKeyframe(newPositionKeyframe.first, newOrientationKeyframe.first, newPositionKeyframe.second);
+
+        if (newPositionKeyframe.second != -1 && newOrientationKeyframe.second != -1)
+        {
+            AlwaysCheckedAssert(newPositionKeyframe.second == newOrientationKeyframe.second);
+            FCarrier->PushNewFullKeyframe(newPositionKeyframe.first, newOrientationKeyframe.first, newPositionKeyframe.second);
+        }
+        else if (newPositionKeyframe.second != -1)
+        {
+            FCarrier->PushNewPositionKeyframe(newPositionKeyframe.first, newPositionKeyframe.second);
+        }
+        else if (newOrientationKeyframe.second != -1)
+        {
+            FCarrier->PushNewRotationKeyframe(newOrientationKeyframe.first, newOrientationKeyframe.second);
+        }
+    }
+
+    if (FVisualModel != nullptr && currentMessages.HasMessage(GFXKeyHelper::Instance().Visible))
+    {
+        auto visible = currentMessages.GetValueIFP<bool>(GFXKeyHelper::Instance().Visible);
+        FVisualModel->SetVisible(visible.first);
     }
 }
 

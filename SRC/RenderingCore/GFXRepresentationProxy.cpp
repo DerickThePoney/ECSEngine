@@ -16,16 +16,16 @@ GFXRepresentationProxy::~GFXRepresentationProxy()
     Cleanup();
 }
 
-void GFXRepresentationProxy::Initialise(const EntityId& parUnitId, const GFXRepresentationInitialiser& parInitialise)
+void GFXRepresentationProxy::Initialise(const GFXRepresentationInitialiser& parInitialise)
 {
-    AssertRelease(parUnitId != EntityId());
-    FUnitId = parUnitId;
-    GFXRepresentationManager::Instance().CreateGFXRepresentation(FUnitId, parInitialise);
+    FId = GFXRepresentationManager::Instance().CreateGFXRepresentation(parInitialise);
+    AssertRelease(FId != -1);
 }
 
 void GFXRepresentationProxy::Cleanup()
 {
-    GFXRepresentationManager::Instance().DeleteGFXRepresentation(FUnitId);
+    AssertRelease(FId != -1);
+    GFXRepresentationManager::Instance().DeleteGFXRepresentation(FId);
 }
 
 } // namespace Rendering

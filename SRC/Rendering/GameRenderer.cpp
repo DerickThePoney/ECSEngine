@@ -126,7 +126,7 @@ void GameRenderer::Render()
             continue;
 
         const VisualModel* visuals = gfxRep.second->GetVisualModel();
-        if (visuals == nullptr)
+        if (visuals == nullptr || !visuals->Visible())
             continue;
 
         if (Rendering::MeshFrustumCulling::CullMesh(visuals->GetMeshHandle(), carrier->LocalToWorld(), frustum))

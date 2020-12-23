@@ -9,6 +9,7 @@ void GFXKeyHelper::Initialise()
 {
     Position = 0;
     Orientation = 1;
+    Visible = 2;
 }
 
 } // namespace ECSEngine

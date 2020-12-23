@@ -15,17 +15,18 @@ public:
     GFXRepresentationProxy();
     ~GFXRepresentationProxy();
 
-    void Initialise(const EntityId& parUnitId, const GFXRepresentationInitialiser& parInitialise);
+    void Initialise(const GFXRepresentationInitialiser& parInitialise);
     void Cleanup();
 
     template<typename T>
     void PushMessage(u32 parKey, const T& parData, const float parTime)
     {
-        GFXRepresentationManager::Instance().PushMessage(FUnitId, parKey, parData, parTime);
+        AssertRelease(FId != -1);
+        GFXRepresentationManager::Instance().PushMessage(FId, parKey, parData, parTime);
     }
 
 private:
-    EntityId FUnitId;
+    u32 FId = -1;
 };
 } // namespace Rendering
 } // namespace ECSEngine

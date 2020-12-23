@@ -15,10 +15,14 @@ public:
 
     const MeshHandle GetMeshHandle() const { return FMeshHandle; }
     const MaterialInstanceHandle GetMaterialInstanceHandle() const { return FMaterialHandle; }
+    const bool Visible() const { return FVisible; }
+
+    void SetVisible(bool parValue) { FVisible = parValue; }
 
 private:
     MeshHandle FMeshHandle;
     MaterialInstanceHandle FMaterialHandle;
+    bool FVisible = true;
 };
 } // namespace Rendering
 } // namespace ECSEngine
