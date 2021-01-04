@@ -1,5 +1,6 @@
 #pragma once
 #include "CameraMoverSystem.h"
+#include "ECSGameplay_Specific/ColonyBuildingSystem.h"
 #include "ECSGameplay_Specific/ColonyFeedbackSystem.h"
 #include "ECSGameplay_Specific/ColonyPeonsTaskAsignmentSystem.h"
 #include "ECSGameplay_Specific/PeonFeedingTimeSystem.h"
@@ -37,6 +38,7 @@ private:
     MovementSystem FMovementSystem;
     SynchroWithRenderSystem FRenderingSystem;
 
+    ColonyBuildingSystem FColonyBuildingSystem;
     ColonyPeonsTaskAssignmentSystem FColonyManagementSystem;
     PeonsHaverstingSystem FPeonHarvestingSytem;
     ResourceProductionSystem FProductionSystem;
