@@ -88,6 +88,9 @@ void PlaceBuildingMousePolicy::VirtualUpdate()
                 message->FTemplateName = FTemplate->GetName();
                 message->FPosition = accessor.CellPosition();
                 GenericMessageManager::Instance().PushMessage<GenericMessageId::PLACE_BUILDING, ConstructBuildingMessage>(message);
+                accessor.SetOccupied(true);
+                Deactivate();
+                return;
             }
         }
         else
