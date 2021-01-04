@@ -5,8 +5,11 @@
 #include "CircularBuildingGrid.h"
 #include "Common/CameraHelpers.h"
 #include "Common/CameraManager.h"
+#include "Common/GenericMessageIdentifiers.h"
+#include "Common/GenericMessageManager.h"
 #include "Common/InputManager.h"
 #include "Common/TimeManager.h"
+#include "ConstructBuildingMessage.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
 #include "RenderingCore/GFXKeyHelper.h"
@@ -15,6 +18,12 @@
 
 namespace ECSEngine
 {
+
+PlaceBuildingMousePolicy::PlaceBuildingMousePolicy()
+{
+    FValidateInputCommand.FMouseButton = MouseButtons::MOUSE_BUTTON_1;
+    FValidateInputCommand.FInputType = EInputType::RELEASED;
+}
 
 void PlaceBuildingMousePolicy::SetupMousePolicy(const std::string& parBuildingTemplateName)
 {
@@ -72,6 +81,14 @@ void PlaceBuildingMousePolicy::VirtualUpdate()
         {
             FBuildingProxy->PushMessage<bool>(GFXKeyHelper::Instance().Visible, true, TimeManager::FrameStartTime());
             FBuildingProxy->PushMessage<glm::vec3>(GFXKeyHelper::Instance().Position, accessor.CellPosition(), TimeManager::FrameStartTime());
+
+            if (FValidateInputCommand.Evaluate())
+            {
+                ConstructBuildingMessage* message = new ConstructBuildingMessage();
+                message->FTemplateName = FTemplate->GetName();
+                message->FPosition = accessor.CellPosition();
+                GenericMessageManager::Instance().PushMessage<GenericMessageId::PLACE_BUILDING, ConstructBuildingMessage>(message);
+            }
         }
         else
         {
