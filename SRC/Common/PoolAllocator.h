@@ -234,9 +234,21 @@ public:                                                                         
                                                                                                                                                                                    \
 private:
 
+#define TEMPLATE_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(TYPE, TEMPLATE, CHUNK_SIZE)                                                                                                      \
+public:                                                                                                                                                                            \
+    using ThisType = TYPE<TEMPLATE>;                                                                                                                                               \
+    static inline PoolAllocator<ThisType, CHUNK_SIZE> sPool##TYPE##TEMPLATE = PoolAllocator<ThisType, CHUNK_SIZE>();                                                               \
+    static void* operator new(std::size_t count) { return ThisType::sPool##TYPE##TEMPLATE.Allocate((u32)(count / sizeof(ThisType))); }                                             \
+    static void operator delete(void* ptr, std::size_t count) { ThisType::sPool##TYPE##TEMPLATE.Free(ptr, (u32)(count / sizeof(ThisType))); }                                      \
+    static void* operator new[](std::size_t count) { return ThisType::sPool##TYPE##TEMPLATE.Allocate((u32)(count / sizeof(ThisType))); }                                           \
+    static void operator delete[](void* ptr, std::size_t count) { ThisType::sPool##TYPE##TEMPLATE.Free(ptr, (u32)(count / sizeof(ThisType))); }                                    \
+                                                                                                                                                                                   \
+private:
+
 #define IMPLEMENT_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(TYPE, CHUNK_SIZE) PoolAllocator<TYPE, CHUNK_SIZE> TYPE::sPool##TYPE = PoolAllocator<TYPE, CHUNK_SIZE>();
 
 #define DECLARE_POOL_ALLOCATED(TYPE) DECLARE_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(TYPE, 1024)
+#define TEMPLATE_POOL_ALLOCATED(TYPE, TEMPLATE) TEMPLATE_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(TYPE, TEMPLATE, 1024)
 #define IMPLEMENT_POOL_ALLOCATED(TYPE) IMPLEMENT_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(TYPE, 1024)
 
 } // namespace ECSEngine
