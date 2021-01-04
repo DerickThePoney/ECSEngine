@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/IdGenerator.h"
 #include "Common/Singleton.h"
 #include "GFXRepresentation.h"
 
@@ -30,6 +31,7 @@ public:
     std::map<u32, std::unique_ptr<GFXRepresentation>>::const_iterator end() const { return FGFXRepresentations.end(); }
 
 private:
+    IdGenerator FGFXIdGenerator;
     std::map<u32, std::unique_ptr<GFXRepresentation>> FGFXRepresentations;
 
     std::atomic_bool FGameplayFrameEnded = false;

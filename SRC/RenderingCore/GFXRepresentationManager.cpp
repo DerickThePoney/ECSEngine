@@ -38,7 +38,7 @@ u32 GFXRepresentationManager::CreateGFXRepresentation(const GFXRepresentationIni
 {
     GFXRepresentation* newRep = new GFXRepresentation();
     newRep->Initialise(parInit);
-    const u32 newId = (u32)FGFXRepresentations.size();
+    const u32 newId = FGFXIdGenerator.GetNextId();
     FGFXRepresentations.insert_or_assign(newId, std::unique_ptr<GFXRepresentation>(newRep));
     return newId;
 }
@@ -50,6 +50,7 @@ void GFXRepresentationManager::DeleteGFXRepresentation(const u32 parId)
     AssertRelease(itFind != FGFXRepresentations.end());
     AssertRelease(itFind->second != nullptr);
     FGFXRepresentations.erase(itFind);
+    FGFXIdGenerator.ReleaseId(parId);
 }
 
 } // namespace Rendering
