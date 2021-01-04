@@ -6,6 +6,9 @@
 #include "Common/GenericMessageManager.h"
 #include "Common/Logger.h"
 #include "ConstructBuildingMessage.h"
+#include "ECSCore/EntityFactory.h"
+#include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/ModuleParameters.h"
 
 namespace ECSEngine
 {
@@ -24,6 +27,12 @@ namespace
 void ProcessMessage(const ConstructBuildingMessage& parMessage)
 {
     LOG_GAMEPLAY(parMessage.FTemplateName.c_str());
+    ModuleParameters::ParameterContainer container;
+    container.Set<ModuleParameters::Position>(parMessage.FPosition);
+    container.Set<ModuleParameters::Orientation>(glm::quat(1.0f, 0.f, 0.f, 0.f));
+
+    const EntityTemplate* temp = EntityTemplateManager::Instance().GetEntityTemplate(parMessage.FTemplateName);
+    EntityFactory::CreateEntity(temp, container);
 }
 } // namespace
 
