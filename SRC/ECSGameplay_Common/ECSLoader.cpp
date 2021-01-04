@@ -2,6 +2,7 @@
 
 #include "ECSLoader.h"
 
+#include "Common/GenericMessageManager.h"
 #include "Common/RandomGenerator.h"
 #include "Common/ResourceCache.h"
 #include "ECSCore/AdjustableDebugParameters.h"
@@ -20,6 +21,8 @@ bool ECSLoader::VirtualInitialise()
     ILoader::VirtualInitialise();
 
     CreateAdjustables();
+
+    GenericMessageManager::CreateIFP();
 
     RandomNumbers::InitRandomNumberGenerator(772);
 
@@ -59,6 +62,8 @@ void ECSLoader::VirtualShutdown()
     ECSEngine::ModuleParameters::DestroyParameterIdentifiersTraits();
 
     RandomNumbers::DestroyRandomNumberGenerator();
+
+    GenericMessageManager::Destroy();
 
     DestroyAdjustables();
 }
