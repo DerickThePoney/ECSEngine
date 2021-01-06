@@ -32,7 +32,7 @@ class BuildingCostManager
 public:
     SERIALIZE() { PROPERTYFIELD(BuildingsCostRules, std::vector<BuildingCostDescriptor>()); }
 
-    const std::vector<BuildingCostDescriptor>& GetCostSpawnRules() const { return FBuildingsCostRules; }
+    const std::vector<BuildingCostDescriptor>& GetBuildingCostDescriptors() const { return FBuildingsCostRules; }
     std::vector<BuildingResourceCost> GetCostsForBuilding(const std::string& parBuildingName);
     std::vector<BuildingResourceCost> GetCostsForBuilding(const u32 parTemplateIndex);
 
