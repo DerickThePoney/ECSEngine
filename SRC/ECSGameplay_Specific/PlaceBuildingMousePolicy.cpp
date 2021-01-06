@@ -29,6 +29,7 @@ void PlaceBuildingMousePolicy::SetupMousePolicy(const std::string& parBuildingTe
 {
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(parBuildingTemplateName);
     AssertRelease(FTemplate != nullptr);
+    AssertRelease(FTemplate->GetWorldId() == Worlds::BUILDINGS);
 }
 
 void PlaceBuildingMousePolicy::VirtualActivate()
