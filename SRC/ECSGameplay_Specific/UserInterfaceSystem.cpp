@@ -8,6 +8,7 @@ namespace ECSEngine
 UserInterfaceSystem::UserInterfaceSystem()
     : ModuleSystem()
 {
+    FInGameMenu.Show(true);
 }
 
 UserInterfaceSystem::~UserInterfaceSystem()
@@ -18,7 +19,7 @@ void UserInterfaceSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    FSelectionPanel.Update();
+    FInGameMenu.Update();
 }
 
 } // namespace ECSEngine

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ColonySelectionPanelController.h"
 #include "ECSCore/ModuleSystem.h"
+#include "UIInGameMenuController.h"
 
 namespace ECSEngine
 {
@@ -15,6 +15,6 @@ protected:
     void VirtualUpdate() override;
 
 private:
-    UI::ColonySelectionPanelController FSelectionPanel;
+    UI::UIInGameMenuController FInGameMenu;
 };
 } // namespace ECSEngine
