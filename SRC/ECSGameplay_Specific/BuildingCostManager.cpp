@@ -26,7 +26,7 @@ void BuildingCostDescriptor::DrawEditorHeader()
 void BuildingCostDescriptor::DrawEditor()
 {
     const EntityTemplate* et = BuildingTemplate();
-    EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED("##Template", et, FBuildingTemplateName, Worlds::STANDARD);
+    EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED("##Template", et, FBuildingTemplateName, Worlds::BUILDINGS);
     ImGui::NextColumn();
     ImGui::BeginChild(ImGui::GetID(this), ImVec2(ImGui::GetContentRegionAvailWidth(), 100.f));
     ImGui::Columns(2);
