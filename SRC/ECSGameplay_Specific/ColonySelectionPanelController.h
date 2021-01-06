@@ -11,7 +11,7 @@ namespace ECSEngine
 {
 namespace UI
 {
-class ColonySelectionPanelController : public UIController<MC<ColonyModule, Worlds::COLONY>,
+class ColonySelectionPanelController : public UIControllerWithModuleAccessors<MC<ColonyModule, Worlds::COLONY>,
                                              MC<ResourceStorageModule, Worlds::COLONY>,
                                              MC<PeonSpawnModule, Worlds::COLONY>,
                                              MC<ColonyPeonsManagementModule, Worlds::COLONY>,

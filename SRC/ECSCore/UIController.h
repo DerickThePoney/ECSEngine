@@ -19,8 +19,76 @@ struct MC
     static Accessor Construct() { return Accessor(_World); }
 };
 
-template<typename... MCs>
 class UIController
+{
+public:
+    virtual ~UIController() { }
+
+    void Init()
+    {
+#ifdef PERFORM_SECURITY_CHECKS
+        FVirtualInitCalled = false;
+#endif
+        VirtualInit();
+        AlwaysCheckedAssert(FVirtualInitCalled);
+    }
+
+    virtual void Update()
+    {
+        if (!FShow)
+            return;
+
+#ifdef PERFORM_SECURITY_CHECKS
+        FVirtualUpdateCalled = false;
+#endif
+        VirtualUpdate();
+        AlwaysCheckedAssert(FVirtualUpdateCalled);
+    }
+
+    void Destroy()
+    {
+#ifdef PERFORM_SECURITY_CHECKS
+        FVirtualDestroyCalled = false;
+#endif
+        VirtualDestroy();
+        AlwaysCheckedAssert(FVirtualDestroyCalled);
+    }
+
+    void Show(bool parShow) { FShow = parShow; }
+    bool Shown() const { return FShow; }
+
+protected:
+    virtual void VirtualInit()
+    {
+#ifdef PERFORM_SECURITY_CHECKS
+        FVirtualInitCalled = true;
+#endif
+    }
+    virtual void VirtualUpdate()
+    {
+#ifdef PERFORM_SECURITY_CHECKS
+        FVirtualUpdateCalled = true;
+#endif
+    }
+    virtual void VirtualDestroy()
+    {
+#ifdef PERFORM_SECURITY_CHECKS
+        FVirtualDestroyCalled = true;
+#endif
+    }
+
+protected:
+    bool FShow = false;
+
+#ifdef PERFORM_SECURITY_CHECKS
+    bool FVirtualInitCalled;
+    bool FVirtualUpdateCalled;
+    bool FVirtualDestroyCalled;
+#endif
+};
+
+template<typename... MCs>
+class UIControllerWithModuleAccessors : public UIController
 {
 
 protected:
@@ -33,29 +101,23 @@ protected:
     using TupleType = brigand::as_tuple<AccessorList>;
 
 public:
-    UIController()
+    UIControllerWithModuleAccessors()
         : FAccessors(std::move(typename MCs::Accessor(MCs::World))...)
     {
     }
 
-    UIController(const UIController&) = delete;
-    UIController(UIController&&) = delete;
-    UIController& operator=(const UIController&) = delete;
-    UIController& operator=(UIController&&) = delete;
+    UIControllerWithModuleAccessors(const UIControllerWithModuleAccessors&) = delete;
+    UIControllerWithModuleAccessors(UIControllerWithModuleAccessors&&) = delete;
+    UIControllerWithModuleAccessors& operator=(const UIControllerWithModuleAccessors&) = delete;
+    UIControllerWithModuleAccessors& operator=(UIControllerWithModuleAccessors&&) = delete;
 
-    virtual ~UIController() { }
+    virtual ~UIControllerWithModuleAccessors() { }
 
-    void Init()
+    void Update() override
     {
-#ifdef PERFORM_SECURITY_CHECKS
-        FVirtualInitCalled = false;
-#endif
-        VirtualInit();
-        AlwaysCheckedAssert(FVirtualInitCalled);
-    }
+        if (!FShow)
+            return;
 
-    void Update()
-    {
 #ifdef PERFORM_SECURITY_CHECKS
         FVirtualUpdateCalled = false;
 #endif
@@ -63,15 +125,6 @@ public:
         VirtualUpdate();
         UnlockDependencies();
         AlwaysCheckedAssert(FVirtualUpdateCalled);
-    }
-
-    void Destroy()
-    {
-#ifdef PERFORM_SECURITY_CHECKS
-        FVirtualDestroyCalled = false;
-#endif
-        VirtualDestroy();
-        AlwaysCheckedAssert(FVirtualDestroyCalled);
     }
 
     template<typename T>
@@ -107,26 +160,6 @@ public:
     }
 
 protected:
-    virtual void VirtualInit()
-    {
-#ifdef PERFORM_SECURITY_CHECKS
-        FVirtualInitCalled = true;
-#endif
-    }
-    virtual void VirtualUpdate()
-    {
-#ifdef PERFORM_SECURITY_CHECKS
-        FVirtualUpdateCalled = true;
-#endif
-    }
-    virtual void VirtualDestroy()
-    {
-#ifdef PERFORM_SECURITY_CHECKS
-        FVirtualDestroyCalled = true;
-#endif
-    }
-
-protected:
     void LockDependencies()
     {
         std::apply([](auto&&... args) { ((args.LockIFN()), ...); }, FAccessors);
@@ -138,12 +171,6 @@ protected:
 
 protected:
     TupleType FAccessors;
-
-#ifdef PERFORM_SECURITY_CHECKS
-    bool FVirtualInitCalled;
-    bool FVirtualUpdateCalled;
-    bool FVirtualDestroyCalled;
-#endif
 };
 } // namespace UI
 } // namespace ECSEngine
