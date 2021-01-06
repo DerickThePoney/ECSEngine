@@ -23,7 +23,7 @@ ColonySelectionPanelController::~ColonySelectionPanelController()
 
 void ColonySelectionPanelController::VirtualUpdate()
 {
-    UIController::VirtualUpdate();
+    UIControllerWithModuleAccessors::VirtualUpdate();
 
     const EntityId colonyId = EntityId(Worlds::COLONY, 0);
 
