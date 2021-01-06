@@ -45,15 +45,7 @@ void GameRenderer::Initialise()
     bgfx::setViewClear(RenderPassId::GEOMETRY_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 
     // Feedback pass initialize
-    FFeedbackFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, size);
-
-    FFeedbackFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
-          0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
-
-    FFeedbackFramebuffer->InitFramebuffer();
-
     FFeedbackCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::FEEDBACK_PASS);
-    bgfx::setViewClear(RenderPassId::FEEDBACK_PASS, BGFX_CLEAR_COLOR, 0x00000000);
 
     // Combine pass
     FCombineCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::COMBINE_PASS);
@@ -65,7 +57,7 @@ void GameRenderer::Initialise()
 void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
 {
     bgfx::setViewFrameBuffer(RenderPassId::GEOMETRY_PASS, FGeometryFramebuffer->GetHandle());
-    bgfx::setViewFrameBuffer(RenderPassId::FEEDBACK_PASS, FFeedbackFramebuffer->GetHandle());
+    bgfx::setViewFrameBuffer(RenderPassId::FEEDBACK_PASS, FGeometryFramebuffer->GetHandle());
 
     bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, parSize.x, parSize.y);
     bgfx::setViewRect(RenderPassId::FEEDBACK_PASS, 0, 0, parSize.x, parSize.y);
@@ -85,8 +77,6 @@ void GameRenderer::Shutdown()
 
     delete FGeometryFramebuffer;
     FGeometryFramebuffer = nullptr;
-    delete FFeedbackFramebuffer;
-    FFeedbackFramebuffer = nullptr;
 }
 
 void GameRenderer::Render()
@@ -98,8 +88,7 @@ void GameRenderer::Render()
 
     // Resize framebuffers
     auto& size = GLFWDisplayWindowHandler::Instance().GetSize();
-    bool hasResized = FGeometryFramebuffer->ResizeIFN(size);
-    hasResized = hasResized || FFeedbackFramebuffer->ResizeIFN(size);
+    const bool hasResized = FGeometryFramebuffer->ResizeIFN(size);
 
     if (hasResized)
         SetViewFramebuffers(size);
@@ -146,7 +135,6 @@ void GameRenderer::Render()
     // combine pass
     MaterialInstanceHandle combineMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\combinepass.material");
     MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_GeometryTexture", FGeometryFramebuffer->GetTextureHandle(0).idx, 0);
-    MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_FeedbackTexture", FFeedbackFramebuffer->GetTextureHandle(0).idx, 1);
 
     FCombineCommandBuffer->BlitWithMaterial(combineMaterial);
     FCombineCommandBuffer->Submit();

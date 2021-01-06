@@ -1156,7 +1156,7 @@ void DrawCircularChunkCommand::SubmitCommand() const
 
     bgfx::setTransform(&FTransform[0][0]);
 
-    Rendering::RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW | BGFX_STATE_BLEND_ALPHA);
+    Rendering::RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW | BGFX_STATE_BLEND_ALPHA | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_MSAA);
     state.ApplyState();
 
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
