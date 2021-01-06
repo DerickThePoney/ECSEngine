@@ -10,6 +10,7 @@ enum Type
     CAMERA,
     RESOURCE_PROD,
     PEONS,
+    BUILDINGS,
     LENGTH
 };
 

@@ -45,6 +45,8 @@ using ColonyControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::PeonFeedingTimeModule,
       ECSEngine::ColonyTraitsModule>;
 
+using BuildingControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule>;
+
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 
 struct f
@@ -88,6 +90,12 @@ void CreateWorlds()
         EntityWorld* world = new EntityWorld(Worlds::PEONS);
         auto r = brigand::for_each<PeonsControllers>(f{ world });
         WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::PEONS, world);
+    }
+
+    {
+        EntityWorld* world = new EntityWorld(Worlds::BUILDINGS);
+        auto r = brigand::for_each<BuildingControllers>(f{ world });
+        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::BUILDINGS, world);
     }
 }
 

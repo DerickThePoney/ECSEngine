@@ -21,6 +21,8 @@ const char* GetName(const Type parWorld)
         return "RESOURCE_PROD";
     case PEONS:
         return "PEONS";
+    case BUILDINGS:
+        return "BUILDINGS";
     default:
         AssertNotReached();
         return "UNKNOW";
