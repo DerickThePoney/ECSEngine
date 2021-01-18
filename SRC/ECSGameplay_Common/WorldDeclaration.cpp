@@ -10,6 +10,8 @@
 #include "ECSGameplay_Specific/ColonyModule.h"
 #include "ECSGameplay_Specific/ColonyPeonsManagementModule.h"
 #include "ECSGameplay_Specific/ColonyTraitsModule.h"
+#include "ECSGameplay_Specific/HousingPlaceModule.h"
+#include "ECSGameplay_Specific/LinkToHousingPlaceModule.h"
 #include "ECSGameplay_Specific/PeonFeedingTimeModule.h"
 #include "ECSGameplay_Specific/PeonSpawnModule.h"
 #include "ECSGameplay_Specific/ResourceHarvesterModule.h"
@@ -32,7 +34,8 @@ using PeonsControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::MovementModule,
       ECSEngine::ResourceStorageModule,
       ECSEngine::LinkToOwnerModule,
-      ECSEngine::ResourceHarvesterModule>;
+      ECSEngine::ResourceHarvesterModule,
+      ECSEngine::LinkToHousingPlaceModule>;
 
 using ResourceProducerControllers =
       brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule, ECSEngine::ResourceProductionModule>;
@@ -45,7 +48,7 @@ using ColonyControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::PeonFeedingTimeModule,
       ECSEngine::ColonyTraitsModule>;
 
-using BuildingControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule>;
+using BuildingControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::HousingPlaceModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 

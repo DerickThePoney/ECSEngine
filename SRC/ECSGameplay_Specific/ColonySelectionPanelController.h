@@ -3,6 +3,7 @@
 #include "ColonyPeonsManagementModule.h"
 #include "ECSCore/UIController.h"
 #include "ECSCore/WorldIds.h"
+#include "HousingPlaceModule.h"
 #include "PeonFeedingTimeModule.h"
 #include "PeonSpawnModule.h"
 #include "ResourceStorageModule.h"
@@ -15,7 +16,8 @@ class ColonySelectionPanelController : public UIControllerWithModuleAccessors<MC
                                              MC<ResourceStorageModule, Worlds::COLONY>,
                                              MC<PeonSpawnModule, Worlds::COLONY>,
                                              MC<ColonyPeonsManagementModule, Worlds::COLONY>,
-                                             MC<PeonFeedingTimeModule, Worlds::COLONY>>
+                                             MC<PeonFeedingTimeModule, Worlds::COLONY>,
+                                             MC<HousingPlaceModule, Worlds::BUILDINGS>>
 {
 public:
     ColonySelectionPanelController();
