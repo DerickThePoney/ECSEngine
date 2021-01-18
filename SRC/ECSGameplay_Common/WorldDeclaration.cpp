@@ -38,7 +38,8 @@ using PeonsControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::ResourceStorageModule,
       ECSEngine::LinkToOwnerModule,
       ECSEngine::ResourceHarvesterModule,
-      ECSEngine::LinkToHousingPlaceModule>;
+      ECSEngine::LinkToHousingPlaceModule,
+      ECSEngine::LinkToWorkPlaceModule>;
 
 using ResourceProducerControllers =
       brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule, ECSEngine::ResourceProductionModule>;
@@ -51,8 +52,12 @@ using ColonyControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::PeonFeedingTimeModule,
       ECSEngine::ColonyTraitsModule>;
 
-using BuildingControllers =
-      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::HousingPlaceModule, ECSEngine::BuildingGridOccupancyModule>;
+using BuildingControllers = brigand::list<ECSEngine::PositionModule,
+      ECSEngine::OrientationModule,
+      ECSEngine::ApparenceModule,
+      ECSEngine::HousingPlaceModule,
+      ECSEngine::BuildingGridOccupancyModule,
+      ECSEngine::WorkPlaceModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 
