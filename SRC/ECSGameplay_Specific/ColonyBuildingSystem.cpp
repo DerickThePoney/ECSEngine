@@ -2,6 +2,7 @@
 
 #include "ColonyBuildingSystem.h"
 
+#include "CircularBuildingGrid.h"
 #include "Common/GenericMessageIdentifiers.h"
 #include "Common/GenericMessageManager.h"
 #include "Common/Logger.h"
@@ -30,6 +31,9 @@ void ProcessMessage(const ConstructBuildingMessage& parMessage)
     ModuleParameters::ParameterContainer container;
     container.Set<ModuleParameters::Position>(parMessage.FPosition);
     container.Set<ModuleParameters::Orientation>(glm::quat(1.0f, 0.f, 0.f, 0.f));
+    CircularGridAccessor accessor = CircularBuildingGrid::Instance().GetAccessorForWorldPosition(parMessage.FPosition);
+    AlwaysCheckedAssert(accessor.Valid());
+    container.Set<ModuleParameters::GridAccessor>(accessor);
 
     const EntityTemplate* temp = EntityTemplateManager::Instance().GetEntityTemplate(parMessage.FTemplateName);
     EntityFactory::CreateEntity(temp, container);
