@@ -7,6 +7,7 @@
 #include "ECSCore/EntityWorld.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/WorldManager.h"
+#include "ECSGameplay_Specific/BuildingGridOccupancyModule.h"
 #include "ECSGameplay_Specific/ColonyModule.h"
 #include "ECSGameplay_Specific/ColonyPeonsManagementModule.h"
 #include "ECSGameplay_Specific/ColonyTraitsModule.h"
@@ -50,7 +51,8 @@ using ColonyControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::PeonFeedingTimeModule,
       ECSEngine::ColonyTraitsModule>;
 
-using BuildingControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::HousingPlaceModule>;
+using BuildingControllers =
+      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::HousingPlaceModule, ECSEngine::BuildingGridOccupancyModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 
