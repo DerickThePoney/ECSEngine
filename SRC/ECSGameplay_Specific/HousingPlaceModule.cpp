@@ -76,7 +76,7 @@ void HousingPlaceModule::RemoveResident(const EntityId& parUnitId)
     }
 }
 
-bool HousingPlaceModule::IsResidentInHere(const EntityId& parUnitId)
+bool HousingPlaceModule::IsResidentInHere(const EntityId& parUnitId) const
 {
     foreachitemconst(resident, FAssociatedResidents)
     {
