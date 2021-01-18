@@ -55,6 +55,27 @@ void ColonySelectionPanelController::VirtualUpdate()
     {
         ImGui::Text("PEONS\t%d", peonsInColony);
         ImGui::Text("Idle PEONS\t%d", peonManagerModule->IdlePeons().size());
+
+        u32 totalPlace = 0;
+        u32 freePlace = 0;
+        foreachitemconst(house, Accessor<HousingPlaceModule>())
+        {
+            totalPlace += house.MaxPlace();
+            freePlace += house.RemainingFreeSpace();
+        }
+
+        if (peonsInColony < totalPlace)
+        {
+            ImGui::Text("Housing spots: %d/%d", peonsInColony, totalPlace);
+        }
+        else if (peonsInColony == totalPlace)
+        {
+            ImGui::TextColored(ImVec4(255, 255, 0, 255), "Housing spots: %d/%d", peonsInColony, totalPlace);
+        }
+        else
+        {
+            ImGui::TextColored(ImVec4(255, 0, 0, 255), "Housing spots: %d/%d", peonsInColony, totalPlace);
+        }
     }
 
     // show colony resources

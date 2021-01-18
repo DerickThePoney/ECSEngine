@@ -3,6 +3,7 @@
 #include "ECSGameplay_Specific/ColonyBuildingSystem.h"
 #include "ECSGameplay_Specific/ColonyFeedbackSystem.h"
 #include "ECSGameplay_Specific/ColonyPeonsTaskAsignmentSystem.h"
+#include "ECSGameplay_Specific/HousingSystem.h"
 #include "ECSGameplay_Specific/PeonFeedingTimeSystem.h"
 #include "ECSGameplay_Specific/PeonSpawnSystem.h"
 #include "ECSGameplay_Specific/PeonsHarvestingSystem.h"
@@ -45,6 +46,7 @@ private:
     PeonSpawnSystem FPeonSpawnSystem;
     PeonFeedingTimeSystem FPeonLifeSpanSystem;
     ResourceStatisticsUpdateSystem FResourceStatsUpdateSystem;
+    HousingSystem FHousingSystem;
 
     ColonyFeedbackSystem FColonyFeedbackSystem;
 
