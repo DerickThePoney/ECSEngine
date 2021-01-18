@@ -42,7 +42,7 @@ public:
     void AddNewResident(const EntityId& parUnitId);
     void RemoveResident(const EntityId& parUnitId);
 
-    bool IsResidentInHere(const EntityId& parUnitId);
+    bool IsResidentInHere(const EntityId& parUnitId) const;
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
