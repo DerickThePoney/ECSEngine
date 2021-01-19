@@ -55,6 +55,8 @@ using ColonyControllers = brigand::list<ECSEngine::PositionModule,
 using BuildingControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::OrientationModule,
       ECSEngine::ApparenceModule,
+      ECSEngine::ResourceStorageModule,
+      ECSEngine::ResourceProductionModule,
       ECSEngine::HousingPlaceModule,
       ECSEngine::BuildingGridOccupancyModule,
       ECSEngine::WorkPlaceModule>;
