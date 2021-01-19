@@ -32,8 +32,8 @@ public:
     LinkToWorkPlaceModule();
     ~LinkToWorkPlaceModule();
 
-    const EntityId& WorkPlace() const { return FWorkPlaceId; }
-    void SetWorkPlace(const EntityId& parWorkPlaceId) { FWorkPlaceId = parWorkPlaceId; }
+    const EntityId& WorkPlaceId() const { return FWorkPlaceId; }
+    void SetWorkPlaceId(const EntityId& parWorkPlaceId) { FWorkPlaceId = parWorkPlaceId; }
 
 private:
     EntityId FWorkPlaceId;
