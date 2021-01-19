@@ -10,6 +10,7 @@
 #include "ECSGameplay_Specific/ResourceProductionSystem.h"
 #include "ECSGameplay_Specific/ResourceStatisticsUpdateSystem.h"
 #include "ECSGameplay_Specific/UserInterfaceSystem.h"
+#include "ECSGameplay_Specific/WorkSystem.h"
 #include "IScenarioUpdater.h"
 #include "MovementSystem.h"
 #include "OrientationSystem.h"
@@ -47,6 +48,7 @@ private:
     PeonFeedingTimeSystem FPeonLifeSpanSystem;
     ResourceStatisticsUpdateSystem FResourceStatsUpdateSystem;
     HousingSystem FHousingSystem;
+    WorkSystem FWorkSystem;
 
     ColonyFeedbackSystem FColonyFeedbackSystem;
 
