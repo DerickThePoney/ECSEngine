@@ -28,6 +28,7 @@ private:
 private:
     const EntityTemplate* FTemplate = nullptr;
     Rendering::GFXRepresentationProxy* FBuildingProxy = nullptr;
+    u32 FCellOccupancy = 1;
 
     MouseButtonCommand FValidateInputCommand;
 };

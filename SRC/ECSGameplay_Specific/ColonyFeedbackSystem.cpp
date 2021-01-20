@@ -55,7 +55,7 @@ void ColonyFeedbackSystem::VirtualUpdate()
         if (accessor.Valid())
         {
             GameplayFeedbackDrawer::Instance().AddAABB(accessor.CellPosition() + glm::vec3(-0.1f), accessor.CellPosition() + glm::vec3(0.1f),
-                  (accessor.IsFree()) ? 0xFF00FF00 : 0xFF0000FF, glm::identity<glm::mat4>(), true);
+                  (accessor.IsFree(1)) ? 0xFF00FF00 : 0xFF0000FF, glm::identity<glm::mat4>(), true);
             GameplayFeedbackDrawer::Instance().AddAABB(mouseWorldPosition + glm::vec3(-0.1f), mouseWorldPosition + glm::vec3(0.1f), 0xFF00FFFF, glm::identity<glm::mat4>(), true);
         }
         else

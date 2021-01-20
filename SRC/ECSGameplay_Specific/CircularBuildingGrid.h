@@ -11,9 +11,9 @@ public:
 
     bool Valid() const { return FValid; }
     glm::vec3 CellPosition() const { return FGridCellPosition; }
-    bool IsFree() const;
+    bool IsFree(const u32 parBuildingSize) const;
 
-    void SetOccupied(bool parOccupied) const;
+    void SetOccupied(bool parOccupied, const u32 parBuildingSize) const;
 
     u32 ChunkId() const { return FChunkId; }
     u32 CellId() const { return FCellId; }
@@ -38,6 +38,8 @@ public:
 
     void SetPositionOccupied(const u32 parChunkId, const u32 parCellId, const bool parOccupied);
 
+    u32 GetCellCount(const u32 parChunkId) const;
+
 private:
     void CreateNewGridChunk();
     float GetRadiusForChunk(const u32 parChunkIndex) const;
@@ -54,7 +56,7 @@ private:
     {
         std::vector<CircularGridCell> GridCells;
         float ActualArcAngle = 0;
-        u32 CellNumber = 0;
+        u32 CellCount = 0;
         u32 Index = 0;
     };
 

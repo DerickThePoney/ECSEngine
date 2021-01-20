@@ -79,7 +79,7 @@ bool CircularBuildingGrid::IsPositionFree(const u32 parChunkId, const u32 parCel
 {
     AssertRelease(parChunkId < FChunks.size());
     const CircularGridChunk& chunk = FChunks[parChunkId];
-    AssertRelease(parCellId < chunk.CellNumber);
+    AssertRelease(parCellId < chunk.CellCount);
     return !chunk.GridCells[parCellId].Occupied;
 }
 
@@ -87,9 +87,15 @@ void CircularBuildingGrid::SetPositionOccupied(const u32 parChunkId, const u32 p
 {
     AssertRelease(parChunkId < FChunks.size());
     CircularGridChunk& chunk = FChunks[parChunkId];
-    AssertRelease(parCellId < chunk.CellNumber);
+    AssertRelease(parCellId < chunk.CellCount);
     AlwaysCheckedAssert(chunk.GridCells[parCellId].Occupied != parOccupied);
     chunk.GridCells[parCellId].Occupied = parOccupied;
+}
+
+u32 CircularBuildingGrid::GetCellCount(const u32 parChunkId) const
+{
+    AssertRelease(parChunkId < FChunks.size());
+    return FChunks[parChunkId].CellCount;
 }
 
 void CircularBuildingGrid::CreateNewGridChunk()
@@ -109,17 +115,17 @@ void CircularBuildingGrid::CreateNewGridChunk()
     CircularGridChunk& chunk = FChunks[gridChunkIndex];
 
     // round the cell number and compute the actual arclength using this number
-    chunk.CellNumber = (u32)std::roundf(nbSubdiv);
-    chunk.ActualArcAngle = 2.0f * glm::pi<float>() / chunk.CellNumber;
+    chunk.CellCount = (u32)std::roundf(nbSubdiv);
+    chunk.ActualArcAngle = 2.0f * glm::pi<float>() / chunk.CellCount;
 
-    AssertRelease(chunk.CellNumber != 0);
+    AssertRelease(chunk.CellCount != 0);
     AssertRelease(chunk.ActualArcAngle != 0);
 
     chunk.Index = gridChunkIndex;
 
-    chunk.GridCells.resize(chunk.CellNumber);
+    chunk.GridCells.resize(chunk.CellCount);
 
-    forrange(i, 0, chunk.CellNumber)
+    forrange(i, 0, chunk.CellCount)
     {
         CircularGridCell& cell = chunk.GridCells[i];
         cell.Index = (u32)i;
@@ -155,18 +161,47 @@ CircularGridAccessor::CircularGridAccessor(const glm::vec3 parGridCellPosition, 
 {
 }
 
-bool CircularGridAccessor::IsFree() const
+bool CircularGridAccessor::IsFree(const u32 parBuildingSize) const
 {
     if (!FValid)
         return false;
 
-    return CircularBuildingGrid::Instance().IsPositionFree(FChunkId, FCellId);
+    const i32 startIdx = (parBuildingSize > 1) ? -(i32)ceil(parBuildingSize / 2.f - 1.f) : 0;
+    const i32 endIdx = startIdx + parBuildingSize;
+    const u32 cellCount = CircularBuildingGrid::Instance().GetCellCount(FChunkId);
+
+    for (i32 idx = startIdx; idx < endIdx; ++idx)
+    {
+        i32 cellId = (FCellId + idx);
+        if (cellId < 0)
+            cellId += cellCount;
+        AlwaysCheckedAssert(cellId >= 0);
+        cellId = cellId % cellCount;
+
+        if (!CircularBuildingGrid::Instance().IsPositionFree(FChunkId, cellId))
+            return false;
+    }
+
+    return true;
 }
 
-void CircularGridAccessor::SetOccupied(bool parOccupied) const
+void CircularGridAccessor::SetOccupied(bool parOccupied, const u32 parBuildingSize) const
 {
     AssertRelease(FValid);
-    CircularBuildingGrid::Instance().SetPositionOccupied(FChunkId, FCellId, parOccupied);
+    const i32 startIdx = (parBuildingSize > 1) ? -(i32)ceil(parBuildingSize / 2.f - 1.f) : 0;
+    const i32 endIdx = startIdx + parBuildingSize;
+    const u32 cellCount = CircularBuildingGrid::Instance().GetCellCount(FChunkId);
+
+    for (i32 idx = startIdx; idx < endIdx; ++idx)
+    {
+        i32 cellId = (FCellId + idx);
+        if (cellId < 0)
+            cellId += cellCount;
+        AlwaysCheckedAssert(cellId >= 0);
+        cellId = cellId % cellCount;
+
+        CircularBuildingGrid::Instance().SetPositionOccupied(FChunkId, cellId, parOccupied);
+    }
 }
 
 } // namespace ECSEngine
