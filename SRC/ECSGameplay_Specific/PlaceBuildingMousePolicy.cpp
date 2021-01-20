@@ -2,6 +2,7 @@
 
 #include "PlaceBuildingMousePolicy.h"
 
+#include "BuildingGridOccupancyModule.h"
 #include "CircularBuildingGrid.h"
 #include "Common/CameraHelpers.h"
 #include "Common/CameraManager.h"
@@ -46,6 +47,10 @@ void PlaceBuildingMousePolicy::VirtualActivate()
         return;
     }
 
+    const BuildingGridOccupancyModuleTemplate* occupancyTemplate = (const BuildingGridOccupancyModuleTemplate*)FTemplate->GetModuleTemplate<BuildingGridOccupancyModule>();
+    AssertRelease(occupancyTemplate != nullptr);
+    FCellOccupancy = occupancyTemplate->CellsOccupancy();
+
     FBuildingProxy = new Rendering::GFXRepresentationProxy();
     Rendering::GFXRepresentationInitialiser init;
     init.FPosition = GetMouseWorldPosition();
@@ -78,7 +83,7 @@ void PlaceBuildingMousePolicy::VirtualUpdate()
 
         CircularGridAccessor accessor = CircularBuildingGrid::Instance().GetAccessorForWorldPosition(mouseWorldPosition);
 
-        if (accessor.Valid())
+        if (accessor.Valid() && accessor.IsFree(FCellOccupancy))
         {
             FBuildingProxy->PushMessage<bool>(GFXKeyHelper::Instance().Visible, true, TimeManager::FrameStartTime());
             FBuildingProxy->PushMessage<glm::vec3>(GFXKeyHelper::Instance().Position, accessor.CellPosition(), TimeManager::FrameStartTime());
@@ -89,7 +94,7 @@ void PlaceBuildingMousePolicy::VirtualUpdate()
                 message->FTemplateName = FTemplate->GetName();
                 message->FPosition = accessor.CellPosition();
                 GenericMessageManager::Instance().PushMessage<GenericMessageId::PLACE_BUILDING, ConstructBuildingMessage>(message);
-                accessor.SetOccupied(true);
+                accessor.SetOccupied(true, FCellOccupancy);
                 Deactivate();
                 return;
             }

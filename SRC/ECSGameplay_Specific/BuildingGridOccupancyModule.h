@@ -21,6 +21,8 @@ public:
 
     SERIALIZE() { PROPERTYFIELD(CellsOccupancy, 1); }
 
+    u32 CellsOccupancy() const { return FCellsOccupancy; }
+
 protected:
     void VirtualDrawEditor() override;
 
