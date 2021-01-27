@@ -47,6 +47,7 @@ void BGFXRenderingBackend::Init()
 
     bgfx::setViewClear(RenderPassId::EDITOR_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
     bgfx::setViewRect(RenderPassId::EDITOR_PASS, 0, 0, window.GetSize().x, window.GetSize().y);
+    bgfx::setViewClear(RenderPassId::DEBUG_PASS, BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
     bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, window.GetSize().x, window.GetSize().y);
 }
 
