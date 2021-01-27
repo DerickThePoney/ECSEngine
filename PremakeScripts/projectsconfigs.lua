@@ -9,11 +9,12 @@ includedirs { "../External/glm",
 
 includedirs { "../External/fmt/", "../External/brigand/brigand/include", "../External/cereal/include"}
 
-filter "options:clang"
-  toolset("msc-clangcl")
 
 flags {"MultiProcessorCompile", "LinkTimeOptimization", "NoIncrementalLink"}
 editAndContinue "Off"
+
+filter "options:clang"
+  toolset("msc-clangcl")
 
 filter "configurations:Debug"
   defines { "DEBUG" , "PERFORM_SECURITY_CHECKS", "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING"}
