@@ -242,10 +242,7 @@ jobs:
         shell: bash
 
       - name: Run Asset cooking
-        run: |
-          mkdir build
-          cd build
-          ../bin/Win64/Release/AssetCooker.exe
+        run: py -u Script/Generation/GenerateData.py
         shell: bash
 
 
