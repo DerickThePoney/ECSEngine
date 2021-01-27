@@ -10,7 +10,7 @@
 #include "ECSGameplay_Specific/CircularBuildingGrid.h"
 #include "ECSGameplay_Specific/MousePolicyManager.h"
 #include "ImGuiTools/ResourceCacheDebug.h"
-#include "PathfindingManager.h"
+#include "NavMeshPathfindingManager.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GFXRepresentationManager.h"

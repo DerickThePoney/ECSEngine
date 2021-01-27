@@ -12,7 +12,7 @@
 #include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
-#include "PathfindingManager.h"
+#include "NavMeshPathfindingManager.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"

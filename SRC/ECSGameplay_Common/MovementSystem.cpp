@@ -8,7 +8,7 @@
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "MovementModule.h"
-#include "PathfindingManager.h"
+#include "NavMeshPathfindingManager.h"
 #include "PositionModule.h"
 #include "RenderingCore/DrawCommands.h"
 
