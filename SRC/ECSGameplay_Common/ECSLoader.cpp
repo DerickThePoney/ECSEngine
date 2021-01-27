@@ -10,7 +10,7 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/WorldManager.h"
-#include "PathfindingManager.h"
+#include "NavMeshPathfindingManager.h"
 #include "WorldDeclaration.h"
 
 namespace ECSEngine

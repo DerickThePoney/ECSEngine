@@ -8,7 +8,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSGameplay_Common/EntityLinksModules.h"
 #include "ECSGameplay_Common/MovementModule.h"
-#include "ECSGameplay_Common/PathfindingManager.h"
+#include "ECSGameplay_Common/NavMeshPathfindingManager.h"
 #include "ECSGameplay_Common/PositionModule.h"
 #include "ResourceHarvesterModule.h"
 #include "ResourceStorageModule.h"

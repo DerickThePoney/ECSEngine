@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "PathfindingManager.h"
+#include "NavMeshPathfindingManager.h"
 
 #include "Common/NavMesh.h"
 #include "Common/NavMeshPath.h"
@@ -15,7 +15,7 @@
 namespace ECSEngine
 {
 
-class PathfindingManager : public Singleton<PathfindingManager>
+class NavMeshPathfindingManager : public Singleton<NavMeshPathfindingManager>
 {
 public:
     void Initialise(const Polygon2D& parWorldExtent, const std::vector<Polygon2D>& parObstacles);
@@ -41,7 +41,7 @@ private:
     std::vector<PathfindingResult> FResults;
 };
 
-void PathfindingManager::Initialise(const Polygon2D& parWorldExtent, const std::vector<Polygon2D>& parObstacles)
+void NavMeshPathfindingManager::Initialise(const Polygon2D& parWorldExtent, const std::vector<Polygon2D>& parObstacles)
 {
     if (FNavMesh.VerticesCount() > 0)
         FNavMesh.Cleanup();
@@ -50,17 +50,17 @@ void PathfindingManager::Initialise(const Polygon2D& parWorldExtent, const std::
     solver.CreateNavMesh(parWorldExtent, parObstacles, FNavMesh);
 }
 
-void PathfindingManager::Cleanup()
+void NavMeshPathfindingManager::Cleanup()
 {
     FNavMesh.Cleanup();
 }
 
-void PathfindingManager::PushRequest(PathfindingRequest&& parRequest)
+void NavMeshPathfindingManager::PushRequest(PathfindingRequest&& parRequest)
 {
     FRequests.push(parRequest);
 }
 
-PathfindingResult PathfindingManager::ComputeRequestsSynchrone(PathfindingRequest&& parRequest)
+PathfindingResult NavMeshPathfindingManager::ComputeRequestsSynchrone(PathfindingRequest&& parRequest)
 {
     const PathfindingRequest request = parRequest;
     ProcessOneRequest(parRequest);
@@ -69,7 +69,7 @@ PathfindingResult PathfindingManager::ComputeRequestsSynchrone(PathfindingReques
     return res;
 }
 
-void PathfindingManager::ComputeRequests()
+void NavMeshPathfindingManager::ComputeRequests()
 {
     while (!FRequests.empty())
     {
@@ -79,13 +79,13 @@ void PathfindingManager::ComputeRequests()
     }
 }
 
-void PathfindingManager::RetrieveResults(std::vector<PathfindingResult>& outResults)
+void NavMeshPathfindingManager::RetrieveResults(std::vector<PathfindingResult>& outResults)
 {
     outResults.swap(FResults);
     FResults.clear();
 }
 
-void PathfindingManager::Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial)
+void NavMeshPathfindingManager::Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial)
 {
     ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showPathfindingDebug, false, "Show navmesh", "Pathfinding/NavMesh");
     if (!showPathfindingDebug || FNavMesh.FacesCount() == 0)
@@ -98,7 +98,7 @@ void PathfindingManager::Debug(Rendering::DrawCommandBuffer& parBuffer, const Re
     foreachitemconst(hole, memView) { parBuffer.DrawLines(parMaterial, hole.data().data(), (u32)hole.size(), 0.0f, 0xFF0000FF, true); }
 }
 
-void PathfindingManager::ProcessOneRequest(const PathfindingRequest& parRequest)
+void NavMeshPathfindingManager::ProcessOneRequest(const PathfindingRequest& parRequest)
 {
     Navigation::NavMeshPath path(parRequest.Start, parRequest.End);
     Navigation::NavMeshPathSolver pathSolver;
@@ -125,43 +125,43 @@ namespace Pathfinding
 
 void CreatePathfinder()
 {
-    PathfindingManager::CreateIFP();
+    NavMeshPathfindingManager::CreateIFP();
 }
 
 void InitialisePathfinder(const Polygon2D& parWorldExtent, const std::vector<Polygon2D>& parObstacles)
 {
-    PathfindingManager::Instance().Initialise(parWorldExtent, parObstacles);
+    NavMeshPathfindingManager::Instance().Initialise(parWorldExtent, parObstacles);
 }
 
 void DestroyPathfinder()
 {
-    PathfindingManager::Instance().Cleanup();
-    PathfindingManager::Destroy();
+    NavMeshPathfindingManager::Instance().Cleanup();
+    NavMeshPathfindingManager::Destroy();
 }
 
 void PushRequest(PathfindingRequest&& parRequest)
 {
-    PathfindingManager::Instance().PushRequest(std::move(parRequest));
+    NavMeshPathfindingManager::Instance().PushRequest(std::move(parRequest));
 }
 
 PathfindingResult ComputeRequestSynchrone(PathfindingRequest&& parRequest)
 {
-    return PathfindingManager::Instance().ComputeRequestsSynchrone(std::move(parRequest));
+    return NavMeshPathfindingManager::Instance().ComputeRequestsSynchrone(std::move(parRequest));
 }
 
 void ComputeRequests()
 {
-    PathfindingManager::Instance().ComputeRequests();
+    NavMeshPathfindingManager::Instance().ComputeRequests();
 }
 
 void RetrieveResults(std::vector<PathfindingResult>& outResults)
 {
-    PathfindingManager::Instance().RetrieveResults(outResults);
+    NavMeshPathfindingManager::Instance().RetrieveResults(outResults);
 }
 
 void Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial)
 {
-    PathfindingManager::Instance().Debug(parBuffer, parMaterial);
+    NavMeshPathfindingManager::Instance().Debug(parBuffer, parMaterial);
 }
 
 } // namespace Pathfinding
