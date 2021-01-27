@@ -1,4 +1,5 @@
 #pragma once
+#include "CircularPathfindingGraph.h"
 #include "Common/Singleton.h"
 
 namespace ECSEngine
@@ -39,6 +40,7 @@ public:
     void SetPositionOccupied(const u32 parChunkId, const u32 parCellId, const bool parOccupied);
 
     u32 GetCellCount(const u32 parChunkId) const;
+    const Pathfinding::CircularPathfindingGraph& GetGraph() const { return FGraph; }
 
 private:
     void CreateNewGridChunk();
@@ -61,5 +63,7 @@ private:
     };
 
     std::vector<CircularGridChunk> FChunks;
+
+    Pathfinding::CircularPathfindingGraph FGraph;
 };
 } // namespace ECSEngine

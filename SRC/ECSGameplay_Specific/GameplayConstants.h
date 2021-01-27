@@ -20,6 +20,7 @@ extern float WantedArcLength;
 extern float InterChunkLength;
 extern float GridStartRadius;
 extern float GridChunkWidth;
+extern float NavigationNodesDistance;
 extern float GridChunkFeedbackThickness;
 extern u32 StartingGridChunkNumber;
 extern glm::vec4 GridFeedbackColor;
@@ -43,6 +44,7 @@ public:
         PROPERTYFIELD(InterChunkLength, 0.5f);
         PROPERTYFIELD(GridStartRadius, 3.0f);
         PROPERTYFIELD(GridChunkWidth, 1.0f);
+        PROPERTYFIELD(NavigationNodesDistance, 0.5f);
         PROPERTYFIELD(GridChunkFeedbackThickness, 0.1f);
         PROPERTYFIELD(StartingGridChunkNumber, 2);
         PROPERTYFIELD(GridFeedbackColor, glm::vec4(0.f));
@@ -68,6 +70,7 @@ private:
     float FInterChunkLength = 0.5f;
     float FGridStartRadius = 3.0f;
     float FGridChunkWidth = 1.0f;
+    float FNavigationNodesDistance = 0.5f;
     float FGridChunkFeedbackThickness = 0.1f;
     u32 FStartingGridChunkNumber = 2;
     glm::vec4 FGridFeedbackColor = glm::vec4(0.f);

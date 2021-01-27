@@ -7,6 +7,7 @@
 #include "Common/TimeManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
+#include "ECSGameplay_Specific/CircularBuildingGrid.h"
 #include "ECSGameplay_Specific/MousePolicyManager.h"
 #include "ImGuiTools/ResourceCacheDebug.h"
 #include "PathfindingManager.h"
@@ -146,6 +147,13 @@ void GameScenarioUpdater::Render()
 
     Pathfinding::Debug(*buffer, handle);
     FMovementSystem.VisualDebug(*buffer, handle);
+
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showDebugForCircularGraph, false, "show debug", "Pathfinding/CircularGraph");
+    if (showDebugForCircularGraph)
+    {
+        CircularBuildingGrid::Instance().GetGraph().Debug(*buffer, handle);
+    }
+
     buffer->Submit();
     buffer->clear();
     delete buffer;

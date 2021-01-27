@@ -24,6 +24,9 @@ float WantedArcLength = 2.0f;
 float InterChunkLength = 0.5f;
 float GridStartRadius = 3.0f;
 float GridChunkWidth = 1.0f;
+
+float NavigationNodesDistance = 0.5f;
+
 float GridChunkFeedbackThickness = 0.1f;
 u32 StartingGridChunkNumber = 2;
 glm::vec4 GridFeedbackColor = glm::vec4(0.f);
@@ -45,6 +48,7 @@ void GameplayConstantsLoader::PostSerialize()
     GameplayConstants::CircularBuildingGrid::InterChunkLength = FInterChunkLength;
     GameplayConstants::CircularBuildingGrid::GridStartRadius = FGridStartRadius;
     GameplayConstants::CircularBuildingGrid::GridChunkWidth = FGridChunkWidth;
+    GameplayConstants::CircularBuildingGrid::NavigationNodesDistance = FNavigationNodesDistance;
     GameplayConstants::CircularBuildingGrid::GridChunkFeedbackThickness = FGridChunkFeedbackThickness;
     GameplayConstants::CircularBuildingGrid::StartingGridChunkNumber = FStartingGridChunkNumber;
     GameplayConstants::CircularBuildingGrid::GridFeedbackColor = FGridFeedbackColor;
@@ -71,6 +75,8 @@ void GameplayConstantsLoader::DrawEditor()
         EDITOR_PROPERTY_SIMPLE("Grid start radius", FGridStartRadius);
         EDITOR_PROPERTY_SIMPLE("Grid chunk width", FGridChunkWidth);
         EDITOR_PROPERTY_SIMPLE("Grid chunks unlocked at start", FStartingGridChunkNumber);
+        ImGui::Separator();
+        EDITOR_PROPERTY_WITH_LIMITS("Navigation node distance", FNavigationNodesDistance, 0.f, FWantedArcLength);
         ImGui::Separator();
         EDITOR_PROPERTY_SIMPLE("Grid chunk feedback thickness", FGridChunkFeedbackThickness);
         EDITOR_PROPERTY_COLOR("Grid feedback color", FGridFeedbackColor);
