@@ -18,6 +18,7 @@ void CircularBuildingGrid::Initialise()
 void CircularBuildingGrid::Shutdown()
 {
     FChunks.clear();
+    FGraph.Cleanup();
 }
 
 void CircularBuildingGrid::DrawFeedback() const
@@ -34,7 +35,7 @@ void CircularBuildingGrid::DrawFeedback() const
 
 CircularGridAccessor CircularBuildingGrid::GetAccessorForWorldPosition(const glm::vec3& parWorldPosition) const
 {
-    glm::vec2 worldPos2D = glm::xz(parWorldPosition);
+    const glm::vec2 worldPos2D = glm::xz(parWorldPosition);
     const float distanceToCenter = glm::length(worldPos2D);
 
     // detect chunk
@@ -130,6 +131,7 @@ void CircularBuildingGrid::CreateNewGridChunk()
         CircularGridCell& cell = chunk.GridCells[i];
         cell.Index = (u32)i;
     }
+    FGraph.AddNewCircularChunk();
 }
 
 float CircularBuildingGrid::GetRadiusForChunk(const u32 parChunkIndex) const
