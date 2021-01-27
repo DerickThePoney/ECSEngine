@@ -132,7 +132,7 @@ CircularPathfindingGraph::NodeId CircularPathfindingGraph::GetClosestNode(const 
         const float minR = chunkRadius - 0.5f * GameplayConstants::CircularBuildingGrid::GridChunkWidth;
         float pathDistance = minR - 0.5f * GameplayConstants::CircularBuildingGrid::InterChunkLength;
 
-        u32 chunkId = i;
+        u32 chunkId = (u32)i;
         if ((distanceToCenter > pathDistance) && (i < FNavigationNodes.size() - 1))
         {
             // check nextNode
@@ -146,7 +146,7 @@ CircularPathfindingGraph::NodeId CircularPathfindingGraph::GetClosestNode(const 
             }
             else if ((nextPathDistance - distanceToCenter) < (distanceToCenter - pathDistance))
             {
-                chunkId = i + 1;
+                chunkId = (u32)i + 1;
                 pathDistance = nextPathDistance;
             }
         }
