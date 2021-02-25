@@ -227,6 +227,7 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - run: |
+          mkdir build/
           mkdir bin/
           mkdir bin/Win64/
           mkdir bin/Win64/Release/
