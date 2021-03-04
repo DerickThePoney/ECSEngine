@@ -1,5 +1,6 @@
 #pragma once
 #include "CircularPathfindingGraph.h"
+#include "Common/Polygon.h"
 #include "Common/Singleton.h"
 
 namespace ECSEngine
@@ -15,6 +16,8 @@ public:
     bool IsFree(const u32 parBuildingSize) const;
 
     void SetOccupied(bool parOccupied, const u32 parBuildingSize) const;
+
+    Polygon2D CreatePolygon(u32 parBuildingSize) const;
 
     u32 ChunkId() const { return FChunkId; }
     u32 CellId() const { return FCellId; }
@@ -41,6 +44,8 @@ public:
 
     u32 GetCellCount(const u32 parChunkId) const;
     const Pathfinding::CircularPathfindingGraph& GetGraph() const { return FGraph; }
+
+    Polygon2D CreatePolygon(const CircularGridAccessor& parGridAccessor, u32 parBuildingSize) const;
 
 private:
     void CreateNewGridChunk();

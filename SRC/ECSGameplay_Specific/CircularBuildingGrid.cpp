@@ -4,6 +4,7 @@
 
 #include "Common/AngleRange.h"
 #include "Common/ColorUtils.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "GameplayConstants.h"
 #include "GameplayFeedbackDrawer.h"
 
@@ -97,6 +98,60 @@ u32 CircularBuildingGrid::GetCellCount(const u32 parChunkId) const
 {
     AssertRelease(parChunkId < FChunks.size());
     return FChunks[parChunkId].CellCount;
+}
+
+Polygon2D CircularBuildingGrid::CreatePolygon(const CircularGridAccessor& parGridAccessor, u32 parBuildingSize) const
+{
+    /// PROBLEMS WITH MULTISIZED BUILDINGS !
+
+    const u32 cellCount = GetCellCount(parGridAccessor.ChunkId());
+    i32 startIdx = (parBuildingSize > 1) ? -(i32)ceil(parBuildingSize / 2.f - 1.f) : 0;
+    i32 endIdx = startIdx + (parBuildingSize - 1);
+
+    auto convertIdxToCellId = [](const CircularGridAccessor& parGridAccessor, const i32 cellIdx, const u32 cellCount) -> i32 {
+        i32 cellId = parGridAccessor.CellId() + cellIdx;
+        if (cellId < 0)
+            cellId += cellCount;
+        AlwaysCheckedAssert(cellId >= 0);
+        cellId = cellId % cellCount;
+        return cellId;
+    };
+    startIdx = convertIdxToCellId(parGridAccessor, startIdx, cellCount);
+    endIdx = convertIdxToCellId(parGridAccessor, endIdx, cellCount);
+
+    Polygon2D res;
+
+    // find inner limits
+    const float radius = GetRadiusForChunk(parGridAccessor.ChunkId());
+    const float minR = radius - 0.4f * GameplayConstants::CircularBuildingGrid::GridChunkWidth;
+    const float maxR = radius + 0.4f * GameplayConstants ::CircularBuildingGrid::GridChunkWidth;
+    AngleRange startCellAngleRange(GetCellAngleRange(startIdx, FChunks[parGridAccessor.ChunkId()].ActualArcAngle));
+    AngleRange endCellAngleRange(GetCellAngleRange(endIdx, FChunks[parGridAccessor.ChunkId()].ActualArcAngle));
+
+    ADJUSTABLE_DEBUG_PARAMETER_SINGLE(freeColisionSpace, 0.1f, "Free colision space", "CircularBuildingGrid/Obstacles", 0.f, 0.5f);
+    const float freeSpaceAngle = freeColisionSpace / radius;
+    const float angleDiff = AngleHelpers::AngleDifference(startCellAngleRange.Left(), endCellAngleRange.Right()) - 2.f * freeSpaceAngle;
+    //-2.0f * glm::radians(1.5f);
+    AlwaysCheckedAssert(angleDiff > 0.f);
+    const u32 wantedSubdiv = (u32)(angleDiff / glm::radians(5.f));
+    const float angleInterv = angleDiff / (wantedSubdiv - 1);
+
+    // fill the polygon
+    res.reserve((wantedSubdiv + 1) * 2);
+    forrange(i, 0, wantedSubdiv)
+    {
+        const float angle = startCellAngleRange.Left() + freeSpaceAngle + i * angleInterv;
+        const glm::vec2 pos = minR * glm::vec2(glm::cos(angle), glm::sin(angle));
+        res.push_back(pos);
+    }
+
+    reverseforrange(i, 0, wantedSubdiv)
+    {
+        const float angle = startCellAngleRange.Left() + freeSpaceAngle + i * angleInterv;
+        const glm::vec2 pos = maxR * glm::vec2(glm::cos(angle), glm::sin(angle));
+        res.push_back(pos);
+    }
+    return res;
 }
 
 void CircularBuildingGrid::CreateNewGridChunk()
@@ -204,6 +259,11 @@ void CircularGridAccessor::SetOccupied(bool parOccupied, const u32 parBuildingSi
 
         CircularBuildingGrid::Instance().SetPositionOccupied(FChunkId, cellId, parOccupied);
     }
+}
+
+Polygon2D CircularGridAccessor::CreatePolygon(u32 parBuildingSize) const
+{
+    return CircularBuildingGrid::Instance().CreatePolygon(*this, parBuildingSize);
 }
 
 } // namespace ECSEngine
