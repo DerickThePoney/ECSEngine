@@ -154,7 +154,7 @@ public:
     {
     }
 
-    bool GetValue() const { return FValue; }
+    float GetValue() const { return FValue; }
 
 protected:
     virtual void VirtualDrawAdjustableDebug() override { ImGui::SliderFloat(fmt::format("##{}", Name()).c_str(), &FValue, FMin, FMax); }
@@ -183,7 +183,7 @@ public:
     {
     }
 
-    bool GetValue() const { return FValue; }
+    double GetValue() const { return FValue; }
 
 protected:
     virtual void VirtualDrawAdjustableDebug() override
