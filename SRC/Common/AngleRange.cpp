@@ -4,6 +4,19 @@
 
 namespace ECSEngine
 {
+namespace AngleHelpers
+{
+float AngleDifference(const float parA, const float parB)
+{
+    float realB = parB;
+    if (realB < parA)
+    {
+        static const float tau = 2.0f * glm::pi<float>();
+        realB += tau;
+    }
+    return realB - parA;
+}
+} // namespace AngleHelpers
 
 AngleRange::AngleRange(std::pair<float, float> parRange)
     : FRange(parRange)
