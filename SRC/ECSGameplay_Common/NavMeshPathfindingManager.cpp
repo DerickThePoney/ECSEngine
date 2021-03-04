@@ -19,6 +19,8 @@ class NavMeshPathfindingManager : public Singleton<NavMeshPathfindingManager>
 {
 public:
     void Initialise(const Polygon2D& parWorldExtent, const std::vector<Polygon2D>& parObstacles);
+    void ModifyWorldExtents(const Polygon2D& parWorldExtent);
+    void AddObstacle(const Polygon2D& parObstacle);
     void Cleanup();
 
     void PushRequest(PathfindingRequest&& parRequest);
@@ -48,6 +50,28 @@ void NavMeshPathfindingManager::Initialise(const Polygon2D& parWorldExtent, cons
 
     Navigation::NavMeshSolver solver;
     solver.CreateNavMesh(parWorldExtent, parObstacles, FNavMesh);
+}
+
+void NavMeshPathfindingManager::ModifyWorldExtents(const Polygon2D& parWorldExtent)
+{
+    MemoryView<const Polygon2D> navMeshHolesView = FNavMesh.Holes();
+    std::vector<Polygon2D> navMeshHolesCopy;
+    navMeshHolesCopy.reserve(navMeshHolesView.size());
+    foreachitemconst(hole, navMeshHolesView) { navMeshHolesCopy.push_back(hole); }
+
+    Initialise(parWorldExtent, navMeshHolesCopy);
+}
+
+void NavMeshPathfindingManager::AddObstacle(const Polygon2D& parObstacle)
+{
+    MemoryView<const Polygon2D> navMeshHolesView = FNavMesh.Holes();
+    std::vector<Polygon2D> navMeshHolesCopy;
+    navMeshHolesCopy.reserve(navMeshHolesView.size() + 1);
+    foreachitemconst(hole, navMeshHolesView) { navMeshHolesCopy.push_back(hole); }
+
+    navMeshHolesCopy.push_back(parObstacle);
+
+    Initialise(FNavMesh.MainPolygon(), navMeshHolesCopy);
 }
 
 void NavMeshPathfindingManager::Cleanup()
@@ -131,6 +155,20 @@ void CreatePathfinder()
 void InitialisePathfinder(const Polygon2D& parWorldExtent, const std::vector<Polygon2D>& parObstacles)
 {
     NavMeshPathfindingManager::Instance().Initialise(parWorldExtent, parObstacles);
+}
+
+void ModifyWorldExtents(const Polygon2D& parWorldExtent)
+{
+    NavMeshPathfindingManager::Instance().ModifyWorldExtents(parWorldExtent);
+}
+
+void AddObstacle(const Polygon2D& parObstacle)
+{
+    NavMeshPathfindingManager::Instance().AddObstacle(parObstacle);
+}
+
+void ModifyPathfinder(const Polygon2D& parWorldExtent, const std::vector<Polygon2D>& parObstacles)
+{
 }
 
 void DestroyPathfinder()

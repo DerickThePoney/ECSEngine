@@ -28,6 +28,8 @@ namespace Pathfinding
 {
 void CreatePathfinder();
 void InitialisePathfinder(const Polygon2D& parWorldExtent, const std::vector<Polygon2D>& parObstacles);
+void ModifyWorldExtents(const Polygon2D& parWorldExtent);
+void AddObstacle(const Polygon2D& parObstacle);
 void DestroyPathfinder();
 
 void PushRequest(PathfindingRequest&& parRequest);
