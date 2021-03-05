@@ -18,7 +18,7 @@ project "Common"
       pchheader ("stdafx.h")
    pchsource(srcfiles.."stdafx.cpp")
 
-   includedirs { "../SRC"}
+   includedirs { "../SRC", "../External/polypartition-master/src"}
    links("FMT")
 
    dofile("projectsconfigs.lua")
