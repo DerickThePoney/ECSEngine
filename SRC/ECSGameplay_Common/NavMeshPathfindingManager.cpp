@@ -122,17 +122,7 @@ void NavMeshPathfindingManager::Debug(Rendering::DrawCommandBuffer& parBuffer, c
     foreachitemconst(hole, memView) { parBuffer.DrawLines(parMaterial, hole.data().data(), (u32)hole.size(), 0.0f, 0xFF0000FF, true); }
 
     const Navigation::FacesDataBase& faces = FNavMesh.Faces();
-    foreachitemconst(face, faces)
-    {
-        const Navigation::NavMeshEdge* edge = face->Edge;
-        std::vector<glm::vec2> faceVertices;
-        do
-        {
-            faceVertices.push_back(edge->Vertex->Position);
-            edge = edge->Next;
-        } while (edge != face->Edge);
-        parBuffer.DrawLines(parMaterial, faceVertices, faceVertices.size(), 0.f, 0xFFFF0000, true);
-    }
+    foreachitemconst(face, faces) { parBuffer.DrawLines(parMaterial, face->FacePolygon.data(), (u32)face->FacePolygon.size(), 0.f, 0xFFFF0000, true); }
 }
 
 void NavMeshPathfindingManager::ProcessOneRequest(const PathfindingRequest& parRequest)
@@ -151,7 +141,7 @@ void NavMeshPathfindingManager::ProcessOneRequest(const PathfindingRequest& parR
 
         result.Waypoints.reserve(path.size());
         result.Waypoints.push_back(path.Start());
-        foreachitemconst(vertex, path) { result.Waypoints.push_back(vertex->Position); }
+        foreachitemconst(vertex, path) { result.Waypoints.push_back(vertex); }
         result.Waypoints.push_back(path.End());
     }
     FResults.push_back(std::move(result));
