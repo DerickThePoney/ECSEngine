@@ -49,3 +49,8 @@ External/glm-0.9.9.5
 *.ktx
 *.bin
 *.exp
+External/polypartition-master/.clang-format
+
+External/polypartition-master/.editorconfig
+
+External/polypartition-master/.gitattributes
