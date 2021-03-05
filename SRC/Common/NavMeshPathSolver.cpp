@@ -2,6 +2,7 @@
 
 #include "NavMeshPathSolver.h"
 
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "NavMesh.h"
 #include "NavMeshPath.h"
 #include "NavMeshUtilities.h"
@@ -48,6 +49,24 @@ static_assert(std::is_trivially_copyable<PathFindNode>(), "PathFindNode must be 
 
 void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPath)
 {
+    ADJUSTABLE_DEBUG_PARAMETER_CHOICES(pathSolverType, 0, "Navigation path algorithm", "Pathfinding/NavMesh", "FACES/VERTEX");
+
+    switch (pathSolverType)
+    {
+    case 0: // FACE SOLVER
+        SolveFacePath(parNavMesh, outPath);
+        break;
+    case 1: // VERTEX SOLVER
+        SolveVertexPath(parNavMesh, outPath);
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
+}
+
+void NavMeshPathSolver::SolveFacePath(const NavMesh& parNavMesh, NavMeshPath& outPath)
+{
     const glm::vec2 start = outPath.Start();
     const NavMeshFace* startFace = parNavMesh.FindContainingFace(start);
     if (startFace == nullptr)
@@ -66,7 +85,113 @@ void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPat
     }
 
     // quick n dirty bailout check
-     if (!NavMeshHelpers::NavMeshSegmentIntersection2D(parNavMesh, Segment2D(outPath.Start(), outPath.End())))
+    if (!NavMeshHelpers::NavMeshSegmentIntersection2D(parNavMesh, Segment2D(outPath.Start(), outPath.End())))
+    {
+        outPath.SetValid(true);
+        return;
+    }
+
+    // Otherwise, navigate the mesh
+    const FacesDataBase& faces = parNavMesh.Faces();
+    std::vector<PathFindNode> pathFindingNodes(faces.size());
+    forrange(i, 0, faces.size())
+    {
+        pathFindingNodes[i].HeuristicScore = PathfindingHelpers::Heuristic(faces[i]->Center, end);
+        pathFindingNodes[i].Id = (u32)i;
+    }
+    std::priority_queue<PathFindNode, std::vector<PathFindNode>, std::greater<PathFindNode>> openList;
+
+    // push the start face onto the open list
+    pathFindingNodes[startFace->Id].DistanceSoFar = PathfindingHelpers::Distance(startFace->Center, start);
+    openList.push(pathFindingNodes[startFace->Id]);
+
+    u32 lastFace = -1;
+    u32 bestLastFace = -1;
+    bool success = false;
+    while (!openList.empty())
+    {
+        const PathFindNode current = openList.top();
+        openList.pop();
+
+        lastFace = current.Id;
+
+        // check connected faces then break
+        bool localSuccess = false;
+        NeighbourFacesSet neighbouringFaces;
+        parNavMesh.NeighbourFaces(faces[lastFace], neighbouringFaces);
+        foreachitemconst(face, neighbouringFaces)
+        {
+            // On est concomitant à la face finale, yeah!!
+            if (face == endFace)
+            {
+                if (bestLastFace == -1 || pathFindingNodes[lastFace].Score() < pathFindingNodes[bestLastFace].Score())
+                {
+                    bestLastFace = lastFace;
+                }
+                localSuccess = true;
+                success = true;
+                break;
+            }
+
+            // sinon, on continue
+            const float distanceSoFar = PathfindingHelpers::Distance(face->Center, faces[lastFace]->Center) + current.DistanceSoFar;
+            const float score = PathfindingHelpers::Score(distanceSoFar, pathFindingNodes[face->Id].HeuristicScore);
+
+            if (score < pathFindingNodes[face->Id].Score())
+            {
+                // update the node, and push it onto the open list
+                pathFindingNodes[face->Id].From = lastFace;
+                pathFindingNodes[face->Id].DistanceSoFar = distanceSoFar;
+                openList.push(pathFindingNodes[face->Id]);
+            }
+        }
+
+        if (localSuccess)
+            break;
+    }
+
+    if (!success)
+        return;
+
+    // reconstruct path
+    std::vector<u32> path;
+    path.reserve(faces.size());
+
+    // on rajoute la end face dans le systeme
+    path.push_back(endFace->Id);
+    while (bestLastFace != -1)
+    {
+        path.push_back(bestLastFace);
+        bestLastFace = pathFindingNodes[bestLastFace].From;
+    }
+
+    // fill out the path in reserve
+    outPath.SetValid(true);
+    outPath.reserve(path.size());
+    reverseforrange(i, 0, path.size()) { outPath.push_back(faces[path[i]]->Center); }
+}
+
+void NavMeshPathSolver::SolveVertexPath(const NavMesh& parNavMesh, NavMeshPath& outPath)
+{
+    const glm::vec2 start = outPath.Start();
+    const NavMeshFace* startFace = parNavMesh.FindContainingFace(start);
+    if (startFace == nullptr)
+        return;
+
+    const glm::vec2 end = outPath.End();
+    const NavMeshFace* endFace = parNavMesh.FindContainingFace(end);
+    if (endFace == nullptr)
+        return;
+
+    // same face -> we're good stop there
+    if (startFace == endFace)
+    {
+        outPath.SetValid(true);
+        return;
+    }
+
+    // quick n dirty bailout check
+    if (!NavMeshHelpers::NavMeshSegmentIntersection2D(parNavMesh, Segment2D(outPath.Start(), outPath.End())))
     {
         outPath.SetValid(true);
         return;
@@ -156,7 +281,7 @@ void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPat
     // fill out the path in reserve
     outPath.SetValid(true);
     outPath.reserve(path.size());
-    reverseforrange(i, 0, path.size()) { outPath.push_back(vertices[path[i]]); }
+    reverseforrange(i, 0, path.size()) { outPath.push_back(vertices[path[i]]->Position); }
 }
 
 } // namespace Navigation
