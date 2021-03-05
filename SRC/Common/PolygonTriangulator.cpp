@@ -22,7 +22,7 @@ u32 NextIndex(const u32 idx, const u32 size)
 bool EarTest(const u32 i_m1, const u32 i, const u32 i_1, const Polygon2D& parPolygon)
 {
     u32 idx = NextIndex(i_1, (u32)parPolygon.size());
-    Triangle2D currentTri(parPolygon[i], parPolygon[i_m1], parPolygon[i_1]);
+    Triangle2D currentTri(parPolygon[i_m1], parPolygon[i], parPolygon[i_1]);
     while (idx != i_m1)
     {
         bool thisRes = Intersection::PointInTriangle2D(currentTri, parPolygon[idx], true);
@@ -33,6 +33,15 @@ bool EarTest(const u32 i_m1, const u32 i, const u32 i_1, const Polygon2D& parPol
     }
 
     return true;
+}
+
+bool IsReflex(const u32 i_m1, const u32 i, const u32 i_1, const Polygon2D& parPolygon)
+{
+    glm::vec2 p1 = parPolygon[i_m1];
+    glm::vec2 p2 = parPolygon[i];
+    glm::vec2 p3 = parPolygon[i_1];
+    float tmp = (p3.y - p1.y) * (p2.x - p1.x) - (p3.x - p1.x) * (p2.y - p1.y);
+    return tmp < 0;
 }
 
 void UpdateAdjacentVertex(const u32 idx, std::vector<u32>& convex, std::vector<u32>& reflex, std::vector<u32>& ears, const Polygon2D& parPolygon)
@@ -60,13 +69,9 @@ void UpdateAdjacentVertex(const u32 idx, std::vector<u32>& convex, std::vector<u
         auto itReflex = std::find(reflex.begin(), reflex.end(), idx);
         AlwaysCheckedAssert(itReflex != reflex.end());
 
-        const glm::vec3 pi_m1 = glm::vec3(parPolygon[i_m1], 0.f);
-        const glm::vec3 pi = glm::vec3(parPolygon[idx], 0.f);
-        const glm::vec3 pi_1 = glm::vec3(parPolygon[i_p1], 0.f);
+        bool isReflex = IsReflex(i_m1, idx, i_p1, parPolygon);
 
-        float s = glm::sign(glm::cross(pi_m1 - pi, pi_1 - pi).z);
-
-        if (s < 0.f)
+        if (!isReflex)
         {
             // on devient convex, ear test + lists update
             reflex.erase(itReflex);
@@ -143,12 +148,8 @@ void InsertHoleIntoPolygon(Polygon2D& parPolygon, const Polygon2D& parHole)
             const u32 i = (u32)idx;
             const u32 i_m1 = PreviousIndex(i, (u32)parPolygon.size());
             const u32 i_p1 = NextIndex(i, (u32)parPolygon.size());
-            const glm::vec3 pi_m1 = glm::vec3(parPolygon[i_m1], 0.f);
-            const glm::vec3 pi = glm::vec3(parPolygon[i], 0.f);
-            const glm::vec3 pi_1 = glm::vec3(parPolygon[i_p1], 0.f);
-
-            float s = glm::sign(glm::cross(pi_m1 - pi, pi_1 - pi).z);
-            if (s >= 0.f)
+            const bool reflex = IsReflex(i_m1, i, i_p1, parPolygon);
+            if (reflex)
             {
                 if (Intersection::PointInTriangle2D(mipTriangle, parPolygon[i]))
                 {
@@ -239,12 +240,8 @@ std::vector<Triangle2D> PolygonTriangulator::Triangulate(const Polygon2D& parPol
         const u32 i = (u32)idx;
         const u32 i_m1 = PreviousIndex(i, (u32)touse.size());
         const u32 i_p1 = NextIndex(i, (u32)touse.size());
-        const glm::vec3 pi_m1 = glm::vec3(touse[i_m1], 0.f);
-        const glm::vec3 pi = glm::vec3(touse[i], 0.f);
-        const glm::vec3 pi_1 = glm::vec3(touse[i_p1], 0.f);
-
-        float s = glm::sign(glm::cross(pi_m1 - pi, pi_1 - pi).z);
-        if (s >= 0.f)
+        const bool isReflex = IsReflex(i_m1, i, i_p1, parPolygon);
+        if (isReflex)
         {
             reflex.push_back(i);
         }
@@ -310,6 +307,30 @@ std::vector<Triangle2D> PolygonTriangulator::Triangulate(const Polygon2D& parPol
     return triangles;
 }
 
+struct PolygonSorter
+{
+    bool operator()(const Polygon2D& parA, const Polygon2D& parB) const
+    {
+        float maxXA = std::numeric_limits<float>::min();
+        forrange(i, 0, parA.size())
+        {
+            const glm::vec2& point = parA[i];
+            if (point.x > maxXA)
+                maxXA = point.x;
+        }
+
+        float maxXB = std::numeric_limits<float>::min();
+        forrange(i, 0, parB.size())
+        {
+            const glm::vec2& point = parB[i];
+            if (point.x > maxXB)
+                maxXB = point.x;
+        }
+
+        return maxXA > maxXB;
+    }
+};
+
 std::vector<Triangle2D> PolygonTriangulator::Triangulate(const Polygon2D& parPolygon, const std::vector<Polygon2D> parPolygonHoles, Polygon2D& outExtentedPolygon)
 {
     if (parPolygonHoles.empty())
@@ -324,6 +345,10 @@ std::vector<Triangle2D> PolygonTriangulator::Triangulate(const Polygon2D& parPol
     {
         polygonCopy = polygonCopy.Revert();
     }
+
+    std::vector<Polygon2D> polygonHolesCopy;
+    polygonHolesCopy.insert(polygonHolesCopy.begin(), parPolygonHoles.begin(), parPolygonHoles.end());
+    std::sort(polygonHolesCopy.begin(), polygonHolesCopy.end(), PolygonSorter{});
 
     foreachitemconst(hole, parPolygonHoles) { InsertHoleIntoPolygon(polygonCopy, hole); }
 
