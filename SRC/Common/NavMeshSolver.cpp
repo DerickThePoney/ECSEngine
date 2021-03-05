@@ -74,13 +74,23 @@ void NavMeshSolver::CreateNavMesh(const Polygon2D& parWorldExtents, const std::v
     foreachitemconst(polygon, partition) { edgesCount += (u32)polygon.size(); }
     edges.reserve(edgesCount);
 
+    u32 faceId = 0;
     foreachitemconst(polygon, partition)
     {
         NavMeshFace* face = new NavMeshFace();
+        face->FacePolygon = polygon;
+        face->Id = faceId++;
+
+        glm::vec2 center(0.f);
 
         std::vector<std::pair<NavMeshVertex*, bool>> verticesLoc;
         verticesLoc.resize(polygon.size());
-        forrange(i, 0, (u32)polygon.size()) { verticesLoc[i].first = GetOrCreateVertex(verticesMap, polygon[i], verticesLoc[i].second); }
+        forrange(i, 0, (u32)polygon.size())
+        {
+            verticesLoc[i].first = GetOrCreateVertex(verticesMap, polygon[i], verticesLoc[i].second);
+            center += polygon[i];
+        }
+        face->Center = center / polygon.size();
 
         std::vector<NavMeshEdge*> edgesLoc;
         edgesLoc.resize((u32)polygon.size());
@@ -125,9 +135,10 @@ void NavMeshSolver::CreateNavMesh(const Polygon2D& parWorldExtents, const std::v
     }
 
     vertices.reserve(verticesMap.size());
+    u32 index = 0;
     foreachitem(vertex, verticesMap)
     {
-        vertex.second->Id = (u32)vertices.size();
+        vertex.second->Id = index++;
         vertices.push_back(vertex.second);
     }
 
