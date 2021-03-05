@@ -37,6 +37,9 @@ struct NavMeshFace
 
 public:
     NavMeshEdge* Edge = nullptr;
+    Polygon2D FacePolygon;
+    glm::vec2 Center;
+    u32 Id;
 };
 
 using VerticesDataBase = std::vector<NavMeshVertex*>;
@@ -66,6 +69,7 @@ public:
     const NeighbourVerticesSet& NeighbourVertices(const NavMeshVertex* parVertex) const;
 
     void NeighbourFaces(const NavMeshVertex* parVertex, NeighbourFacesSet& outFaces) const;
+    void NeighbourFaces(const NavMeshFace* parFace, NeighbourFacesSet& outFaces) const;
 
     const Polygon2D& MainPolygon() const { return FMainPolygon; }
     const MemoryView<const Polygon2D> Holes() const { return MemoryView<const Polygon2D>(FHoles.data(), (u32)FHoles.size()); }

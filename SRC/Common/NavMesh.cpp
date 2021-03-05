@@ -54,15 +54,7 @@ const NavMeshFace* NavMesh::FindContainingFace(const glm::vec2 parPoint) const
 {
     foreachitemconst(face, FFaces)
     {
-        Polygon2D facePoly;
-        const NavMeshEdge* e = face->Edge;
-        do
-        {
-            facePoly.push_back(e->Vertex->Position);
-            e = e->Next;
-        } while (e != face->Edge);
-
-        if (Intersection::PointInPolygon2D(facePoly, parPoint))
+        if (Intersection::PointInPolygon2D(face->FacePolygon, parPoint))
         {
             return face;
         }
@@ -79,6 +71,21 @@ const NeighbourVerticesSet& NavMesh::NeighbourVertices(const NavMeshVertex* parV
 void NavMesh::NeighbourFaces(const NavMeshVertex* parVertex, NeighbourFacesSet& outFaces) const
 {
     foreachitemconst(edge, parVertex->Edge) { outFaces.insert(edge->Face); }
+}
+
+void NavMesh::NeighbourFaces(const NavMeshFace* parFace, NeighbourFacesSet& outFaces) const
+{
+    NavMeshEdge* currentEdge = parFace->Edge;
+
+    do
+    {
+        if (currentEdge->Pair != nullptr)
+        {
+            AssertRelease(currentEdge->Pair->Face != nullptr);
+            outFaces.insert(currentEdge->Pair->Face);
+        }
+        currentEdge = currentEdge->Next;
+    } while (currentEdge != parFace->Edge);
 }
 
 void NavMesh::FindNeighbourgingVertices(const NavMeshVertex* parVertex, NeighbourVerticesSet& outVertices) const
