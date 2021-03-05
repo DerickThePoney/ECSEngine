@@ -27,6 +27,14 @@ public:
     }
     bool Done() const { return FCurrentLevel >= (u32)FSubFamilies.size() - 1; }
 
+    u32 size() const { return (u32)FSubFamilies.size(); }
+
+    const std::string& GetFamily(u32 parIndex)
+    {
+        AssertRelease(parIndex < (u32)FSubFamilies.size());
+        return FSubFamilies[parIndex];
+    }
+
     const std::string& GetCurrentFamily()
     {
         AssertRelease(FCurrentLevel < (u32)FSubFamilies.size());
@@ -199,6 +207,49 @@ private:
 };
 
 IMPLEMENT_POOL_ALLOCATED(DoubleAdjustableDebug);
+
+//----------------------------------------------------------------
+//          DoubleAdjustableDebug
+//----------------------------------------------------------------
+class ChoiceAdjustableDebug : public IAdjustableDebugParameter
+{
+    DECLARE_POOL_ALLOCATED(ChoiceAdjustableDebug);
+
+public:
+    ChoiceAdjustableDebug(const char* parName, const u32 parDefaultValue, const char* parChoices)
+        : FValue(parDefaultValue)
+        , FChoices(parChoices)
+        , IAdjustableDebugParameter(parName)
+    {
+    }
+
+    u32 GetValue() const { return FValue; }
+
+protected:
+    virtual void VirtualDrawAdjustableDebug() override
+    {
+        FamilyIterator choiceIt(FChoices);
+        AssertRelease(FValue < choiceIt.size());
+        if (ImGui::BeginCombo(fmt::format("##{}", Name()).c_str(), choiceIt.GetFamily(FValue).c_str()))
+        {
+            forrange(i, 0, choiceIt.size())
+            {
+                if (ImGui::Selectable(choiceIt.GetFamily((u32)i).c_str(), (u32)i == FValue))
+                {
+                    FValue = (u32)i;
+                }
+            }
+
+            ImGui::EndCombo();
+        }
+    }
+
+private:
+    u32 FValue;
+    const char* FChoices;
+};
+
+IMPLEMENT_POOL_ALLOCATED(ChoiceAdjustableDebug);
 
 //----------------------------------------------------------------
 //          AdjustableGraph IBaseNode
@@ -395,6 +446,7 @@ public:
     float GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, float parDefaultValue, float parMinValue, float parMaxValue);
     double GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, double parDefaultValue, double parMinValue, double parMaxValue);
     bool GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, bool parDefaultValue);
+    u32 GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, u32 parDefaultValue, const char* parChoices);
 
     void DrawDebugs();
 
@@ -454,6 +506,15 @@ double AdjustableDebugParametersManager::GetOrCreateAdjustableDebugParameter(con
 {
     GetOrCreateAdjustableVisitor<double, DoubleAdjustableDebug> visitor(
           parName, parFamily, std::unique_ptr<DoubleAdjustableDebug>(new DoubleAdjustableDebug(parName, parDefaultValue, parMinValue, parMaxValue)));
+
+    UseGetOrCreateVisitor(parName, parFamily, &visitor);
+
+    return visitor.GetValue();
+}
+
+u32 AdjustableDebugParametersManager::GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, u32 parDefaultValue, const char* parChoices)
+{
+    GetOrCreateAdjustableVisitor<u32, ChoiceAdjustableDebug> visitor(parName, parFamily, std::make_unique<ChoiceAdjustableDebug>(parName, parDefaultValue, parChoices));
 
     UseGetOrCreateVisitor(parName, parFamily, &visitor);
 
@@ -531,6 +592,11 @@ float GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFa
 double GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, double parDefaultValue, double parMinValue, double parMaxValue)
 {
     return GetOrCreate().GetOrCreateAdjustableDebugParameter(parName, parFamily, parDefaultValue, parMinValue, parMaxValue);
+}
+
+u32 GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, u32 parDefaultValue, const char* parChoices)
+{
+    return GetOrCreate().GetOrCreateAdjustableDebugParameter(parName, parFamily, parDefaultValue, parChoices);
 }
 
 } // namespace ECSEngine
