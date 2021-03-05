@@ -54,12 +54,15 @@ const NavMeshFace* NavMesh::FindContainingFace(const glm::vec2 parPoint) const
 {
     foreachitemconst(face, FFaces)
     {
-        Triangle2D faceTri;
-        faceTri.A = face->Edge->Vertex->Position;
-        faceTri.B = face->Edge->Next->Vertex->Position;
-        faceTri.C = face->Edge->Next->Next->Vertex->Position;
+        Polygon2D facePoly;
+        const NavMeshEdge* e = face->Edge;
+        do
+        {
+            facePoly.push_back(e->Vertex->Position);
+            e = e->Next;
+        } while (e != face->Edge);
 
-        if (Intersection::PointInTriangle2D(faceTri, parPoint))
+        if (Intersection::PointInPolygon2D(facePoly, parPoint))
         {
             return face;
         }
