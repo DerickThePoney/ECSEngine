@@ -4,6 +4,7 @@
 
 #include "NavMesh.h"
 #include "Polygon.h"
+#include "PolygonPartitionner.h"
 #include "PolygonTriangulator.h"
 #include "Triangle.h"
 
@@ -58,86 +59,66 @@ NavMeshEdge* LookUpPotentialHalfEdge(const NavMeshVertex* start, const NavMeshVe
 
 void NavMeshSolver::CreateNavMesh(const Polygon2D& parWorldExtents, const std::vector<Polygon2D>& parObstacles, NavMesh& outNavMesh)
 {
-    PolygonTriangulator polyTri;
-    std::vector<Triangle2D> triangulation = polyTri.Triangulate(parWorldExtents, parObstacles);
-    AssertRelease(triangulation.size() > 0);
+    PolygonPartionner polyPart;
+    std::vector<Polygon2D> partition = polyPart.Partition(parWorldExtents, parObstacles);
+    AssertRelease(partition.size() > 0);
 
     std::unordered_map<glm::vec2, NavMeshVertex*> verticesMap;
     VerticesDataBase vertices;
     EdgesDataBase edges;
     FacesDataBase faces;
-    faces.reserve(triangulation.size());
-    edges.reserve(triangulation.size() * 3);
+    faces.reserve(partition.size());
 
-    foreachitemconst(triangle, triangulation)
+    // Count the number of edges
+    u32 edgesCount = 0;
+    foreachitemconst(polygon, partition) { edgesCount += (u32)polygon.size(); }
+    edges.reserve(edgesCount);
+
+    foreachitemconst(polygon, partition)
     {
         NavMeshFace* face = new NavMeshFace();
 
-        bool v1New = false, v2New = false, v3New = false;
-        NavMeshVertex* v1 = GetOrCreateVertex(verticesMap, triangle.A, v1New);
-        NavMeshVertex* v2 = GetOrCreateVertex(verticesMap, triangle.B, v2New);
-        NavMeshVertex* v3 = GetOrCreateVertex(verticesMap, triangle.C, v3New);
+        std::vector<std::pair<NavMeshVertex*, bool>> verticesLoc;
+        verticesLoc.resize(polygon.size());
+        forrange(i, 0, (u32)polygon.size()) { verticesLoc[i].first = GetOrCreateVertex(verticesMap, polygon[i], verticesLoc[i].second); }
 
-        NavMeshEdge* e1 = new NavMeshEdge();
-        edges.push_back(e1);
-        NavMeshEdge* e2 = new NavMeshEdge();
-        edges.push_back(e2);
-        NavMeshEdge* e3 = new NavMeshEdge();
-        edges.push_back(e3);
+        std::vector<NavMeshEdge*> edgesLoc;
+        edgesLoc.resize((u32)polygon.size());
+        forrange(i, 0, (u32)polygon.size())
+        {
+            edgesLoc[i] = new NavMeshEdge();
+            edges.push_back(edgesLoc[i]);
 
-        // Connect vertices and edges
-        v1->Edge.push_back(e1);
-        v2->Edge.push_back(e2);
-        v3->Edge.push_back(e3);
+            // Connect vertex to edge
+            verticesLoc[i].first->Edge.push_back(edgesLoc[i]);
+
+            // Connect edge to vertex
+            edgesLoc[i]->Vertex = verticesLoc[i].first;
+
+            // Connect edge to face
+            edgesLoc[i]->Face = face;
+        }
 
         // Connect face to first edge
-        face->Edge = e1;
-
-        // Connect edges to face
-        e1->Face = face;
-        e2->Face = face;
-        e3->Face = face;
+        face->Edge = edgesLoc[0];
 
         // Setup face connectivity
-        e1->Next = e2;
-        e2->Next = e3;
-        e3->Next = e1;
-
-        e1->Prev = e3;
-        e2->Prev = e1;
-        e3->Prev = e2;
-
-        // Connect edge to vertices
-        e1->Vertex = v1;
-        e2->Vertex = v2;
-        e3->Vertex = v3;
-
-        // Lookup half edge
-        NavMeshEdge* e1Pair = LookUpPotentialHalfEdge(v1, v2, faces);
-        NavMeshEdge* e2Pair = LookUpPotentialHalfEdge(v2, v3, faces);
-        NavMeshEdge* e3Pair = LookUpPotentialHalfEdge(v3, v1, faces);
-
-        AssertRelease(e1Pair == nullptr || e1Pair->Pair == nullptr);
-        AssertRelease(e2Pair == nullptr || e2Pair->Pair == nullptr);
-        AssertRelease(e3Pair == nullptr || e3Pair->Pair == nullptr);
-
-        // Connect halfedges
-        if (e1Pair != nullptr)
+        forrange(i, 0, (u32)polygon.size())
         {
-            e1Pair->Pair = e1;
-            e1->Pair = e1Pair;
-        }
+            const u32 next = ((u32)i + 1) % (u32)polygon.size();
+            const u32 prev = ((u32)i == 0) ? ((u32)polygon.size() - 1u) : (u32)i - 1u;
+            edgesLoc[i]->Next = edgesLoc[next];
+            edgesLoc[i]->Prev = edgesLoc[prev];
 
-        if (e2Pair != nullptr)
-        {
-            e2Pair->Pair = e2;
-            e2->Pair = e2Pair;
-        }
+            // lookup halfedge
+            NavMeshEdge* potentialPair = LookUpPotentialHalfEdge(edgesLoc[i]->Vertex, edgesLoc[i]->Next->Vertex, faces);
+            AssertRelease(potentialPair == nullptr || potentialPair->Pair == nullptr);
 
-        if (e3Pair != nullptr)
-        {
-            e3Pair->Pair = e3;
-            e3->Pair = e3Pair;
+            if (potentialPair != nullptr)
+            {
+                potentialPair->Pair = edgesLoc[i];
+                edgesLoc[i]->Pair = potentialPair;
+            }
         }
 
         faces.push_back(face);

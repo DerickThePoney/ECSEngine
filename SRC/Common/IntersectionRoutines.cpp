@@ -41,6 +41,24 @@ bool PointInTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint, 
     }
 }
 
+bool PointInPolygon2D(const Polygon2D& parPolygon, const glm::vec2 parPoint, const bool parStrictlyInside /*= false*/)
+{
+    Ray2D ray(parPoint, glm::vec2(1.f, 0.f));
+    std::vector<std::pair<bool, LinearComponentIntersection>> intersections;
+    if (!RayPolygonIntersections2D(ray, parPolygon, intersections))
+        return false;
+
+    u32 nbIntersections = 0;
+    forrange(i, 0, intersections.size())
+    {
+        if (intersections[i].first)
+            nbIntersections += 1;
+    }
+
+    bool res = nbIntersections & 1;
+    return res;
+}
+
 bool LinearComponentIntersection2D(const glm::vec2& parPointsDifference,
       const glm::vec2& parDirectionA,
       const glm::vec2& parDirectionB,
@@ -195,7 +213,7 @@ bool RayPolygonClosestIntersection2D(const Ray2D& parRay,
             continue;
         }
 
-        if (outIntersection.Intersection1 > inter.second.Intersection1)
+        if (outIntersection.Intersection1 >= inter.second.Intersection1)
         {
             closestEdgeIndex = currentEdge;
             result = true;

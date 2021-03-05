@@ -5,6 +5,7 @@
 #include "Common/Camera.h"
 #include "Common/CameraManager.h"
 #include "Common/IntersectionRoutines.h"
+#include "Common/PolygonPartitionner.h"
 #include "Common/PolygonTriangulator.h"
 #include "Common/Ray.h"
 #include "Common/RenderingHandles.h"
@@ -284,25 +285,15 @@ bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawComman
         }
     }
 
-    verticesForTriangles.clear();
-    forrange(i, 0, FTriangles.size())
-    {
-        const Triangle2D& currentTri = FTriangles[i];
-        std::vector<glm::vec3> verts;
-        verts.push_back(glm::vec3(currentTri.A.x, 0.f, currentTri.A.y) + offset);
-        verts.push_back(glm::vec3(currentTri.B.x, 0.f, currentTri.B.y) + offset);
-        verts.push_back(glm::vec3(currentTri.C.x, 0.f, currentTri.C.y) + offset);
-        verticesForTriangles.push_back(verts);
-        parCommandBuffer.DrawLines(parMaterial, verticesForTriangles[verticesForTriangles.size() - 1].data(), 3, 0xFFFF0000, true);
-    }
+    foreachitemconst(partition, FPartitions) { parCommandBuffer.DrawLines(parMaterial, partition.data(), (u32)partition.size(), 0.f, 0xFFFF0000, true); }
 
     return true;
 }
 
 void SceneActionPolygonalPattern::ComputeTriangulation()
 {
-    PolygonTriangulator triangulator;
-    FTriangles = triangulator.Triangulate(FPolygon, FPolygonHoles, FExtendedPolygon);
+    PolygonPartionner partitionner;
+    FPartitions = partitionner.Partition(FPolygon, FPolygonHoles);
 }
 
 } // namespace ECSEngine

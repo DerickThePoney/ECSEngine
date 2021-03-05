@@ -115,6 +115,7 @@ private:
 
     std::vector<Polygon2D> FPolygonHoles;
 
+    std::vector<Polygon2D> FPartitions;
     std::vector<Triangle2D> FTriangles;
     std::vector<glm::vec3> vertices;
     std::vector<std::vector<glm::vec3>> holesVertices;

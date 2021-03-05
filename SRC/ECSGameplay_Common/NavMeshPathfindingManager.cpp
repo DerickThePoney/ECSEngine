@@ -120,6 +120,19 @@ void NavMeshPathfindingManager::Debug(Rendering::DrawCommandBuffer& parBuffer, c
 
     MemoryView<const Polygon2D> memView = FNavMesh.Holes();
     foreachitemconst(hole, memView) { parBuffer.DrawLines(parMaterial, hole.data().data(), (u32)hole.size(), 0.0f, 0xFF0000FF, true); }
+
+    const Navigation::FacesDataBase& faces = FNavMesh.Faces();
+    foreachitemconst(face, faces)
+    {
+        const Navigation::NavMeshEdge* edge = face->Edge;
+        std::vector<glm::vec2> faceVertices;
+        do
+        {
+            faceVertices.push_back(edge->Vertex->Position);
+            edge = edge->Next;
+        } while (edge != face->Edge);
+        parBuffer.DrawLines(parMaterial, faceVertices, faceVertices.size(), 0.f, 0xFFFF0000, true);
+    }
 }
 
 void NavMeshPathfindingManager::ProcessOneRequest(const PathfindingRequest& parRequest)
