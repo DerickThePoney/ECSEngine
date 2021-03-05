@@ -12,19 +12,18 @@ bool NavMeshPath::isValid() const
     return FValid && FStart != FEnd;
 }
 
-void NavMeshPath::push_back(NavMeshVertex* parVertex)
+void NavMeshPath::push_back(glm::vec2 parWaypoint)
 {
 #ifdef PERFORM_SECURITY_CHECKS
-    AssertExistsAndNoDoublon(parVertex);
+    AssertExistsAndNoDoublon(parWaypoint);
 #endif // PERFORM_SECURITY_CHECKS
-    FWaypoints.push_back(parVertex);
+    FWaypoints.push_back(parWaypoint);
 }
 
 #ifdef PERFORM_SECURITY_CHECKS
-void NavMeshPath::AssertExistsAndNoDoublon(NavMeshVertex* parVertex) const
+void NavMeshPath::AssertExistsAndNoDoublon(glm::vec2 parWaypoint) const
 {
-    AssertRelease(parVertex != nullptr);
-    foreachitemconst(vertex, FWaypoints) { AssertRelease(parVertex != vertex); }
+    foreachitemconst(vertex, FWaypoints) { AssertRelease(parWaypoint != vertex); }
 }
 #endif
 } // namespace Navigation

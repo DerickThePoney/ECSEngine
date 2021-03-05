@@ -34,13 +34,13 @@ void NavMeshPathSmoother::SmoothPath(const NavMesh& parNavMesh, NavMeshPath& out
         bool intersected = false;
         forrange(i, currentIndex, outPath.waypoints_size())
         {
-            Segment2D s(curentSegmentStart, outPath[i]->Position);
+            Segment2D s(curentSegmentStart, outPath[i]);
             if (NavMeshHelpers::NavMeshSegmentIntersection2D(parNavMesh, s))
             {
                 // the segment intersects in the navMesh, there is no direct point... push the last point in the new path
                 intersected = true;
                 newNavMeshPath.push_back(outPath[i - 1]);
-                curentSegmentStart = outPath[i - 1]->Position;
+                curentSegmentStart = outPath[i - 1];
                 currentIndex = (u32)i + 1;
                 break;
             }
