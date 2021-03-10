@@ -7,7 +7,7 @@ includedirs { "../External/glm",
 "../External/boost/*/include"
 }
 
-includedirs { "../External/fmt/", "../External/brigand/brigand/include", "../External/cereal/include"}
+includedirs { "../External/Remotery/lib", "../External/fmt/", "../External/brigand/brigand/include", "../External/cereal/include"}
 
 
 flags {"MultiProcessorCompile", "LinkTimeOptimization", "NoIncrementalLink"}
@@ -21,12 +21,12 @@ filter "configurations:Debug"
   symbols "On"
 
 filter "configurations:Release"
-  defines { "NDEBUG" , "PERFORM_SECURITY_CHECKS", "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING"}
+  defines { "NDEBUG" , "PERFORM_SECURITY_CHECKS", "PROFILE_CODE", "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING"}
   optimize "On"
   symbols "On"
 
 filter "configurations:Profile"
-  defines { "NDEBUG" , "ABSOLUTELY_NOT_ASSERT", "ENABLE_BGFX_PROFILING", "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING"}
+  defines { "NDEBUG" , "ABSOLUTELY_NOT_ASSERT", "ENABLE_BGFX_PROFILING", "PROFILE_CODE", "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING"}
   optimize "Speed"
   symbols "On"
 

@@ -12,7 +12,7 @@ project "Common"
       ["Headers"] = {srcfiles.."*.h", srcfiles.."*.inl"},
       ["Sources"] = {srcfiles.."*.cpp"}
       }
-   files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl"}
+   files{srcfiles.."*.cpp", srcfiles.."*.h", srcfiles.."*.inl", "../External/Remotery/lib/Remotery.c", "../External/Remotery/lib/Remotery.h"}
    pchheader (srcfiles.."stdafx.h")
    filter {"action:vs*", "options:not clang"}
       pchheader ("stdafx.h")
@@ -22,3 +22,6 @@ project "Common"
    links("FMT")
 
    dofile("projectsconfigs.lua")
+
+   filter { 'files:../External/Remotery/lib/Remotery.c' }
+      flags { 'NoPCH' }

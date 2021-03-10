@@ -25,6 +25,8 @@
 
 #include "Macros.h"
 
+#include "Profiling.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_ALIGNED_GENTYPES
 #define GLM_FORCE_INTRINSICS
