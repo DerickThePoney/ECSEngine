@@ -3,6 +3,7 @@
 #include "NavMeshPathSolver.h"
 
 #include "ECSCore/AdjustableDebugParameters.h"
+#include "IntersectionRoutines.h"
 #include "NavMesh.h"
 #include "NavMeshPath.h"
 #include "NavMeshUtilities.h"
@@ -65,6 +66,10 @@ void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPat
     }
 }
 
+/************************************************************************/
+/* IDEAS : HYBRID FACE - EDGE - pathFinding                             */
+/*         NAVMESH INTEGRATED PATHSMOOTHER                              */
+/************************************************************************/
 void NavMeshPathSolver::SolveFacePath(const NavMesh& parNavMesh, NavMeshPath& outPath)
 {
     const glm::vec2 start = outPath.Start();
@@ -168,7 +173,31 @@ void NavMeshPathSolver::SolveFacePath(const NavMesh& parNavMesh, NavMeshPath& ou
     // fill out the path in reserve
     outPath.SetValid(true);
     outPath.reserve(path.size());
-    reverseforrange(i, 0, path.size()) { outPath.push_back(faces[path[i]]->Center); }
+    reverseforrange(i, 0, path.size())
+    {
+        // outPath.push_back(faces[path[i]]->Center);
+        if (i > 0)
+        {
+            // find common edge
+            const NavMeshEdge* commonEdge = parNavMesh.FindCommonEdge_AssumeExists(faces[path[i]], faces[path[i - 1]]);
+
+            Segment2D FaceFaceDirection(faces[path[i]]->Center, faces[path[i - 1]]->Center);
+            Segment2D EdgeDirection(commonEdge->Vertex->Position, commonEdge->Pair->Vertex->Position);
+            Intersection::LinearComponentIntersection intersection;
+
+            bool intersects = Intersection::SegmentSegmentIntersection2D(FaceFaceDirection, EdgeDirection, intersection);
+
+            if (intersects)
+            {
+                outPath.push_back(FaceFaceDirection.Start + intersection.Intersection1 * FaceFaceDirection.Direction());
+            }
+            else
+            {
+                // Add the segment center to the path !
+                outPath.push_back(0.5f * (commonEdge->Vertex->Position + commonEdge->Pair->Vertex->Position));
+            }
+        }
+    }
 }
 
 void NavMeshPathSolver::SolveVertexPath(const NavMesh& parNavMesh, NavMeshPath& outPath)

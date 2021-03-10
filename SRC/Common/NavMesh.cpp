@@ -88,6 +88,23 @@ void NavMesh::NeighbourFaces(const NavMeshFace* parFace, NeighbourFacesSet& outF
     } while (currentEdge != parFace->Edge);
 }
 
+const NavMeshEdge* NavMesh::FindCommonEdge_AssumeExists(const NavMeshFace* parFace, const NavMeshFace* parOtherFace) const
+{
+    NavMeshEdge* currentEdge = parFace->Edge;
+
+    do
+    {
+        if (currentEdge->Pair != nullptr && currentEdge->Pair->Face == parOtherFace)
+        {
+            return currentEdge;
+        }
+        currentEdge = currentEdge->Next;
+    } while (currentEdge != parFace->Edge);
+
+    AssertNotReached();
+    return nullptr;
+}
+
 void NavMesh::FindNeighbourgingVertices(const NavMeshVertex* parVertex, NeighbourVerticesSet& outVertices) const
 {
     std::set<NavMeshFace*> neighBouringFaces;

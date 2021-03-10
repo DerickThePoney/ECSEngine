@@ -136,8 +136,13 @@ void NavMeshPathfindingManager::ProcessOneRequest(const PathfindingRequest& parR
 
     if (path.isValid())
     {
-        Navigation::NavMeshPathSmoother smoother;
-        smoother.SmoothPath(FNavMesh, path);
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(smoothPath, false, "Smooth path", "Pathfinding/NavMesh");
+        
+        if (smoothPath)
+        {
+            Navigation::NavMeshPathSmoother smoother;
+            smoother.SmoothPath(FNavMesh, path);
+        }
 
         result.Waypoints.reserve(path.size());
         result.Waypoints.push_back(path.Start());

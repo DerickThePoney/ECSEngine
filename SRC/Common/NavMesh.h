@@ -70,6 +70,7 @@ public:
 
     void NeighbourFaces(const NavMeshVertex* parVertex, NeighbourFacesSet& outFaces) const;
     void NeighbourFaces(const NavMeshFace* parFace, NeighbourFacesSet& outFaces) const;
+    const NavMeshEdge* FindCommonEdge_AssumeExists(const NavMeshFace* parFace, const NavMeshFace* parOtherFace) const;
 
     const Polygon2D& MainPolygon() const { return FMainPolygon; }
     const MemoryView<const Polygon2D> Holes() const { return MemoryView<const Polygon2D>(FHoles.data(), (u32)FHoles.size()); }
