@@ -9,6 +9,7 @@
 
 int main(int argc, char** argv)
 {
+    ECSEngine::Profiling::StartProfiler();
     ECSEngine::BaseApplicationLayer app;
 
     {
@@ -42,6 +43,8 @@ int main(int argc, char** argv)
     app.RunMainLoop();
 
     app.Shutdown();
+
+    ECSEngine::Profiling::EndProfiler();
 
     return 0;
 }

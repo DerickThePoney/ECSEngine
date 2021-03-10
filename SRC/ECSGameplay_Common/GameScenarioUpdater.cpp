@@ -93,70 +93,89 @@ void GameScenarioUpdater::Destroy()
 
 void GameScenarioUpdater::Update()
 {
-    AssertRelease(FScenario != nullptr);
-    FScenario->Update();
-    FCameraMoverSystem.Update();
-    FMovementSystem.Update();
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_GameplayUpdate);
 
-    FColonyManagementSystem.Update();
-    FPeonHarvestingSytem.Update();
-    FProductionSystem.Update();
-    FPeonSpawnSystem.Update();
-    FPeonLifeSpanSystem.Update();
-    FResourceStatsUpdateSystem.Update();
-    FColonyFeedbackSystem.Update();
-    FHousingSystem.Update();
-    FWorkSystem.Update();
-    MousePolicyManager::Instance().Update();
+        AssertRelease(FScenario != nullptr);
+        FScenario->Update();
+        FCameraMoverSystem.Update();
+        FMovementSystem.Update();
 
-    FColonyBuildingSystem.Update();
+        FColonyManagementSystem.Update();
+        FPeonHarvestingSytem.Update();
+        FProductionSystem.Update();
+        FPeonSpawnSystem.Update();
+        FPeonLifeSpanSystem.Update();
+        FResourceStatsUpdateSystem.Update();
+        FColonyFeedbackSystem.Update();
+        FHousingSystem.Update();
+        FWorkSystem.Update();
+        MousePolicyManager::Instance().Update();
 
-    WorldManager::Instance().ProcessDestroyEntities();
+        FColonyBuildingSystem.Update();
 
-    FRenderingSystem.Update();
+        WorldManager::Instance().ProcessDestroyEntities();
+    }
 
-    Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
-    FUserInterfaceSystem.Update();
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_SynchroWithRenderingUpdate);
+        FRenderingSystem.Update();
+    }
 
-    Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
-    DrawAdjustables();
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_UIUpdate);
+        Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
+        FUserInterfaceSystem.Update();
+    }
 
-    FPeonHarvestingSytem.Debug();
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_DebugUpdate);
+        Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
+        DrawAdjustables();
+
+        FPeonHarvestingSytem.Debug();
+    }
 }
 
 void GameScenarioUpdater::Render()
 {
-    Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
-
-    Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
-
-    Rendering::GameRenderer::Instance().Render();
-
-    Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
-    u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
-    Camera* camera = CameraManager::Instance().GetCamera(camId);
-    buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
-    Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
-
-    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showDebugForCacheDebug, false, "show debug", "ResourceCache");
-    if (showDebugForCacheDebug)
     {
-        bool dummy = showDebugForCacheDebug;
-        ImGUITools::DrawResourceCacheDebug(&dummy);
+        SCOPED_PROFILE(GameScenarioUpdater_RenderingFrame);
+        Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
+
+        Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
+
+        Rendering::GameRenderer::Instance().Render();
     }
 
-    Pathfinding::Debug(*buffer, handle);
-    FMovementSystem.VisualDebug(*buffer, handle);
-
-    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showDebugForCircularGraph, false, "show debug", "Pathfinding/CircularGraph");
-    if (showDebugForCircularGraph)
     {
-        CircularBuildingGrid::Instance().GetGraph().Debug(*buffer, handle);
-    }
+        SCOPED_PROFILE(GameScenarioUpdater_DebugRendering);
+        Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
+        u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+        Camera* camera = CameraManager::Instance().GetCamera(camId);
+        buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
+        Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
 
-    buffer->Submit();
-    buffer->clear();
-    delete buffer;
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showDebugForCacheDebug, false, "show debug", "ResourceCache");
+        if (showDebugForCacheDebug)
+        {
+            bool dummy = showDebugForCacheDebug;
+            ImGUITools::DrawResourceCacheDebug(&dummy);
+        }
+
+        Pathfinding::Debug(*buffer, handle);
+        FMovementSystem.VisualDebug(*buffer, handle);
+
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showDebugForCircularGraph, false, "show debug", "Pathfinding/CircularGraph");
+        if (showDebugForCircularGraph)
+        {
+            CircularBuildingGrid::Instance().GetGraph().Debug(*buffer, handle);
+        }
+
+        buffer->Submit();
+        buffer->clear();
+        delete buffer;
+    }
 }
 
 void GameScenarioUpdater::SetScenario(const std::string& parScenarioFile)

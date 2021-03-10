@@ -53,3 +53,7 @@ ReverseWrapper<T> reverse(T&& container)
 #define ENABLE_DEBUG_PARAMETERS
 #define ENABLE_SECURITY_CHECKS
 #endif
+
+#ifdef PROFILE_CODE
+#define ENABLE_PROFILING
+#endif

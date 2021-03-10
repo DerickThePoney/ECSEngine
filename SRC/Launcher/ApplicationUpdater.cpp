@@ -45,9 +45,15 @@ void ApplicationUpdater::Render()
 {
     scene->Render();
 
-    Rendering::ImGUI::Render();
+    {
+        SCOPED_PROFILE(ApplicationUpdater_Render_Imgui);
+        Rendering::ImGUI::Render();
+    }
 
-    Rendering::BGFXRenderingBackend::Instance().RenderFrame();
+    {
+        SCOPED_PROFILE(ApplicationUpdater_Render_Present);
+        Rendering::BGFXRenderingBackend::Instance().RenderFrame();
+    }
 }
 
 void ApplicationUpdater::EndUpdate()
@@ -92,24 +98,28 @@ bool ApplicationUpdaterWrapper::CheckShouldFinish()
 
 void ApplicationUpdaterWrapper::StartUpdate()
 {
+    SCOPED_PROFILE_CLASS(ApplicationUpdaterWrapper, StartUpdate);
     AssertRelease(FWrappedGameplayUpdater != nullptr);
     FWrappedGameplayUpdater->StartUpdate();
 }
 
 void ApplicationUpdaterWrapper::Update()
 {
+    SCOPED_PROFILE_CLASS(ApplicationUpdaterWrapper, Update);
     AssertRelease(FWrappedGameplayUpdater != nullptr);
     FWrappedGameplayUpdater->Update();
 }
 
 void ApplicationUpdaterWrapper::Render()
 {
+    SCOPED_PROFILE_CLASS(ApplicationUpdaterWrapper, Render);
     AssertRelease(FWrappedGameplayUpdater != nullptr);
     FWrappedGameplayUpdater->Render();
 }
 
 void ApplicationUpdaterWrapper::EndUpdate()
 {
+    SCOPED_PROFILE_CLASS(ApplicationUpdaterWrapper, EndUpdate);
     AssertRelease(FWrappedGameplayUpdater != nullptr);
     FWrappedGameplayUpdater->EndUpdate();
 }
