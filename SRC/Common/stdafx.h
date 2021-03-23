@@ -3,6 +3,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 // clang-format off
+#include <stdio.h>
 #include <iostream>
 #include <set>
 #include <sstream>
