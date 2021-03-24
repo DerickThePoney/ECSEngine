@@ -23,11 +23,5 @@ project "Launcher"
    postbuildcommands {"{COPY} ../External/glfw-3.3.bin.WIN64/lib-vc2019/*.dll %{cfg.targetdir}"}
 
    includedirs { "../SRC"}
-   
-   disablewarnings { "" }
-   
-   linkoptions{ "/WHOLEARCHIVE:application.lib", "/WHOLEARCHIVE:rendering.lib", "/WHOLEARCHIVE:renderingcore.lib", "/WHOLEARCHIVE:ecsgameplay_common.lib", "/WHOLEARCHIVE:ecsgameplay_specific.lib","/WHOLEARCHIVE:ecscore.lib", "/WHOLEARCHIVE:common.lib","/FORCE:MULTIPLE", "/IGNORE:4006", "/IGNORE:4088" }
 
    dofile("projectsconfigs.lua")
-   
-   
