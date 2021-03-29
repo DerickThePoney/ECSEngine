@@ -5,6 +5,8 @@
     .AdditionalCompilerOptions = ''
     ^ProjectIncludePath + .ProjectPath
 
+    .SolutionFolder = 'Rendering'
+
     .BuildTarget = { '$ProjectName$' }
 
     #include "../Utils/MakeProjectStandard.bff"

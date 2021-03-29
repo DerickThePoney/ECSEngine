@@ -1,6 +1,7 @@
 #once
 #include "Utils/Compiler.bff"
 #include "Utils/SolutionConfigs.bff"
+#include "Utils/PreSolutionFile.bff"
 
 .ProjectList = {}
 .ProjectIncludePath = {}
@@ -33,6 +34,8 @@
 #include "Projects/Launcher.bff"
 
 #include "Utils/Executable.bff"
+
+#include "Utils/BuildSolutionProjects.bff"
 
 #include "Utils/SolutionFile.bff"
 
