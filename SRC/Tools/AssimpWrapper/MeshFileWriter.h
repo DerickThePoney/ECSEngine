@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "assimp/scene.h"
+#include <assimp/scene.h>
 
 namespace ECSEngine
 {
@@ -12,7 +12,7 @@ public:
     MeshFileWriter(const std::string& parFilename);
     ~MeshFileWriter();
 
-    void MeshFileWriter::operator<<(const aiScene* parMeshData);
+    void operator<<(const aiScene* parMeshData);
 
 private:
     std::ofstream FOutputStream;

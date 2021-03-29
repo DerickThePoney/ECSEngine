@@ -8,6 +8,8 @@
 
     .SolutionFolder = 'External'
 
+    .ExeName = .GameName
+
     .BuildTarget = { '$ProjectName$' }
 
     #include "../../Utils/MakeProjectStandard.bff"

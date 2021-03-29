@@ -5,6 +5,8 @@
     .AdditionnalIncludePaths = {"SRC" }
 
     .SolutionFolder = 'Core'
+
+    .ExeName = .GameName
     #define USE_PRECOMPILED_HEADERS
     .BuildTarget = { '$ProjectName$' }
     #include "../Utils/MakeProjectStandard.bff"

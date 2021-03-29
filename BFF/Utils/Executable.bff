@@ -2,7 +2,7 @@
     ForEach(.SolutionConfig in .SolutionConfigs)
     {
         Using( .SolutionConfig )
-        Executable( '$GameName$-$Platform$-$Config$' )
+        Executable( '$ExeName$-Exe-$Platform$-$Config$' )
         {
             Using(.'MSVC2019_X64$Config$')
             .Libraries = {}
@@ -12,7 +12,7 @@
               ^Libraries     + "$Project$-Obj-$Platform$-$Config$"
             }
 
-            .LinkerOutput       = '$OutputDir$\$GameName$-$Platform$-$Config$.exe'
+            .LinkerOutput       = '$OutputDir$\$ExeName$-$Platform$-$Config$.exe'
 
             .LibPaths = .LibraryPaths + .AdditionalLibraryPath
             ForEach(.LibPath in .LibPaths)
@@ -27,7 +27,7 @@
 
         }
 
-        RemoveDir( '$GameName$-$Platform$-$Config$-Purge' )
+        RemoveDir( '$ExeName$-Exe-$Platform$-$Config$-Purge' )
         {
             .RemovePaths = {'$OutputDir$', '$ObjDir$' }
         }
