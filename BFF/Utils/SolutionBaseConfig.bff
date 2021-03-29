@@ -2,7 +2,7 @@
 // Visual Studio Base Config
 //------------------------------------------------------------------------------
 
-.VisualStudioFBuildCommand          = 'cd .. &amp; "tools\FBuild.exe" -config fbuild.bff -ide'
+.VisualStudioFBuildCommand          = 'cd ..\.. &amp; "tools\FBuild.exe" -config fbuild.bff -ide'
 .VisualStudioFBuildCommand          + ' -nostoponerror'
 
 .VisualStudioFBuildTarget = ''
