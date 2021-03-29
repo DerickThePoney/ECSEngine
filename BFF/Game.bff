@@ -9,6 +9,10 @@
 .AdditionalAllTarget = {}
 .ForcedTarget = {}
 
+.'$GameName$Projects' = {}
+.AssetCookerProjects = {}
+
+#include "Projects/External/Assimp.bff"
 #include "Projects/External/RenderingLibs.bff"
 #include "Projects/External/boost.bff"
 #include "Projects/External/brigand.bff"
@@ -17,6 +21,8 @@
 #include "Projects/External/polypartition.bff"
 #include "Projects/External/fmt.bff"
 #include "Projects/External/Remotery.bff"
+
+#include "Projects/AssimpWrapper.bff"
 
 #include "Projects/imgui.bff"
 #include "Projects/imguitools.bff"
@@ -32,12 +38,32 @@
 #include "Projects/Rendering.bff"
 
 #include "Projects/Launcher.bff"
+#include "Projects/AssetCooker.bff"
 
-#include "Utils/Executable.bff"
+{
+    .ExeName = .GameName
+    .ProjectList = .'$GameName$Projects'
+    #include "Utils/Executable.bff"
+}
+
+{
+    ^AdditionalLibs_x64_Debug + {'assimp-vc142-mtd'}
+    ^AdditionalLibs_x64_Release + {'assimp-vc142-mt'}
+    ^AdditionalLibs_x64_Final + {'assimp-vc142-mt'}
+    ^AdditionalLibs_x64_Profile + {'assimp-vc142-mt'}
+    ^AdditionalLibraryPath + {'External\assimpBinaries\Release\', 'External\assimpBinaries\Debug\'}
+    .ExeName = 'AssetCooker'
+    .ProjectList = .AssetCookerProjects
+    #include "Utils/Executable.bff"
+}
 
 #include "Utils/BuildSolutionProjects.bff"
 
-#include "Utils/SolutionFile.bff"
+{
+    .ProjectList = .'$GameName$Projects' + .AssetCookerProjects
+    Print(.ProjectList)
+    #include "Utils/SolutionFile.bff"
+}
 
 Alias('all')
 {

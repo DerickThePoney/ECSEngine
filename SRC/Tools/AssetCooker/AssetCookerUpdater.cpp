@@ -8,8 +8,6 @@
 #include "Common/Timer.h"
 #include "ResourcesCooking.h"
 #include "Tools/AssimpWrapper/AssimpMeshDataLoading.h"
-#include "assimp/scene.h"
-
 namespace ECSEngine
 {
 

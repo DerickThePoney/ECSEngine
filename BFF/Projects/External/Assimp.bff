@@ -1,0 +1,16 @@
+#once
+{
+    Copy('AssimpCopyDebug')
+    {
+        .Source = 'External/assimpBinaries/Debug/assimp-vc142-mtd.dll'
+        .Dest = .OutputDir + '\'
+    }
+
+    Copy('AssimpCopyRelease')
+    {
+        .Source = 'External/assimpBinaries/Release/assimp-vc142-mt.dll'
+        .Dest = .OutputDir + '\'
+    }
+
+    Alias('AssimpCopy') {.Targets = {'AssimpCopyDebug', 'AssimpCopyRelease'}}
+}

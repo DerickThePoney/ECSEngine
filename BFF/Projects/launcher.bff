@@ -6,8 +6,10 @@
 
     .SolutionFolder = 'Launcher'
 
+    .ExeName = .GameName
+
     #define USE_PRECOMPILED_HEADERS
-    .BuildTarget = { '$GameName$' }
+    .BuildTarget = { '$GameName$-Exe' }
     .ForcedTarget = { 'GLFWCopy' }
     #include "../Utils/MakeProjectStandard.bff"
     #undef USE_PRECOMPILED_HEADERS

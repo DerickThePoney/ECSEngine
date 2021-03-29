@@ -1,0 +1,18 @@
+#once
+{
+    .ProjectName = 'AssetCooker'
+    .ProjectPath = 'SRC/Tools'
+    .AdditionnalIncludePaths = {"SRC", "SRC/Tools" }
+
+    .SolutionFolder = 'Tools'
+
+    .ExeName = 'AssetCooker'
+
+    #define USE_PRECOMPILED_HEADERS
+    .BuildTarget = { 'AssetCooker-Exe' }
+    .ForcedTarget = { 'AssimpCopy' }
+    #include "../Utils/MakeProjectStandard.bff"
+    #undef USE_PRECOMPILED_HEADERS
+
+    ^'$ExeName$Projects' + 'Common' + 'Remotery' + 'fmt' + 'imgui' + 'Application' + 'ECSCore' + 'ECSGameplay_Common' + 'ECSGameplay_Specific' + 'RenderingCore' + 'Rendering' + 'ImguiTools'
+}

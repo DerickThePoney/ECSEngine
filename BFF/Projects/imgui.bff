@@ -7,6 +7,8 @@
 
     .SolutionFolder = 'Rendering'
 
+    .ExeName = .GameName
+
     .BuildTarget = { '$ProjectName$' }
 
     #include "../Utils/MakeProjectStandard.bff"

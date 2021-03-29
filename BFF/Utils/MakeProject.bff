@@ -85,7 +85,7 @@
       .AdditionalOptions = ' /std:c++17' // pour intellisense
     }
 
-    ^ProjectList + '$ProjectName$'
+    ^'$ExeName$Projects' + '$ProjectName$'
 
     {
         ^"$SolutionFolder$Projects" + '$ProjectName$-Proj'
