@@ -26,7 +26,7 @@ public:
 
     void ReOpenFileSystem();
 
-    std::shared_ptr<ResourceHandle> GetResourceHandle(Resource* parResource);
+    std::shared_ptr<ResourceHandle> GetResourceHandle(const Resource* parResource);
     i32 Preload(std::string parPattern, void (*parProgressCallback)(i32, bool&));
     void Flush();
 
@@ -42,10 +42,10 @@ public:
     const ResourceHandleMap& AllocatedResources() const { return FResources; }
 
 private:
-    std::shared_ptr<ResourceHandle> Find(Resource* parResource);
+    std::shared_ptr<ResourceHandle> Find(const Resource* parResource);
     void Update(std::shared_ptr<ResourceHandle> parHandle);
 
-    std::shared_ptr<ResourceHandle> Load(Resource* parResource);
+    std::shared_ptr<ResourceHandle> Load(const Resource* parResource);
     void Free(std::shared_ptr<ResourceHandle> parResourceHandle);
 
     bool MakeRoom(u32 parSize);

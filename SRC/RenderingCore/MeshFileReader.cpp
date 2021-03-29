@@ -128,7 +128,7 @@ void MeshFileReader::ReadMesh(Mesh*& parMesh, const std::string& parFilename)
     ReadMeshImplementation(parMesh, ifstr);
 }
 
-void MeshFileReader::ReadMesh(Mesh*& parMesh, Resource& parResource)
+void MeshFileReader::ReadMesh(Mesh*& parMesh, const Resource& parResource)
 {
     std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&parResource);
 

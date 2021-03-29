@@ -13,7 +13,7 @@ struct ResourceBuffer : public std::streambuf
 class ResourceHandle
 {
 public:
-    ResourceHandle(Resource& parResource, c8* parBuffer, u32 parSize, ResourceCache* parResourceCache);
+    ResourceHandle(const Resource& parResource, c8* parBuffer, u32 parSize, ResourceCache* parResourceCache);
     virtual ~ResourceHandle();
 
     const Resource& GetResource() const { return FResource; }

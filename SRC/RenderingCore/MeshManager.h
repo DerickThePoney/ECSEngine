@@ -16,7 +16,7 @@ public:
     ~MeshManager();
 
     const MeshHandle CreateMesh(const std::string& parFilename);
-    const MeshHandle CreateMesh(Resource& parResource);
+    const MeshHandle CreateMesh(const Resource& parResource);
     const MeshHandle CreateMesh(const VertexDataStream& parVertexData, const void* parIndexData, const u32 parIndexDataSizeInBytes);
 
     Mesh* GetMesh(const MeshHandle& meshHandle) const;
