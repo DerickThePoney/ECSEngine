@@ -1,0 +1,35 @@
+{
+    ForEach(.SolutionConfig in .SolutionConfigs)
+    {
+        Using( .SolutionConfig )
+        Executable( '$GameName$-$Platform$-$Config$' )
+        {
+            Using(.'MSVC2019_X64$Config$')
+            .Libraries = {}
+
+            ForEach( .Project in .ProjectList)
+            {
+              ^Libraries     + "$Project$-Obj-$Platform$-$Config$"
+            }
+
+            .LinkerOutput       = '$OutputDir$\$GameName$-$Platform$-$Config$.exe'
+
+            .LibPaths = .LibraryPaths + .AdditionalLibraryPath
+            ForEach(.LibPath in .LibPaths)
+            {
+                ^LinkerOptions + ' $LinkerLibraryPathFlag$$LibPath$'
+            }
+
+            ForEach(.ExternalLib in .'AdditionalLibs_$Platform$_$Config$')
+            {
+                ^LinkerOptions + ' $ExternalLib$.lib'
+            }
+
+        }
+
+        RemoveDir( '$GameName$-$Platform$-$Config$-Purge' )
+        {
+            .RemovePaths = {'$OutputDir$', '$ObjDir$' }
+        }
+    }
+}

@@ -1,0 +1,4 @@
+{
+    .ProjectFilesPath = '$ProjectPath$/$ProjectName$'
+    #include "MakeProject.bff"
+}

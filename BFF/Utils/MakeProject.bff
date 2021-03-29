@@ -1,0 +1,88 @@
+{
+    .ProjectConfigurations = {}
+
+    #include "../Utils/PCH.bff"
+    Print('Making project $ProjectName$')
+    ForEach(.SolutionConfig in .SolutionConfigs)
+    {
+        Using( .SolutionConfig )
+        ObjectList('$ProjectName$-Obj-$Platform$-$Config$')
+        {
+            Using(.'MSVC2019_X64$Config$')
+
+#if USE_PRECOMPILED_HEADERS
+            .PCHInputFile   = '$ProjectFilesPath$/$PCHName$.cpp'          ; (optional) Precompiled header (.cpp) file to compile
+            .PCHOutputFile  = '$ObjDir$/$Platform$-$Config$/$ProjectName$/$PCHName$.pch'          ; (optional) Precompiled header compilation output
+            .CompilerOptions + ' /Yu"$PCHName$.h" /Fp"$PCHOutputFile$"'
+            .PCHOptions     +  ' /Yc"$PCHName$.h"'          ; (optional) Options for compiler for precompiled header
+#else
+            Using(.MSVCPCHConfigDisabled)
+#endif
+
+            .CompilerInputPath  = .ProjectFilesPath
+            .CompilerOutputPath = '$ObjDir$\$Platform$-$Config$\$ProjectName$\'
+
+            .CompilerOptions + ' $CompilerIncludeSystemFlag$"$ProjectFilesPath$"'
+            ForEach(.IncludePath in .IncludePaths)
+            {
+                ^CompilerOptions + ' $CompilerIncludeSystemFlag$"$IncludePath$"'
+                #if USE_PRECOMPILED_HEADERS
+                ^PCHOptions     + ' $CompilerIncludeSystemFlag$"$IncludePath$"'
+                #endif
+            }
+
+            .OtherIncludes = .AdditionnalIncludePaths + .ProjectIncludePath
+            ForEach(.IncludePath in .OtherIncludes)
+            {
+                ^CompilerOptions + ' $CompilerIncludeSystemFlag$"$IncludePath$"'
+                #if USE_PRECOMPILED_HEADERS
+                ^PCHOptions     + ' $CompilerIncludeSystemFlag$"$IncludePath$"'
+                #endif
+            }
+
+            ForEach(.Define in .ConfigDefines)
+            {
+                ^CompilerOptions + ' $CompilerDefineFlag$"$Define$"'
+                #if USE_PRECOMPILED_HEADERS
+                ^PCHOptions     + ' $CompilerDefineFlag$"$Define$"'
+                #endif
+            }
+        }
+
+        .ProjectList + '$ProjectName$-Obj-$Platform$-$Config$'
+
+        RemoveDir( '$ProjectName$-Obj-$Platform$-$Config$-Purge' )
+        {
+            .RemovePaths = '$ObjDir$\$Platform$-$Config$\$ProjectName$\'
+        }
+
+        Alias( '$ProjectName$-$Platform$-$Config$' ) { .Targets = { '$ProjectName$-Obj-$Platform$-$Config$' } }
+        Alias( '$ProjectName$-$Platform$-$Config$-Purge' ) { .Targets = { '$ProjectName$-Obj-$Platform$-$Config$-Purge' } }
+
+        .ProjConf =
+        [
+            .Config = '$Config$'
+            .Platform = '$Platform$'
+            .Target = '$ProjectName$-$Platform$-$Config$'
+        ]
+        ^ProjectConfigurations + .ProjConf
+    }
+
+    #include "SolutionBaseConfig.bff"
+
+    VCXProject( '$ProjectName$-Proj' )
+    {
+      Using( .VisualStudioBaseConfig)
+      // Output Options
+      .ProjectOutput                  = '$SolutionFolder$/$ProjectName$.vcxproj'
+
+      // Input Options
+      .ProjectBasePath    = .ProjectFilesPath
+      .ProjectInputPaths  = .ProjectFilesPath
+
+      .ProjectConfigs  = .ProjectConfigurations
+      .AdditionalOptions = ' /std:c++17' // pour intellisense
+    }
+
+    ^ProjectList + '$ProjectName$'
+}

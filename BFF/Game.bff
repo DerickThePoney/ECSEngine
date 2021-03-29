@@ -1,0 +1,42 @@
+#once
+#include "Utils/Compiler.bff"
+#include "Utils/SolutionConfigs.bff"
+
+.ProjectList = {}
+.ProjectIncludePath = {}
+.AdditionalLibraryPath = {}
+.AdditionalAllTarget = {}
+.ForcedTarget = {}
+
+#include "Projects/External/RenderingLibs.bff"
+#include "Projects/External/boost.bff"
+#include "Projects/External/brigand.bff"
+#include "Projects/External/cereal.bff"
+#include "Projects/External/glm.bff"
+#include "Projects/External/polypartition.bff"
+#include "Projects/External/fmt.bff"
+#include "Projects/External/Remotery.bff"
+
+#include "Projects/imgui.bff"
+#include "Projects/imguitools.bff"
+
+#include "Projects/Common.bff"
+#include "Projects/Application.bff"
+#include "Projects/ECSCore.bff"
+#include "Projects/RenderingCore.bff"
+
+#include "Projects/ECSGameplay_Common.bff"
+#include "Projects/ECSGameplay_Specific.bff"
+
+#include "Projects/Rendering.bff"
+
+#include "Projects/Launcher.bff"
+
+#include "Utils/Executable.bff"
+
+#include "Utils/SolutionFile.bff"
+
+Alias('all')
+{
+  .Targets = {'$SolutionName$'}
+}

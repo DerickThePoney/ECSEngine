@@ -1,0 +1,9 @@
+#once
+
+{
+    .BoostIncludes = { "External/boost/array/include", "External/boost/assert/include", "External/boost/config/include", "External/boost/container_hash/include", "External/boost/core/include", "External/boost/detail/include", "External/boost/fusion/include"}
+    .BoostIncludes + { "External/boost/integer/include", "External/boost/move/include", "External/boost/mpl/include", "External/boost/predef/include", "External/boost/preprocessor/include", "External/boost/stacktrace/include"}
+    .BoostIncludes + { "External/boost/static_assert/include", "External/boost/throw_exception/include", "External/boost/type_index/include", "External/boost/type_traits/include", "External/boost/utility/include", "External/boost/variant/include", "External/boost/winapi/include"}
+
+    ^ProjectIncludePath + .BoostIncludes
+}

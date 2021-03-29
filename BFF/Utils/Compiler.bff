@@ -1,0 +1,626 @@
+#once
+
+; Speeding up the Incremental Developer Build Scenario
+; http://blogs.msdn.com/b/vcblog/archive/2014/11/12/speeding-up-the-incremental-developer-scenario-with-visual-studio-2015.aspx
+
+; The Visual C++ Linker best practices: Developer Iteration
+; http://blogs.msdn.com/b/vcblog/archive/2015/10/30/the-visual-c-linker-best-practices-developer-iteration.aspx
+
+//------------------------------------------------------------------------------
+// Environment Variables
+//------------------------------------------------------------------------------
+
+#if !USE_NO_ALL_CPP
+#define USE_FASTBUILD_CACHE     ; set les bonnes options pour tirer parti du cache
+#endif
+
+; active le debugging des itérateurs de la STL (_ITERATOR_DEBUG_LEVEL)
+;#define USE_STL_ITERATOR_DEBUG
+
+; utilise les .obj à la place des .libs pour linker
+#define USE_LIBRARY_DEPENDENCY_INPUT
+
+; active l'utilisation des Pre-Compiled Headers (PCH)
+//#define USE_PRECOMPILED_HEADERS
+
+; active l'inlining sur les versions debug (link + rapide, jeu - lent)
+#define USE_INLINING_IN_DEBUG
+
+; active /GS /sdl /RTC1 pour avoir plus de checks lors de l'execution
+#define USE_RUNTIME_CHECKS
+
+#if USE_LIBRARY_DEPENDENCY_INPUT
+Print( "Using library dependency input (link with .obj instead of .lib)" )
+#endif
+
+.NoIncrementalLink = ' /INCREMENTAL:NO'
+.IncrementalLink = ' /INCREMENTAL /VERBOSE:INCR'
+#if NO_INCREMENTAL_LINK
+Print( "Disabling Incremental Link")
+.IncrementalLink = .NoIncrementalLink
+#endif
+
+//------------------------------------------------------------------------------
+// Common MSVC Configuration
+//------------------------------------------------------------------------------
+.MSVCBase =
+[
+    .AdditionalWarnings = ''
+    ;+ ' /W3'     // warning level 3, les warnings ne génèrent pas d'erreurs
+    ;+ ' /we4062' // enumerator 'identifier' in a switch of enum 'enumeration' is not handled
+    ;+ ' /we4263' // 'function' : member function does not override any base class virtual member function
+    ;+ ' /we4265' // 'class': class has virtual functions, but destructor is not virtual // not handled by boost and stl
+    ;+ ' /we4296' // 'operator': expression is always false
+    ;+ ' /we4555' // expression has no effect; expected expression with side-effect
+    ;+ ' /we4619' // #pragma warning : there is no warning number 'number'
+    ;+ ' /we4640' // 'instance' : construction of local static object is not thread-safe
+    + ' /we4834' // discarding return value of function with 'nodiscard' attribute
+    + ' /we4826' // Conversion from 'type1 ' to 'type_2' is sign-extended. This may cause unexpected runtime behavior.
+    + ' /we4836' // nonstandard extension used : 'type' : local types or unnamed types cannot be used as template arguments
+    + ' /we4905' // wide string literal cast to 'LPSTR'
+    + ' /we4906' // string literal cast to 'LPWSTR'
+    + ' /wd4752' // found Intel(R) Advanced Vector Extensions; consider using /arch:AVX
+    + ' /wd4316' // object allocated on the heap may not be aligned 16
+    + ' /wd5033' // 'register' is no longer a supported storage class
+
+    .Defines =
+    {
+        "STRICT",                       ; https://msdn.microsoft.com/en-us/library/windows/desktop/aa383681(v=vs.85).aspx
+        "NOMINMAX",                     ; https://support.microsoft.com/en-us/kb/143208
+        "VC_EXTRALEAN",                 ; https://support.microsoft.com/en-us/kb/166474
+        "WIN32_LEAN_AND_MEAN",          ; https://support.microsoft.com/en-us/kb/166474
+        "STRSAFE_NO_DEPRECATE=1",       ; https://msdn.microsoft.com/en-us/library/windows/desktop/ms647466(v=vs.85).aspx
+        "_CRT_SECURE_NO_DEPRECATE=1",   ; https://msdn.microsoft.com/fr-fr/library/8ef0s5kh.aspx
+        "_CRT_NONSTDC_NO_DEPRECATE=1",  ; https://msdn.microsoft.com/fr-fr/library/8ef0s5kh.aspx
+        "_WINSOCK_DEPRECATED_NO_WARNINGS",
+        "_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS",
+    }
+
+    .IncludePaths =
+    {
+        'src/',
+        ;'$EnginePath$/Eugen/CPP',
+    }
+
+    .BaseIncludes =
+    {
+        'src/',
+    }
+
+    .CompilerOptions = ''
+    + ' /nologo'            ; pas de message de copyright lors de la compilation
+    + ' /GR'                ; active le support des RTTI std de C++ (RunTime Type Information, nécessaire pour dynamic_cast<> par ex)
+    + ' /GF'                ; fusion des chaînes de caractères identiques (string pooling)
+    + ' /fp:precise'        ; opération virgule flottante précises, NECESSAIRE POUR LE DETERMINISME
+    + ' /bigobj'            ; augmente le nombre des sections qu'un fichier objet peut contenir (les obj peuvent être plus gros)
+    + ' /openmp-'           ; desactivation du support de openmp (parallèlisation automatique)
+    + ' /FS'                ; https://msdn.microsoft.com/fr-fr/library/dn502518.aspx
+    + ' /Zo'                ; https://msdn.microsoft.com/fr-fr/library/dn785163.aspx
+    + ' /Zc:wchar_t'        ; active le support de wchar_t comme type natif
+    + ' /Zc:forScope'       ; interdit d'acceder à l'iterateur d'un for en dehors de son scope (comportement std)
+    + ' /Zc:inline'         ; https://msdn.microsoft.com/fr-fr/library/dn642448.aspx
+    + ' /Zc:rvalueCast'     ; https://msdn.microsoft.com/fr-fr/library/dn449507.aspx
+    + ' -c "%1"'
+
+    .PreprocessorOptions = ''
+    .PCHOptions = .CompilerOptions + ' /FS /Fp"%2" /Fo"%3"'
+
+    .CompilerOptions + .AdditionalWarnings
+    .CompilerOptions + ' /Fo"%2"'
+
+    .LibrarianOptions = ''
+    + ' /IGNORE:4221'       ; ignore le warning d'obj vide
+    + ' /nologo'            ; pas de message de copyright lors de la compilation
+    + ' /SUBSYSTEM:CONSOLE'
+    + ' /OUT:"%2" "%1"'
+
+    .LinkerOptions = ' /OUT:"%2" "%1" /PDBALTPATH:"%_PDB%"'
+
+    .DllOptions                 = ' /DLL'   ; https://msdn.microsoft.com/en-us/library/527z7zfs.aspx
+
+    ; utilisés pour généraliser les templates :
+    .CompilerDefineFlag         = ' /D'
+    .CompilerIncludeFlag        = ' /I'
+    .CompilerPreprocessorFlag   = ' /P /Fi"%2"'
+
+    .LinkerDelayLoadDLLFlag     = ' /DELAYLOAD:'
+    .LinkerIgnoreLibFlag        = ' /NODEFAULTLIB:'
+    .LinkerLibraryFlag          = ''
+    .LinkerLibraryPathFlag      = ' /LIBPATH:'
+    .LinkerLibExt               = '.lib'
+    .LinkerDefinitionFileFlag   = ' /DEF:'
+
+    .ExecutableExt              = '.exe'
+    .SharedLibExt               = '.dll'
+    .StaticLibExt               = '.lib'
+]
+
+
+//------------------------------------------------------------------------------
+// MSVC Exe generation Configurations
+//------------------------------------------------------------------------------
+.MSVCProjectExeConsoleApplication =
+[
+    .ExecutableOptions = ''
+        + ' /SUBSYSTEM:CONSOLE'
+        + ' /MANIFEST' ; https://msdn.microsoft.com/en-us/library/f2c0w594.aspx
+        + ' /MANIFESTUAC:"level=^'asInvoker^' uiAccess=^'false^'"'
+        + ' /MANIFESTFILE:"^$BinDirectory^$/^$ExecutableName^$^$ExecutableExt^$.intermediate.manifest"'
+#if !USE_NO_ALL_CPP
+        + ' /PDB:"^$BinDirectory^$/^$ExecutableName^$.pdb"'
+#endif
+]
+//------------------------------------------------------------------------------
+// MSVC Unmanaged Cpp
+//------------------------------------------------------------------------------
+.UnmanagedCppConfig_Base =
+[
+
+    .LinkerOptions = ''
+    + ' /nologo'            ; pas de message de copyright lors de la compilation
+    + ' /LARGEADDRESSAWARE' ; l'application gère les adresses de taille supérieure à 2 gigaoctets
+    + ' /TLBID:1'           ; https://msdn.microsoft.com/fr-fr/library/b1kw34cb.aspx
+    + ' /IGNORE:4001'       ; https://msdn.microsoft.com/en-us/library/aa234697(v=vs.60).aspx
+    + ' /DYNAMICBASE:NO'    ; pas de randomisation des adresses
+    + ' /NXCOMPAT:NO'       ; indique que le programme n'est pas compatible avec Data Execution Prevention
+    + ' kernel32.lib'
+    + ' user32.lib'
+    + ' gdi32.lib'
+    + ' winspool.lib'
+    + ' comdlg32.lib'
+    + ' advapi32.lib'
+    + ' shell32.lib'
+    + ' ole32.lib'
+    + ' oleaut32.lib'
+    + ' uuid.lib'
+    + ' odbc32.lib'
+    + ' odbccp32.lib'
+    + ' setupapi.lib'
+
+    .CompilerOptions = ' /EHs'  ; active le support des exceptions
+    .PCHOptions = .CompilerOptions
+    ;+ ' /we4706' // assignment within conditional expression
+]
+.UnmanagedCppConfig_Debug =
+[
+    Using(.UnmanagedCppConfig_Base)
+#if !DISABLE_DEBUG_CRT
+    .CompilerOptions + ' -MTd'
+    .PCHOptions + ' -MTd'
+#else
+    .CompilerOptions + ' -MT'
+    .PCHOptions + ' -MT'
+#endif
+]
+.UnmanagedCppConfig =
+[
+    Using(.UnmanagedCppConfig_Base)
+
+    .CompilerOptions + ' -MT'
+    .PCHOptions + ' -MT'
+]
+
+//------------------------------------------------------------------------------
+// MSVC Base Platforms
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Shared PC Platform
+//------------------------------------------------------------------------------
+.SharedPlatformWindowsBase =
+[
+    .PlatformDefines = { 'WIN32', '_CONSOLE', '__WINDOWS__' }
+]
+
+//------------------------------------------------------------------------------
+// Shared X64 Platform
+//------------------------------------------------------------------------------
+.SharedPlatformWin64 =
+[
+    Using( .SharedPlatformWindowsBase )
+
+    .Arch = 'x64'
+
+    .Platform = 'x64'
+    .PlatformDefines + { '_WIN64' }
+    .MetaPlatform = 'Win'
+]
+.AllSharedPlatforms = .SharedPlatformWin64
+
+
+.MSVCBasePlatformX64 =
+[
+    Using( .SharedPlatformWin64 )
+    Using( .MSVCBase )
+
+    .Defines            + .PlatformDefines
+
+    .PlatformOptions    = ' /Zm100'
+;                        + ' /Zm100'        ; precompiled header size limit
+
+    .CompilerOptions    + .PlatformOptions
+    .PCHOptions         + .PlatformOptions
+
+    .LibrarianOptions   + ' /MACHINE:X64'
+    .LinkerOptions      + ' /MACHINE:X64'
+]
+
+//------------------------------------------------------------------------------
+// MSVC Base Platforms
+//------------------------------------------------------------------------------
+.MSVCBaseConfig =
+[
+    .STLWithoutIteratorDebugDefines =
+    {
+        "_SECURE_SCL=0",                 ; https://msdn.microsoft.com/fr-fr/library/aa985896.aspx
+        "_ITERATOR_DEBUG_LEVEL=0",       ; https://msdn.microsoft.com/fr-fr/library/hh697468.aspx
+        "_HAS_ITERATOR_DEBUGGING=0",     ; https://msdn.microsoft.com/fr-fr/library/aa985939.aspx
+    }
+
+    .STLWithIteratorDebugDefines = .STLWithoutIteratorDebugDefines
+#if USE_STL_ITERATOR_DEBUG
+    Print( "Using STL iterator debug : compiling with /D_ITERATOR_DEBUG_LEVEL=2" )
+    .STLWithIteratorDebugDefines =
+    {
+        "_SECURE_SCL=1",                 ; https://msdn.microsoft.com/fr-fr/library/aa985896.aspx
+        "_ITERATOR_DEBUG_LEVEL=2",       ; https://msdn.microsoft.com/fr-fr/library/hh697468.aspx
+        "_HAS_ITERATOR_DEBUGGING=1",     ; https://msdn.microsoft.com/fr-fr/library/aa985939.aspx
+    }
+#endif
+
+    .NoRuntimeChecksOptions = ''
+    ;' /GS-'   ; pas de protection pour les under/overflow mémoire (pas gratuit)
+    .RunTimeChecksOptions = .NoRuntimeChecksOptions
+#if USE_RUNTIME_CHECKS
+    .RunTimeChecksOptions   = ''
+    ;+ ' /GS'                ; vérification de la sécurité de la mémoire tampon
+    ;+ ' /sdl'               ; Security Development Lifecycle checks (https://msdn.microsoft.com/fr-fr/library/jj161081(v=vs.140).aspx)
+    + ' /GS'
+    ;+ ' /RTC1'              ; vérifications des erreurs au moment de l'exécution (https://msdn.microsoft.com/fr-fr/library/8wtf2dfz.aspx) ; coute trop cher
+    ; RTC1 ne marche pas avec O2 de toute facon. Je commente
+    + ' /wd4789' // Ce warning saute dans eugvector.h en debug
+    Print( "Using runtime checks : report stack frame errors, uninitialized variables and buffer overruns." )
+#endif
+
+    .DebugDefines           = .STLWithIteratorDebugDefines
+    .ReleaseDefines         = .STLWithoutIteratorDebugDefines
+
+    .DebugOptimisations = ''
+    + ' /Od'                ; désactive les optimisations (debug)
+    + .RunTimeChecksOptions
+#if USE_INLINING_IN_DEBUG
+    + ' /Ob1'               ; active l'inlinling pour garder des perfs correctes et linker plus vite
+    Print( "Using inlining in debug : debug version will be faster" )
+#endif
+
+    .FastDebugOptimisations = ''
+    + ' /O2'                ; optimisations favorisant la vitesse
+    + .RunTimeChecksOptions
+
+    .ReleaseOptimisations = ''
+    + ' /O2'                ; optimisations favorisant la vitesse
+    + .RunTimeChecksOptions
+
+    .FinalOptimisations = ''
+    + ' /O2'                ; optimisations favorisant la vitesse
+    + .NoRuntimeChecksOptions
+
+    ;Cache ou pas cache ?
+    .CompileWithoutCacheOptions =
+    [
+        // en NO_ALL_CPP je desactive les PDB. Ces builds sont la uniquement pour tester qu'ils compilent
+        .CompilerCacheOption = ''
+    ]
+    #if !USE_NO_ALL_CPP
+    .CompileWithoutCacheOptions =
+    [
+        .CompilerCacheOption = ' /Zi' ; produit une base de données de programme (PDB)
+        .AllowCaching       = false
+    ]
+    #endif
+
+    .CompileWithCacheOptions = .CompileWithoutCacheOptions
+    #if USE_FASTBUILD_CACHE
+    Print( "Using FBuild cache : compiling with /Z7 instead of /Zi" )
+    .CompileWithCacheOptions =
+    [
+        .CompilerCacheOption = ' /Z7' ; Produit un fichier .obj contenant des informations de débogage complètes
+    ]
+    #endif
+
+#if USE_LIBRARY_DEPENDENCY_INPUT
+    .DefaultLinkType = 'Obj'
+    .LinkerLinkObjects = true
+#endif
+]
+
+#if USE_LIBRARY_DEPENDENCY_INPUT
+    .DefaultLinkType = 'Obj'
+    .LinkerLinkObjects = true
+#endif
+
+//------------------------------------------------------------------------------
+// MSVC Debug Configuration
+//------------------------------------------------------------------------------
+.SharedDebugConfig =
+[
+    .Config = 'Debug'
+    .ConfigDefines = { "DEBUG", "PERFORM_SECURITY_CHECKS", "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING", "UNICODE" }
+]
+
+.SharedReleaseConfig =
+[
+    .Config = 'Release'
+    .ConfigDefines = { "RELEASE", "NDEBUG", "PERFORM_SECURITY_CHECKS", "PROFILE_CODE", "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING", "UNICODE"}
+]
+
+.SharedProfileConfig =
+[
+    .Config = 'Profile'
+    .ConfigDefines = { "PROFILE", "ABSOLUTELY_NOT_ASSERT", "ENABLE_BGFX_PROFILING", "PROFILE_CODE", "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING", "UNICODE" }
+]
+
+.SharedFinalConfig =
+[
+    .Config = 'Final'
+    .ConfigDefines = { "FINAL", "NDEBUG", "ABSOLUTELY_NOT_ASSERT", "_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING", "UNICODE" }
+]
+
+.MSVCBaseDebugConfig =
+[
+    Using( .MSVCBaseConfig )
+    Using( .SharedDebugConfig )
+    Using( .CompileWithCacheOptions )
+
+    .ConfigOptions      = .DebugOptimisations
+                        + .CompilerCacheOption
+
+    .Defines            = .ConfigDefines
+                        + .DebugDefines
+
+    .CompilerOptions    = .ConfigOptions
+    .PCHOptions         = .ConfigOptions
+
+    .LinkerOptions      = .IncrementalLink
+]
+
+//------------------------------------------------------------------------------
+// MSVC Release Configuration
+//------------------------------------------------------------------------------
+.MSVCBaseReleaseConfig =
+[
+    Using( .MSVCBaseConfig )
+    Using( .SharedReleaseConfig )
+    Using( .CompileWithCacheOptions )
+
+    .ConfigOptions      = .ReleaseOptimisations
+                        + .CompilerCacheOption
+
+    .Defines            = .ConfigDefines
+                        + .ReleaseDefines
+
+    .CompilerOptions    = .ConfigOptions
+    .PCHOptions         = .ConfigOptions
+
+    .LinkerOptions      = .IncrementalLink
+]
+
+//------------------------------------------------------------------------------
+// MSVC Release Configuration
+//------------------------------------------------------------------------------
+.MSVCBaseProfileConfig =
+[
+    Using( .MSVCBaseConfig )
+    Using( .SharedProfileConfig )
+    Using( .CompileWithCacheOptions )
+
+    .ConfigOptions      = .FinalOptimisations
+                        + .CompilerCacheOption
+
+    .Defines            = .ConfigDefines
+                        + .ReleaseDefines
+
+    .CompilerOptions    = .ConfigOptions
+    .PCHOptions         = .ConfigOptions
+
+    .LinkerOptions      = .IncrementalLink
+]
+
+//------------------------------------------------------------------------------
+// MSVC Release Configuration
+//------------------------------------------------------------------------------
+.MSVCBaseFinalConfig =
+[
+    Using( .MSVCBaseConfig )
+    Using( .SharedFinalConfig )
+    Using( .CompileWithCacheOptions )
+
+    .ConfigOptions      = .FinalOptimisations
+                        + .CompilerCacheOption
+
+    .Defines            = .ConfigDefines
+                        + .ReleaseDefines
+
+    .CompilerOptions    = .ConfigOptions
+    .PCHOptions         = .ConfigOptions
+
+    .LinkerOptions      = .IncrementalLink
+]
+
+//------------------------------------------------------------------------------
+// Windows sdk
+//------------------------------------------------------------------------------
+
+//.WindowsSDKVersion10  = '10.0.10240.0' ; Visual 2015 final
+.WindowsSDKVersion10  = '10.0.18362.0' ; Visual 2019 final
+
+.WindowsNetSDKBasePath = 'C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8'
+.WindowsSDKBasePath10 = 'C:\Program Files (x86)\Windows Kits\10'
+Print( "Using Windows 10 SDK $WindowsSDKVersion10$" )
+
+.WinSDKIncludePaths = {
+    '$WindowsNetSDKBasePath$\include\um'
+    '$WindowsSDKBasePath10$\Include\$WindowsSDKVersion10$\ucrt',
+    '$WindowsSDKBasePath10$\Include\$WindowsSDKVersion10$\shared',
+    '$WindowsSDKBasePath10$\Include\$WindowsSDKVersion10$\um',
+    '$WindowsSDKBasePath10$\Include\$WindowsSDKVersion10$\winrt',
+    '$WindowsSDKBasePath10$\Include\$WindowsSDKVersion10$\cppwinrt',
+}
+
+.WinSDKLibraryPathsX64 = {
+    '"$WindowsSDKBasePath10$\Lib\$WindowsSDKVersion10$\ucrt\x64"',
+    '"$WindowsSDKBasePath10$\Lib\$WindowsSDKVersion10$\um\x64"',
+    '"$WindowsNetSDKBasePath$\lib\um\x64"'
+}
+
+
+//------------------------------------------------------------------------------
+// Global Properties
+//------------------------------------------------------------------------------
+.VCTOOLVERSION = '14.28.29333'
+.VCREDISTVERSION = '14.28.29333'
+.VSINSTALLPATH = "$VSPATH$\VC"
+.VSVERSION = .VCTOOLVERSION
+.VSREDISTVERSION = .VCREDISTVERSION
+
+.MSVC2019BasePath =
+[
+    .VSBasePath         = '$VSINSTALLPATH$\Tools\MSVC\$VSVERSION$'
+    .ToolsPath          = '$VSBasePath$\bin\Hostx64'
+    .ToolsBasePath      = '$ToolsPath$\x64'
+]
+
+.PlatformToolset = 'v142'
+
+//------------------------------------------------------------------------------
+// Microsoft Visual Studio 2019 (x64)
+//------------------------------------------------------------------------------
+Compiler( 'Compiler-MSVC2019-x64' )
+{
+    Using( .MSVC2019BasePath )
+
+    .Root       = '$ToolsPath$\x64'
+    .RedistPath = '$VSINSTALLPATH$\Redist\MSVC\$VSREDISTVERSION$\x64\Microsoft.VC142.CRT'
+    .Executable = '$Root$\cl.exe'
+    .ExtraFiles =
+    {
+        '$Root$\c1.dll'
+        '$Root$\c1xx.dll',
+        '$Root$\c2.dll',
+        '$Root$\msobj140.dll'
+        '$Root$\mspdb140.dll'
+        '$Root$\mspdbcore.dll'
+        '$Root$\mspdbsrv.exe'
+        '$Root$\mspft140.dll'
+        '$Root$\msvcp140.dll'
+        '$Root$\vcruntime140.dll'
+    }
+}
+
+//------------------------------------------------------------------------------
+// Base Config
+//------------------------------------------------------------------------------
+.MSVC2019BaseConfig =
+[
+    Using( .MSVC2019BasePath )
+
+    .CompilerIncludeSystemFlag  = ' /I'
+
+    .IncludePaths =
+    {
+        '$VSBasePath$/include',
+    } + .WinSDKIncludePaths
+
+    .ManagedCppLinkerPath = '$ToolsBasePath$/link.exe'
+
+    .LinkerPath = '$ToolsBasePath$/link.exe'
+
+]
+
+.MSVC2019DebugFastLink =
+[
+#if USE_FASTLINK
+    Print( "Using Visual 2019 debug fast link : pdb references built objs" )
+    ; utilise un lien symbolique vers les obj plutot que de les copier dans le pdb
+    .LinkerOptions = ' /DEBUG:fastlink'
+#else
+    .LinkerOptions = ' /DEBUG'
+#endif
+]
+
+.MSVC2019BaseConfigFinal =
+[
+    .CompilerOptions = ' /Gw' ; optimisations des données globales
+#if !USE_LLVM_LLD // https://reviews.llvm.org/D26647
+                     + ' /GL' ; optimisations du programme globales
+#endif
+                     + ' /GS-'; desactivation des checks de buffer overflow
+
+    .PCHOptions      = ' /Gw' ; optimisations des données globales
+#if !USE_LLVM_LLD // https://reviews.llvm.org/D26647
+                     + ' /GL' ; optimisations du programme globales
+#endif
+                     + ' /GS-'; desactivation des checks de buffer overflow
+
+    ; Link Time Code Generation (LTCG) incrémental pour accélérer les builds en FINAL
+#if !USE_LLVM_LLD
+    .LinkerOptions      = ' /LTCG'
+    .LibrarianOptions   = ' /LTCG'
+#endif
+]
+
+//------------------------------------------------------------------------------
+// Platforms
+//------------------------------------------------------------------------------
+.CompilerOptionsHacks = ''
+        + ' /wd4996'
+        + ' /Zc:strictStrings-' // Parceque python ne sait pas utiliser const
+
+.MSVC2019PlatformX64 =
+[
+    Using( .MSVC2019BaseConfig )
+
+    .Compiler           = 'Compiler-MSVC2019-x64'
+    .CompilerOptions = ''
+        + ' /errorreport:none'
+        + ' /utf-8'
+        + ' /std:c++17'
+        + ' /permissive-'
+        + .CompilerOptionsHacks
+    .PCHOptions = ''
+        + ' /errorreport:none'
+        + ' /utf-8'
+        + ' /std:c++17'
+        + ' /permissive-'
+        + .CompilerOptionsHacks
+    .CompilerFamily     = 'Visual'
+
+    .Linker = .LinkerPath
+    .Librarian          = '$ToolsBasePath$/lib.exe'
+    .LibraryPaths       = { '"$VSBasePath$/lib/x64"' } + .WinSDKLibraryPathsX64
+]
+.MSVC2019PlatformX64 + .MSVCBasePlatformX64
+
+
+//------------------------------------------------------------------------------
+// Configurations
+//------------------------------------------------------------------------------
+
+.MSVC2019_X64Debug           = .MSVC2019PlatformX64   + .MSVCBaseDebugConfig          + .UnmanagedCppConfig_Debug + .MSVC2019DebugFastLink
+.MSVC2019_X64Release         = .MSVC2019PlatformX64   + .MSVCBaseReleaseConfig        + .UnmanagedCppConfig + .MSVC2019DebugFastLink
+.MSVC2019_X64Profile           = .MSVC2019PlatformX64   + .MSVCBaseProfileConfig          + .UnmanagedCppConfig
+.MSVC2019_X64Final         = .MSVC2019PlatformX64   + .MSVCBaseFinalConfig        + .UnmanagedCppConfig
+
+.AdditionalLibs_x64_Debug = {}
+.AdditionalLibs_x64_Release = {}
+.AdditionalLibs_x64_Final = {}
+.AdditionalLibs_x64_Profile = {}
+
+
+.MSVC2019CompileConfigs =
+{
+    // X64
+    .MSVC2019_X64Debug,
+    .MSVC2019_X64Release,
+    .MSVC2019_X64Profile,
+    .MSVC2019_X64Final,
+}

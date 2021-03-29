@@ -1,0 +1,11 @@
+{
+    .ProjectName = 'imgui'
+    .ProjectPath = 'SRC'
+    .AdditionnalIncludePaths = { .ProjectPath}
+    .AdditionalCompilerOptions = ''
+    ^ProjectIncludePath + .ProjectPath
+
+    .BuildTarget = { '$ProjectName$' }
+
+    #include "../Utils/MakeProjectStandard.bff"
+}

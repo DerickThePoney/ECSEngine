@@ -1,0 +1,11 @@
+{
+    .ProjectName = 'main'
+    .ProjectPath = 'src/main'
+    .AdditionnalIncludePaths = {"src"}
+
+    .BuildTarget = { '$GameName$' }
+
+    .SolutionBuildProject = '$ProjectName$-Proj'
+
+    #include "MakeProject.bff"
+}

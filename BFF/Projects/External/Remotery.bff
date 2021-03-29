@@ -1,0 +1,13 @@
+{
+    .ProjectName = 'Remotery'
+    .ProjectPath = 'External/Remotery/lib'
+    .ProjectFilesPath = .ProjectPath
+    .AdditionnalIncludePaths = { .ProjectPath}
+    .CompilerInputPattern = "*.c"
+    .AdditionalCompilerOptions = ''
+    ^ProjectIncludePath + .ProjectPath
+
+    .BuildTarget = { '$ProjectName$' }
+
+    #include "../../Utils/MakeProject.bff"
+}

@@ -1,0 +1,10 @@
+.GameName = 'BuildingGame'
+.VSPATH = 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community'
+.PCHName = 'stdafx'
+.SolutionName = 'ECSEngine'
+.SolutionFolder = 'Build'
+.ObjDir = "$SolutionFolder$/Intermediary"
+.OutputDir = "bin"
+.ExternalLibraries = {}
+
+#include "BFF/Game.bff"
