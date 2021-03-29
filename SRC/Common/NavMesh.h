@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "MemoryView.h"
 #include "Polygon.h"
 #include "PoolAllocator.h"

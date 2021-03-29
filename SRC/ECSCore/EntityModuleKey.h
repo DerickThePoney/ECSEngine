@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/BitSet.h"
 #include "Common/Constants.h"
 #include "ModuleId.h"

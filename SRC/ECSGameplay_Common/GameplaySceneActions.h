@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Application/ApplicationSceneActions.h"
 #include "Common/NavMesh.h"
 #include "Common/NavMeshPath.h"

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 // void* operator new(size_t s, void* where, size_t limit) noexcept
 //{

@@ -1,4 +1,4 @@
-DECLARE_SCENE_ACTION(SceneActionCreateMainCamera)
+﻿DECLARE_SCENE_ACTION(SceneActionCreateMainCamera)
 DECLARE_SCENE_ACTION(SceneActionPolygonalPattern)
 
 #include "ECSCore/SceneActionIds.inl"

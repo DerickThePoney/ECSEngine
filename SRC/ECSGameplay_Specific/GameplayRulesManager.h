@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "BuildingCostManager.h"
 #include "Common/Singleton.h"
 #include "GameplayConstants.h"

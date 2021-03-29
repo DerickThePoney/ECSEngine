@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "BaseApplication.h"
 
@@ -44,6 +44,7 @@ void BaseApplicationLayer::RunMainLoop()
 {
     while (!FGameplayUpdater->CheckShouldFinish())
     {
+        SCOPED_PROFILE_CLASS(BaseApplicationLayer, RunMainLoop);
         FGameplayUpdater->StartUpdate();
         FGameplayUpdater->Update();
         FGameplayUpdater->Render();

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/Constants.h"
 #include "Common/ModulePoolAllocator.h"
 #include "EntityId.h"

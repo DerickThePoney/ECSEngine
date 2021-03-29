@@ -1,1 +1,1 @@
-DECLARE_SCENE_ITEM(BaseSceneItem)
+﻿DECLARE_SCENE_ITEM(BaseSceneItem)

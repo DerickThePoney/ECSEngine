@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ResourceFile.h"
 
 namespace ECSEngine

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Main template for delgates
  * From https://github.com/marcmo/delegates
  * \tparam return_type  return type of the function that gets captured

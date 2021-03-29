@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 namespace ECSEngine
 {
 namespace Rendering
@@ -204,6 +204,12 @@ struct MeshLayoutDescription
 //----------------------------------------------------------------
 //          MeshFileHeader
 //----------------------------------------------------------------
+namespace MagicStuff
+{
+constexpr u32 MajorVersion = 0;
+constexpr u32 MinorVersion = 1;
+} // namespace MagicStuff
+
 struct MeshFileHeader
 {
     u32 MajorVersion = 0;

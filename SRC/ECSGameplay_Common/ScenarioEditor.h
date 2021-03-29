@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Application/SceneScenario.h"
 #include "EditorCamera.h"
 #include "IScenarioUpdater.h"

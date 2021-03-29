@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ECSCore/EntityId.h"
 
 namespace ECSEngine

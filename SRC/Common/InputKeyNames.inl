@@ -1,4 +1,4 @@
-// clang-format off
+﻿// clang-format off
 /* Printable keys */
 DECLARE_ENUM(INPUT_KEY_SPACE, 32),
 DECLARE_ENUM(INPUT_KEY_APOSTROPHE, 39), /* ' */

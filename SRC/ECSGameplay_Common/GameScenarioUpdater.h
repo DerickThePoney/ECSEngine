@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "CameraMoverSystem.h"
 #include "ECSGameplay_Specific/ColonyBuildingSystem.h"
 #include "ECSGameplay_Specific/ColonyFeedbackSystem.h"
@@ -53,5 +53,7 @@ private:
     ColonyFeedbackSystem FColonyFeedbackSystem;
 
     UserInterfaceSystem FUserInterfaceSystem;
+
+    float FTimeBeforeNextUpdate = 0.f;
 };
 } // namespace ECSEngine
