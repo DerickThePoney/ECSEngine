@@ -1,0 +1,40 @@
+//------------------------------------------------------------------------------
+// Visual Studio Base Config
+//------------------------------------------------------------------------------
+
+.VisualStudioFBuildCommand          = 'cd .. &amp; "tools\FBuild.exe" -config fbuild.bff -ide'
+.VisualStudioFBuildCommand          + ' -nostoponerror'
+
+.VisualStudioFBuildTarget = ''
+.VisualStudioFBuildPurgeTarget = ''
+ForEach(.Target in .BuildTarget)
+{
+  ^VisualStudioFBuildTarget           + '$Target$-^$(Platform)-^$(Configuration) '
+  ^VisualStudioFBuildPurgeTarget           + '$Target$-^$(Platform)-^$(Configuration)-Purge '
+}
+
+ForEach(.Target in .ForcedTarget)
+{
+  ^VisualStudioFBuildTarget           + '$Target$ '
+}
+
+Print(.VisualStudioFBuildTarget)
+
+.VSBuildOptions = ''
++ ' -nosummaryonerror'
+//+ ' -dist'      ; active la compilation distribuée
++ ' -summary'   ; affiche un rapport à la fin de la compilation
+
+.VisualStudioBaseConfig =
+[
+    .ProjectBuildCommand    = '$VisualStudioFBuildCommand$ $VSBuildOptions$ $VisualStudioFBuildTarget$  $SolutionName$'
+    .ProjectRebuildCommand  = '$VisualStudioFBuildCommand$ -clean $VSBuildOptions$ $VisualStudioFBuildTarget$  $SolutionName$'
+    .ProjectCleanCommand    = '$VisualStudioFBuildCommand$ -clean $VisualStudioFBuildPurgeTarget$'
+
+    .LocalDebuggerCommand = '$OutputDir$\$GameName$-^$(Platform)-^$(Configuration).exe'
+
+    .SourceType = [ .FileType = "Source Files"      .Pattern = "*.cpp" ]
+    .HeaderType = [ .FileType = "Header Files"      .Pattern = "*.h" ]
+
+    .ProjectFileTypes = { .SourceType, .HeaderType }
+]

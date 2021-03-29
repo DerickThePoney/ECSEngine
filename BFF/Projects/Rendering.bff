@@ -1,0 +1,11 @@
+#once
+{
+    .ProjectName = 'Rendering'
+    .ProjectPath = 'SRC'
+    .AdditionnalIncludePaths = {"SRC", "External/glfw-3.3.bin.WIN64/include", "External/BGFX/bgfx/include", "External/BGFX/bimg/include", "External/BGFX/bx/include", "External/BGFX/bx/include/compat/msvc" }
+
+    #define USE_PRECOMPILED_HEADERS
+    .BuildTarget = { '$ProjectName$' }
+    #include "../Utils/MakeProjectStandard.bff"
+    #undef USE_PRECOMPILED_HEADERS
+}

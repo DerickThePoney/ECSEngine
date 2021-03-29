@@ -1,0 +1,16 @@
+{
+    VSSolution( '$SolutionName$' )
+    {
+
+        .SolutionOutput = '$SolutionFolder$/$SolutionName$.sln'
+        .SolutionConfigs = .SolutionConfigs
+
+        .SolutionVisualStudioVersion = '16.8.30717.126'
+
+        .SolutionProjects = {}
+        ForEach( .Project in .ProjectList)
+        {
+          ^SolutionProjects     + "$Project$-Proj"
+        }
+    }
+}

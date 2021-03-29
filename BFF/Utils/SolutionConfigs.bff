@@ -1,0 +1,22 @@
+.Solution_Config_Debug =
+[
+  .Platform = 'x64'
+  .Config   = 'Debug'
+]
+.Solution_Config_Release =
+[
+  .Platform = 'x64'
+  .Config   = 'Release'
+]
+.Solution_Config_Profile =
+[
+  .Platform = 'x64'
+  .Config   = 'Profile'
+]
+.Solution_Config_Final =
+[
+  .Platform = 'x64'
+  .Config   = 'Final'
+]
+
+.SolutionConfigs = { .Solution_Config_Debug, .Solution_Config_Release , .Solution_Config_Profile, .Solution_Config_Final }

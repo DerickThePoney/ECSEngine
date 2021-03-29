@@ -54,3 +54,5 @@ External/polypartition-master/.clang-format
 External/polypartition-master/.editorconfig
 
 External/polypartition-master/.gitattributes
+
+fbuild.windows.fdb

@@ -1,0 +1,23 @@
+//------------------------------------------------------------------------------
+// MSVC PCH Configurations
+//------------------------------------------------------------------------------
+.MSVCPCHConfigDisabled =
+[
+    .UnityPCH = ''
+    .PCHOpt = ' '
+    .PCHInput = ''
+    .PCHOutput = ''
+    .CompilerOpt = ''
+
+]
+#if USE_PRECOMPILED_HEADERS
+.MSVCPCHConfigEnabled =
+[
+    .UnityPCH = '$PCHName$.h'
+    .PCHOpt = ' /Yc^$PCHName^$.h'
+    .PCHInput = '^$ProjectPath^$\^$PCHName^$.cpp'
+    .PCHOutput = '^$GenDirectory^$\^$IntermediateDir^$\^$Platform^$\^$Config^$\^$ProjectName^$\^$PCHName^$.pch'
+    .CompilerOpt = ' /Yu^$PCHName^$.h /Fp"^$GenDirectory^$\^$IntermediateDir^$\^$Platform^$\^$Config^$\^$ProjectName^$\^$PCHName^$.pch"'
+]
+Print( "Using Pre-Compiled Headers : /Fp, /Yc, /Yu" )
+#endif

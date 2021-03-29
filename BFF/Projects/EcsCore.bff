@@ -1,0 +1,11 @@
+#once
+{
+    .ProjectName = 'ECSCore'
+    .ProjectPath = 'SRC'
+    .AdditionnalIncludePaths = {"SRC" }
+
+    #define USE_PRECOMPILED_HEADERS
+    .BuildTarget = { '$ProjectName$' }
+    #include "../Utils/MakeProjectStandard.bff"
+    #undef USE_PRECOMPILED_HEADERS
+}

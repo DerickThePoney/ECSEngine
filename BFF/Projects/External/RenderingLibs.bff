@@ -1,0 +1,19 @@
+#once
+{
+    Copy('GLFWCopy')
+    {
+        .Source = 'External\glfw-3.3.bin.WIN64\lib-vc2019\glfw3.dll'
+        .Dest = .OutputDir + '\'
+    }
+
+    ^AdditionalLibraryPath + {'External\glfw-3.3.bin.WIN64\lib-vc2019\', "External/BGFX/bgfx/.build/win64_vs2019/bin/"}
+
+    Print(.AdditionalLibraryPath)
+
+    ^AdditionalLibs_x64_Debug + {"bgfxDebug", "bimgDebug","bxDebug", "glfw3dll"}
+    ^AdditionalLibs_x64_Release + {"bgfxRelease", "bimgRelease","bxRelease", "glfw3dll"}
+    ^AdditionalLibs_x64_Final + {"bgfxRelease", "bimgRelease","bxRelease", "glfw3dll"}
+    ^AdditionalLibs_x64_Profile + {"bgfxRelease", "bimgRelease","bxRelease", "glfw3dll"}
+
+    ^AdditionalAllTarget + 'GLFWCopy'
+}
