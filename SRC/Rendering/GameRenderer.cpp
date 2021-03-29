@@ -26,7 +26,7 @@ namespace Rendering
 
 void GameRenderer::Initialise()
 {
-    auto& size = GLFWDisplayWindowHandler::Instance().GetSize();
+    auto size = GLFWDisplayWindowHandler::Instance().GetSize();
 
     FGameplayCameraId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
     AssertRelease(FGameplayCameraId != -1);
@@ -87,7 +87,7 @@ void GameRenderer::Render()
     FCombineCommandBuffer->clear();
 
     // Resize framebuffers
-    auto& size = GLFWDisplayWindowHandler::Instance().GetSize();
+    auto size = GLFWDisplayWindowHandler::Instance().GetSize();
     const bool hasResized = FGeometryFramebuffer->ResizeIFN(size);
 
     if (hasResized)

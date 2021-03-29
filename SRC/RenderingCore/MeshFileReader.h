@@ -15,7 +15,7 @@ public:
     ~MeshFileReader();
 
     void ReadMesh(Mesh*& parMesh, const std::string& parFilename);
-    void ReadMesh(Mesh*& parMesh, Resource& parResource);
+    void ReadMesh(Mesh*& parMesh, const Resource& parResource);
 };
 
 } // namespace Rendering

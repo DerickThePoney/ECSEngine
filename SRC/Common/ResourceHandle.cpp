@@ -5,7 +5,7 @@
 #include "ResourceCache.h"
 namespace ECSEngine
 {
-ResourceHandle::ResourceHandle(Resource& parResource, c8* parBuffer, u32 parSize, ResourceCache* parResourceCache)
+ResourceHandle::ResourceHandle(const Resource& parResource, c8* parBuffer, u32 parSize, ResourceCache* parResourceCache)
     : FResource(parResource)
     , FBuffer(parBuffer)
     , FSize(parSize)

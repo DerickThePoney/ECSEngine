@@ -47,7 +47,7 @@ const MeshHandle MeshManager::CreateMesh(const std::string& parFilename)
     return CreateMesh(res);
 }
 
-const MeshHandle MeshManager::CreateMesh(Resource& parResource)
+const MeshHandle MeshManager::CreateMesh(const Resource& parResource)
 {
     auto itFind = FFileToMesh.find(parResource.FName);
 

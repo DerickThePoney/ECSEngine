@@ -63,7 +63,7 @@ void ResourceCache::ReOpenFileSystem()
     AssertRelease(FFileSystem->Open());
 }
 
-std::shared_ptr<ResourceHandle> ResourceCache::GetResourceHandle(Resource* parResource)
+std::shared_ptr<ResourceHandle> ResourceCache::GetResourceHandle(const Resource* parResource)
 {
     AssertRelease(FFileSystem != nullptr);
     std::shared_ptr<ResourceHandle> handle(Find(parResource));
@@ -85,7 +85,7 @@ const std::string& ResourceCache::GetBasePath() const
     return FFileSystem->GetBasePathName();
 }
 
-std::shared_ptr<ECSEngine::ResourceHandle> ResourceCache::Find(Resource* parResource)
+std::shared_ptr<ECSEngine::ResourceHandle> ResourceCache::Find(const Resource* parResource)
 {
     auto itFind = FResources.find(parResource->FName);
     if (itFind != FResources.end())
@@ -109,7 +109,7 @@ void ResourceCache::Update(std::shared_ptr<ResourceHandle> parHandle)
     FLRU.push_front(parHandle);
 }
 
-std::shared_ptr<ResourceHandle> ResourceCache::Load(Resource* parResource)
+std::shared_ptr<ResourceHandle> ResourceCache::Load(const Resource* parResource)
 {
     AssertRelease(FFileSystem != nullptr);
     std::shared_ptr<IResourceLoader> loader;
