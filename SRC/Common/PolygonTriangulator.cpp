@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "PolygonTriangulator.h"
 
@@ -204,7 +204,7 @@ void InsertHoleIntoPolygon(Polygon2D& parPolygon, const Polygon2D& parHole)
     } while (currentHoleIndex != maxXVertex);
     newPoints.push_back(holeToUse[currentHoleIndex]);
 
-    // on continue le polygone principal en recomman�ant par PIndex
+    // on continue le polygone principal en recommançant par PIndex
     forrange(i, PIndex, parPolygon.size()) { newPoints.push_back(parPolygon[i]); }
 
     parPolygon.set_points(std::move(newPoints));

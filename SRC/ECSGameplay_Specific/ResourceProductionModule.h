@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/MemoryView.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"

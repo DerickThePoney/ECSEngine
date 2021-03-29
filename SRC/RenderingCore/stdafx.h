@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/stdafx.h"
 
 // clang-format off

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "ECSCore/ModuleSystem.h"
 #include "UIInGameMenuController.h"

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 
 #include "SceneItems.h"
 
@@ -44,7 +44,7 @@ void BaseSceneItem::DrawEditor()
 #endif
     VirtualDrawEditor();
 #ifdef PERFORM_SECURITY_CHECKS
-    AlwaysCheckedAssertMsg(FVirtualDrawEditorHasBeenCalled, "Un appel virtuel à VirtualDrawEditor a été manqué");
+    AlwaysCheckedAssertMsg(FVirtualDrawEditorHasBeenCalled, "Un appel virtuel Ã  VirtualDrawEditor a Ã©tÃ© manquÃ©");
 #endif
 }
 

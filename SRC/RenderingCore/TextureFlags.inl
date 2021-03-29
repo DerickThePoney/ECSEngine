@@ -1,4 +1,4 @@
-// clang-format off
+﻿// clang-format off
 TEXTURE_FLAG(TEXTURE_NONE, 0x0000000000000000),
 TEXTURE_FLAG(TEXTURE_MSAA_SAMPLE, 0x0000000800000000), //!< Texture will be used for MSAA sampling.
 TEXTURE_FLAG(TEXTURE_RT, 0x0000001000000000) ,//!< Render target no MSAA.

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/ModifiableValue.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"

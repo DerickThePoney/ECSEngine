@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "MousePolicyType.h"
 
 namespace ECSEngine

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/Camera.h"
 #include "ECSCore/ModuleSystem.h"
 

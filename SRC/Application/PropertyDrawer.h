@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/BoundingBox.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
@@ -489,7 +489,7 @@ private:
         if (ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str()))
         {
             ImGui::Indent();
-            std::vector<T>::iterator itToErase = FProperty->end();
+            auto itToErase = FProperty->end();
             u32 i = 0;
             u32 action = -1; // 0 erase / 1 up / 2 down
             for (auto element = FProperty->begin(); element != FProperty->end(); ++element, ++i)

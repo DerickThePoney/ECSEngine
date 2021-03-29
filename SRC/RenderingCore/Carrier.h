@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/PoolAllocator.h"
 #include "Common/ValueInterpolator.h"
 

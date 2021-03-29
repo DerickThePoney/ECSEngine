@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "MeshFileWriter.h"
 
@@ -8,11 +8,7 @@ namespace ECSEngine
 {
 namespace Rendering
 {
-namespace MagicStuff
-{
-constexpr u32 MajorVersion = 0;
-constexpr u32 MinorVersion = 1;
-} // namespace MagicStuff
+
 MeshFileWriter::MeshFileWriter(const std::string& parFilename)
 {
     FOutputStream.open(parFilename.c_str(), std::ofstream::binary);

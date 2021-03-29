@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "VertexBuffer.h"
 
 namespace ECSEngine

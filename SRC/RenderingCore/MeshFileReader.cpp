@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "MeshFileReader.h"
 
@@ -20,6 +20,9 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
 {
     MeshFileHeader fileHeader;
     parStream.read((c8*)&fileHeader, sizeof(MeshFileHeader));
+
+    AssertRelease(fileHeader.MajorVersion == MagicStuff::MajorVersion);
+    AssertRelease(fileHeader.MinorVersion == MagicStuff::MinorVersion);
 
     VertexLayoutHash hash(fileHeader.layout);
 

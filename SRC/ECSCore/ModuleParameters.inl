@@ -1,4 +1,4 @@
-#ifdef DECLARING_PARAMETERS
+﻿#ifdef DECLARING_PARAMETERS
 #include "Common/RenderingHandles.h"
 #include "ECSGameplay_Specific/CircularBuildingGrid.h"
 #include "EntityId.h"

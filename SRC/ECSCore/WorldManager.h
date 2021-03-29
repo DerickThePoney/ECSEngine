@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/Singleton.h"
 #include "EntityWorld.h"
 #include "WorldIds.h"

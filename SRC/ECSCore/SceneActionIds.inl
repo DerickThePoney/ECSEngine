@@ -1,4 +1,4 @@
-DECLARE_SCENE_ACTION(SpawnEntitySceneAction)
+﻿DECLARE_SCENE_ACTION(SpawnEntitySceneAction)
 DECLARE_SCENE_ACTION(SpawnEntitiesInPolygonalPatternSceneAction)
 DECLARE_SCENE_ACTION(CreateNavMeshSceneAction)
 DECLARE_SCENE_ACTION(CreateWorldSceneAction)

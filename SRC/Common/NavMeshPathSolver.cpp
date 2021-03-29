@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 
 #include "NavMeshPathSolver.h"
 
@@ -126,7 +126,7 @@ void NavMeshPathSolver::SolveFacePath(const NavMesh& parNavMesh, NavMeshPath& ou
         parNavMesh.NeighbourFaces(faces[lastFace], neighbouringFaces);
         foreachitemconst(face, neighbouringFaces)
         {
-            // On est concomitant à la face finale, yeah!!
+            // On est concomitant Ã  la face finale, yeah!!
             if (face == endFace)
             {
                 if (bestLastFace == -1 || pathFindingNodes[lastFace].Score() < pathFindingNodes[bestLastFace].Score())
@@ -261,7 +261,7 @@ void NavMeshPathSolver::SolveVertexPath(const NavMesh& parNavMesh, NavMeshPath& 
         parNavMesh.NeighbourFaces(vertices[lastVertex], neighbouringFaces);
         foreachitemconst(face, neighbouringFaces)
         {
-            // On est concomitant à la face finale, yeah!!
+            // On est concomitant Ã  la face finale, yeah!!
             if (face == endFace)
             {
                 if (bestLastVertex == -1 || pathFindingNodes[lastVertex].Score() < pathFindingNodes[bestLastVertex].Score())

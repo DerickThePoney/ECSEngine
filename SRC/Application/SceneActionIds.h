@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "standalone/brigand.hpp"
 namespace ECSEngine
 {

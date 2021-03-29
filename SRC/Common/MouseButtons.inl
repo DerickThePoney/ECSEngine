@@ -1,4 +1,4 @@
-// clang-format off
+﻿// clang-format off
 DECLARE_ENUM(MOUSE_BUTTON_1, 0),
 DECLARE_ENUM(MOUSE_BUTTON_2, 1),
 DECLARE_ENUM(MOUSE_BUTTON_3, 2),

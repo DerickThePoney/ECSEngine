@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "EntityModuleKey.h"
 #include "ModuleTemplate.h"
 #include "WorldIds.h"

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 namespace ECSEngine
 {
@@ -60,11 +60,11 @@ template<int ID>
 class ParameterIdentifierTrait : public IParameterIdentifierTrait
 {
 public:
-    void Init(const void* parSrc, void* parDst) const override { static_assert(false, "Vous avez oublié de déclarer votre parametre !"); }
-    void Destroy(void* parPtr) const override { static_assert(false, "Vous avez oublié de déclarer votre parametre !"); }
+    void Init(const void* parSrc, void* parDst) const override { static_assert(false, "Vous avez oubliÃ© de dÃ©clarer votre parametre !"); }
+    void Destroy(void* parPtr) const override { static_assert(false, "Vous avez oubliÃ© de dÃ©clarer votre parametre !"); }
     const std::type_info& TypeId() const override
     {
-        static_assert(false, "Vous avez oublié de déclarer votre parametre !");
+        static_assert(false, "Vous avez oubliÃ© de dÃ©clarer votre parametre !");
         return typeid(0);
     }
 };
@@ -138,7 +138,7 @@ public:
     template<int ID>
     void Set(typename ParameterIdentifierTrait<ID>::InterfaceType parValue)
     {
-        static_assert(ID != 0, "ParameterContainer::Set : Id ne doit pas être 0, c'est dummy !");
+        static_assert(ID != 0, "ParameterContainer::Set : Id ne doit pas Ãªtre 0, c'est dummy !");
 
         std::vector<ModuleParameter>::iterator it;
         for (it = FDataList.begin(); it != FDataList.end() && (it->GetId() != ID); ++it)
@@ -153,7 +153,7 @@ public:
     template<int ID>
     typename ParameterIdentifierTrait<ID>::InterfaceType Get() const
     {
-        static_assert(ID != 0, "ParameterContainer::Set : Id ne doit pas être 0, c'est dummy !");
+        static_assert(ID != 0, "ParameterContainer::Set : Id ne doit pas Ãªtre 0, c'est dummy !");
         std::vector<ModuleParameter>::const_iterator it;
         for (it = FDataList.begin(); it != FDataList.end(); ++it)
         {
@@ -170,7 +170,7 @@ public:
     template<int ID>
     typename ParameterIdentifierTrait<ID>::InterfaceType Get_IFP(typename ParameterIdentifierTrait<ID>::InterfaceType parDefault) const
     {
-        static_assert(ID != 0, "ParameterContainer::Set : Id ne doit pas être 0, c'est dummy !");
+        static_assert(ID != 0, "ParameterContainer::Set : Id ne doit pas Ãªtre 0, c'est dummy !");
         std::vector<ModuleParameter>::const_iterator it;
         for (it = FDataList.begin(); it != FDataList.end(); ++it)
         {
@@ -189,7 +189,7 @@ public:
     template<int ID>
     bool HasParameter() const
     {
-        static_assert(ID != 0, "ParameterContainer::Set : Id ne doit pas être 0, c'est dummy !");
+        static_assert(ID != 0, "ParameterContainer::Set : Id ne doit pas Ãªtre 0, c'est dummy !");
         std::vector<ModuleParameter>::const_iterator it;
         for (it = FDataList.begin(); it != FDataList.end(); ++it)
         {
@@ -237,7 +237,7 @@ enum Identifiers
         constexpr static size_t Size = sizeof(ImplementationType);                                                                                                                 \
                                                                                                                                                                                    \
     public:                                                                                                                                                                        \
-        static_assert(Size <= MaxParameterByteSize, "La taille du paramètre est trop élevée");                                                                                     \
+        static_assert(Size <= MaxParameterByteSize, "La taille du paramÃ¨tre est trop Ã©levÃ©e");                                                                                     \
         void Destroy(void* parPtr) const override { ((ImplementationType*)parPtr)->~ImplementationType(); }                                                                        \
         void Init(const void* parSrc, void* parDst) const override { new (parDst) ImplementationType(*((const ImplementationType*)parSrc)); }                                      \
         const std::type_info& TypeId() const override { return typeid(ImplementationType); }                                                                                       \

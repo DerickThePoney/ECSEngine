@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Application/PropertyDrawer.h"
 #include "EntityTemplate.h"

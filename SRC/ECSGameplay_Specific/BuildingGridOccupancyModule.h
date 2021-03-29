@@ -1,4 +1,4 @@
-
+﻿
 #pragma once
 #include "CircularBuildingGrid.h"
 #include "ECSCore/Module.h"

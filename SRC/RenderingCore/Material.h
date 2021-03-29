@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/MeshStreamingData.h"
 #include "Common/RefCountedObject.h"
 #include "Common/RenderingHandles.h"

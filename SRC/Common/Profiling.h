@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef ENABLE_PROFILING
 #include "Remotery.h"

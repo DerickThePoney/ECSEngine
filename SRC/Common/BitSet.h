@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 namespace ECSEngine
 {
@@ -6,7 +6,7 @@ namespace ECSEngine
 template<u32 BitSetSize>
 class BitSet
 {
-    static_assert(BitSetSize > 0, "Impossible de d�clarer un bitset vide !");
+    static_assert(BitSetSize > 0, "Impossible de déclarer un bitset vide !");
     using BitSetType = u32;
 
 public:

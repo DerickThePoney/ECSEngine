@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Plane.h"
 #include "Ray.h"
 #include "Segment.h"

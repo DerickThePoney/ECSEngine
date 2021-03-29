@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/Polygon.h"
 #include "Common/PoolAllocator.h"
 #include "Common/Triangle.h"

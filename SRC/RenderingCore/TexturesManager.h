@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/RenderingHandles.h"
 #include "Common/Singleton.h"
 #include "TextureBank.h"

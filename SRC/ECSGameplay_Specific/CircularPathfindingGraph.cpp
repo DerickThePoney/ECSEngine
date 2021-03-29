@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 
 #include "CircularPathfindingGraph.h"
 
@@ -16,15 +16,15 @@ namespace ECSEngine
 namespace Pathfinding
 {
 /*
- * Pour chaque chunk circulaire, on ajoute un inner navigation ring, qui circule à l'intérieur du chunk. Cela veut dire qu'on ajoute un edge vers l'intérieur à chaque fois. On
- * ajoute ensuite un noeud correspondant pour chaque noeud de l'inner navigation ring à l'intérieur du chunk, qui permet d'aller vers l'intérieur du chunk. Ces noeuds seront
- * connectés aux noeuds de l'inner navigation ring du ring suivant pour permettre de passer au noeud suivant.
+ * Pour chaque chunk circulaire, on ajoute un inner navigation ring, qui circule Ã  l'intÃ©rieur du chunk. Cela veut dire qu'on ajoute un edge vers l'intÃ©rieur Ã  chaque fois. On
+ * ajoute ensuite un noeud correspondant pour chaque noeud de l'inner navigation ring Ã  l'intÃ©rieur du chunk, qui permet d'aller vers l'intÃ©rieur du chunk. Ces noeuds seront
+ * connectÃ©s aux noeuds de l'inner navigation ring du ring suivant pour permettre de passer au noeud suivant.
  *
  * EDIT: DANS UN PREMIER TEMPS, UNE SEULE CONNECTION ENTRE L'INNER ET L'OUTER RING
  *
  * TODO:
- * - méthode efficiente pour touver le noeud le plus proche à partir de la position. -- Une méthode trouvée
- * - méthode efficiente pour linker les chunks
+ * - mÃ©thode efficiente pour touver le noeud le plus proche Ã  partir de la position. -- Une mÃ©thode trouvÃ©e
+ * - mÃ©thode efficiente pour linker les chunks
  * - path solving
  */
 void CircularPathfindingGraph::AddNewCircularChunk()

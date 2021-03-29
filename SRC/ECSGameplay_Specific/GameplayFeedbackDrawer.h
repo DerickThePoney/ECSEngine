@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/IFeedbackDrawer.h"
 #include "Common/PoolAllocator.h"
 #include "Common/RenderingHandles.h"

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 
 #include "SceneActions.h"
 
@@ -37,7 +37,7 @@ void ISceneAction::Initialise(const SceneScenario* parScene)
 #endif
     VirtualInitialise(parScene);
 
-    AlwaysCheckedAssertMsg(FVirtualInitialiseCalled, "Un appel à VirtualInitialise du parent à été oublié");
+    AlwaysCheckedAssertMsg(FVirtualInitialiseCalled, "A call to VirtualInitialise of the parent was forgotten");
 }
 
 void ISceneAction::Shutdown()
@@ -47,7 +47,7 @@ void ISceneAction::Shutdown()
 #endif
     VirtualShutdown();
 
-    AlwaysCheckedAssertMsg(FVirtualShutdownCalled, "Un appel à VirtualShutdown du parent à été oublié");
+    AlwaysCheckedAssertMsg(FVirtualShutdownCalled, "Un appel Ã  VirtualShutdown du parent Ã  Ã©tÃ© oubliÃ©");
 }
 
 void ISceneAction::Start()
@@ -57,7 +57,7 @@ void ISceneAction::Start()
 #endif
     VirtualStart();
 
-    AlwaysCheckedAssertMsg(FVirtualStartCalled, "Un appel à VirtualStart du parent à été oublié");
+    AlwaysCheckedAssertMsg(FVirtualStartCalled, "Un appel Ã  VirtualStart du parent Ã  Ã©tÃ© oubliÃ©");
 }
 
 void ISceneAction::Update()
@@ -67,7 +67,7 @@ void ISceneAction::Update()
 #endif
     VirtualUpdate();
 
-    AlwaysCheckedAssertMsg(FVirtualUpdateCalled, "Un appel à VirtualUpdate du parent à été oublié");
+    AlwaysCheckedAssertMsg(FVirtualUpdateCalled, "Un appel Ã  VirtualUpdate du parent Ã  Ã©tÃ© oubliÃ©");
 }
 
 void ISceneAction::Finish()
@@ -77,7 +77,7 @@ void ISceneAction::Finish()
 #endif
     VirtualFinish();
 
-    AlwaysCheckedAssertMsg(FVirtualFinishCalled, "Un appel à VirtualFinish du parent à été oublié");
+    AlwaysCheckedAssertMsg(FVirtualFinishCalled, "Un appel Ã  VirtualFinish du parent Ã  Ã©tÃ© oubliÃ©");
 }
 
 bool ISceneAction::IsStarted() const
@@ -99,7 +99,7 @@ void ISceneAction::DrawEditor()
     VirtualDrawEditor();
     ImGui::PopID();
 
-    AlwaysCheckedAssertMsg(FVirtualDrawEditorCalled, "Un appel à VirtualDrawEditor du parent à été oublié");
+    AlwaysCheckedAssertMsg(FVirtualDrawEditorCalled, "Un appel Ã  VirtualDrawEditor du parent Ã  Ã©tÃ© oubliÃ©");
 }
 
 bool ISceneAction::DrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
@@ -108,7 +108,7 @@ bool ISceneAction::DrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuf
     FVirtualDrawEditorCalled = false;
 #endif
     const bool res = VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
-    AlwaysCheckedAssertMsg(FVirtualDrawInSceneEditorCalled, "Un appel à VirtualDrawInSceneEditor du parent à été oublié");
+    AlwaysCheckedAssertMsg(FVirtualDrawInSceneEditorCalled, "Un appel Ã  VirtualDrawInSceneEditor du parent Ã  Ã©tÃ© oubliÃ©");
     return res;
 }
 

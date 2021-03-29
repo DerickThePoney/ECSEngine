@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ILoader.h"
 
 namespace ECSEngine

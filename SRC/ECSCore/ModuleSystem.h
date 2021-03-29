@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "EntityWorld.h"
 #include "WorldManager.h"
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common/InputCommands.h"
 #include "Common/MousePolicy.h"
 

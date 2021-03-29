@@ -1,4 +1,4 @@
-// clang-format off
+﻿// clang-format off
 DECLARE_ENUM(GAMEPAD_BUTTON_A, 0),
 DECLARE_ENUM(GAMEPAD_BUTTON_B, 1),
 DECLARE_ENUM(GAMEPAD_BUTTON_X, 2),

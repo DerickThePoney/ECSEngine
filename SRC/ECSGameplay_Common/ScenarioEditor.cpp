@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "ScenarioEditor.h"
 
@@ -10,6 +10,7 @@
 #include "Rendering/EditorGridRenderer.h"
 #include "Rendering/EditorSceneRenderer.h"
 #include "Rendering/SceneObjectsPickingRenderer.h"
+#include "RenderingCore/GFXOperator.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/RenderPass.h"
 
@@ -256,6 +257,8 @@ void ScenarioEditor::UpdateSceneEditorStatus()
             }
         }
     }
+
+    MemoryView<const char*> operators = Rendering::GFXOperatorDescriptorFactory::GetOperatorsList();
 }
 
 void ScenarioEditor::RenderForSceneEditing()

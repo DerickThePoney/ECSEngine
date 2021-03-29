@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "RefCountedObject.h"
 
 namespace ECSEngine

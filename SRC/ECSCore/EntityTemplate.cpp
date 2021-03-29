@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "EntityTemplate.h"
 
@@ -33,7 +33,7 @@ void EntityTemplate::AddModule(const u32 parId)
     auto itFind = FModuleTemplates.find(parId);
     if (itFind == FModuleTemplates.end())
     {
-        auto& it = FModuleTemplates.emplace(parId, EntityTemplateManagerMethods::CreateModuleTemplate(parId));
+        auto it = FModuleTemplates.emplace(parId, EntityTemplateManagerMethods::CreateModuleTemplate(parId));
         AssertRelease(it.first->second != nullptr);
         it.first->second->Init(this);
 

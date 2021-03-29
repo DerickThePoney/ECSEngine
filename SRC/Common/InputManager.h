@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "FixedSizedArray.h"
 #include "Singleton.h"
 

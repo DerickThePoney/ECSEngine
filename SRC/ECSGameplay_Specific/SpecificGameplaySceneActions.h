@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "WorldGenerationParameters.h"
 

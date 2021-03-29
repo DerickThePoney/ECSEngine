@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ReferenceCounter.h"
 
 namespace ECSEngine

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "PeonFeedingTimeSystem.h"
 
@@ -40,7 +40,7 @@ void PeonFeedingTimeSystem::VirtualUpdate()
     ModuleAccessor<PositionModule> colonyPositionAccessor(Worlds::COLONY);
     ModuleAccessor<PositionModule> peonPositionAccessor(Worlds::PEONS);
 
-    // Id�es:
+    // Idées:
     //    - Chaque span, on nourrit les peons. X points de nourriture par peons.
     //    - Si on peut pas consummer nbPeons x X points de nourriture, on compte le max de peons qu'on peut nourrir. Ceux qui sont le plus de loin de la colony meurent.
     std::vector<EntityId> deadIds;

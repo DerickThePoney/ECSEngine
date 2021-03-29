@@ -1,4 +1,4 @@
-
+﻿
 #pragma once
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
