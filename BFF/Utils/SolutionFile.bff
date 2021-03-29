@@ -2,7 +2,7 @@
     VSSolution( '$SolutionName$' )
     {
 
-        .SolutionOutput = '$SolutionFolder$/$SolutionName$.sln'
+        .SolutionOutput = '$SolutionOutput$/$SolutionName$.sln'
         .SolutionConfigs = .SolutionConfigs
 
         .SolutionVisualStudioVersion = '16.8.30717.126'
