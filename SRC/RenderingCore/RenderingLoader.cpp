@@ -5,6 +5,7 @@
 #include "BGFXRenderingBackend.h"
 #include "ECSGameplay_Specific/GameplayFeedbackDrawer.h"
 #include "GFXKeyHelper.h"
+#include "GFXOperator.h"
 #include "GFXRepresentationManager.h"
 #include "GLFWDisplayWindowHandler.h"
 #include "ImguiRenderer.h"
@@ -70,6 +71,8 @@ void RenderingLoader::VirtualShutdown()
 
     Rendering::GLFWDisplayWindowHandler::Instance().Shutdown();
     Rendering::GLFWDisplayWindowHandler::Destroy();
+
+    Rendering::GFXOperatorDescriptorFactory::DestroyManager();
 }
 
 } // namespace ECSEngine
