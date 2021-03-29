@@ -7,6 +7,8 @@
     .AdditionalCompilerOptions = ''
     ^ProjectIncludePath + .ProjectPath
 
+    .SolutionFolder = 'External'
+
     .BuildTarget = { '$ProjectName$' }
 
     #include "../../Utils/MakeProject.bff"

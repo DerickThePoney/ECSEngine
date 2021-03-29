@@ -4,6 +4,8 @@
     .ProjectPath = 'SRC'
     .AdditionnalIncludePaths = {"SRC" }
 
+    .SolutionFolder = 'Core'
+
     #define USE_PRECOMPILED_HEADERS
     .BuildTarget = { '$ProjectName$' }
     #include "../Utils/MakeProjectStandard.bff"

@@ -11,9 +11,9 @@ template<class T>
 class PropertyDrawer
 {
 public:
-    PropertyDrawer() { AssertNotReachedMsg("This draw is not implemented yet !") }
+    PropertyDrawer() { AssertNotReachedMsg("This draw is not implemented yet !"); }
 
-    void ShowProperty() { AssertNotReachedMsg("This draw is not implemented yet !") }
+    void ShowProperty() { AssertNotReachedMsg("This draw is not implemented yet !"); }
 };
 
 template<>

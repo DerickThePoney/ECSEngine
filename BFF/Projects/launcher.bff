@@ -4,6 +4,8 @@
     .ProjectPath = 'SRC'
     .AdditionnalIncludePaths = {"SRC" }
 
+    .SolutionFolder = 'Launcher'
+
     #define USE_PRECOMPILED_HEADERS
     .BuildTarget = { '$GameName$' }
     .ForcedTarget = { 'GLFWCopy' }

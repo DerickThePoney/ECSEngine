@@ -1,0 +1,45 @@
+#once
+
+.ExternalFolder =
+[
+  .Path       = 'External'
+  .Projects   = .ExternalProjects
+]
+
+.CoreFolder =
+[
+  .Path       = 'Core'
+  .Projects   = .CoreProjects
+]
+
+.RenderingFolder =
+[
+  .Path       = 'Rendering'
+  .Projects   = .RenderingProjects
+]
+
+.GameplayFolder =
+[
+  .Path       = 'Gameplay'
+  .Projects   = .GameplayProjects
+]
+
+.ImGuiToolsFolder =
+[
+  .Path       = 'ImGuiTools'
+  .Projects   = .ImGuiToolsProjects
+]
+
+.ToolsFolder =
+[
+  .Path       = 'Tools'
+  .Projects   = .ToolsProjects
+]
+
+.LauncherFolder =
+[
+  .Path       = 'Launcher'
+  .Projects   = .LauncherProjects
+]
+
+.SolutionFolders = {.ExternalFolder, .CoreFolder, .RenderingFolder, .GameplayFolder, .ImGuiToolsFolder, .ToolsFolder, .LauncherFolder}

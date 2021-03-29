@@ -1,0 +1,15 @@
+#once
+
+.ExternalProjects = {}
+
+.CoreProjects = {}
+
+.RenderingProjects = {}
+
+.GameplayProjects = {}
+
+.ImGuiToolsProjects = {}
+
+.ToolsProjects = {}
+
+.LauncherProjects = {}
