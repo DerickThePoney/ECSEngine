@@ -69,3 +69,23 @@ Alias('all')
 {
   .Targets = {'$SolutionName$'}
 }
+
+ForEach(.SolutionConfig in .SolutionConfigs)
+{
+    Using(.SolutionConfig)
+    {
+        .ExeName = 'AssetCooker'
+        Alias('Build-$ExeName$-$Platform$-$Config$')
+        {
+            .Targets = {'$ExeName$-Exe-$Platform$-$Config$', 'AssimpCopy' }
+        }
+    }
+
+    {
+        .ExeName = .GameName
+        Alias('Build-$GameName$-$Platform$-$Config$')
+        {
+            .Targets = {'$GameName$-Exe-$Platform$-$Config$', 'GLFWCopy' }
+        }
+    }
+}
