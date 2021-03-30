@@ -27,9 +27,6 @@ fbuildtemplate = """
 #include "BFF/Game.bff"
 """
 
-if sys.platform == 'win32':
-    import win32api
-
 def GetVSStuff():
     vswhere = "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe"
     vswhere_params = [vswhere, '-products', '*', '-version', '[16.7,18.0)', '-property', 'installationPath', '-latest', '-format', 'value']
