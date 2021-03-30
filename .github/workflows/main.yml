@@ -95,8 +95,8 @@ jobs:
         with:
           name: ECSEngine-Binaries-Release
           path: |
-            bin/Win64/Release/Launcher.exe
-            bin/Win64/Release/glfw3.dll
+            bin/BuildingGame-x64-Release.exe
+            bin/glfw3.dll
           if-no-files-found: error
 
       - name: Upload AssetCooker Release build
@@ -104,9 +104,9 @@ jobs:
         with:
           name: AssetCooker-Binaries-Release
           path: |
-            bin/Win64/Release/AssetCooker.exe
-            bin/Win64/Release/glfw3.dll
-            bin/Win64/Release/assimp-vc142-mt.dll
+            bin/AssetCooker-x64-Release.exe
+            bin/glfw3.dll
+            bin/assimp-vc142-mt.dll
           if-no-files-found: error
 
   # This workflow contains a single job called "build-release"
@@ -229,14 +229,12 @@ jobs:
       - run: |
           mkdir build/
           mkdir bin/
-          mkdir bin/Win64/
-          mkdir bin/Win64/Release/
 
       - name: AssetCooker-Binaries-Release
         uses: actions/download-artifact@v2
         with:
           name: AssetCooker-Binaries-Release
-          path: bin/Win64/Release/
+          path: bin/
 
       - name: Clone Assets submodules
         run: py -u Script/Cloning/CloneSubmodules.py --assets
