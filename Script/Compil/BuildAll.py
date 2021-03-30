@@ -40,7 +40,7 @@ def BuildEngine(config, MSBUILD):
     if result.returncode != 0:
         return result.returncode
 
-    command = ['./tools/FBuild.exe', 'Build-BuildingGame-x64-%s'%(config), 'Build-AssetCooker-x64-%s'%(config)]
+    command = ['./tools/FBuild.exe', '-summary', 'Build-BuildingGame-x64-%s'%(config), 'Build-AssetCooker-x64-%s'%(config)]
 
     result = subprocess.run(command)
 
@@ -55,6 +55,23 @@ def BuildAll(config, MSBUILD, tools, samples):
 
     return BuildEngine(config, MSBUILD)
 
+def BuildSolution():
+    print('BUILDING Solution')
+    sys.stdout.flush()
+
+    command = ['py', '-u', 'Script/FastBuild/fastbuild.py']
+
+    result = subprocess.run(command)
+
+    if result.returncode != 0:
+        return result.returncode
+
+    command = ['./tools/FBuild.exe', '-summary', 'ECSEngine']
+
+    result = subprocess.run(command)
+
+    return result.returncode
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -62,6 +79,7 @@ def main():
     group.add_argument('-a', '--all', action="store_true", help='Build all')
     group.add_argument('-b', '--bgfx', action="store_true", help='Build BGFX')
     group.add_argument('-e', '--engine', action="store_true", help='Build Engine')
+    group.add_argument('-sln', '--solution', action="store_true", help='Build Solution')
     parser.add_argument('-c', '--config', type=str, help='Configuration to build', default='Release')
     parser.add_argument('-m', '--msbuild', type=str, help='Path to MSBuild')
     parser.add_argument('-t', '--bgfxtools', action="store_true", help='Build BGFX Tools')
@@ -72,6 +90,11 @@ def main():
     MSBUILD = '\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\"'
     if args.msbuild:
         MSBUILD = args.msbuild
+
+    if args.solution:
+        res = BuildSolution()
+        if res != 0:
+            return res
 
     if args.all:
         print('Build all')
