@@ -30,16 +30,12 @@ def BuildBGFX(config, MSBUILD, tools, samples):
     return result.returncode
 
 def BuildEngine(config, MSBUILD):
-    print('Making solution')
-    sys.stdout.flush()
-    result = subprocess.run(['./tools/premake5.exe', 'vs2019'])
-
-    if result.returncode != 0:
-        return result.returncode
-
     print('BUILDING ECSEngine')
     sys.stdout.flush()
-    result = subprocess.run('{0} -m build/ECSEngine.sln /verbosity:minimal /p:Configuration={1}'.format(MSBUILD, config))
+
+    command = ['./tools/FBuild.exe', 'BuildingGame-Exe-x64-%s'%(config)]
+
+    result = subprocess.run(command)
 
     return result.returncode
 
