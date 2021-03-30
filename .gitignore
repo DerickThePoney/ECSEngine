@@ -56,3 +56,4 @@ External/polypartition-master/.editorconfig
 External/polypartition-master/.gitattributes
 
 fbuild.windows.fdb
+fbuild.bff
