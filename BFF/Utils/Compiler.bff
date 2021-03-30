@@ -476,8 +476,6 @@ Print( "Using Windows 10 SDK $WindowsSDKVersion10$" )
 //------------------------------------------------------------------------------
 // Global Properties
 //------------------------------------------------------------------------------
-.VCTOOLVERSION = '14.28.29333'
-.VCREDISTVERSION = '14.28.29333'
 .VSINSTALLPATH = "$VSPATH$\VC"
 .VSVERSION = .VCTOOLVERSION
 .VSREDISTVERSION = .VCREDISTVERSION
