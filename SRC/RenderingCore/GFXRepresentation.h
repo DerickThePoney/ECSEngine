@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Common/PoolAllocator.h"
 #include "GFXMessage.h"
+#include "GFXOperator.h"
 
 namespace ECSEngine
 {
@@ -21,6 +22,35 @@ struct GFXRepresentationInitialiser
 
     bool HasCarier = false;
     bool HasVisuals = false;
+};
+
+class GFXRepresentation;
+class GFXRepresentationDescriptor
+{
+    DECLARE_POOL_ALLOCATED(GFXRepresentationDescriptor);
+
+public:
+    const GFXRepresentation* CreateRepresentation() const;
+
+    const std::string& Name() const { return FName; }
+    const std::string& MaterialName() const { return FMaterialName; }
+    const std::string& MeshFile() const { return FMeshFile; }
+
+    void DrawInEditor();
+
+protected:
+    SERIALIZE()
+    {
+        PROPERTYFIELD(Name, "");
+        PROPERTYFIELD(MeshFile, "");
+        PROPERTYFIELD(MaterialName, "");
+    }
+
+private:
+    std::string FName;
+    std::string FMeshFile;
+    std::string FMaterialName;
+    std::vector<std::unique_ptr<AbstractGFXOperatorDescriptor>> FOperatorDescriptors;
 };
 
 class GFXRepresentation

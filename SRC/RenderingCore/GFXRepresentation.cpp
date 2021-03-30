@@ -10,6 +10,17 @@ namespace ECSEngine
 {
 namespace Rendering
 {
+IMPLEMENT_POOL_ALLOCATED(GFXRepresentationDescriptor);
+
+const GFXRepresentation* GFXRepresentationDescriptor::CreateRepresentation() const
+{
+    return new GFXRepresentation();
+}
+
+void GFXRepresentationDescriptor::DrawInEditor()
+{
+}
+
 IMPLEMENT_POOL_ALLOCATED(GFXRepresentation);
 GFXRepresentation::GFXRepresentation()
 {
