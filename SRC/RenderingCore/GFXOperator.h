@@ -13,6 +13,7 @@ enum OperatorMask
 
 class VisualModel;
 class Carrier;
+class AbstractGFXOperator;
 class AbstractGFXOperatorDescriptor
 {
 public:
@@ -23,17 +24,23 @@ public:
 
     void DrawInEditor();
 
-    void ApplyChangesOnMesh(VisualModel& parModel, const Carrier& parCarrier){};
-
-    virtual OperatorMask GetMask() const = 0;
-
     const char* Name() const { return FName; }
+
+    virtual AbstractGFXOperator* CreateOperator() const = 0;
 
 protected:
     virtual void VirtualDrawInEditor(){};
 
-private:
+protected:
     const char* FName = nullptr;
+};
+
+class AbstractGFXOperator
+{
+public:
+    virtual void ApplyChangesOnMesh(VisualModel& parModel, const Carrier& parCarrier){};
+
+    virtual OperatorMask GetMask() const = 0;
 };
 
 namespace GFXOperatorDescriptorFactory
@@ -45,7 +52,7 @@ MemoryView<const char*> GetOperatorsList();
 } // namespace GFXOperatorDescriptorFactory
 
 #define REGISTER_OPERATOR_FACTORY(TYPE)                                                                                                                                            \
-    const AbstractGFXOperatorDescriptor* Create##TYPE() { return new TYPE(#TYPE); }                                                                                                \
+    const AbstractGFXOperatorDescriptor* Create##TYPE() { return new TYPE(); }                                                                                                     \
     static const bool s_Registered_##TYPE = GFXOperatorDescriptorFactory::RegisterOperatorDescriptor(#TYPE, &Create##TYPE);
 
 } // namespace Rendering

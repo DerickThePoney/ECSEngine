@@ -12,16 +12,62 @@ class GeneratorRotatorOperatorDescriptor : public AbstractGFXOperatorDescriptor
     DECLARE_POOL_ALLOCATED(GeneratorRotatorOperatorDescriptor);
 
 public:
-    GeneratorRotatorOperatorDescriptor(const char* parName)
-        : AbstractGFXOperatorDescriptor(parName)
+    GeneratorRotatorOperatorDescriptor()
+        : AbstractGFXOperatorDescriptor("GeneratorRotatorOperatorDescriptor")
     {
     }
 
-    OperatorMask GetMask() const override { return OperatorMask::APPLY_ON_MESH; }
+    virtual AbstractGFXOperator* CreateOperator() const override;
+
+    SERIALIZE() { }
+
+protected:
+    virtual void VirtualDrawInEditor() override;
+
+private:
+    float FRotationSpeed = 0.f;
 };
 
 IMPLEMENT_POOL_ALLOCATED(GeneratorRotatorOperatorDescriptor);
 
+void GeneratorRotatorOperatorDescriptor::VirtualDrawInEditor()
+{
+}
+
 REGISTER_OPERATOR_FACTORY(GeneratorRotatorOperatorDescriptor);
+
+class GeneratorRotatorOperator : public AbstractGFXOperator
+{
+    DECLARE_POOL_ALLOCATED(GeneratorRotatorOperator);
+
+public:
+    GeneratorRotatorOperator(const GeneratorRotatorOperatorDescriptor* parDescriptor)
+        : FDescriptor(parDescriptor)
+    {
+        AssertRelease(FDescriptor != nullptr);
+    }
+
+    virtual OperatorMask GetMask() const override { return OperatorMask::APPLY_ON_MESH; }
+
+    virtual void ApplyChangesOnMesh(VisualModel& parModel, const Carrier& parCarrier) override;
+
+private:
+    const GeneratorRotatorOperatorDescriptor* FDescriptor = nullptr;
+};
+
+AbstractGFXOperator* GeneratorRotatorOperatorDescriptor::CreateOperator() const
+{
+    return new GeneratorRotatorOperator(this);
+}
+
+void GeneratorRotatorOperator::ApplyChangesOnMesh(VisualModel& parModel, const Carrier& parCarrier)
+{
+}
+
+IMPLEMENT_POOL_ALLOCATED(GeneratorRotatorOperator);
+
 } // namespace Rendering
 } // namespace ECSEngine
+
+CEREAL_REGISTER_TYPE(ECSEngine::Rendering::GeneratorRotatorOperatorDescriptor);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::Rendering::AbstractGFXOperatorDescriptor, ECSEngine::Rendering::GeneratorRotatorOperatorDescriptor)
