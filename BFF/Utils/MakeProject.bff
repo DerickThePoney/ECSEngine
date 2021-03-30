@@ -63,7 +63,7 @@
         [
             .Config = '$Config$'
             .Platform = '$Platform$'
-            .Target = '$ProjectName$-$Platform$-$Config$'
+            .Target = '$ProjectName$-Obj-$Platform$-$Config$'
         ]
         ^ProjectConfigurations + .ProjConf
     }

@@ -33,7 +33,14 @@ def BuildEngine(config, MSBUILD):
     print('BUILDING ECSEngine')
     sys.stdout.flush()
 
-    command = ['./tools/FBuild.exe', 'BuildingGame-Exe-x64-%s'%(config)]
+    command = ['py', '-u', 'Script/FastBuild/fastbuild.py']
+
+    result = subprocess.run(command)
+
+    if result.returncode != 0:
+        return result.returncode
+
+    command = ['./tools/FBuild.exe', 'Build-BuildingGame-x64-%s'%(config), 'Build-AssetCooker-x64-%s'%(config)]
 
     result = subprocess.run(command)
 
