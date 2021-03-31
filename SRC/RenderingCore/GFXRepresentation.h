@@ -35,6 +35,10 @@ public:
     const std::string& Name() const { return FName; }
     const std::string& MaterialName() const { return FMaterialName; }
     const std::string& MeshFile() const { return FMeshFile; }
+    const MemoryView<const std::unique_ptr<AbstractGFXOperatorDescriptor>> OperatorDescriptors() const
+    {
+        return MemoryView(FOperatorDescriptors.data(), (u32)FOperatorDescriptors.size());
+    }
 
     void DrawInEditor();
 
@@ -44,12 +48,13 @@ protected:
         PROPERTYFIELD(Name, "");
         PROPERTYFIELD(MeshFile, "");
         PROPERTYFIELD(MaterialName, "");
+        PROPERTYFIELD(OperatorDescriptors, std::vector<std::unique_ptr<AbstractGFXOperatorDescriptor>>());
     }
 
 private:
-    std::string FName;
-    std::string FMeshFile;
-    std::string FMaterialName;
+    std::string FName = "Default";
+    std::string FMeshFile = "none";
+    std::string FMaterialName = "none";
     std::vector<std::unique_ptr<AbstractGFXOperatorDescriptor>> FOperatorDescriptors;
 };
 

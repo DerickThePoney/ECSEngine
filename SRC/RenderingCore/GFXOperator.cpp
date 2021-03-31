@@ -24,7 +24,7 @@ namespace GFXOperatorDescriptorFactory
 class GFXOperatorsManager : public Singleton<GFXOperatorsManager>
 {
 public:
-    std::map<const char*, const AbstractGFXOperatorDescriptor* (*)()> FactoryMap;
+    std::map<const char*, AbstractGFXOperatorDescriptor* (*)()> FactoryMap;
     std::vector<const char*> OperatorsList;
 };
 
@@ -33,7 +33,7 @@ void DestroyManager()
     GFXOperatorsManager::Destroy();
 }
 
-bool RegisterOperatorDescriptor(const char* parOperatorName, const AbstractGFXOperatorDescriptor* (*parFactory)())
+bool RegisterOperatorDescriptor(const char* parOperatorName, AbstractGFXOperatorDescriptor* (*parFactory)())
 {
     if (!GFXOperatorsManager::HasInstance())
         GFXOperatorsManager::CreateIFP();
@@ -44,12 +44,12 @@ bool RegisterOperatorDescriptor(const char* parOperatorName, const AbstractGFXOp
     return true;
 }
 
-std::unique_ptr<const AbstractGFXOperatorDescriptor> CreateOperator(const char* parOperatorName)
+std::unique_ptr<AbstractGFXOperatorDescriptor> CreateOperator(const char* parOperatorName)
 {
     AssertRelease(GFXOperatorsManager::HasInstance());
     auto itFind = GFXOperatorsManager::Instance().FactoryMap.find(parOperatorName);
     AssertRelease(itFind != GFXOperatorsManager::Instance().FactoryMap.end());
-    return std::unique_ptr<const AbstractGFXOperatorDescriptor>(itFind->second());
+    return std::unique_ptr<AbstractGFXOperatorDescriptor>(itFind->second());
 }
 
 MemoryView<const char*> GetOperatorsList()
