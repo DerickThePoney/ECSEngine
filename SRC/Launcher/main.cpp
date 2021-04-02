@@ -28,7 +28,7 @@ int main(int argc, char** argv)
             app.SetGameplayUpdater_StealOwnership(new ECSEngine::ApplicationUpdaterWrapper());
 
             {
-                std::ofstream ofstr("Assets\\Configuration\\BaseApplication.json", std::ofstream::out);
+                std::ofstream ofstr("..\\Assets\\Configuration\\BaseApplication.json", std::ofstream::out);
                 AssertRelease(ofstr.good());
                 cereal::JSONOutputArchive outputArchive(ofstr);
                 outputArchive(app);

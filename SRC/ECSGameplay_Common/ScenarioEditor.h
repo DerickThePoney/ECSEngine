@@ -10,6 +10,7 @@ struct WindowsToShow
     bool showSceneItemsList = true;
     bool showActionManager = true;
     bool showEntityTemplateEditor = false;
+    bool showGFXRepresentationsEditor = false;
     bool showLogger = false;
     bool showImGuiDemo = false;
     bool showInputDebug = false;

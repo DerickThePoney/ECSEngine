@@ -9,6 +9,7 @@
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
 #include "RenderingCore/Carrier.h"
+#include "RenderingCore/GFXRepresentationDescriptorManager.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
 
@@ -25,8 +26,34 @@ Module* ApparenceModuleTemplate::CreateInstance(const EntityId& parUnitId, const
 
 void ApparenceModuleTemplate::VirtualDrawEditor()
 {
-    EDITOR_PROPERTY_STRING("MeshFile", FMeshFileName, true, "*.fbx.gen");
-    EDITOR_PROPERTY_STRING("MaterialFile", FMaterialFileName, true, "*.material");
+    auto descriptor = Rendering::GFXRepresentationDescriptorManager::Instance().Decriptors();
+#ifdef ENABLE_SECURITY_CHECKS
+    if (!FGFXRepresentationDescriptorName.empty())
+    {
+        bool found = false;
+        foreachitemconst(d, descriptor)
+        {
+            if (d->Name() == FGFXRepresentationDescriptorName)
+            {
+                found = true;
+                break;
+            }
+        }
+        AssertRelease(found);
+    }
+#endif
+
+    if (ImGui::BeginCombo("GFXRep", FGFXRepresentationDescriptorName.c_str()))
+    {
+        foreachitemconst(d, descriptor)
+        {
+            if (ImGui::Selectable(d->Name().c_str(), d->Name() == FGFXRepresentationDescriptorName))
+            {
+                FGFXRepresentationDescriptorName = d->Name();
+            }
+        }
+        ImGui::EndCombo();
+    }
 }
 
 ApparenceModule::ApparenceModule()
@@ -37,11 +64,6 @@ ApparenceModule::ApparenceModule()
 void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
     parent_type::VirtualInit(parUnitId, parParameters);
-    FMeshHandle = Rendering::MeshManager::Instance().CreateMesh(Resource(Template<ApparenceModuleTemplate>()->GetMeshFileName()));
-    FMaterialHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(Template<ApparenceModuleTemplate>()->GetMaterialFileName());
-
-    AssertRelease(FMeshHandle.IsValid());
-    AssertRelease(FMaterialHandle.IsValid());
 
     FProxy = new Rendering::GFXRepresentationProxy();
 
@@ -67,8 +89,8 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
     init.FOrientation = orient;
     init.HasCarier = true;
     init.FCurrentTime = TimeManager::FrameStartTime();
-    init.FMaterialFilename = Template<ApparenceModuleTemplate>()->GetMaterialFileName();
-    init.FMeshFileName = Template<ApparenceModuleTemplate>()->GetMeshFileName();
+    AssertRelease(!Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName().empty());
+    init.FRepresentationDescriptor = Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName();
     init.HasVisuals = true;
 
     FProxy->Initialise(init);
@@ -78,16 +100,6 @@ void ApparenceModule::VirtualDeinit()
 {
     parent_type::VirtualDeinit();
     delete FProxy;
-}
-
-const Rendering::MeshHandle& ApparenceModule::GetMeshHandle() const
-{
-    return FMeshHandle;
-}
-
-const Rendering::MaterialInstanceHandle& ApparenceModule::GetMaterialHandle() const
-{
-    return FMaterialHandle;
 }
 
 } // namespace ECSEngine

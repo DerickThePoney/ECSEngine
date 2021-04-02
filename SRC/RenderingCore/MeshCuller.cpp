@@ -14,14 +14,6 @@ namespace Rendering
 namespace MeshFrustumCulling
 {
 
-bool CullApparenceModule(const ApparenceModule& parApparenceModule, const glm::mat4& parLocalToWorldMatrix, const Frustum& parFrustum)
-{
-    const MeshHandle& meshHandle = parApparenceModule.GetMeshHandle();
-    AlwaysCheckedAssert(meshHandle.IsValid());
-
-    return CullMesh(meshHandle, parLocalToWorldMatrix, parFrustum);
-}
-
 bool CullMesh(const MeshHandle& parMeshHandle, const glm::mat4& parLocalToWorldMatrix, const Frustum& parFrustum)
 {
     const Mesh* mesh = MeshManager::Instance().GetMesh(parMeshHandle);

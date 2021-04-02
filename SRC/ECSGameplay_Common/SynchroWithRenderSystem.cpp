@@ -42,8 +42,6 @@ void UpdateObjectsForRendering()
     foreachitem(apparenceModule, apparenceController)
     {
         const EntityId& unitId = apparenceModule.UnitId();
-        const Rendering::MeshHandle& meshHandle = apparenceModule.GetMeshHandle();
-        const Rendering::MaterialInstanceHandle& materialHandle = apparenceModule.GetMaterialHandle();
 
         const PositionModule* positionModule = positionController[unitId];
         AssertRelease(positionModule != nullptr);

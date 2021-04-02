@@ -37,7 +37,6 @@ bool ECSLoader::VirtualInitialise()
 
     EntityTemplateManager::CreateIFP();
     AssertRelease(EntityTemplateManager::HasInstance());
-    AssertRelease(EntityTemplateManager::HasInstance());
     {
         std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + FEntityTemplatesFile);
 
