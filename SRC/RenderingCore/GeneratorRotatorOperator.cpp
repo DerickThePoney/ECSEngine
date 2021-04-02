@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 
 #include "Common/PoolAllocator.h"
+#include "GFXMessage.h"
 #include "GFXOperator.h"
 
 namespace ECSEngine
@@ -16,6 +17,7 @@ public:
         : AbstractGFXOperatorDescriptor("GeneratorRotatorOperatorDescriptor")
     {
     }
+    virtual ~GeneratorRotatorOperatorDescriptor() = default;
 
     virtual AbstractGFXOperator* CreateOperator() const override;
 
@@ -47,9 +49,11 @@ public:
         AssertRelease(FDescriptor != nullptr);
     }
 
+    virtual ~GeneratorRotatorOperator() = default;
+
     virtual OperatorMask GetMask() const override { return OperatorMask::APPLY_ON_MESH; }
 
-    virtual void ApplyChangesOnMesh(VisualModel& parModel, const Carrier& parCarrier) override;
+    virtual void ApplyChangesOnMesh(const GFXMessage& parMessages, VisualModel* parModel, const Carrier* parCarrier) override;
 
 private:
     const GeneratorRotatorOperatorDescriptor* FDescriptor = nullptr;
@@ -60,7 +64,7 @@ AbstractGFXOperator* GeneratorRotatorOperatorDescriptor::CreateOperator() const
     return new GeneratorRotatorOperator(this);
 }
 
-void GeneratorRotatorOperator::ApplyChangesOnMesh(VisualModel& parModel, const Carrier& parCarrier)
+void GeneratorRotatorOperator::ApplyChangesOnMesh(const GFXMessage& parMessages, VisualModel* parModel, const Carrier* parCarrier)
 {
 }
 

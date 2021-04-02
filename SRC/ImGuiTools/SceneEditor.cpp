@@ -11,6 +11,7 @@
 #include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "ECSGameplay_Common/ScenarioEditor.h"
 #include "EntityTemplatesEditor.h"
+#include "GFXRepresentationsEditor.h"
 #include "GameRulesEditor.h"
 #include "InputDebug.h"
 #include "LoggerGUI.h"
@@ -75,6 +76,11 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
         {
             ImGui::MenuItem("Scene templates", NULL, &options.showEntityTemplateEditor);
             ImGui::MenuItem("Gameplay rules", NULL, &options.showGameplayRulesEditor);
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Rendering"))
+        {
+            ImGui::MenuItem("GFX representations", NULL, &options.showGFXRepresentationsEditor);
             ImGui::EndMenu();
         }
         ImGui::EndMenu();
@@ -307,6 +313,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showEntityTemplateEditor)
         DrawEntityTemplatesEditor(&parOutWindowsToShow.showEntityTemplateEditor, menuBarHeight.y);
+
+    if (parOutWindowsToShow.showGFXRepresentationsEditor)
+        DrawGFXRepresentationsEditor(&parOutWindowsToShow.showGFXRepresentationsEditor, menuBarHeight.y);
 
     if (parOutWindowsToShow.showLogger)
         DrawLogger(Logger::GetLoggedMessages(), true, &parOutWindowsToShow.showLogger);

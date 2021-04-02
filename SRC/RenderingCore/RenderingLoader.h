@@ -15,13 +15,14 @@ public:
     template<class Archive>
     void save(Archive& ar) const
     {
-        ar(cereal::base_class<ILoader>(this), PROPERTY(ApplicationName));
+        ar(cereal::base_class<ILoader>(this), PROPERTY(ApplicationName), PROPERTY(RepresentationDescriptors));
     }
 
     template<class Archive>
     void load(Archive& ar)
     {
         ar(cereal::base_class<ILoader>(this), PROPERTY(ApplicationName));
+        PROPERTYFIELD(RepresentationDescriptors, "Configuration\\GFXRepresentationDescriptors.json");
     }
 
 protected:
@@ -31,6 +32,7 @@ protected:
 
 private:
     std::string FApplicationName;
+    std::string FRepresentationDescriptors;
 };
 } // namespace ECSEngine
 

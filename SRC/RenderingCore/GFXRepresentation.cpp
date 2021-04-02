@@ -5,6 +5,7 @@
 #include "Application/PropertyDrawer.h"
 #include "Carrier.h"
 #include "GFXKeyHelper.h"
+#include "GFXRepresentationDescriptorManager.h"
 #include "VisualModel.h"
 
 namespace ECSEngine
@@ -12,11 +13,6 @@ namespace ECSEngine
 namespace Rendering
 {
 IMPLEMENT_POOL_ALLOCATED(GFXRepresentationDescriptor);
-
-const GFXRepresentation* GFXRepresentationDescriptor::CreateRepresentation() const
-{
-    return new GFXRepresentation();
-}
 
 void GFXRepresentationDescriptor::DrawInEditor()
 {
@@ -43,13 +39,7 @@ void GFXRepresentationDescriptor::DrawInEditor()
         FOperatorDescriptors.push_back(std::unique_ptr<AbstractGFXOperatorDescriptor>(GFXOperatorDescriptorFactory::CreateOperator(operatorsList[selected])));
     }
 
-    forrange(i, 0, FOperatorDescriptors.size())
-    {
-        if (ImGui::CollapsingHeader(FOperatorDescriptors[i]->Name()))
-        {
-            FOperatorDescriptors[i]->DrawInEditor();
-        }
-    }
+    forrange(i, 0, FOperatorDescriptors.size()) { FOperatorDescriptors[i]->DrawInEditor(); }
 }
 
 IMPLEMENT_POOL_ALLOCATED(GFXRepresentation);
@@ -61,10 +51,15 @@ GFXRepresentation::~GFXRepresentation()
 {
     FCarrier.reset(nullptr);
     FVisualModel.reset(nullptr);
+    FGFXOperators.clear();
 }
 
 void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
 {
+    AssertRelease(!parInit.FRepresentationDescriptor.empty());
+    const GFXRepresentationDescriptor* descriptor = GFXRepresentationDescriptorManager::Instance().Descriptor(parInit.FRepresentationDescriptor);
+    AssertRelease(descriptor != nullptr);
+
     if (parInit.HasCarier)
     {
         FCarrier.reset(new Carrier());
@@ -76,8 +71,12 @@ void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
     {
         FVisualModel.reset(new VisualModel());
         AssertRelease(FVisualModel != nullptr);
-        FVisualModel->Init(parInit.FMaterialFilename, parInit.FMeshFileName);
+        FVisualModel->Init(descriptor->MaterialName(), descriptor->MeshFile());
     }
+
+    const MemoryView<const std::unique_ptr<AbstractGFXOperatorDescriptor>> operators = descriptor->OperatorDescriptors();
+    FGFXOperators.reserve(operators.size());
+    forrange(i, 0, operators.size()) { FGFXOperators.push_back(std::unique_ptr<AbstractGFXOperator>(operators[i]->CreateOperator())); }
 }
 
 void GFXRepresentation::Update(float parCurrentTime)
@@ -130,6 +129,14 @@ void GFXRepresentation::ProcessMessages()
     {
         auto visible = currentMessages.GetValueIFP<bool>(GFXKeyHelper::Instance().Visible);
         FVisualModel->SetVisible(visible.first);
+    }
+
+    foreachitem(op, FGFXOperators)
+    {
+        if (op->GetMask() & OperatorMask::APPLY_ON_MESH)
+        {
+            op->ApplyChangesOnMesh(currentMessages, FVisualModel.get(), FCarrier.get());
+        }
     }
 }
 
