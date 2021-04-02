@@ -8,6 +8,7 @@
 #include "GameplayConstants.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/FeedbackParameters.h"
+#include "RenderingCore/GFXRepresentationDescriptorManager.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
 #include "WorldBuilder.h"
@@ -59,8 +60,13 @@ bool CreateWorldSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuff
 
         const ApparenceModuleTemplate* apparenceModuleTemplate = (ApparenceModuleTemplate*)FFirePlaceTemplate->GetModuleTemplate<ApparenceModule>();
         AssertRelease(apparenceModuleTemplate != nullptr);
-        const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(apparenceModuleTemplate->GetMeshFileName());
-        const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(apparenceModuleTemplate->GetMaterialFileName());
+
+        const Rendering::GFXRepresentationDescriptor* descriptor = Rendering::GFXRepresentationDescriptorManager::Instance().Descriptor(
+              apparenceModuleTemplate->GFXRepresentationDescriptorName());
+        AssertRelease(descriptor != nullptr);
+
+        const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(descriptor->MeshFile());
+        const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(descriptor->MaterialName());
         if (!meshHandle.IsValid())
             return false;
 

@@ -7,11 +7,6 @@
 
 namespace ECSEngine
 {
-namespace Rendering
-{
-class Carrier;
-} // namespace Rendering
-
 class ApparenceModuleTemplate : public ModuleTemplate
 {
     DECLARE_MODULE_TEMPLATE(ApparenceModule, ApparenceModuleTemplate);
@@ -26,22 +21,19 @@ public:
 
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
-    const std::string& GetMeshFileName() const { return FMeshFileName; }
-    const std::string& GetMaterialFileName() const { return FMaterialFileName; }
+    const std::string& GFXRepresentationDescriptorName() const { return FGFXRepresentationDescriptorName; }
 
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(PROPERTY(MeshFileName));
-        PROPERTYFIELD(MaterialFileName, "");
+        PROPERTYFIELD(GFXRepresentationDescriptorName, "");
     }
 
 protected:
     virtual void VirtualDrawEditor() override;
 
 private:
-    std::string FMeshFileName;
-    std::string FMaterialFileName;
+    std::string FGFXRepresentationDescriptorName;
 };
 
 class ApparenceModule final : public Module
@@ -52,8 +44,6 @@ public:
     ApparenceModule();
     ~ApparenceModule() { }
 
-    const Rendering::MeshHandle& GetMeshHandle() const;
-    const Rendering::MaterialInstanceHandle& GetMaterialHandle() const;
     Rendering::GFXRepresentationProxy* Proxy() const { return FProxy; }
 
 protected:
@@ -61,9 +51,6 @@ protected:
     void VirtualDeinit() override;
 
 private:
-    // bgfx::ProgramHandle FProgram;
-    Rendering::MeshHandle FMeshHandle;
-    Rendering::MaterialInstanceHandle FMaterialHandle;
     Rendering::GFXRepresentationProxy* FProxy = nullptr;
 };
 } // namespace ECSEngine

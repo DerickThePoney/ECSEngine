@@ -57,8 +57,8 @@ void PlaceBuildingMousePolicy::VirtualActivate()
     init.FOrientation = glm::quat(1.f, 0.f, 0.f, 0.f);
     init.HasCarier = true;
     init.FCurrentTime = TimeManager::FrameStartTime();
-    init.FMaterialFilename = apparenceTemplate->GetMaterialFileName();
-    init.FMeshFileName = apparenceTemplate->GetMeshFileName();
+    AssertRelease(!apparenceTemplate->GFXRepresentationDescriptorName().empty());
+    init.FRepresentationDescriptor = apparenceTemplate->GFXRepresentationDescriptorName();
     init.HasVisuals = true;
     FBuildingProxy->Initialise(init);
 }
