@@ -14,6 +14,7 @@ enum OperatorMask
 class VisualModel;
 class Carrier;
 class AbstractGFXOperator;
+class GFXMessage;
 class AbstractGFXOperatorDescriptor
 {
 public:
@@ -41,7 +42,8 @@ protected:
 class AbstractGFXOperator
 {
 public:
-    virtual void ApplyChangesOnMesh(VisualModel& parModel, const Carrier& parCarrier){};
+    virtual ~AbstractGFXOperator() = default;
+    virtual void ApplyChangesOnMesh(const GFXMessage& parMessages, VisualModel* parModel, const Carrier* parCarrier){};
 
     virtual OperatorMask GetMask() const = 0;
 };

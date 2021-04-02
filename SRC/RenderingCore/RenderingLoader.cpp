@@ -3,9 +3,11 @@
 #include "RenderingLoader.h"
 
 #include "BGFXRenderingBackend.h"
+#include "Common/ResourceCache.h"
 #include "ECSGameplay_Specific/GameplayFeedbackDrawer.h"
 #include "GFXKeyHelper.h"
 #include "GFXOperator.h"
+#include "GFXRepresentationDescriptorManager.h"
 #include "GFXRepresentationManager.h"
 #include "GLFWDisplayWindowHandler.h"
 #include "ImguiRenderer.h"
@@ -45,12 +47,27 @@ bool RenderingLoader::VirtualInitialise()
     GameplayFeedbackDrawer::CreateIFP();
     GameplayFeedbackDrawer::Instance().Initialise();
 
+    Rendering::GFXRepresentationDescriptorManager::CreateIFP();
+    AssertRelease(Rendering::GFXRepresentationDescriptorManager::HasInstance());
+    {
+        const std::string& filename = GlobalResourceCache::Instance().FCache->GetBasePath() + FRepresentationDescriptors;
+        std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + FRepresentationDescriptors);
+
+        if (ifstr.good())
+        {
+            cereal::JSONInputArchive archive(ifstr);
+            archive(NAMEDPROPERTY("GFXRepresentationDescriptors", Rendering::GFXRepresentationDescriptorManager::Instance()));
+        }
+    }
+
     return true;
 }
 
 void RenderingLoader::VirtualShutdown()
 {
     ILoader::VirtualShutdown();
+
+    Rendering::GFXRepresentationDescriptorManager::Destroy();
 
     GameplayFeedbackDrawer::Instance().Shutdown();
     GameplayFeedbackDrawer::Destroy();

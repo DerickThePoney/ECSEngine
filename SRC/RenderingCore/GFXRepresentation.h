@@ -10,28 +10,12 @@ namespace Rendering
 class Carrier;
 class VisualModel;
 
-struct GFXRepresentationInitialiser
-{
-    float FCurrentTime = 0.f;
-
-    glm::vec3 FPosition = glm::vec3(0.f);
-    glm::quat FOrientation = glm::quat(1.f, 0.f, 0.f, 0.f);
-
-    std::string FMeshFileName = "";
-    std::string FMaterialFilename = "";
-
-    bool HasCarier = false;
-    bool HasVisuals = false;
-};
-
 class GFXRepresentation;
 class GFXRepresentationDescriptor
 {
     DECLARE_POOL_ALLOCATED(GFXRepresentationDescriptor);
 
 public:
-    const GFXRepresentation* CreateRepresentation() const;
-
     const std::string& Name() const { return FName; }
     const std::string& MaterialName() const { return FMaterialName; }
     const std::string& MeshFile() const { return FMeshFile; }
@@ -42,12 +26,11 @@ public:
 
     void DrawInEditor();
 
-protected:
     SERIALIZE()
     {
-        PROPERTYFIELD(Name, "");
-        PROPERTYFIELD(MeshFile, "");
-        PROPERTYFIELD(MaterialName, "");
+        PROPERTYFIELD(Name, "Default");
+        PROPERTYFIELD(MeshFile, "none");
+        PROPERTYFIELD(MaterialName, "none");
         PROPERTYFIELD(OperatorDescriptors, std::vector<std::unique_ptr<AbstractGFXOperatorDescriptor>>());
     }
 
@@ -56,6 +39,19 @@ private:
     std::string FMeshFile = "none";
     std::string FMaterialName = "none";
     std::vector<std::unique_ptr<AbstractGFXOperatorDescriptor>> FOperatorDescriptors;
+};
+
+struct GFXRepresentationInitialiser
+{
+    float FCurrentTime = 0.f;
+
+    glm::vec3 FPosition = glm::vec3(0.f);
+    glm::quat FOrientation = glm::quat(1.f, 0.f, 0.f, 0.f);
+
+    std::string FRepresentationDescriptor;
+
+    bool HasCarier = false;
+    bool HasVisuals = false;
 };
 
 class GFXRepresentation
@@ -81,6 +77,8 @@ private:
 private:
     std::unique_ptr<Carrier> FCarrier = nullptr;
     std::unique_ptr<VisualModel> FVisualModel = nullptr;
+
+    std::vector<std::unique_ptr<AbstractGFXOperator>> FGFXOperators;
 
     GFXMessage FMessages[2];
     u32 FCurrentMessageQueue = 0;
