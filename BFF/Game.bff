@@ -8,6 +8,7 @@
 .AdditionalLibraryPath = {}
 .AdditionalAllTarget = {}
 .ForcedTarget = {}
+.ExeName = .GameName
 
 .'$GameName$Projects' = {}
 .AssetCookerProjects = {}
