@@ -114,6 +114,9 @@ bgfx::VertexLayout GetVertexLayout(const VertexLayoutHash& parVertexLayoutHash)
     if (parVertexLayoutHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS))
         pcvDecl.add(bgfx::Attrib::Bitangent, 3, bgfx::AttribType::Float);
 
+    if (parVertexLayoutHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_BONES))
+        pcvDecl.add(bgfx::Attrib::Indices, 1, bgfx::AttribType::Float);
+
     pcvDecl.end();
 
     return pcvDecl;

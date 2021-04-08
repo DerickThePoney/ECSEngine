@@ -76,17 +76,22 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
             vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0, data);
         }
 
-        if (fileHeader.layout.HasTangents)
+        if (fileHeader.layout.HasBinormals)
         {
             glm::vec3 data(0.0f);
             parStream.read((c8*)&data.x, 4);
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
-            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0, data);
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS, 0, data);
         }
 
-        u32 nodeIdx = 0;
-        parStream.read((c8*)&nodeIdx, sizeof(u32));
+        if (fileHeader.layout.HasBones)
+        {
+            float nodeIdx = 0.f;
+            parStream.read((c8*)&nodeIdx, sizeof(float));
+            AssertRelease(nodeIdx < fileHeader.NbNodesInHierarchy);
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_BONES, 0, nodeIdx);
+        }
 
         vertexDataStream.Advance();
     }

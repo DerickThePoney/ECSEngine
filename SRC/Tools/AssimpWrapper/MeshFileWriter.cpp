@@ -65,6 +65,7 @@ void ReadHierarchyMesh(const aiScene* parScene,
 {
     AssertRelease(parNode->mName.C_Str() == parHierarchy[outCurrentNodeIdx].Name);
 
+    const float nodeIdx = (float)outCurrentNodeIdx;
     forrange(i, 0, parNode->mNumMeshes)
     {
         const aiMesh* mesh = parScene->mMeshes[parNode->mMeshes[i]];
@@ -116,7 +117,7 @@ void ReadHierarchyMesh(const aiScene* parScene,
                 parOutputStream.write((c8*)&mesh->mBitangents[l].z, 4);
             }
 
-            parOutputStream.write((c8*)&outCurrentNodeIdx, sizeof(u32));
+            parOutputStream.write((c8*)&nodeIdx, sizeof(float));
 
             outNbVertices++;
         }
@@ -146,19 +147,6 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
     fileHeader.layout.HasTangents = mesh0->HasTangentsAndBitangents();
     fileHeader.layout.HasBinormals = fileHeader.layout.HasTangents;
 
-    if (fileHeader.layout.HasPositions)
-        fileHeader.VertexSizeInOctet += 3 * sizeof(float);
-
-    fileHeader.VertexSizeInOctet += fileHeader.layout.NbColorChannels * sizeof(u32);
-    fileHeader.VertexSizeInOctet += fileHeader.layout.NbUVs * 2 * sizeof(float);
-
-    if (fileHeader.layout.HasNormals)
-        fileHeader.VertexSizeInOctet += 3 * sizeof(float);
-    if (fileHeader.layout.HasTangents)
-        fileHeader.VertexSizeInOctet += 3 * sizeof(float);
-    if (fileHeader.layout.HasTangents)
-        fileHeader.VertexSizeInOctet += 3 * sizeof(float);
-
     fileHeader.NbIndices = 0;
     forrange(i, 0, parMeshData->mNumMeshes)
     {
@@ -184,7 +172,11 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
         ReadHierarchy(parMeshData->mRootNode, -1, hierarchy);
     }
     fileHeader.NbNodesInHierarchy = (u32)hierarchy.size();
+    fileHeader.layout.HasBones = true;
     // ------------------------------------------------------------
+
+    VertexLayoutHash layoutHash(fileHeader.layout);
+    fileHeader.VertexSizeInOctet = layoutHash.GetByteSize();
 
     FOutputStream.write((c8*)&fileHeader, sizeof(MeshFileHeader));
 
