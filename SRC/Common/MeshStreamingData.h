@@ -207,7 +207,7 @@ struct MeshLayoutDescription
 namespace MagicStuff
 {
 constexpr u32 MajorVersion = 0;
-constexpr u32 MinorVersion = 1;
+constexpr u32 MinorVersion = 3;
 } // namespace MagicStuff
 
 struct MeshFileHeader
@@ -221,6 +221,16 @@ struct MeshFileHeader
     MeshLayoutDescription layout;
 
     u32 NbIndices = 0;
+
+    u32 NbNodesInHierarchy = 0;
+};
+
+struct HierarchyNode
+{
+    u8 Idx = -1;
+    u8 Parent = -1;
+    const char* Name = nullptr;
+    glm::mat4 LocalTransform = glm::identity<glm::mat4>();
 };
 #pragma pack(pop, r1)
 } // namespace Rendering
