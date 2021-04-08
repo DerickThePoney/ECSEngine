@@ -31,7 +31,7 @@ Print(.VisualStudioFBuildTarget)
     .ProjectRebuildCommand  = '$VisualStudioFBuildCommand$ -clean $VSBuildOptions$ $VisualStudioFBuildTarget$  $SolutionName$'
     .ProjectCleanCommand    = '$VisualStudioFBuildCommand$ -clean $VisualStudioFBuildPurgeTarget$'
 
-    .LocalDebuggerCommand = '..\$OutputDir$\$GameName$-^$(Platform)-^$(Configuration).exe'
+    .LocalDebuggerCommand = '..\$OutputDir$\$ExeName$-^$(Platform)-^$(Configuration).exe'
     .LocalDebuggerWorkingDirectory = '^$(SolutionDir)'
 
     .SourceType = [ .FileType = "Source Files"      .Pattern = "*.cpp" ]
