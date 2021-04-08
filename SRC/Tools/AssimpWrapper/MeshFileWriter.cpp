@@ -22,8 +22,112 @@ MeshFileWriter::~MeshFileWriter()
     FOutputStream.close();
 }
 
+void ReadHierarchy(const aiNode* parNode, const u8 parParentIdx, std::vector<HierarchyNode>& parHierarchy)
+{
+    HierarchyNode node;
+    node.Idx = (u8)parHierarchy.size();
+    node.Parent = parParentIdx;
+    node.Name = parNode->mName.C_Str();
+
+    const aiMatrix4x4& mat = parNode->mTransformation;
+    node.LocalTransform[0][0] = mat.a1;
+    node.LocalTransform[0][1] = mat.b1;
+    node.LocalTransform[0][2] = mat.c1;
+    node.LocalTransform[0][3] = mat.d1;
+
+    node.LocalTransform[1][0] = mat.a2;
+    node.LocalTransform[1][1] = mat.b2;
+    node.LocalTransform[1][2] = mat.c2;
+    node.LocalTransform[1][3] = mat.d2;
+
+    node.LocalTransform[2][0] = mat.a3;
+    node.LocalTransform[2][1] = mat.b3;
+    node.LocalTransform[2][2] = mat.c3;
+    node.LocalTransform[2][3] = mat.d3;
+
+    node.LocalTransform[3][0] = mat.a4;
+    node.LocalTransform[3][1] = mat.b4;
+    node.LocalTransform[3][2] = mat.c4;
+    node.LocalTransform[3][3] = mat.d4;
+
+    const u8 parent = node.Idx;
+    parHierarchy.push_back(node);
+    forrange(i, 0, parNode->mNumChildren) { ReadHierarchy(parNode->mChildren[i], parent, parHierarchy); }
+}
+
+void ReadHierarchyMesh(const aiScene* parScene,
+      const aiNode* parNode,
+      const MeshFileHeader& parFileHeader,
+      const std::vector<HierarchyNode>& parHierarchy,
+      u32& outCurrentNodeIdx,
+      std::ofstream& parOutputStream,
+      u32& outNbVertices)
+{
+    AssertRelease(parNode->mName.C_Str() == parHierarchy[outCurrentNodeIdx].Name);
+
+    forrange(i, 0, parNode->mNumMeshes)
+    {
+        const aiMesh* mesh = parScene->mMeshes[parNode->mMeshes[i]];
+
+        forrange(l, 0, mesh->mNumVertices)
+        {
+            if (parFileHeader.layout.HasPositions)
+            {
+                parOutputStream.write((c8*)&mesh->mVertices[l].x, 4);
+                parOutputStream.write((c8*)&mesh->mVertices[l].y, 4);
+                parOutputStream.write((c8*)&mesh->mVertices[l].z, 4);
+            }
+
+            forrange(j, 0, parFileHeader.layout.NbColorChannels)
+            {
+                u32 r, g, b, a;
+                r = (u32)(mesh->mColors[j][l].r * 255.f) & 0xFF;
+                g = (u32)(mesh->mColors[j][l].g * 255.f) & 0xFF;
+                b = (u32)(mesh->mColors[j][l].b * 255.f) & 0xFF;
+                a = (u32)(mesh->mColors[j][l].a * 255.f) & 0xFF;
+                u32 color32 = (a << 24) | (b << 16) | (g << 8) | r;
+                parOutputStream.write((c8*)&color32, 4);
+            }
+
+            forrange(j, 0, parFileHeader.layout.NbUVs)
+            {
+                parOutputStream.write((c8*)&mesh->mTextureCoords[j][l].x, 4);
+                parOutputStream.write((c8*)&mesh->mTextureCoords[j][l].y, 4);
+            }
+
+            if (parFileHeader.layout.HasNormals)
+            {
+                parOutputStream.write((c8*)&mesh->mNormals[l].x, 4);
+                parOutputStream.write((c8*)&mesh->mNormals[l].y, 4);
+                parOutputStream.write((c8*)&mesh->mNormals[l].z, 4);
+            }
+
+            if (parFileHeader.layout.HasTangents)
+            {
+                parOutputStream.write((c8*)&mesh->mTangents[l].x, 4);
+                parOutputStream.write((c8*)&mesh->mTangents[l].y, 4);
+                parOutputStream.write((c8*)&mesh->mTangents[l].z, 4);
+            }
+
+            if (parFileHeader.layout.HasBinormals)
+            {
+                parOutputStream.write((c8*)&mesh->mBitangents[l].x, 4);
+                parOutputStream.write((c8*)&mesh->mBitangents[l].y, 4);
+                parOutputStream.write((c8*)&mesh->mBitangents[l].z, 4);
+            }
+
+            parOutputStream.write((c8*)&outCurrentNodeIdx, sizeof(u32));
+
+            outNbVertices++;
+        }
+    }
+
+    forrange(i, 0, parNode->mNumChildren) { ReadHierarchyMesh(parScene, parNode->mChildren[i], parFileHeader, parHierarchy, ++outCurrentNodeIdx, parOutputStream, outNbVertices); }
+}
+
 void MeshFileWriter::operator<<(const aiScene* parMeshData)
 {
+    static_assert(sizeof(ai_real) == 4, "la taille des reels assimp est != 4");
     AssertRelease(FOutputStream.is_open());
     AssertRelease(FOutputStream.good());
     MeshFileHeader fileHeader;
@@ -68,65 +172,35 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
         }
     }
 
-    FOutputStream.write((c8*)&fileHeader, sizeof(MeshFileHeader));
-    static_assert(sizeof(ai_real) == 4, "la taille des reels assimp est != 4");
-    u32 k = 0;
-    forrange(i, 0, parMeshData->mNumMeshes)
+    // ------------------------------------------------------------
+    std::vector<HierarchyNode> hierarchy;
+
+    if (parMeshData->mRootNode->mNumChildren == 1)
     {
-        const aiMesh* mesh = parMeshData->mMeshes[i];
+        ReadHierarchy(parMeshData->mRootNode->mChildren[0], -1, hierarchy);
+    }
+    else
+    {
+        ReadHierarchy(parMeshData->mRootNode, -1, hierarchy);
+    }
+    fileHeader.NbNodesInHierarchy = (u32)hierarchy.size();
+    // ------------------------------------------------------------
 
-        forrange(l, 0, mesh->mNumVertices)
-        {
-            if (fileHeader.layout.HasPositions)
-            {
-                FOutputStream.write((c8*)&mesh->mVertices[l].x, 4);
-                FOutputStream.write((c8*)&mesh->mVertices[l].y, 4);
-                FOutputStream.write((c8*)&mesh->mVertices[l].z, 4);
-            }
+    FOutputStream.write((c8*)&fileHeader, sizeof(MeshFileHeader));
 
-            forrange(j, 0, fileHeader.layout.NbColorChannels)
-            {
-                u32 r, g, b, a;
-                r = (u32)(mesh->mColors[j][l].r * 255.f) & 0xFF;
-                g = (u32)(mesh->mColors[j][l].g * 255.f) & 0xFF;
-                b = (u32)(mesh->mColors[j][l].b * 255.f) & 0xFF;
-                a = (u32)(mesh->mColors[j][l].a * 255.f) & 0xFF;
-                u32 color32 = (a << 24) | (b << 16) | (g << 8) | r;
-                FOutputStream.write((c8*)&color32, 4);
-            }
-
-            forrange(j, 0, fileHeader.layout.NbUVs)
-            {
-                FOutputStream.write((c8*)&mesh->mTextureCoords[j][l].x, 4);
-                FOutputStream.write((c8*)&mesh->mTextureCoords[j][l].y, 4);
-            }
-
-            if (fileHeader.layout.HasNormals)
-            {
-                FOutputStream.write((c8*)&mesh->mNormals[l].x, 4);
-                FOutputStream.write((c8*)&mesh->mNormals[l].y, 4);
-                FOutputStream.write((c8*)&mesh->mNormals[l].z, 4);
-            }
-
-            if (fileHeader.layout.HasTangents)
-            {
-                FOutputStream.write((c8*)&mesh->mTangents[l].x, 4);
-                FOutputStream.write((c8*)&mesh->mTangents[l].y, 4);
-                FOutputStream.write((c8*)&mesh->mTangents[l].z, 4);
-            }
-
-            if (fileHeader.layout.HasBinormals)
-            {
-                FOutputStream.write((c8*)&mesh->mBitangents[l].x, 4);
-                FOutputStream.write((c8*)&mesh->mBitangents[l].y, 4);
-                FOutputStream.write((c8*)&mesh->mBitangents[l].z, 4);
-            }
-
-            k++;
-        }
+    u32 currentNodeIdx = 0;
+    u32 nbVerticesWritten = 0;
+    if (parMeshData->mRootNode->mNumChildren == 1)
+    {
+        ReadHierarchyMesh(parMeshData, parMeshData->mRootNode->mChildren[0], fileHeader, hierarchy, currentNodeIdx, FOutputStream, nbVerticesWritten);
+    }
+    else
+    {
+        ReadHierarchyMesh(parMeshData, parMeshData->mRootNode, fileHeader, hierarchy, currentNodeIdx, FOutputStream, nbVerticesWritten);
     }
 
-    AssertRelease(k == fileHeader.NbVertices);
+    AssertRelease(nbVerticesWritten == fileHeader.NbVertices);
+    AssertRelease(currentNodeIdx == (hierarchy.size() - 1));
 
     u32 vertexOffset = 0;
     std::vector<u32> indices;
@@ -144,6 +218,14 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
     }
 
     FOutputStream.write((c8*)indices.data(), 4u * fileHeader.NbIndices);
+
+    foreachitemconst(node, hierarchy)
+    {
+        FOutputStream.write((c8*)&node.Idx, sizeof(uc8));
+        FOutputStream.write((c8*)&node.Parent, sizeof(uc8));
+        FOutputStream.write((c8*)node.Name, strlen(node.Name));
+        FOutputStream.write((c8*)&node.LocalTransform, sizeof(glm::mat4));
+    }
 }
 
 } // namespace Rendering

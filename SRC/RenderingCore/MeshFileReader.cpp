@@ -85,6 +85,9 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
             vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0, data);
         }
 
+        u32 nodeIdx = 0;
+        parStream.read((c8*)&nodeIdx, sizeof(u32));
+
         vertexDataStream.Advance();
     }
 
