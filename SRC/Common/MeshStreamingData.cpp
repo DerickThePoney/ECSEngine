@@ -25,9 +25,10 @@ VertexLayoutHash::VertexLayoutHash(const MeshLayoutDescription& parMeshLayoutDes
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_NORMALS, parMeshLayoutDescription.HasNormals);
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, parMeshLayoutDescription.HasTangents);
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS, parMeshLayoutDescription.HasBinormals);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_BONES, parMeshLayoutDescription.HasBones);
 }
 
-VertexLayoutHash::VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbUvs, bool parNormals, bool parTangents, bool parBinormals)
+VertexLayoutHash::VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbUvs, bool parNormals, bool parTangents, bool parBinormals, bool parBones)
     : hash(0)
 {
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, parPosition);
@@ -38,6 +39,7 @@ VertexLayoutHash::VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbU
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_NORMALS, parNormals);
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, parTangents);
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS, parBinormals);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_BONES, parBones);
 }
 
 VertexLayoutHash::VertexLayoutHash(const VertexLayoutHash& parOther)
@@ -121,6 +123,8 @@ u32 VertexLayoutHash::GetByteSize() const
         byteSize += 3 * sizeof(float);
     if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS))
         byteSize += 3 * sizeof(float);
+    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_BONES))
+        byteSize += sizeof(u32);
 
     return byteSize;
 }
@@ -267,6 +271,15 @@ void VertexDataStream::InitOffsetData()
     {
         TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_BINORMALS, 0 };
         OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec3) };
+        currentOffset += o.second;
+        FOffsetMap[p] = o;
+    }
+
+    // Bones
+    if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_BONES))
+    {
+        TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_BONES, 0 };
+        OffsetByteSizePair o = { currentOffset, (u32)sizeof(u32) };
         currentOffset += o.second;
         FOffsetMap[p] = o;
     }

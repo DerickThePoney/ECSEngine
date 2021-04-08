@@ -15,7 +15,9 @@ enum Type
     HAS_NORMALS = HAS_UVS + 5, // 1 bit pour has uv et 4 pour le nombre (max 8 uvs)
     HAS_TANGENTS = HAS_NORMALS + 1,
     HAS_BINORMALS = HAS_TANGENTS + 1,
-    LENGTH = 13 // HAS_BINORMALS + 1  // Recompute leadHashSizeLeadingZeros if you change this [__builtin_clz(VERTEX_LAYOUT_PARAMS::LENGTH - 1)]
+    HAS_BONES = HAS_BINORMALS + 1,
+    LENGTH = HAS_BONES + 1 // HAS_BINORMALS + 1  // Recompute leadHashSizeLeadingZeros if you change this
+                           // [__builtin_clz(VERTEX_LAYOUT_PARAMS::LENGTH - 1)]
 };
 constexpr u32 leadHashSizeLeadingZeros = 28; // --> Apparently support for __builtin_clz got dropped at some point so take extracare with this kind of shit
 }; // namespace VERTEX_LAYOUT_PARAMS
@@ -37,7 +39,7 @@ struct VertexLayoutHash
 
     VertexLayoutHash();
     VertexLayoutHash(const MeshLayoutDescription& parMeshLayoutDescription);
-    VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbUvs, bool parNormals, bool parTangents, bool parBinormals);
+    VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbUvs, bool parNormals, bool parTangents, bool parBinormals, bool parBones);
 
     VertexLayoutHash(const VertexLayoutHash& parOther);
     VertexLayoutHash(VertexLayoutHash&& parOther) = delete;
@@ -187,6 +189,7 @@ struct MeshLayoutDescription
     bool HasNormals = false;
     bool HasTangents = false;
     bool HasBinormals = false;
+    bool HasBones = false;
 
     SERIALIZE()
     {
@@ -198,6 +201,7 @@ struct MeshLayoutDescription
         NAMEDPROPERTYFIELD("HasNormals", HasNormals, false);
         NAMEDPROPERTYFIELD("HasBinormals", HasTangents, false);
         NAMEDPROPERTYFIELD("HasBinormals", HasBinormals, false);
+        NAMEDPROPERTYFIELD("HasBones", HasBones, false);
     }
 };
 
