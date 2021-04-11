@@ -30,25 +30,25 @@ void ReadHierarchy(const aiNode* parNode, const u8 parParentIdx, std::vector<Hie
     node.Name = parNode->mName.C_Str();
 
     const aiMatrix4x4& mat = parNode->mTransformation;
-    node.LocalTransform[0][0] = mat.a1;
-    node.LocalTransform[0][1] = mat.b1;
-    node.LocalTransform[0][2] = mat.c1;
-    node.LocalTransform[0][3] = mat.d1;
+    node.InverseLocalTransform[0][0] = mat.a1;
+    node.InverseLocalTransform[0][1] = mat.b1;
+    node.InverseLocalTransform[0][2] = mat.c1;
+    node.InverseLocalTransform[0][3] = mat.d1;
 
-    node.LocalTransform[1][0] = mat.a2;
-    node.LocalTransform[1][1] = mat.b2;
-    node.LocalTransform[1][2] = mat.c2;
-    node.LocalTransform[1][3] = mat.d2;
+    node.InverseLocalTransform[1][0] = mat.a2;
+    node.InverseLocalTransform[1][1] = mat.b2;
+    node.InverseLocalTransform[1][2] = mat.c2;
+    node.InverseLocalTransform[1][3] = mat.d2;
 
-    node.LocalTransform[2][0] = mat.a3;
-    node.LocalTransform[2][1] = mat.b3;
-    node.LocalTransform[2][2] = mat.c3;
-    node.LocalTransform[2][3] = mat.d3;
+    node.InverseLocalTransform[2][0] = mat.a3;
+    node.InverseLocalTransform[2][1] = mat.b3;
+    node.InverseLocalTransform[2][2] = mat.c3;
+    node.InverseLocalTransform[2][3] = mat.d3;
 
-    node.LocalTransform[3][0] = mat.a4;
-    node.LocalTransform[3][1] = mat.b4;
-    node.LocalTransform[3][2] = mat.c4;
-    node.LocalTransform[3][3] = mat.d4;
+    node.InverseLocalTransform[3][0] = mat.a4;
+    node.InverseLocalTransform[3][1] = mat.b4;
+    node.InverseLocalTransform[3][2] = mat.c4;
+    node.InverseLocalTransform[3][3] = mat.d4;
 
     const u8 parent = node.Idx;
     parHierarchy.push_back(node);
@@ -216,7 +216,7 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
         FOutputStream.write((c8*)&node.Idx, sizeof(uc8));
         FOutputStream.write((c8*)&node.Parent, sizeof(uc8));
         FOutputStream.write((c8*)node.Name, strlen(node.Name));
-        FOutputStream.write((c8*)&node.LocalTransform, sizeof(glm::mat4));
+        FOutputStream.write((c8*)&node.InverseLocalTransform, sizeof(glm::mat4));
     }
 }
 
