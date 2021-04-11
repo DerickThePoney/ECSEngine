@@ -19,6 +19,7 @@ void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& p
 void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue);
 void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue);
 void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue);
+void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber);
 } // namespace MaterialManager
 
 } // namespace Rendering

@@ -35,6 +35,7 @@ public:
     void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue) const;
     void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue) const;
     void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue) const;
+    void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber) const;
 
 private:
     std::unordered_map<std::string, u32> FFileToMaterialDescriptor;
@@ -250,6 +251,13 @@ void MaterialManagerSingleton::SetMat4Uniform(const std::string& parUniformName,
     bgfx::setUniform(handle, &parUniformValue[0][0]);
 }
 
+void MaterialManagerSingleton::SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber) const
+{
+    const bgfx::UniformHandle& handle = MaterialManagerSingleton::Instance().GetUniform(parUniformName, bgfx::UniformType::Mat4);
+    AssertRelease(bgfx::isValid(handle));
+    bgfx::setUniform(handle, parUniformValue, parNumber);
+}
+
 namespace MaterialManager
 {
 
@@ -309,6 +317,12 @@ void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUnifo
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     MaterialManagerSingleton::Instance().SetMat4Uniform(parUniformName, parUniformValue);
+}
+
+void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::Instance().SetMat4Uniforms(parUniformName, parUniformValue, parNumber);
 }
 
 } // namespace MaterialManager
