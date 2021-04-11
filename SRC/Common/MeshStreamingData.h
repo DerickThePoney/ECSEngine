@@ -199,7 +199,7 @@ struct MeshLayoutDescription
         NAMEDPROPERTYFIELD("HasUVs", HasUVs, false);
         NAMEDPROPERTYFIELD("NbUVs", NbUVs, 0);
         NAMEDPROPERTYFIELD("HasNormals", HasNormals, false);
-        NAMEDPROPERTYFIELD("HasBinormals", HasTangents, false);
+        NAMEDPROPERTYFIELD("HasTangents", HasTangents, false);
         NAMEDPROPERTYFIELD("HasBinormals", HasBinormals, false);
         NAMEDPROPERTYFIELD("HasBones", HasBones, false);
     }
