@@ -11,6 +11,7 @@ struct SkelettonJoint
 
 public:
     glm::mat4 InvBindPose = glm::identity<glm::mat4>();
+    glm::mat4 ModelToJointMatrix = glm::identity<glm::mat4>();
     const char* Name = nullptr;
     const u8 ParentId = 0xFF;
 };
@@ -43,6 +44,7 @@ public:
     SkelettonPose(const Skeletton* parSkeletton)
         : FSkeletton(parSkeletton)
     {
+        AssertRelease(FSkeletton != nullptr);
     }
 
     ~SkelettonPose();
@@ -55,6 +57,9 @@ public:
     const glm::mat4* SkinningMatrix() const { return FSkinningMatrix; }
 
     void SetDirty();
+
+private:
+    void ComputeSkinningMatrixForJoint(const u8 parIndex, std::vector<bool>& parComputedCache);
 
 private:
     const Skeletton* FSkeletton = nullptr;
