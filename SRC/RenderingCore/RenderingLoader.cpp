@@ -13,6 +13,7 @@
 #include "ImguiRenderer.h"
 #include "MaterialManager.h"
 #include "MeshManager.h"
+#include "SkelettonPoseManager.h"
 #include "TexturesManager.h"
 
 namespace ECSEngine
@@ -47,6 +48,7 @@ bool RenderingLoader::VirtualInitialise()
     GameplayFeedbackDrawer::CreateIFP();
     GameplayFeedbackDrawer::Instance().Initialise();
 
+    Rendering::SkelettonPoseManager::CreateIFP();
     Rendering::GFXRepresentationDescriptorManager::CreateIFP();
     AssertRelease(Rendering::GFXRepresentationDescriptorManager::HasInstance());
     {
@@ -68,6 +70,7 @@ void RenderingLoader::VirtualShutdown()
     ILoader::VirtualShutdown();
 
     Rendering::GFXRepresentationDescriptorManager::Destroy();
+    Rendering::SkelettonPoseManager::Destroy();
 
     GameplayFeedbackDrawer::Instance().Shutdown();
     GameplayFeedbackDrawer::Destroy();
