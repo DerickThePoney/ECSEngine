@@ -60,10 +60,9 @@ const MeshHandle MeshManager::CreateMesh(const Resource& parResource)
         MeshFileReader reader;
         Mesh* mesh = nullptr;
 
-        reader.ReadMesh(mesh, parResource);
-
-        AssertRelease(mesh != nullptr);
         MeshHandle handle((u32)FMeshes.size());
+        reader.ReadMesh(handle, mesh, parResource);
+        AssertRelease(mesh != nullptr);
         FMeshes.push_back(mesh);
         FFileToMesh[parResource.FName] = handle.GetMeshId();
         return handle;

@@ -46,6 +46,15 @@ SkelettonPose* SkelettonManager::GetPose(const u32 parGFXId)
     return &FSkelettonPoses[itFind->second];
 }
 
+void SkelettonManager::DeleteSkelettonPose(const u32 parGFXId)
+{
+    auto itFind = FGFXToSquelettonPose.find(parGFXId);
+    if (itFind == FGFXToSquelettonPose.end())
+        return;
+    // ahha -- need to changes thing here, or it'll not work
+    FSkelettonPoses.erase(FSkelettonPoses.begin());
+}
+
 void SkelettonManager::UpdateSkinningMatrices()
 {
     foreachitem(pose, FSkelettonPoses) { pose.UpdateSkinningMatrix(); }

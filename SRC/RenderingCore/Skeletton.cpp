@@ -35,11 +35,11 @@ const SkelettonJoint& Skeletton::GetJoint(u8 parIndex) const
     return FJoints[parIndex];
 }
 
-u8 Skeletton::FindSkelettonJoint(const char* parName) const
+u8 Skeletton::FindSkelettonJoint(const std::string& parName) const
 {
     forrange(i, 0, FBonesNumber)
     {
-        if (strcmp(FJoints[i].Name, parName) == 0)
+        if (FJoints[i].Name == parName)
             return i;
     }
     return -1;

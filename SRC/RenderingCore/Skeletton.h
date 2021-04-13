@@ -12,8 +12,8 @@ struct SkelettonJoint
 public:
     glm::mat4 InvBindPose = glm::identity<glm::mat4>();
     glm::mat4 ModelToJointMatrix = glm::identity<glm::mat4>();
-    const char* Name = nullptr;
-    const u8 ParentId = 0xFF;
+    std::string Name;
+    u8 ParentId = 0xFF;
 };
 
 class Skeletton
@@ -29,7 +29,7 @@ public:
     SkelettonJoint& GetJoint(u8 parIndex);
     const SkelettonJoint& GetJoint(u8 parIndex) const;
 
-    u8 FindSkelettonJoint(const char* parName) const;
+    u8 FindSkelettonJoint(const std::string& parName) const;
 
 private:
     u8 FBonesNumber = 0;

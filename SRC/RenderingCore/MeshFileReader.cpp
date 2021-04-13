@@ -3,12 +3,15 @@
 #include "MeshFileReader.h"
 
 #include "Common/MeshStreamingData.h"
+#include "Common/RenderingHandles.h"
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "Mesh.h"
 #include "MeshUtils.h"
+#include "SkelettonManager.h"
 #include "VertexLayout.h"
+
 namespace ECSEngine
 {
 namespace Rendering
@@ -16,7 +19,68 @@ namespace Rendering
 
 namespace
 {
-void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
+void ReadSkelettonImplementation(const MeshHandle parHandle, const MeshFileHeader& parHeader, std::istream& parStream)
+{
+    if (parHeader.NbNodesInHierarchy == 1)
+        return;
+
+    std::vector<HierarchyNode> joints(parHeader.NbNodesInHierarchy);
+    c8 buff[1024];
+    forrange(i, 0, joints.size())
+    {
+        HierarchyNode& joint = joints[i];
+        parStream.read((c8*)&joint.Idx, sizeof(uc8));
+        parStream.read((c8*)&joint.Parent, sizeof(uc8));
+        u32 nameLength = 0;
+        parStream.read((c8*)&nameLength, sizeof(u32));
+        AssertRelease(nameLength > 0);
+        parStream.read((c8*)buff, nameLength);
+        joint.Name = std::string(buff, nameLength);
+        parStream.read((c8*)&joint.InverseLocalTransform, sizeof(glm::mat4));
+    }
+
+    Skeletton* skeletton = SkelettonManager::Instance().CreateSkeletton_ReturnCreatedSkeletton(parHandle);
+    skeletton->SetBonesNumber(joints.size());
+    forrange(i, 0, joints.size())
+    {
+        HierarchyNode& node = joints[i];
+        SkelettonJoint& joint = skeletton->GetJoint((u8)i);
+        joint.InvBindPose = node.InverseLocalTransform;
+        joint.ParentId = node.Parent;
+        joint.Name = node.Name;
+    }
+
+    bool allGood = false;
+    std::vector<bool> computed(joints.size(), false);
+    while (!allGood)
+    {
+        forrange(i, 0, joints.size())
+        {
+            if (computed[i])
+                continue;
+            SkelettonJoint& joint = skeletton->GetJoint((u8)i);
+            if (joint.ParentId == 0xFF)
+            {
+                joint.ModelToJointMatrix = glm::identity<glm::mat4>();
+                computed[i] = true;
+                continue;
+            }
+
+            if (computed[joint.ParentId])
+            {
+                SkelettonJoint& parent = skeletton->GetJoint(joint.ParentId);
+                joint.ModelToJointMatrix = parent.ModelToJointMatrix * joint.InvBindPose;
+                computed[i] = true;
+                continue;
+            }
+        }
+
+        allGood = true;
+        forrange(i, 0, joints.size()) { allGood = allGood && computed[i]; }
+    }
+}
+
+void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::istream& parStream)
 {
     MeshFileHeader fileHeader;
     parStream.read((c8*)&fileHeader, sizeof(MeshFileHeader));
@@ -118,6 +182,8 @@ void ReadMeshImplementation(Mesh*& parMesh, std::istream& parStream)
     parMesh->SetRawVertexData(vertexDataStream);
     parMesh->SetRawIndexData(indices.data(), fileHeader.NbIndices * 4u);
     parMesh->SetBoundingCircle(glm::vec4(verticesGravityCenter, radius));
+
+    ReadSkelettonImplementation(parHandle, fileHeader, parStream);
 }
 } // namespace
 
@@ -129,20 +195,20 @@ MeshFileReader::~MeshFileReader()
 {
 }
 
-void MeshFileReader::ReadMesh(Mesh*& parMesh, const std::string& parFilename)
+void MeshFileReader::ReadMesh(const MeshHandle parHandle, Mesh*& parMesh, const std::string& parFilename)
 {
     std::ifstream ifstr(parFilename.c_str(), std::ifstream::binary);
     AssertRelease(ifstr.good());
-    ReadMeshImplementation(parMesh, ifstr);
+    ReadMeshImplementation(parHandle, parMesh, ifstr);
 }
 
-void MeshFileReader::ReadMesh(Mesh*& parMesh, const Resource& parResource)
+void MeshFileReader::ReadMesh(const MeshHandle parHandle, Mesh*& parMesh, const Resource& parResource)
 {
     std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&parResource);
 
     ResourceBuffer buff = handle->GetResourceBuffer();
     std::istream sstr(&buff, std::istream::binary);
-    ReadMeshImplementation(parMesh, sstr);
+    ReadMeshImplementation(parHandle, parMesh, sstr);
 }
 
 } // namespace Rendering
