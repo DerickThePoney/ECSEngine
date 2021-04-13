@@ -61,11 +61,13 @@ void ReadHierarchyMesh(const aiScene* parScene,
       const std::vector<HierarchyNode>& parHierarchy,
       u32& outCurrentNodeIdx,
       std::ofstream& parOutputStream,
-      u32& outNbVertices)
+      u32& outNbVertices,
+      const aiMatrix4x4 parParentTransform = aiMatrix4x4())
 {
     AssertRelease(parNode->mName.C_Str() == parHierarchy[outCurrentNodeIdx].Name);
 
     const float nodeIdx = (float)outCurrentNodeIdx;
+    const aiMatrix4x4 transform = parParentTransform * parNode->mTransformation;
     forrange(i, 0, parNode->mNumMeshes)
     {
         const aiMesh* mesh = parScene->mMeshes[parNode->mMeshes[i]];
@@ -74,9 +76,10 @@ void ReadHierarchyMesh(const aiScene* parScene,
         {
             if (parFileHeader.layout.HasPositions)
             {
-                parOutputStream.write((c8*)&mesh->mVertices[l].x, 4);
-                parOutputStream.write((c8*)&mesh->mVertices[l].y, 4);
-                parOutputStream.write((c8*)&mesh->mVertices[l].z, 4);
+                const aiVector3D vertex = transform * mesh->mVertices[l];
+                parOutputStream.write((c8*)&vertex.x, 4);
+                parOutputStream.write((c8*)&vertex.y, 4);
+                parOutputStream.write((c8*)&vertex.z, 4);
             }
 
             forrange(j, 0, parFileHeader.layout.NbColorChannels)
@@ -98,23 +101,26 @@ void ReadHierarchyMesh(const aiScene* parScene,
 
             if (parFileHeader.layout.HasNormals)
             {
-                parOutputStream.write((c8*)&mesh->mNormals[l].x, 4);
-                parOutputStream.write((c8*)&mesh->mNormals[l].y, 4);
-                parOutputStream.write((c8*)&mesh->mNormals[l].z, 4);
+                const aiVector3D normal = transform * mesh->mNormals[l];
+                parOutputStream.write((c8*)&normal.x, 4);
+                parOutputStream.write((c8*)&normal.y, 4);
+                parOutputStream.write((c8*)&normal.z, 4);
             }
 
             if (parFileHeader.layout.HasTangents)
             {
-                parOutputStream.write((c8*)&mesh->mTangents[l].x, 4);
-                parOutputStream.write((c8*)&mesh->mTangents[l].y, 4);
-                parOutputStream.write((c8*)&mesh->mTangents[l].z, 4);
+                const aiVector3D tangent = transform * mesh->mTangents[l];
+                parOutputStream.write((c8*)&tangent.x, 4);
+                parOutputStream.write((c8*)&tangent.y, 4);
+                parOutputStream.write((c8*)&tangent.z, 4);
             }
 
             if (parFileHeader.layout.HasBinormals)
             {
-                parOutputStream.write((c8*)&mesh->mBitangents[l].x, 4);
-                parOutputStream.write((c8*)&mesh->mBitangents[l].y, 4);
-                parOutputStream.write((c8*)&mesh->mBitangents[l].z, 4);
+                const aiVector3D binormal = transform * mesh->mBitangents[l];
+                parOutputStream.write((c8*)&binormal.x, 4);
+                parOutputStream.write((c8*)&binormal.y, 4);
+                parOutputStream.write((c8*)&binormal.z, 4);
             }
 
             parOutputStream.write((c8*)&nodeIdx, sizeof(float));
@@ -123,7 +129,10 @@ void ReadHierarchyMesh(const aiScene* parScene,
         }
     }
 
-    forrange(i, 0, parNode->mNumChildren) { ReadHierarchyMesh(parScene, parNode->mChildren[i], parFileHeader, parHierarchy, ++outCurrentNodeIdx, parOutputStream, outNbVertices); }
+    forrange(i, 0, parNode->mNumChildren)
+    {
+        ReadHierarchyMesh(parScene, parNode->mChildren[i], parFileHeader, parHierarchy, ++outCurrentNodeIdx, parOutputStream, outNbVertices, transform);
+    }
 }
 
 void MeshFileWriter::operator<<(const aiScene* parMeshData)
