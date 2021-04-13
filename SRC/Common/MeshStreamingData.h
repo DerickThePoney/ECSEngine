@@ -233,7 +233,7 @@ struct HierarchyNode
 {
     u8 Idx = -1;
     u8 Parent = -1;
-    const char* Name = nullptr;
+    std::string Name;
     glm::mat4 InverseLocalTransform = glm::identity<glm::mat4>();
 };
 #pragma pack(pop, r1)
