@@ -36,9 +36,9 @@ void GFXRepresentationManager::OnGameplayFrameEnded()
 
 u32 GFXRepresentationManager::CreateGFXRepresentation(const GFXRepresentationInitialiser& parInit)
 {
-    GFXRepresentation* newRep = new GFXRepresentation();
-    newRep->Initialise(parInit);
     const u32 newId = FGFXIdGenerator.GetNextId();
+    GFXRepresentation* newRep = new GFXRepresentation(newId);
+    newRep->Initialise(parInit);
     FGFXRepresentations.insert_or_assign(newId, std::unique_ptr<GFXRepresentation>(newRep));
     return newId;
 }

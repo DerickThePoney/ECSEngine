@@ -43,7 +43,8 @@ void GFXRepresentationDescriptor::DrawInEditor()
 }
 
 IMPLEMENT_POOL_ALLOCATED(GFXRepresentation);
-GFXRepresentation::GFXRepresentation()
+GFXRepresentation::GFXRepresentation(const u32 parId)
+    : FId(parId)
 {
 }
 
