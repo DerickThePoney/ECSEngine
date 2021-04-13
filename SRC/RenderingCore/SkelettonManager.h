@@ -16,6 +16,7 @@ public:
 
     const Skeletton* GetSkeletton(const MeshHandle parMesh);
     SkelettonPose* GetPose(const u32 parGFXId);
+    void DeleteSkelettonPose(const u32 parGFXId);
 
     void UpdateSkinningMatrices();
 
