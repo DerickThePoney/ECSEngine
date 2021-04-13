@@ -59,7 +59,7 @@ class GFXRepresentation
     DECLARE_POOL_ALLOCATED(GFXRepresentation);
 
 public:
-    GFXRepresentation();
+    GFXRepresentation(const u32 parId);
     ~GFXRepresentation();
 
     void Initialise(const GFXRepresentationInitialiser& parInit);
@@ -70,6 +70,8 @@ public:
 
     const Carrier* GetCarrier() const { return FCarrier.get(); }
     const VisualModel* GetVisualModel() const { return FVisualModel.get(); }
+
+    u32 Id() const { return FId; }
 
 private:
     void ProcessMessages();
@@ -82,6 +84,8 @@ private:
 
     GFXMessage FMessages[2];
     u32 FCurrentMessageQueue = 0;
+
+    const u32 FId = -1;
 };
 } // namespace Rendering
 } // namespace ECSEngine
