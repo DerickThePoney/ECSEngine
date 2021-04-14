@@ -21,10 +21,9 @@ SkelettonPose* SkelettonManager::CreateSkelettonPose_ReturnPose(const u32 parGFX
     if (itSqueletton == FSkelettons.end())
         return nullptr;
 
-    u32 poseId = (u32)FSkelettonPoses.size();
-    FSkelettonPoses.push_back(SkelettonPose(&itSqueletton->second));
-    FGFXToSquelettonPose.insert_or_assign(parGFXId, poseId);
-    return &FSkelettonPoses[poseId];
+    auto it = FGFXToSquelettonPose.insert_or_assign(parGFXId, SkelettonPose(&itSqueletton->second));
+    it.first->second.InitialiseFromSkeletton();
+    return &it.first->second;
 }
 
 const Skeletton* SkelettonManager::GetSkeletton(const MeshHandle parMesh)
@@ -42,8 +41,7 @@ SkelettonPose* SkelettonManager::GetPose(const u32 parGFXId)
     if (itFind == FGFXToSquelettonPose.end())
         return nullptr;
 
-    AssertRelease(FSkelettonPoses.size() > itFind->second);
-    return &FSkelettonPoses[itFind->second];
+    return &itFind->second;
 }
 
 void SkelettonManager::DeleteSkelettonPose(const u32 parGFXId)
@@ -51,13 +49,13 @@ void SkelettonManager::DeleteSkelettonPose(const u32 parGFXId)
     auto itFind = FGFXToSquelettonPose.find(parGFXId);
     if (itFind == FGFXToSquelettonPose.end())
         return;
-    // ahha -- need to changes thing here, or it'll not work
-    FSkelettonPoses.erase(FSkelettonPoses.begin());
+
+    FGFXToSquelettonPose.erase(itFind);
 }
 
 void SkelettonManager::UpdateSkinningMatrices()
 {
-    foreachitem(pose, FSkelettonPoses) { pose.UpdateSkinningMatrix(); }
+    foreachitem(pose, FGFXToSquelettonPose) { pose.second.UpdateSkinningMatrix(); }
 }
 
 } // namespace Rendering

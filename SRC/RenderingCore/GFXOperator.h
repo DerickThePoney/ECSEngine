@@ -15,6 +15,7 @@ class VisualModel;
 class Carrier;
 class AbstractGFXOperator;
 class GFXMessage;
+class SkelettonPose;
 class AbstractGFXOperatorDescriptor
 {
 public:
@@ -43,7 +44,7 @@ class AbstractGFXOperator
 {
 public:
     virtual ~AbstractGFXOperator() = default;
-    virtual void ApplyChangesOnMesh(const GFXMessage& parMessages, VisualModel* parModel, const Carrier* parCarrier){};
+    virtual void ApplyChangesOnMesh(const GFXMessage& parMessages, VisualModel* parModel, SkelettonPose* parSkelettonPose, const Carrier* parCarrier){};
 
     virtual OperatorMask GetMask() const = 0;
 };

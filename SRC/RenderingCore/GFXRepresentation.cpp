@@ -6,6 +6,7 @@
 #include "Carrier.h"
 #include "GFXKeyHelper.h"
 #include "GFXRepresentationDescriptorManager.h"
+#include "SkelettonManager.h"
 #include "VisualModel.h"
 
 namespace ECSEngine
@@ -53,6 +54,7 @@ GFXRepresentation::~GFXRepresentation()
     FCarrier.reset(nullptr);
     FVisualModel.reset(nullptr);
     FGFXOperators.clear();
+    SkelettonManager::Instance().DeleteSkelettonPose(FId);
 }
 
 void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
@@ -73,6 +75,8 @@ void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
         FVisualModel.reset(new VisualModel());
         AssertRelease(FVisualModel != nullptr);
         FVisualModel->Init(descriptor->MaterialName(), descriptor->MeshFile());
+
+        FSkelettonPose = SkelettonManager::Instance().CreateSkelettonPose_ReturnPose(FId, FVisualModel->GetMeshHandle());
     }
 
     const MemoryView<const std::unique_ptr<AbstractGFXOperatorDescriptor>> operators = descriptor->OperatorDescriptors();
@@ -136,7 +140,7 @@ void GFXRepresentation::ProcessMessages()
     {
         if (op->GetMask() & OperatorMask::APPLY_ON_MESH)
         {
-            op->ApplyChangesOnMesh(currentMessages, FVisualModel.get(), FCarrier.get());
+            op->ApplyChangesOnMesh(currentMessages, FVisualModel.get(), FSkelettonPose, FCarrier.get());
         }
     }
 }

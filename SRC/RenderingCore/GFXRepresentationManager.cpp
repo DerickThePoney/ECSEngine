@@ -2,6 +2,8 @@
 
 #include "GFXRepresentationManager.h"
 
+#include "SkelettonManager.h"
+
 namespace ECSEngine
 {
 namespace Rendering
@@ -26,6 +28,8 @@ void GFXRepresentationManager::Update(float parCurrentTime)
         AssertRelease(rep.second != nullptr);
         rep.second->Update(parCurrentTime);
     }
+
+    SkelettonManager::Instance().UpdateSkinningMatrices();
 }
 
 void GFXRepresentationManager::OnGameplayFrameEnded()

@@ -22,8 +22,7 @@ public:
 
 private:
     std::map<MeshHandle, Skeletton> FSkelettons;
-    std::map<u32, u32> FGFXToSquelettonPose;
-    std::vector<SkelettonPose> FSkelettonPoses;
+    std::map<u32, SkelettonPose> FGFXToSquelettonPose;
 };
 } // namespace Rendering
 } // namespace ECSEngine

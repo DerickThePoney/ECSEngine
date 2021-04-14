@@ -80,6 +80,8 @@ private:
     std::unique_ptr<Carrier> FCarrier = nullptr;
     std::unique_ptr<VisualModel> FVisualModel = nullptr;
 
+    SkelettonPose* FSkelettonPose = nullptr;
+
     std::vector<std::unique_ptr<AbstractGFXOperator>> FGFXOperators;
 
     GFXMessage FMessages[2];
