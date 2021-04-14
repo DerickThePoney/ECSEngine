@@ -184,6 +184,8 @@ void ScenarioEditor::UpdateForSceneEditing()
 
         AlwaysCheckedAssert(!(isDone && isCancel));
 
+        isDone = isDone && !sceneToChoose.empty();
+
         if (isDone)
         {
             if (FCurrentScenario != nullptr)
