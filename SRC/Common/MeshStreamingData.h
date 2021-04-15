@@ -236,6 +236,12 @@ struct HierarchyNode
     std::string Name;
     glm::mat4 InverseLocalTransform = glm::identity<glm::mat4>();
 };
+
+union BlendIndices
+{
+    u8 Indices[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
+    u32 pack;
+};
 #pragma pack(pop, r1)
 } // namespace Rendering
 } // namespace ECSEngine

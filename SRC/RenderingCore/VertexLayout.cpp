@@ -115,7 +115,7 @@ bgfx::VertexLayout GetVertexLayout(const VertexLayoutHash& parVertexLayoutHash)
         pcvDecl.add(bgfx::Attrib::Bitangent, 3, bgfx::AttribType::Float);
 
     if (parVertexLayoutHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_BONES))
-        pcvDecl.add(bgfx::Attrib::Indices, 1, bgfx::AttribType::Float);
+        pcvDecl.add(bgfx::Attrib::Indices, 4, bgfx::AttribType::Uint8);
 
     pcvDecl.end();
 

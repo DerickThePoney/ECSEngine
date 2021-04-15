@@ -55,7 +55,7 @@ void ReadHierarchy(const aiNode* parNode, const u8 parParentIdx, std::vector<Hie
     forrange(i, 0, parNode->mNumChildren) { ReadHierarchy(parNode->mChildren[i], parent, parHierarchy); }
 }
 
-void ReadHierarchyMesh(const aiScene* parScene,
+void WriteMeshHierarchy(const aiScene* parScene,
       const aiNode* parNode,
       const MeshFileHeader& parFileHeader,
       const std::vector<HierarchyNode>& parHierarchy,
@@ -66,7 +66,8 @@ void ReadHierarchyMesh(const aiScene* parScene,
 {
     AssertRelease(parNode->mName.C_Str() == parHierarchy[outCurrentNodeIdx].Name);
 
-    const float nodeIdx = (float)outCurrentNodeIdx;
+    BlendIndices nodeIdx;
+    nodeIdx.Indices[0] = (u8)outCurrentNodeIdx;
     const aiMatrix4x4 transform = parParentTransform * parNode->mTransformation;
     forrange(i, 0, parNode->mNumMeshes)
     {
@@ -123,7 +124,10 @@ void ReadHierarchyMesh(const aiScene* parScene,
                 parOutputStream.write((c8*)&binormal.z, 4);
             }
 
-            parOutputStream.write((c8*)&nodeIdx, sizeof(float));
+            if (parFileHeader.layout.HasBones)
+            {
+                parOutputStream.write((c8*)&nodeIdx, sizeof(BlendIndices));
+            }
 
             outNbVertices++;
         }
@@ -131,7 +135,7 @@ void ReadHierarchyMesh(const aiScene* parScene,
 
     forrange(i, 0, parNode->mNumChildren)
     {
-        ReadHierarchyMesh(parScene, parNode->mChildren[i], parFileHeader, parHierarchy, ++outCurrentNodeIdx, parOutputStream, outNbVertices, transform);
+        WriteMeshHierarchy(parScene, parNode->mChildren[i], parFileHeader, parHierarchy, ++outCurrentNodeIdx, parOutputStream, outNbVertices, transform);
     }
 }
 
@@ -193,11 +197,11 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
     u32 nbVerticesWritten = 0;
     if (parMeshData->mRootNode->mNumChildren == 1)
     {
-        ReadHierarchyMesh(parMeshData, parMeshData->mRootNode->mChildren[0], fileHeader, hierarchy, currentNodeIdx, FOutputStream, nbVerticesWritten);
+        WriteMeshHierarchy(parMeshData, parMeshData->mRootNode->mChildren[0], fileHeader, hierarchy, currentNodeIdx, FOutputStream, nbVerticesWritten);
     }
     else
     {
-        ReadHierarchyMesh(parMeshData, parMeshData->mRootNode, fileHeader, hierarchy, currentNodeIdx, FOutputStream, nbVerticesWritten);
+        WriteMeshHierarchy(parMeshData, parMeshData->mRootNode, fileHeader, hierarchy, currentNodeIdx, FOutputStream, nbVerticesWritten);
     }
 
     AssertRelease(nbVerticesWritten == fileHeader.NbVertices);
