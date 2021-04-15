@@ -54,7 +54,13 @@ public:
 
     const Skeletton* GetSkeletton() const { return FSkeletton; }
     glm::mat4* LocalPoses() { return FLocalPoses; }
-    const glm::mat4* SkinningMatrix() const { return FSkinningMatrix; }
+    const glm::mat4* SkinningMatrices() const { return FSkinningMatrices; }
+
+    u8 BonesNumber() const
+    {
+        AssertRelease(FSkeletton != nullptr);
+        return FSkeletton->NumberOfBones();
+    }
 
     void SetDirty();
 
@@ -64,7 +70,7 @@ private:
 private:
     const Skeletton* FSkeletton = nullptr;
     glm::mat4* FLocalPoses = nullptr;
-    glm::mat4* FSkinningMatrix = nullptr;
+    glm::mat4* FSkinningMatrices = nullptr;
     bool FDirty = false;
 };
 } // namespace Rendering
