@@ -120,7 +120,14 @@ void GameRenderer::Render()
 
         if (Rendering::MeshFrustumCulling::CullMesh(visuals->GetMeshHandle(), carrier->LocalToWorld(), frustum))
         {
-            FGeometryCommandBuffer->DrawMesh(visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
+            if (gfxRep.second->GetPose() != nullptr)
+            {
+                FGeometryCommandBuffer->DrawMeshWithPose(gfxRep.second->GetPose(), visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
+            }
+            else
+            {
+                FGeometryCommandBuffer->DrawMesh(visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
+            }
         }
     }
 
