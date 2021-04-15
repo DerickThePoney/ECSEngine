@@ -1,8 +1,10 @@
 ﻿#include "stdafx.h"
 
 #include "Common/PoolAllocator.h"
+#include "Common/TimeManager.h"
 #include "GFXMessage.h"
 #include "GFXOperator.h"
+#include "Skeletton.h"
 
 namespace ECSEngine
 {
@@ -21,7 +23,9 @@ public:
 
     virtual AbstractGFXOperator* CreateOperator() const override;
 
-    SERIALIZE() {}
+    float RotationSpeed() const { return FRotationSpeed; }
+
+    SERIALIZE() { PROPERTYFIELD(RotationSpeed, 0.f); }
 
 protected:
     virtual void VirtualDrawInEditor() override;
@@ -34,6 +38,9 @@ IMPLEMENT_POOL_ALLOCATED(GeneratorRotatorOperatorDescriptor);
 
 void GeneratorRotatorOperatorDescriptor::VirtualDrawInEditor()
 {
+    float rotationTRS = 0.5f * FRotationSpeed / glm::pi<float>();
+    ImGui::InputFloat("Rotation speed (TRS)", &rotationTRS, 1.f, 10.f);
+    FRotationSpeed = 2.f * glm::pi<float>() * rotationTRS;
 }
 
 REGISTER_OPERATOR_FACTORY(GeneratorRotatorOperatorDescriptor);
@@ -57,6 +64,7 @@ public:
 
 private:
     const GeneratorRotatorOperatorDescriptor* FDescriptor = nullptr;
+    u8 FSkelettonJoint = 0xFF;
 };
 
 AbstractGFXOperator* GeneratorRotatorOperatorDescriptor::CreateOperator() const
@@ -66,6 +74,20 @@ AbstractGFXOperator* GeneratorRotatorOperatorDescriptor::CreateOperator() const
 
 void GeneratorRotatorOperator::ApplyChangesOnMesh(const GFXMessage& parMessages, VisualModel* parModel, SkelettonPose* parSkelettonPose, const Carrier* parCarrier)
 {
+    AssertRelease(parSkelettonPose != nullptr);
+    if (FSkelettonJoint == 0xFF)
+    {
+        FSkelettonJoint = parSkelettonPose->GetSkeletton()->FindSkelettonJoint("RotatingPale");
+        AlwaysCheckedAssert(FSkelettonJoint != 0xFF);
+        if (FSkelettonJoint == 0xFF)
+            return;
+    }
+
+    glm::mat4* localPoses = parSkelettonPose->LocalPoses();
+    AssertRelease(localPoses != nullptr);
+    const float angle = FDescriptor->RotationSpeed() * TimeManager::FrameDeltaTime();
+    localPoses[FSkelettonJoint] = glm::rotate(angle, glm::vec3(0.f, 0.f, 1.f)) * localPoses[FSkelettonJoint];
+    parSkelettonPose->SetDirty();
 }
 
 IMPLEMENT_POOL_ALLOCATED(GeneratorRotatorOperator);
