@@ -48,7 +48,7 @@ u8 Skeletton::FindSkelettonJoint(const std::string& parName) const
 SkelettonPose::~SkelettonPose()
 {
     delete[] FLocalPoses;
-    delete[] FSkinningMatrix;
+    delete[] FSkinningMatrices;
 }
 
 void SkelettonPose::InitialiseFromSkeletton()
@@ -57,7 +57,7 @@ void SkelettonPose::InitialiseFromSkeletton()
     AssertRelease(FSkeletton != nullptr);
     const u8 nbBones = FSkeletton->NumberOfBones();
     FLocalPoses = new glm::mat4[nbBones];
-    FSkinningMatrix = new glm::mat4[nbBones];
+    FSkinningMatrices = new glm::mat4[nbBones];
 
     forrange(i, 0, nbBones) { FLocalPoses[i] = glm::inverse(FSkeletton->GetJoint(i).InvBindPose); }
 
@@ -84,7 +84,7 @@ void SkelettonPose::UpdateSkinningMatrix()
     forrange(i, 0, nbBones)
     {
         const SkelettonJoint& joint = FSkeletton->GetJoint(i);
-        FSkinningMatrix[i] = FSkinningMatrix[i] * joint.ModelToJointMatrix;
+        FSkinningMatrices[i] = joint.ModelToJointMatrix * FSkinningMatrices[i];
     }
 
     // in the shader, push the skinning array into u_skinningMatrices
@@ -106,7 +106,7 @@ void SkelettonPose::ComputeSkinningMatrixForJoint(const u8 parIndex, std::vector
     // si on est parent, alors on prend la local pose
     if (joint.ParentId == 0xFF)
     {
-        FSkinningMatrix[parIndex] = FLocalPoses[parIndex];
+        FSkinningMatrices[parIndex] = FLocalPoses[parIndex];
         parComputedCache[parIndex] = true;
         return;
     }
@@ -117,7 +117,7 @@ void SkelettonPose::ComputeSkinningMatrixForJoint(const u8 parIndex, std::vector
         ComputeSkinningMatrixForJoint(joint.ParentId, parComputedCache);
     }
 
-    FSkinningMatrix[parIndex] = FLocalPoses[parIndex] * FSkinningMatrix[joint.ParentId];
+    FSkinningMatrices[parIndex] = FSkinningMatrices[joint.ParentId] * FLocalPoses[parIndex];
     parComputedCache[parIndex] = true;
 }
 
