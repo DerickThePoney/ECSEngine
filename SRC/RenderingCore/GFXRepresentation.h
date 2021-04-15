@@ -70,11 +70,13 @@ public:
 
     const Carrier* GetCarrier() const { return FCarrier.get(); }
     const VisualModel* GetVisualModel() const { return FVisualModel.get(); }
+    const SkelettonPose* GetPose() const { return FSkelettonPose; }
 
     u32 Id() const { return FId; }
 
 private:
     void ProcessMessages();
+    void UpdateOperators();
 
 private:
     std::unique_ptr<Carrier> FCarrier = nullptr;
