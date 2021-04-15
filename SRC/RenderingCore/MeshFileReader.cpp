@@ -69,7 +69,7 @@ void ReadSkelettonImplementation(const MeshHandle parHandle, const MeshFileHeade
             if (computed[joint.ParentId])
             {
                 SkelettonJoint& parent = skeletton->GetJoint(joint.ParentId);
-                joint.ModelToJointMatrix = parent.ModelToJointMatrix * joint.InvBindPose;
+                joint.ModelToJointMatrix = joint.InvBindPose * parent.ModelToJointMatrix;
                 computed[i] = true;
                 continue;
             }
@@ -151,10 +151,10 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
 
         if (fileHeader.layout.HasBones)
         {
-            float nodeIdx = 0.f;
-            parStream.read((c8*)&nodeIdx, sizeof(float));
-            AssertRelease(nodeIdx < fileHeader.NbNodesInHierarchy);
-            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_BONES, 0, nodeIdx);
+            BlendIndices nodeIdx;
+            parStream.read((c8*)&nodeIdx, sizeof(BlendIndices));
+            AssertRelease(nodeIdx.Indices[0] < fileHeader.NbNodesInHierarchy);
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_BONES, 0, nodeIdx.pack);
         }
 
         vertexDataStream.Advance();
@@ -200,6 +200,7 @@ void MeshFileReader::ReadMesh(const MeshHandle parHandle, Mesh*& parMesh, const 
     std::ifstream ifstr(parFilename.c_str(), std::ifstream::binary);
     AssertRelease(ifstr.good());
     ReadMeshImplementation(parHandle, parMesh, ifstr);
+    parMesh->SetMeshFilename(parFilename);
 }
 
 void MeshFileReader::ReadMesh(const MeshHandle parHandle, Mesh*& parMesh, const Resource& parResource)
@@ -209,6 +210,7 @@ void MeshFileReader::ReadMesh(const MeshHandle parHandle, Mesh*& parMesh, const 
     ResourceBuffer buff = handle->GetResourceBuffer();
     std::istream sstr(&buff, std::istream::binary);
     ReadMeshImplementation(parHandle, parMesh, sstr);
+    parMesh->SetMeshFilename(parResource.FName);
 }
 
 } // namespace Rendering
