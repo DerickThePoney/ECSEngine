@@ -43,12 +43,12 @@ bool RenderingLoader::VirtualInitialise()
     GFXKeyHelper::CreateIFP();
     GFXKeyHelper::Instance().Initialise();
 
+    Rendering::SkelettonManager::CreateIFP();
     Rendering::GFXRepresentationManager::CreateIFP();
 
     GameplayFeedbackDrawer::CreateIFP();
     GameplayFeedbackDrawer::Instance().Initialise();
 
-    Rendering::SkelettonManager::CreateIFP();
     Rendering::GFXRepresentationDescriptorManager::CreateIFP();
     AssertRelease(Rendering::GFXRepresentationDescriptorManager::HasInstance());
     {
@@ -70,12 +70,12 @@ void RenderingLoader::VirtualShutdown()
     ILoader::VirtualShutdown();
 
     Rendering::GFXRepresentationDescriptorManager::Destroy();
-    Rendering::SkelettonManager::Destroy();
 
     GameplayFeedbackDrawer::Instance().Shutdown();
     GameplayFeedbackDrawer::Destroy();
 
     Rendering::GFXRepresentationManager::Destroy();
+    Rendering::SkelettonManager::Destroy();
 
     Rendering::MeshManager::Destroy();
 
