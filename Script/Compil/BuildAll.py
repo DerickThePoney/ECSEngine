@@ -46,15 +46,6 @@ def BuildEngine(config, MSBUILD):
 
     return result.returncode
 
-def BuildAll(config, MSBUILD, tools, samples):
-
-    res = BuildBGFX(config, MSBUILD, tools, samples)
-
-    if res != 0:
-        return res
-
-    return BuildEngine(config, MSBUILD)
-
 def BuildSolution():
     print('BUILDING Solution')
     sys.stdout.flush()
@@ -71,6 +62,15 @@ def BuildSolution():
     result = subprocess.run(command)
 
     return result.returncode
+
+def BuildAll(config, MSBUILD, tools, samples):
+
+    res = BuildBGFX(config, MSBUILD, tools, samples)
+
+    if res != 0:
+        return res
+
+    return BuildEngine(config, MSBUILD)
 
 
 def main():
