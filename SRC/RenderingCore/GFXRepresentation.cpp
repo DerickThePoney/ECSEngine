@@ -89,8 +89,11 @@ void GFXRepresentation::Update(float parCurrentTime)
     if (FMessages[FCurrentMessageQueue].HasMessages())
     {
         ProcessMessages();
-        FMessages[FCurrentMessageQueue].ClearMessages();
     }
+
+    UpdateOperators();
+
+    FMessages[FCurrentMessageQueue].ClearMessages();
 
     if (FCarrier != nullptr)
         FCarrier->Update(parCurrentTime);
@@ -135,7 +138,11 @@ void GFXRepresentation::ProcessMessages()
         auto visible = currentMessages.GetValueIFP<bool>(GFXKeyHelper::Instance().Visible);
         FVisualModel->SetVisible(visible.first);
     }
+}
 
+void GFXRepresentation::UpdateOperators()
+{
+    GFXMessage& currentMessages = FMessages[FCurrentMessageQueue];
     foreachitem(op, FGFXOperators)
     {
         if (op->GetMask() & OperatorMask::APPLY_ON_MESH)
