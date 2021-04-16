@@ -230,6 +230,10 @@ jobs:
           mkdir build/
           mkdir bin/
 
+      - name: Clone ENGINE submodules
+        run: py -u Script/Cloning/CloneSubmodules.py -b
+        shell: bash
+
       - name: AssetCooker-Binaries-Release
         uses: actions/download-artifact@v2
         with:
