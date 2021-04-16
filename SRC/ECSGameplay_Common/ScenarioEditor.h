@@ -58,7 +58,9 @@ public:
     void Initialise() override;
     void Destroy() override;
 
-    void Update() override;
+    void GameplayUpdate() override;
+    void UIUpdate() override;
+    void DebugRender() override;
     void Render() override;
 
     const SceneScenario* GetEditedScenario() const { return FCurrentScenario; }

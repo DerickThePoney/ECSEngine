@@ -91,7 +91,7 @@ void GameScenarioUpdater::Destroy()
     Rendering::GameRenderer::Destroy();
 }
 
-void GameScenarioUpdater::Update()
+void GameScenarioUpdater::GameplayUpdate()
 {
     {
         SCOPED_PROFILE(GameScenarioUpdater_GameplayUpdate);
@@ -121,13 +121,19 @@ void GameScenarioUpdater::Update()
         SCOPED_PROFILE(GameScenarioUpdater_SynchroWithRenderingUpdate);
         FRenderingSystem.Update();
     }
+}
 
+void GameScenarioUpdater::UIUpdate()
+{
     {
         SCOPED_PROFILE(GameScenarioUpdater_UIUpdate);
         Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
         FUserInterfaceSystem.Update();
     }
+}
 
+void GameScenarioUpdater::DebugRender()
+{
     {
         SCOPED_PROFILE(GameScenarioUpdater_DebugUpdate);
         Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);

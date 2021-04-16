@@ -36,9 +36,19 @@ void ApplicationUpdater::StartUpdate()
     Rendering::ImGUI::NewFrame();
 }
 
-void ApplicationUpdater::Update()
+void ApplicationUpdater::UpdateGameplay()
 {
-    scene->Update();
+    scene->GameplayUpdate();
+}
+
+void ApplicationUpdater::UIUpdate()
+{
+    scene->UIUpdate();
+}
+
+void ApplicationUpdater::DebugRender()
+{
+    scene->DebugRender();
 }
 
 void ApplicationUpdater::Render()
@@ -103,11 +113,25 @@ void ApplicationUpdaterWrapper::StartUpdate()
     FWrappedGameplayUpdater->StartUpdate();
 }
 
-void ApplicationUpdaterWrapper::Update()
+void ApplicationUpdaterWrapper::GameplayUpdate()
 {
-    SCOPED_PROFILE_CLASS(ApplicationUpdaterWrapper, Update);
+    SCOPED_PROFILE_CLASS(ApplicationUpdaterWrapper, GameplayUpdate);
     AssertRelease(FWrappedGameplayUpdater != nullptr);
-    FWrappedGameplayUpdater->Update();
+    FWrappedGameplayUpdater->UpdateGameplay();
+}
+
+void ApplicationUpdaterWrapper::UIUpdate()
+{
+    SCOPED_PROFILE_CLASS(ApplicationUpdaterWrapper, UIUpdate);
+    AssertRelease(FWrappedGameplayUpdater != nullptr);
+    FWrappedGameplayUpdater->UIUpdate();
+}
+
+void ApplicationUpdaterWrapper::DebugRender()
+{
+    SCOPED_PROFILE_CLASS(ApplicationUpdaterWrapper, DebugRender);
+    AssertRelease(FWrappedGameplayUpdater != nullptr);
+    FWrappedGameplayUpdater->DebugRender();
 }
 
 void ApplicationUpdaterWrapper::Render()
