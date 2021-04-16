@@ -67,7 +67,7 @@ void ScenarioEditor::Destroy()
     delete FEditorSceneObjectPickingRenderer;
 }
 
-void ScenarioEditor::Update()
+void ScenarioEditor::GameplayUpdate()
 {
     UpdateSceneEditorStatus();
 
@@ -229,7 +229,7 @@ void ScenarioEditor::UpdateForInEditorPlaying()
 
     // TODO Editor Playing scene menu
 
-    FInGameScenarioPlayer->Update();
+    FInGameScenarioPlayer->GameplayUpdate();
 }
 
 void ScenarioEditor::UpdateSceneEditorStatus()
@@ -280,6 +280,38 @@ void ScenarioEditor::RenderForEditorPlaying()
 {
     AssertRelease(FInGameScenarioPlayer != nullptr);
     FInGameScenarioPlayer->Render();
+}
+
+void ScenarioEditor::UIUpdate()
+{
+    switch (FState)
+    {
+    case ECSEngine::ScenarioEditorStatus::EDITING_SCENARIO:
+        break;
+    case ECSEngine::ScenarioEditorStatus::PLAYING_SCENARIO:
+        AssertRelease(FInGameScenarioPlayer != nullptr);
+        FInGameScenarioPlayer->UIUpdate();
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
+}
+
+void ScenarioEditor::DebugRender()
+{
+    switch (FState)
+    {
+    case ECSEngine::ScenarioEditorStatus::EDITING_SCENARIO:
+        break;
+    case ECSEngine::ScenarioEditorStatus::PLAYING_SCENARIO:
+        AssertRelease(FInGameScenarioPlayer != nullptr);
+        FInGameScenarioPlayer->DebugRender();
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
 }
 
 } // namespace ECSEngine

@@ -46,7 +46,9 @@ void BaseApplicationLayer::RunMainLoop()
     {
         SCOPED_PROFILE_CLASS(BaseApplicationLayer, RunMainLoop);
         FGameplayUpdater->StartUpdate();
-        FGameplayUpdater->Update();
+        FGameplayUpdater->GameplayUpdate();
+        FGameplayUpdater->UIUpdate();
+        FGameplayUpdater->DebugRender();
         FGameplayUpdater->Render();
         FGameplayUpdater->EndUpdate();
     }

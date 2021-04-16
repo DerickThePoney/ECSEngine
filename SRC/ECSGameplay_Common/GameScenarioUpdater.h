@@ -28,7 +28,9 @@ public:
 
     void Initialise() override;
     void Destroy() override;
-    void Update() override;
+    void GameplayUpdate() override;
+    void UIUpdate() override;
+    void DebugRender() override;
     void Render() override;
 
     void SetScenario(const std::string& parScenarioFile);
