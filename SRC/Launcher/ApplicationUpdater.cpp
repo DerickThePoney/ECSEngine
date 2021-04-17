@@ -38,7 +38,12 @@ void ApplicationUpdater::StartUpdate()
 
 void ApplicationUpdater::UpdateGameplay()
 {
-    scene->GameplayUpdate();
+    while (TimeManager::FrameStartTime() > TimeManager::CurrentGameplayTime())
+    {
+        SCOPED_PROFILE(ApplicationUpdater_OneGameplayTick);
+        TimeManager::NewGameplayTick();
+        scene->GameplayUpdate();
+    }
 }
 
 void ApplicationUpdater::UIUpdate()
