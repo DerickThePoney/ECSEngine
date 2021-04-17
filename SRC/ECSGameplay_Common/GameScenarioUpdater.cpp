@@ -134,28 +134,14 @@ void GameScenarioUpdater::UIUpdate()
 
 void GameScenarioUpdater::DebugRender()
 {
+#ifdef WITH_VISUAL_DEBUG
     {
         SCOPED_PROFILE(GameScenarioUpdater_DebugUpdate);
         Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
         DrawAdjustables();
 
         FPeonHarvestingSytem.Debug();
-    }
-}
 
-void GameScenarioUpdater::Render()
-{
-    {
-        SCOPED_PROFILE(GameScenarioUpdater_RenderingFrame);
-        Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
-
-        Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
-
-        Rendering::GameRenderer::Instance().Render();
-    }
-
-    {
-        SCOPED_PROFILE(GameScenarioUpdater_DebugRendering);
         Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
         u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
         Camera* camera = CameraManager::Instance().GetCamera(camId);
@@ -181,6 +167,19 @@ void GameScenarioUpdater::Render()
         buffer->Submit();
         buffer->clear();
         delete buffer;
+    }
+#endif
+}
+
+void GameScenarioUpdater::Render()
+{
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_RenderingFrame);
+        Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
+
+        Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
+
+        Rendering::GameRenderer::Instance().Render();
     }
 }
 
