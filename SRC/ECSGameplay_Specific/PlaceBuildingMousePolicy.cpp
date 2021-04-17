@@ -24,6 +24,10 @@ PlaceBuildingMousePolicy::PlaceBuildingMousePolicy()
 {
     FValidateInputCommand.FMouseButton = MouseButtons::MOUSE_BUTTON_1;
     FValidateInputCommand.FInputType = EInputType::RELEASED;
+
+    FShiftedValidationCommand.FMouseButton = MouseButtons::MOUSE_BUTTON_1;
+    FShiftedValidationCommand.FInputType = EInputType::RELEASED;
+    FShiftedValidationCommand.FShift = true;
 }
 
 void PlaceBuildingMousePolicy::SetupMousePolicy(const std::string& parBuildingTemplateName)
@@ -88,14 +92,17 @@ void PlaceBuildingMousePolicy::VirtualUpdate()
             FBuildingProxy->PushMessage<bool>(GFXKeyHelper::Instance().Visible, true, TimeManager::FrameStartTime());
             FBuildingProxy->PushMessage<glm::vec3>(GFXKeyHelper::Instance().Position, accessor.CellPosition(), TimeManager::FrameStartTime());
 
-            if (FValidateInputCommand.Evaluate())
+            const bool validateNormal = FValidateInputCommand.Evaluate();
+            const bool validateShifted = FShiftedValidationCommand.Evaluate();
+            if (validateNormal || validateShifted)
             {
                 ConstructBuildingMessage* message = new ConstructBuildingMessage();
                 message->FTemplateName = FTemplate->GetName();
                 message->FPosition = accessor.CellPosition();
                 GenericMessageManager::Instance().PushMessage<GenericMessageId::PLACE_BUILDING, ConstructBuildingMessage>(message);
                 accessor.SetOccupied(true, FCellOccupancy);
-                Deactivate();
+                if (validateNormal && !validateShifted)
+                    Deactivate();
                 return;
             }
         }
