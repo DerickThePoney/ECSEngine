@@ -83,7 +83,7 @@ void MovementSystem::VirtualUpdate()
     std::vector<PathfindingResult> results;
     Pathfinding::RetrieveResults(results);
 
-    const float dt = TimeManager::FrameDeltaTime();
+    const float dt = TimeManager::GameplayDeltaTime();
 
     foreachitemconst(result, results)
     {

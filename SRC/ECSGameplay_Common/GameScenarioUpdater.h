@@ -13,7 +13,6 @@
 #include "ECSGameplay_Specific/WorkSystem.h"
 #include "IScenarioUpdater.h"
 #include "MovementSystem.h"
-#include "OrientationSystem.h"
 #include "Rendering/GameRenderer.h"
 #include "SynchroWithRenderSystem.h"
 

@@ -46,7 +46,7 @@ void PeonFeedingTimeSystem::VirtualUpdate()
     std::vector<EntityId> deadIds;
     foreachitem(lifeSpan, lifeSpanAccessor)
     {
-        const float newLifeSpan = lifeSpan.RemainingTimeBeforeNextFeed() - TimeManager::FrameDeltaTime();
+        const float newLifeSpan = lifeSpan.RemainingTimeBeforeNextFeed() - TimeManager::GameplayDeltaTime();
         lifeSpan.SetRemainingTimeBeforeNextFeedingTime(newLifeSpan);
 
         if (newLifeSpan <= 0.f)

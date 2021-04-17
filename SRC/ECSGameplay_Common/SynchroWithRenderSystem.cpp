@@ -50,8 +50,8 @@ void UpdateObjectsForRendering()
         AssertRelease(orientationModule != nullptr);
 
         Rendering::GFXRepresentationProxy* proxy = apparenceModule.Proxy();
-        proxy->PushMessage<glm::vec3>(GFXKeyHelper::Instance().Position, positionModule->GetPosition3D(), TimeManager::FrameStartTime());
-        proxy->PushMessage<glm::quat>(GFXKeyHelper::Instance().Orientation, orientationModule->GetOrientation(), TimeManager::FrameStartTime());
+        proxy->PushMessage<glm::vec3>(GFXKeyHelper::Instance().Position, positionModule->GetPosition3D(), TimeManager::CurrentGameplayTime());
+        proxy->PushMessage<glm::quat>(GFXKeyHelper::Instance().Orientation, orientationModule->GetOrientation(), TimeManager::CurrentGameplayTime());
     }
 }
 

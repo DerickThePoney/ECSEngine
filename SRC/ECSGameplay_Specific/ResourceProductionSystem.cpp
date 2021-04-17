@@ -35,7 +35,7 @@ void ResourceProductionSystem::VirtualUpdate()
 
         const u32 remainingStorageSpace = producerStorage->GetRemainingStorageSpace();
         u32 producedResources = 0;
-        const float dt = TimeManager::FrameDeltaTime();
+        const float dt = TimeManager::GameplayDeltaTime();
         MemoryView<ResourceProductionModule::ProducedResourceTiming> resourceTimings = producer.ProducedResourcesTimings();
         foreachitem(resource, resourceTimings)
         {

@@ -107,10 +107,8 @@ void GameScenarioUpdater::GameplayUpdate()
         FPeonSpawnSystem.Update();
         FPeonLifeSpanSystem.Update();
         FResourceStatsUpdateSystem.Update();
-        FColonyFeedbackSystem.Update();
         FHousingSystem.Update();
         FWorkSystem.Update();
-        MousePolicyManager::Instance().Update();
 
         FColonyBuildingSystem.Update();
 
@@ -125,6 +123,10 @@ void GameScenarioUpdater::GameplayUpdate()
 
 void GameScenarioUpdater::UIUpdate()
 {
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_UIUpdate_MousePolicies);
+        MousePolicyManager::Instance().Update();
+    }
     {
         SCOPED_PROFILE(GameScenarioUpdater_UIUpdate);
         Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
@@ -175,6 +177,8 @@ void GameScenarioUpdater::Render()
 {
     {
         SCOPED_PROFILE(GameScenarioUpdater_RenderingFrame);
+        FColonyFeedbackSystem.Update();
+
         Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
 
         Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());

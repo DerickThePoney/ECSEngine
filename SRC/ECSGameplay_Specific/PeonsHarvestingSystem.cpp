@@ -261,7 +261,7 @@ void PeonsHaverstingSystem::VirtualUpdate()
                 break;
             }
 
-            const float currentRemainingTime = harvester.RemainingHarvestingDuration() - TimeManager::FrameDeltaTime();
+            const float currentRemainingTime = harvester.RemainingHarvestingDuration() - TimeManager::GameplayDeltaTime();
             harvester.SetRemainingHarvestingDuration(currentRemainingTime);
             if (currentRemainingTime <= 0.f)
             {
