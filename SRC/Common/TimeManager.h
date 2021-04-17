@@ -4,10 +4,13 @@ namespace ECSEngine
 {
 namespace TimeManager
 {
-void Start();
+void Create();
 void NewFrame();
+void NewGameplayTick();
 void End();
 
+constexpr float GameplayDeltaTime();
+const u32 GameplayCurrentTick();
 const float FrameDeltaTime();
 const float FrameStartTime();
 const float DurationSinceStartRealTime();

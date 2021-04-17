@@ -2,46 +2,38 @@
 
 #include "TimeManager.h"
 
+#include "Logger.h"
 #include "Singleton.h"
 #include "Timer.h"
 
 namespace ECSEngine
 {
+constexpr float GameplayTickSize = 0.1f;
 
 class TimeManagerImpl : public Singleton<TimeManagerImpl>
 {
 public:
-    TimeManagerImpl();
-    ~TimeManagerImpl();
-
     void Start();
     void NewFrame();
+    void NewGameplayTick();
     void End();
 
-    const float FrameDeltaTime() const { return FFrameDeltaTime; }
-    const float FrameStartTime() const { return FFrameStartTime; }
-    const float DurationSinceStartRealTime() const { return FGlobalTimer.PeekDurationSinceStart<ETimePeriod::SECONDS>(); }
-    const u32 GetFrameNumber() const { return FFrameNumber; }
+    float FrameDeltaTime() const { return FFrameDeltaTime; }
+    float FrameStartTime() const { return FFrameStartTime; }
+    float DurationSinceStartRealTime() const { return FGlobalTimer.PeekDurationSinceStart<ETimePeriod::SECONDS>(); }
+    u32 GetFrameNumber() const { return FFrameNumber; }
+    u32 CurrentGameplayTick() const { return FCurrentGameplayTick; }
+    float CurrentGameplayTime() const { return FCurrentGameplayTick * GameplayTickSize; }
 
 private:
     Timer FGlobalTimer;
     Timer FFrameDurationTimer;
 
-    float FFrameStartTime;
-    float FFrameDeltaTime;
-    u32 FFrameNumber;
+    float FFrameStartTime = 0.f;
+    float FFrameDeltaTime = 0.f;
+    u32 FFrameNumber = 0;
+    u32 FCurrentGameplayTick = 0;
 };
-
-TimeManagerImpl::TimeManagerImpl()
-    : Singleton()
-    , FFrameDeltaTime(0.0f)
-    , FFrameNumber(0)
-{
-}
-
-TimeManagerImpl::~TimeManagerImpl()
-{
-}
 
 void TimeManagerImpl::Start()
 {
@@ -50,6 +42,9 @@ void TimeManagerImpl::Start()
 
 void TimeManagerImpl::NewFrame()
 {
+    if (!FGlobalTimer.Running())
+        Start();
+
     if (FFrameNumber != 0)
     {
         FFrameDurationTimer.Stop();
@@ -61,6 +56,14 @@ void TimeManagerImpl::NewFrame()
     ++FFrameNumber;
 }
 
+void TimeManagerImpl::NewGameplayTick()
+{
+    FCurrentGameplayTick++;
+
+    AlwaysCheckedAssert(FFrameDeltaTime >= FFrameStartTime - CurrentGameplayTime());
+    FFrameDeltaTime = std::min(FFrameDeltaTime, FFrameStartTime - CurrentGameplayTime());
+}
+
 void TimeManagerImpl::End()
 {
     FGlobalTimer.Stop();
@@ -69,10 +72,9 @@ void TimeManagerImpl::End()
 namespace TimeManager
 {
 
-void Start()
+void Create()
 {
     TimeManagerImpl::CreateIFP();
-    TimeManagerImpl::Instance().Start();
 }
 
 void NewFrame()
@@ -80,10 +82,26 @@ void NewFrame()
     TimeManagerImpl::Instance().NewFrame();
 }
 
+void NewGameplayTick()
+{
+    LOG_GAMEPLAY(fmt::format("Current gameplay tick {}", TimeManagerImpl::Instance().CurrentGameplayTick()));
+    TimeManagerImpl::Instance().CurrentGameplayTick();
+}
+
 void End()
 {
     TimeManagerImpl::Instance().End();
     TimeManagerImpl::Destroy();
+}
+
+constexpr float GameplayDeltaTime()
+{
+    return GameplayTickSize;
+}
+
+const u32 GameplayCurrentTick()
+{
+    return TimeManagerImpl::Instance().CurrentGameplayTick();
 }
 
 const float FrameDeltaTime()
