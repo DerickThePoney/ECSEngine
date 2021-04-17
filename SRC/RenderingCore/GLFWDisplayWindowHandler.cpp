@@ -61,7 +61,7 @@ void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, in
 #else
         io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 #endif
-        ctrl = ctrl || io.KeyShift;
+        ctrl = ctrl || io.KeyCtrl;
         shift = shift || io.KeyShift;
         alt = alt || io.KeyAlt;
     }
