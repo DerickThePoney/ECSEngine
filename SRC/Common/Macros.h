@@ -57,3 +57,7 @@ ReverseWrapper<T> reverse(T&& container)
 #ifdef PROFILE_CODE
 #define ENABLE_PROFILING
 #endif
+
+#ifdef FINAL
+#define COMPILE_FINAL
+#endif

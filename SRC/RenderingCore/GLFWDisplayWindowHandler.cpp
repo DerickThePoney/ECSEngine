@@ -163,7 +163,18 @@ void GLFWDisplayWindowHandler::Init()
     if (FWindow != nullptr)
         Destroy();
 
-    FWindow = glfwCreateWindow(FWidth, FHeight, FName.c_str(), nullptr, nullptr);
+    GLFWmonitor* monitor = nullptr;
+
+#ifdef COMPILE_FINAL
+    monitor = glfwGetPrimaryMonitor();
+    AssertRelease(monitor != nullptr);
+    const GLFWvidmode* resolution = glfwGetVideoMode(monitor);
+    AssertRelease(resolution != nullptr);
+    FWidth = resolution->width;
+    FHeight = resolution->height;
+#endif
+
+    FWindow = glfwCreateWindow(FWidth, FHeight, FName.c_str(), monitor, nullptr);
     AssertRelease(FWindow != nullptr);
 
     glfwSetWindowSizeCallback(FWindow, &WindowSizeCallback);
