@@ -69,12 +69,9 @@ void ScenarioEditor::Destroy()
 
 void ScenarioEditor::GameplayUpdate()
 {
-    UpdateSceneEditorStatus();
-
     switch (FState)
     {
     case ECSEngine::ScenarioEditorStatus::EDITING_SCENARIO:
-        UpdateForSceneEditing();
         break;
     case ECSEngine::ScenarioEditorStatus::PLAYING_SCENARIO:
         UpdateForInEditorPlaying();
@@ -99,6 +96,8 @@ void ScenarioEditor::Render()
         AssertNotReached();
         break;
     }
+
+    UpdateSceneEditorStatus();
 }
 
 void ScenarioEditor::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect)
@@ -287,6 +286,7 @@ void ScenarioEditor::UIUpdate()
     switch (FState)
     {
     case ECSEngine::ScenarioEditorStatus::EDITING_SCENARIO:
+        UpdateForSceneEditing();
         break;
     case ECSEngine::ScenarioEditorStatus::PLAYING_SCENARIO:
         AssertRelease(FInGameScenarioPlayer != nullptr);
