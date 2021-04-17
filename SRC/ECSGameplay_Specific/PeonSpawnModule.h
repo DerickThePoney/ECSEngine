@@ -34,7 +34,7 @@ public:
     ~PeonSpawnModule();
 
     bool RequestedPeonCreation() const { return FRequestedPeonCreation; }
-    void RequestPeonSapwn(SpawnPeonOrder&& parSpawnOrder)
+    void RequestPeonSpawn(SpawnPeonOrder&& parSpawnOrder)
     {
         FSpawnOrder = std::move(parSpawnOrder);
         FRequestedPeonCreation = true;

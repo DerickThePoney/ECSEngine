@@ -139,7 +139,7 @@ void ColonySelectionPanelController::VirtualUpdate()
             }
             if (ImGui::Button(fmt::format("Spawn {}", peonTemplateName).c_str()) && !disabled)
             {
-                peonSpawnModule->RequestPeonSapwn(SpawnPeonOrder(colonyId, spawnRule));
+                peonSpawnModule->RequestPeonSpawn(SpawnPeonOrder(colonyId, spawnRule));
             }
             ImGui::SameLine();
 
