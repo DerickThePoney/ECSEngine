@@ -49,7 +49,11 @@ public:
 
     void StartUpdate() override;
 
-    void Update() override;
+    void GameplayUpdate() override;
+
+    void UIUpdate() override;
+
+    void DebugRender() override;
 
     void Render() override;
 
