@@ -31,5 +31,6 @@ private:
     u32 FCellOccupancy = 1;
 
     MouseButtonCommand FValidateInputCommand;
+    MouseButtonCommand FShiftedValidationCommand;
 };
 } // namespace ECSEngine
