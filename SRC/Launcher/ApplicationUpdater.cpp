@@ -2,7 +2,9 @@
 
 #include "ApplicationUpdater.h"
 
+#include "Common/MainOptions.h"
 #include "Common/TimeManager.h"
+#include "ECSGameplay_Common/GameScenarioUpdater.h"
 #include "ECSGameplay_Common/ScenarioEditor.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -13,7 +15,18 @@ namespace ECSEngine
 
 void ApplicationUpdater::Initialise()
 {
-    scene = new ScenarioEditor();
+#ifndef COMPILE_FINAL
+    if (Options.IsUsingEditor)
+    {
+        scene = new ScenarioEditor();
+    }
+    else
+    {
+        scene = new GameScenarioUpdater();
+    }
+#else
+    scene = new GameScenarioUpdater();
+#endif
     scene->Initialise();
 }
 

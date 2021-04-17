@@ -3,12 +3,15 @@
 #include "Application/BaseApplication.h"
 #include "Application/CommonLoaders.h"
 #include "ApplicationUpdater.h"
+#include "Common/MainOptions.h"
 #include "ECSGameplay_Common/ECSLoader.h"
 #include "ECSGameplay_Specific/GameplaySpecificLoader.h"
 #include "RenderingCore/RenderingLoader.h"
 
 int main(int argc, char** argv)
 {
+    ECSEngine::ReadMainCommandLine(argc, argv);
+
     ECSEngine::Profiling::StartProfiler();
     ECSEngine::BaseApplicationLayer app;
 
