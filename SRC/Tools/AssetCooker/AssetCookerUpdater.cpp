@@ -118,12 +118,6 @@ void AssetCookerUpdaterWrapper::StartUpdate()
     FWrappedGameplayUpdater->StartUpdate();
 }
 
-void AssetCookerUpdaterWrapper::Update()
-{
-    AssertRelease(FWrappedGameplayUpdater != nullptr);
-    FWrappedGameplayUpdater->Update();
-}
-
 void AssetCookerUpdaterWrapper::Render()
 {
     AssertRelease(FWrappedGameplayUpdater != nullptr);
@@ -134,6 +128,20 @@ void AssetCookerUpdaterWrapper::EndUpdate()
 {
     AssertRelease(FWrappedGameplayUpdater != nullptr);
     FWrappedGameplayUpdater->EndUpdate();
+}
+
+void AssetCookerUpdaterWrapper::GameplayUpdate()
+{
+    AssertRelease(FWrappedGameplayUpdater != nullptr);
+    FWrappedGameplayUpdater->Update();
+}
+
+void AssetCookerUpdaterWrapper::UIUpdate()
+{
+}
+
+void AssetCookerUpdaterWrapper::DebugRender()
+{
 }
 
 } // namespace ECSEngine
