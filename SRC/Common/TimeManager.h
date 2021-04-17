@@ -9,7 +9,8 @@ void NewFrame();
 void NewGameplayTick();
 void End();
 
-constexpr float GameplayDeltaTime();
+const float GameplayDeltaTime();
+const float CurrentGameplayTime();
 const u32 GameplayCurrentTick();
 const float FrameDeltaTime();
 const float FrameStartTime();

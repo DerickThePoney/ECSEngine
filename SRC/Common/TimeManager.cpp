@@ -60,8 +60,7 @@ void TimeManagerImpl::NewGameplayTick()
 {
     FCurrentGameplayTick++;
 
-    AlwaysCheckedAssert(FFrameDeltaTime >= FFrameStartTime - CurrentGameplayTime());
-    FFrameDeltaTime = std::min(FFrameDeltaTime, FFrameStartTime - CurrentGameplayTime());
+    AlwaysCheckedAssert(FFrameStartTime <= CurrentGameplayTime());
 }
 
 void TimeManagerImpl::End()
@@ -85,7 +84,7 @@ void NewFrame()
 void NewGameplayTick()
 {
     LOG_GAMEPLAY(fmt::format("Current gameplay tick {}", TimeManagerImpl::Instance().CurrentGameplayTick()));
-    TimeManagerImpl::Instance().CurrentGameplayTick();
+    TimeManagerImpl::Instance().NewGameplayTick();
 }
 
 void End()
@@ -94,9 +93,14 @@ void End()
     TimeManagerImpl::Destroy();
 }
 
-constexpr float GameplayDeltaTime()
+const float GameplayDeltaTime()
 {
     return GameplayTickSize;
+}
+
+const float CurrentGameplayTime()
+{
+    return GameplayCurrentTick() * GameplayDeltaTime();
 }
 
 const u32 GameplayCurrentTick()
