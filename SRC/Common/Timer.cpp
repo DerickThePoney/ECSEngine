@@ -6,9 +6,8 @@ namespace ECSEngine
 Timer::Timer(bool parStartImmediately /*= false*/)
     : FStart()
     , FEnd()
-#ifdef PERFORM_SECURITY_CHECKS
     , FRunning(false)
-#endif
+
 {
     if (parStartImmediately)
         Start();

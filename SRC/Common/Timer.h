@@ -74,6 +74,8 @@ public:
         return -1.f;
     }
 
+    bool Running() const { return FRunning; }
+
 private:
     const float ElapsedTimeInSeconds(const std::chrono::high_resolution_clock::time_point& parTo) const;
     const float ElapsedTimeInMilliseconds(const std::chrono::high_resolution_clock::time_point& parTo) const;

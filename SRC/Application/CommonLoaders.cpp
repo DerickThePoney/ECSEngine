@@ -42,7 +42,7 @@ bool LoaderInitialiseCommonResources::VirtualInitialise()
     Logger::InitLogger();
 
     // Time
-    TimeManager::Start();
+    TimeManager::Create();
 
     // Global resources
     GlobalResourceCache::CreateIFP();
