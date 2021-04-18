@@ -12,6 +12,7 @@
 
 .'$GameName$Projects' = {}
 .AssetCookerProjects = {}
+.DataPackerProjects = {}
 
 #include "Projects/External/Assimp.bff"
 #include "Projects/External/RenderingLibs.bff"
@@ -28,6 +29,7 @@
 #include "Projects/imgui.bff"
 #include "Projects/imguitools.bff"
 
+#include "Projects/DataPack.bff"
 #include "Projects/Common.bff"
 #include "Projects/Application.bff"
 #include "Projects/ECSCore.bff"
@@ -40,12 +42,20 @@
 
 #include "Projects/Launcher.bff"
 #include "Projects/AssetCooker.bff"
+#include "Projects/DataPacker.bff"
 
 {
     .ExeName = .GameName
     .ProjectList = .'$GameName$Projects'
     #include "Utils/Executable.bff"
 }
+
+{
+    .ExeName = 'DataPacker'
+    .ProjectList = .DataPackerProjects
+    #include "Utils/Executable.bff"
+}
+
 
 {
     ^AdditionalLibs_x64_Debug + {'assimp-vc142-mtd'}
@@ -58,10 +68,11 @@
     #include "Utils/Executable.bff"
 }
 
+
 #include "Utils/BuildSolutionProjects.bff"
 
 {
-    .ProjectList = .'$GameName$Projects' + .AssetCookerProjects
+    .ProjectList = .'$GameName$Projects' + .AssetCookerProjects + .DataPackerProjects
     Print(.ProjectList)
     #include "Utils/SolutionFile.bff"
 }
@@ -74,6 +85,15 @@ Alias('all')
 ForEach(.SolutionConfig in .SolutionConfigs)
 {
     Using(.SolutionConfig)
+
+    {
+        .ExeName = 'DataPacker'
+        Alias('Build-$ExeName$-$Platform$-$Config$')
+        {
+            .Targets = {'$ExeName$-Exe-$Platform$-$Config$'}
+        }
+    }
+
     {
         .ExeName = 'AssetCooker'
         Alias('Build-$ExeName$-$Platform$-$Config$')
