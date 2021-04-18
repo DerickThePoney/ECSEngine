@@ -40,7 +40,7 @@ def BuildEngine(config, MSBUILD):
     if result.returncode != 0:
         return result.returncode
 
-    command = ['./tools/FBuild.exe', '-summary', 'Build-BuildingGame-x64-%s'%(config), 'Build-AssetCooker-x64-%s'%(config)]
+    command = ['./tools/FBuild.exe', '-summary', 'Build-BuildingGame-x64-%s'%(config), 'Build-AssetCooker-x64-%s'%(config), 'Build-DataPacker-x64-%s'%(config)]
 
     result = subprocess.run(command)
 
