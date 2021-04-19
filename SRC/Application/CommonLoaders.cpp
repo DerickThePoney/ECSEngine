@@ -44,16 +44,6 @@ bool LoaderInitialiseCommonResources::VirtualInitialise()
     // Time
     TimeManager::Create();
 
-    // Global resources
-    GlobalResourceCache::CreateIFP();
-    GlobalResourceCache::Instance().FCache = new ResourceCache(10, new ResourceFileDirectoryView(FAssetDirectory));
-
-    if (!GlobalResourceCache::Instance().FCache->Initialize())
-    {
-        AssertNotReachedMsg("Unable to init the resource cache!!");
-        return false;
-    }
-
     // CameraManager
     CameraManager::CreateIFP();
     return true;
@@ -63,7 +53,6 @@ void LoaderInitialiseCommonResources::VirtualShutdown()
 {
     ILoader::VirtualShutdown();
     CameraManager::Destroy();
-    GlobalResourceCache::Destroy();
     TimeManager::End();
     ECSEngine::Logger::ShutdownLogger();
 }

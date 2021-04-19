@@ -6,7 +6,14 @@ struct MainOptions
 {
     bool IsUsingEditor = false;
 };
-
 extern MainOptions Options;
 extern void ReadMainCommandLine(int argc, char** argv);
+
+namespace Configuration
+{
+extern const char* AssetsDirectory;
+}
+
+bool InitialiseGlobalCache();
+void DestroyGlobalCache();
 } // namespace ECSEngine

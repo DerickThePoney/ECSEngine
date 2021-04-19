@@ -3,14 +3,21 @@
 #include "Application/BaseApplication.h"
 #include "Application/CommonLoaders.h"
 #include "AssetCookerUpdater.h"
+#include "Common/MainOptions.h"
 
 int main(int argc, char** argv)
 {
     ECSEngine::BaseApplicationLayer app;
 
+    if (!ECSEngine::InitialiseGlobalCache())
+    {
+        ECSEngine::DestroyGlobalCache();
+        return -1;
+    }
+
     try
     {
-        app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>("..\\Assets");
+        app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>();
         app.SetGameplayUpdater_StealOwnership(new ECSEngine::AssetCookerUpdaterWrapper());
 
         app.Initialise();
@@ -22,6 +29,9 @@ int main(int argc, char** argv)
         std::cerr << "Unhandled exception!" << std::endl << e.what() << std::endl;
         return -1;
     }
+
+    // destroy Resources
+    ECSEngine::DestroyGlobalCache();
 
     return 0;
 }

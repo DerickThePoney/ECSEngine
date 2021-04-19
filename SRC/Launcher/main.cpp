@@ -4,6 +4,9 @@
 #include "Application/CommonLoaders.h"
 #include "ApplicationUpdater.h"
 #include "Common/MainOptions.h"
+#include "Common/Resource.h"
+#include "Common/ResourceCache.h"
+#include "Common/ResourceHandle.h"
 #include "ECSGameplay_Common/ECSLoader.h"
 #include "ECSGameplay_Specific/GameplaySpecificLoader.h"
 #include "RenderingCore/RenderingLoader.h"
@@ -13,18 +16,29 @@ int main(int argc, char** argv)
     ECSEngine::ReadMainCommandLine(argc, argv);
 
     ECSEngine::Profiling::StartProfiler();
+    if (!ECSEngine::InitialiseGlobalCache())
+    {
+        ECSEngine::DestroyGlobalCache();
+        ECSEngine::Profiling::EndProfiler();
+        return -1;
+    }
+
     ECSEngine::BaseApplicationLayer app;
 
     {
         try
         {
-            std::ifstream ifstr("..\\Assets\\Configuration\\BaseApplication.json");
-            cereal::JSONInputArchive ar(ifstr);
+            ECSEngine::Resource baseApplication("Configuration\\BaseApplication.json");
+            std::shared_ptr<ECSEngine::ResourceHandle> handle = ECSEngine::GlobalResourceCache::Instance().FCache->GetResourceHandle(&baseApplication);
+            ECSEngine::ResourceBuffer buff = handle->GetResourceBuffer();
+            std::istream sstr(&buff, std::istream::in);
+            cereal::JSONInputArchive ar(sstr);
             ar(app);
         }
         catch (std::exception e)
         {
-            app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>("..\\Assets");
+#ifndef COMPILE_FINAL
+            app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>();
             app.AddNewLoader<ECSEngine::ECSLoader>("\\Configuration\\EntityTemplates.json");
             app.AddNewLoader<ECSEngine::RenderingLoader>("Base Application");
             app.AddNewLoader<ECSEngine::ECSGameplaySpecificLoader>("\\Configuration\\GameplayRules.json");
@@ -36,6 +50,7 @@ int main(int argc, char** argv)
                 cereal::JSONOutputArchive outputArchive(ofstr);
                 outputArchive(app);
             }
+#endif
 
             return -1;
         }
@@ -47,6 +62,7 @@ int main(int argc, char** argv)
 
     app.Shutdown();
 
+    ECSEngine::DestroyGlobalCache();
     ECSEngine::Profiling::EndProfiler();
 
     return 0;
