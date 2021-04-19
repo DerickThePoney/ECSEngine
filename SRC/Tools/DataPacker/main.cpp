@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "Application/BaseApplication.h"
+#include "Common/MainOptions.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFileDirectoryView.h"
 #include "DataPack/DataPackReader.h"
@@ -8,12 +10,9 @@
 int main(int argc, char** argv)
 {
     // Global resources
-    ECSEngine::GlobalResourceCache::CreateIFP();
-    ECSEngine::GlobalResourceCache::Instance().FCache = new ECSEngine::ResourceCache(10, new ECSEngine::ResourceFileDirectoryView("..\\Assets"));
-
-    if (!ECSEngine::GlobalResourceCache::Instance().FCache->Initialize())
+    if (!ECSEngine::InitialiseGlobalCache())
     {
-        AssertNotReachedMsg("Unable to init the resource cache!!");
+        ECSEngine::DestroyGlobalCache();
         return -1;
     }
 
@@ -39,9 +38,15 @@ int main(int argc, char** argv)
     {
         ECSEngine::DataPack::DataPackFile<ECSEngine::DataPack::Access::READ> packer;
         packer.ReadDataPack("..\\Assets.datapack");
+
+        ECSEngine::Resource r("Configuration\\BaseApplication.json");
+        u32 size = packer.FileExists_ReturnFileSize(r.FName);
+        c8* buffer = new c8[size];
+        packer.CopyFileBuffer_AssumesSufficientCapacity(r.FName, buffer);
+        delete[] buffer;
     }
 
     // destroy Resources
-    ECSEngine::GlobalResourceCache::Destroy();
+    ECSEngine::DestroyGlobalCache();
     return 0;
 }
