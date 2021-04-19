@@ -14,7 +14,9 @@ MainOptions Options;
 
 int main(int argc, char** argv)
 {
+#ifndef COMPILE_FINAL
     ECSEngine::Options.NoDatapack = true;
+#endif
     // Global resources
     if (!ECSEngine::InitialiseGlobalCache())
     {

@@ -12,7 +12,9 @@ MainOptions Options;
 
 int main(int argc, char** argv)
 {
+#ifndef COMPILE_FINAL
     ECSEngine::Options.NoDatapack = true;
+#endif
 
     ECSEngine::BaseApplicationLayer app;
 
