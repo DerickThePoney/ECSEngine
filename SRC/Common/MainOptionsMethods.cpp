@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "DataPackDirectoryView.h"
 #include "MainOptions.h"
 #include "ResourceCache.h"
 #include "ResourceFileDirectoryView.h"
@@ -10,7 +11,15 @@ bool InitialiseGlobalCache()
 {
     // Global resources
     GlobalResourceCache::CreateIFP();
-    GlobalResourceCache::Instance().FCache = new ResourceCache(10, new ResourceFileDirectoryView(Configuration::AssetsDirectory));
+
+#ifdef COMPILE_FINAL
+    GlobalResourceCache::Instance().FCache = new ResourceCache(10, new DataPackDirectoryView(Configuration::AssetsDirectory));
+#else
+    if (Options.NoDatapack)
+        GlobalResourceCache::Instance().FCache = new ResourceCache(10, new ResourceFileDirectoryView(Configuration::AssetsDirectory));
+    else
+        GlobalResourceCache::Instance().FCache = new ResourceCache(10, new DataPackDirectoryView(std::string(Configuration::AssetsDirectory) + ".datapack"));
+#endif
 
     if (!GlobalResourceCache::Instance().FCache->Initialize())
     {

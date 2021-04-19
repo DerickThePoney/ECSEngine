@@ -71,11 +71,11 @@ public:
         return fileRecord->FileByteSize;
     }
 
-    void CopyFileBuffer_AssumesSufficientCapacity(const std::string& parFilename, c8* outBuffer) const
+    u32 CopyFileBuffer_AssumesSufficientCapacity(const std::string& parFilename, c8* outBuffer) const
     {
         auto it = FFilenameToFileOffsetMap.find(parFilename);
         if (it == FFilenameToFileOffsetMap.end())
-            return;
+            return -1;
 
         AssertRelease(it->second < (u32)FFileOffsets.size());
         FileOffset currentOffset = FFileOffsets[it->second];
@@ -89,7 +89,12 @@ public:
         AssertRelease(fileRecord->FileNameByteSize > 0);
 
         memcpy(outBuffer, FDataPackBuffer + currentOffset + fileRecord->FileNameByteSize, fileRecord->FileByteSize);
+        return fileRecord->FileByteSize;
     }
+
+    const std::map<std::string, u32>& FilenamesToFileOffsetMap() const { return FFilenameToFileOffsetMap; }
+
+    u32 NumberOfResources() const { return FFileOffsets.size(); }
 
 private:
     DataPackHeader FHeader;

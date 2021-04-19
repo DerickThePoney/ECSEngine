@@ -14,8 +14,14 @@ void ReadMainCommandLine(int argc, char** argv)
         if (strcmp(argv[i], "--editor") == 0)
         {
             Options.IsUsingEditor = true;
-            ++i;
         }
+#ifndef COMPILE_FINAL
+        else if (strcmp(argv[i], "--nodatapack") == 0)
+        {
+            Options.NoDatapack = true;
+        }
+#endif
+        ++i;
     }
 }
 } // namespace ECSEngine
