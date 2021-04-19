@@ -29,30 +29,26 @@ private:
 class LoaderInitialiseCommonResources final : public ILoader
 {
 public:
-    LoaderInitialiseCommonResources(const std::string& parDirectory = "dummy")
+    LoaderInitialiseCommonResources()
         : ILoader()
-        , FAssetDirectory(parDirectory)
     {
     }
 
     template<typename Archive>
     void save(Archive& ar) const
     {
-        ar(cereal::base_class<ILoader>(this), PROPERTY(AssetDirectory));
+        ar(cereal::base_class<ILoader>(this));
     }
 
     template<typename Archive>
     void load(Archive& ar)
     {
-        ar(cereal::base_class<ILoader>(this), PROPERTY(AssetDirectory));
+        ar(cereal::base_class<ILoader>(this));
     }
 
 protected:
     bool VirtualInitialise() override;
     void VirtualShutdown() override;
-
-private:
-    std::string FAssetDirectory = "DummyDir";
 };
 } // namespace ECSEngine
 
