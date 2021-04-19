@@ -4,7 +4,9 @@
 
 #include "Common/GenericMessageManager.h"
 #include "Common/RandomGenerator.h"
+#include "Common/Resource.h"
 #include "Common/ResourceCache.h"
+#include "Common/ResourceHandle.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/EntityTemplate.h"
 #include "ECSCore/EntityTemplateManager.h"
@@ -38,9 +40,11 @@ bool ECSLoader::VirtualInitialise()
     EntityTemplateManager::CreateIFP();
     AssertRelease(EntityTemplateManager::HasInstance());
     {
-        std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + FEntityTemplatesFile);
-
-        cereal::JSONInputArchive archive(ifstr);
+        Resource r(FEntityTemplatesFile);
+        auto handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
+        ResourceBuffer buff = handle->GetResourceBuffer();
+        std::istream istr(&buff, std::istream::in);
+        cereal::JSONInputArchive archive(istr);
         archive(NAMEDPROPERTY("EntityTemplatesList", EntityTemplateManager::Instance()));
     }
 

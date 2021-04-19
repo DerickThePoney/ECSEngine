@@ -7,8 +7,14 @@
 #include "DataPack/DataPackReader.h"
 #include "DataPack/DataPackWriter.h"
 
+namespace ECSEngine
+{
+MainOptions Options;
+} // namespace ECSEngine
+
 int main(int argc, char** argv)
 {
+    ECSEngine::Options.NoDatapack = true;
     // Global resources
     if (!ECSEngine::InitialiseGlobalCache())
     {
@@ -33,17 +39,6 @@ int main(int argc, char** argv)
         }
 
         packer.Finalize("..\\Assets.datapack");
-    }
-
-    {
-        ECSEngine::DataPack::DataPackFile<ECSEngine::DataPack::Access::READ> packer;
-        packer.ReadDataPack("..\\Assets.datapack");
-
-        ECSEngine::Resource r("Configuration\\BaseApplication.json");
-        u32 size = packer.FileExists_ReturnFileSize(r.FName);
-        c8* buffer = new c8[size];
-        packer.CopyFileBuffer_AssumesSufficientCapacity(r.FName, buffer);
-        delete[] buffer;
     }
 
     // destroy Resources

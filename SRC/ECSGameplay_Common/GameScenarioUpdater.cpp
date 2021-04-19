@@ -4,6 +4,9 @@
 
 #include "Application/SceneScenario.h"
 #include "Common/CameraManager.h"
+#include "Common/Resource.h"
+#include "Common/ResourceCache.h"
+#include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
@@ -190,8 +193,11 @@ void GameScenarioUpdater::Render()
 void GameScenarioUpdater::SetScenario(const std::string& parScenarioFile)
 {
     AssertRelease(FScenario == nullptr);
-    std::ifstream ofstr(parScenarioFile);
-    cereal::JSONInputArchive ar(ofstr);
+    Resource r(parScenarioFile);
+    auto handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
+    ResourceBuffer buff = handle->GetResourceBuffer();
+    std::istream istr(&buff, std::istream::in);
+    cereal::JSONInputArchive ar(istr);
 
     FScenario = new SceneScenario();
     ar(*FScenario);

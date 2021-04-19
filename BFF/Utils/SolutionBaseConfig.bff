@@ -32,7 +32,7 @@ Print(.VisualStudioFBuildTarget)
     .ProjectCleanCommand    = '$VisualStudioFBuildCommand$ -clean $VisualStudioFBuildPurgeTarget$'
 
     .LocalDebuggerCommand = '..\$OutputDir$\$ExeName$-^$(Platform)-^$(Configuration).exe'
-    .LocalDebuggerCommandArguments = '--editor'
+    .LocalDebuggerCommandArguments = '--editor --noeditor'
     .LocalDebuggerWorkingDirectory = '^$(SolutionDir)'
 
     .SourceType = [ .FileType = "Source Files"      .Pattern = "*.cpp" ]

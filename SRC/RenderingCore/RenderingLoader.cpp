@@ -3,7 +3,9 @@
 #include "RenderingLoader.h"
 
 #include "BGFXRenderingBackend.h"
+#include "Common/Resource.h"
 #include "Common/ResourceCache.h"
+#include "Common/ResourceHandle.h"
 #include "ECSGameplay_Specific/GameplayFeedbackDrawer.h"
 #include "GFXKeyHelper.h"
 #include "GFXOperator.h"
@@ -52,12 +54,14 @@ bool RenderingLoader::VirtualInitialise()
     Rendering::GFXRepresentationDescriptorManager::CreateIFP();
     AssertRelease(Rendering::GFXRepresentationDescriptorManager::HasInstance());
     {
-        const std::string& filename = GlobalResourceCache::Instance().FCache->GetBasePath() + FRepresentationDescriptors;
-        std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + FRepresentationDescriptors);
-
-        if (ifstr.good())
+        Resource r(FRepresentationDescriptors);
+        auto handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
+        AlwaysCheckedAssert(handle != nullptr);
+        if (handle != nullptr)
         {
-            cereal::JSONInputArchive archive(ifstr);
+            ResourceBuffer buff = handle->GetResourceBuffer();
+            std::istream istr(&buff, std::istream::in);
+            cereal::JSONInputArchive archive(istr);
             archive(NAMEDPROPERTY("GFXRepresentationDescriptors", Rendering::GFXRepresentationDescriptorManager::Instance()));
         }
     }

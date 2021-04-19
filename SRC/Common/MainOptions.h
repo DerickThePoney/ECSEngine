@@ -5,6 +5,9 @@ namespace ECSEngine
 struct MainOptions
 {
     bool IsUsingEditor = false;
+#ifndef COMPILE_FINAL
+    bool NoDatapack = false;
+#endif
 };
 extern MainOptions Options;
 extern void ReadMainCommandLine(int argc, char** argv);

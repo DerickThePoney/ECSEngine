@@ -5,8 +5,15 @@
 #include "AssetCookerUpdater.h"
 #include "Common/MainOptions.h"
 
+namespace ECSEngine
+{
+MainOptions Options;
+}
+
 int main(int argc, char** argv)
 {
+    ECSEngine::Options.NoDatapack = true;
+
     ECSEngine::BaseApplicationLayer app;
 
     if (!ECSEngine::InitialiseGlobalCache())
