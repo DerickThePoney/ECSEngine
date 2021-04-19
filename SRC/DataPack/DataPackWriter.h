@@ -6,8 +6,6 @@
 #include "DataPackDataStructures.h"
 #include "DataPackFile.h"
 
-#include <strstream>
-
 namespace ECSEngine
 {
 namespace DataPack
@@ -18,7 +16,7 @@ class DataPackFile<Access::WRITE>
 {
 public:
     DataPackFile()
-        : FFilesStream()
+        : FFilesStream(std::ios::binary)
     {
     }
 
@@ -67,11 +65,12 @@ public:
             ofstr.write((c8*)&idx, sizeof(FileOffset));
         }
         ofstr.write((c8*)&FCurrentOffset, sizeof(FileOffset));
-        ofstr.write(FFilesStream.str(), FCurrentOffset);
+        AssertRelease(FFilesStream.str().size() == FCurrentOffset);
+        ofstr.write(FFilesStream.str().c_str(), FCurrentOffset);
     }
 
 private:
-    std::ostrstream FFilesStream;
+    std::ostringstream FFilesStream;
     DataPackHeader FHeader;
     std::vector<FileOffset> FFilesOffsets;
     FileOffset FCurrentOffset = 0;
