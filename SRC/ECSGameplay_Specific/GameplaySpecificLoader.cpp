@@ -2,7 +2,9 @@
 
 #include "GameplaySpecificLoader.h"
 
+#include "Common/Resource.h"
 #include "Common/ResourceCache.h"
+#include "Common/ResourceHandle.h"
 #include "GameplayRulesManager.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::ECSGameplaySpecificLoader);
@@ -17,11 +19,15 @@ bool ECSGameplaySpecificLoader::VirtualInitialise()
     GameplayRulesManager::CreateIFP();
 
     {
-        std::ifstream ifstr(GlobalResourceCache::Instance().FCache->GetBasePath() + FGameplayRulesFile);
-
-        if (ifstr.good())
+        Resource r(FGameplayRulesFile);
+        auto handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
+        AlwaysCheckedAssert(handle != nullptr);
+        if (handle != nullptr)
         {
-            cereal::JSONInputArchive archive(ifstr);
+            ResourceBuffer buff = handle->GetResourceBuffer();
+            std::istream istr(&buff, std::istream::in);
+
+            cereal::JSONInputArchive archive(istr);
             archive(NAMEDPROPERTY("GameplayRules", GameplayRulesManager::Instance()));
         }
     }
