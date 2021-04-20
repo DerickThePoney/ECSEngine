@@ -18,6 +18,7 @@ public:
     void ListResourceFiles(const std::string& parWildcardPattern, std::vector<std::string>& parOutFileList) const override;
     bool FileExists(const std::string& parFileName) const override;
     const std::string& GetBasePathName() const override { return FPath; }
+    const char* FileSystemInfo() const override { return "Data packed system view"; };
 
 private:
     DataPack::DataPackFile<DataPack::Access::READ> FDataPackFile;

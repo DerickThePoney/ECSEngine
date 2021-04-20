@@ -26,6 +26,8 @@ public:
 
     const std::string& GetBasePathName() const override { return FPath; }
 
+    const char* FileSystemInfo() const override { return "Directory system view"; };
+
 private:
     void ListResources();
 

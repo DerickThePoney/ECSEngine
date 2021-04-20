@@ -16,5 +16,6 @@ public:
     virtual ~IResourceFile() {}
 
     virtual const std::string& GetBasePathName() const = 0;
+    virtual const char* FileSystemInfo() const = 0;
 };
 } // namespace ECSEngine

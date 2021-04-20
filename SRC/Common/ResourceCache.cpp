@@ -85,6 +85,11 @@ const std::string& ResourceCache::GetBasePath() const
     return FFileSystem->GetBasePathName();
 }
 
+const char* ResourceCache::GetFileSystemInfo() const
+{
+    return FFileSystem->FileSystemInfo();
+}
+
 std::shared_ptr<ECSEngine::ResourceHandle> ResourceCache::Find(const Resource* parResource)
 {
     auto itFind = FResources.find(parResource->FName);
