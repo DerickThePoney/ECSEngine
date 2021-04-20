@@ -15,7 +15,7 @@ namespace ECSEngine
 
 void ApplicationUpdater::Initialise()
 {
-#ifndef COMPILE_FINAL
+    //#ifndef COMPILE_FINAL
     if (Options.IsUsingEditor)
     {
         scene = new ScenarioEditor();
@@ -24,9 +24,9 @@ void ApplicationUpdater::Initialise()
     {
         scene = new GameScenarioUpdater();
     }
-#else
-    scene = new GameScenarioUpdater();
-#endif
+    //#else
+    //    scene = new GameScenarioUpdater();
+    //#endif
     scene->Initialise();
 }
 
