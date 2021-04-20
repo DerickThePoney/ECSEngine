@@ -14,13 +14,13 @@ class DataPackFile<Access::READ>
 public:
     ~DataPackFile() { delete[] FDataPackBuffer; }
 
-    void ReadDataPack(const std::string& parFilename)
+    bool ReadDataPack(const std::string& parFilename)
     {
         std::ifstream ifstr(parFilename, std::ios::binary);
         if (!ifstr.good())
         {
             AssertNotReached();
-            return;
+            return false;
         }
 
         // read header
