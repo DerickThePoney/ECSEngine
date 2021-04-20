@@ -50,6 +50,8 @@ public:
             AssertRelease(FFilenameToFileOffsetMap.find(fileName) == FFilenameToFileOffsetMap.end());
             FFilenameToFileOffsetMap.insert_or_assign(fileName, (u32)i);
         }
+
+        return true;
     }
 
     u32 FileExists_ReturnFileSize(const std::string& parFilename) const
