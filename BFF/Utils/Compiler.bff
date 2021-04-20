@@ -605,8 +605,8 @@ Compiler( 'Compiler-MSVC2019-x64' )
 
 .MSVC2019_X64Debug           = .MSVC2019PlatformX64   + .MSVCBaseDebugConfig          + .UnmanagedCppConfig_Debug + .MSVC2019DebugFastLink
 .MSVC2019_X64Release         = .MSVC2019PlatformX64   + .MSVCBaseReleaseConfig        + .UnmanagedCppConfig + .MSVC2019DebugFastLink
-.MSVC2019_X64Profile           = .MSVC2019PlatformX64   + .MSVCBaseProfileConfig          + .UnmanagedCppConfig
-.MSVC2019_X64Final         = .MSVC2019PlatformX64   + .MSVCBaseFinalConfig        + .UnmanagedCppConfig
+.MSVC2019_X64Profile           = .MSVC2019PlatformX64   + .MSVCBaseProfileConfig          + .UnmanagedCppConfig + .MSVC2019DebugFastLink
+.MSVC2019_X64Final         = .MSVC2019PlatformX64   + .MSVCBaseFinalConfig        + .UnmanagedCppConfig + .MSVC2019DebugFastLink
 
 .AdditionalLibs_x64_Debug = {}
 .AdditionalLibs_x64_Release = {}
