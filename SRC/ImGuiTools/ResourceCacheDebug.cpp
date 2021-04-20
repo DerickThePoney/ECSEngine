@@ -16,6 +16,7 @@ void DrawResourceCacheDebug(bool* parOpen)
 
     if (ImGui::CollapsingHeader("Global stats", ImGuiTreeNodeFlags_DefaultOpen))
     {
+        ImGui::Text("File system type: %s", GlobalResourceCache::Instance().FCache->GetFileSystemInfo());
         ImGui::Text("Allocated: %.2f / %.2f MB", (float)GlobalResourceCache::Instance().FCache->Allocated() / 1024.f / 1024.f,
               (float)GlobalResourceCache::Instance().FCache->CacheSize() / 1024.f / 1024.f);
     }

@@ -40,6 +40,7 @@ public:
     u32 Allocated() const { return FAllocated; }
 
     const ResourceHandleMap& AllocatedResources() const { return FResources; }
+    const char* GetFileSystemInfo() const;
 
 private:
     std::shared_ptr<ResourceHandle> Find(const Resource* parResource);
