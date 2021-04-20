@@ -19,8 +19,7 @@ DataPackDirectoryView::~DataPackDirectoryView()
 
 bool DataPackDirectoryView::Open()
 {
-    FDataPackFile.ReadDataPack(FPath);
-    return true;
+    return FDataPackFile.ReadDataPack(FPath);
 }
 
 u32 DataPackDirectoryView::GetRawResourceSize(const Resource& r)
