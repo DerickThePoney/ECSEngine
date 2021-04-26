@@ -46,6 +46,23 @@ def BuildEngine(config, MSBUILD):
 
     return result.returncode
 
+def BuildEngineTools(config, MSBUILD):
+    print('BUILDING ECSEngine')
+    sys.stdout.flush()
+
+    command = ['py', '-u', 'Script/FastBuild/fastbuild.py']
+
+    result = subprocess.run(command)
+
+    if result.returncode != 0:
+        return result.returncode
+
+    command = ['./tools/FBuild.exe', '-summary', 'Build-AssetCooker-x64-%s'%(config), 'Build-DataPacker-x64-%s'%(config)]
+
+    result = subprocess.run(command)
+
+    return result.returncode
+
 def BuildSolution():
     print('BUILDING Solution')
     sys.stdout.flush()
@@ -79,6 +96,7 @@ def main():
     group.add_argument('-a', '--all', action="store_true", help='Build all')
     group.add_argument('-b', '--bgfx', action="store_true", help='Build BGFX')
     group.add_argument('-e', '--engine', action="store_true", help='Build Engine')
+    group.add_argument('-et', '--enginetools', action="store_true", help='Build Engine tools')
     group.add_argument('-sln', '--solution', action="store_true", help='Build Solution')
     parser.add_argument('-c', '--config', type=str, help='Configuration to build', default='Release')
     parser.add_argument('-m', '--msbuild', type=str, help='Path to MSBuild')
