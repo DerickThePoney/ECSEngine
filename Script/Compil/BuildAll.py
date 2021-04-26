@@ -123,6 +123,8 @@ def main():
     elif args.engine:
         print('Build Engine')
         return BuildEngine(args.config, MSBUILD)
+    elif args.enginetools:
+        return BuildEngineTools(args.config, MSBUILD)
 
 if __name__ == "__main__":
    sys.exit(main())

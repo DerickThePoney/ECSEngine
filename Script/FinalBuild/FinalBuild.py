@@ -7,13 +7,22 @@ from shutil import copyfile
 
 import argparse
 
+def clean():
+    command = ['git', 'clean', '-fdx']
+    ret = subprocess.run(command)
+    return ret.returncode
 
 def main():
     print('Flush everything')
-    command = ['git', 'clean', '-fdx', '&&', 'cd', 'Assets', '&&', 'git', 'clean', '-fdx', '&&', 'cd', '..']
-    ret = subprocess.run(command)
-    if ret.returncode != 0:
-        return ret.returncode
+    ret = clean()
+    if ret != 0:
+        return ret
+
+    os.chdir('Assets')
+    ret = clean()
+    if ret != 0:
+        return ret
+    os.chdir('..')
 
     print('Build all Final')
     command = ['py', '-u', 'Script/Compil/BuildAll.py', '-a', '-c', 'Final']
@@ -34,7 +43,8 @@ def main():
         return ret.returncode
 
     print('Datapack')
-    command = ['cd', 'bin', '&&', './DataPacker-x64-Release.exe']
+    os.chdir('bin')
+    command = ['./DataPacker-x64-Release.exe']
     ret = subprocess.run(command)
     if ret.returncode != 0:
         return ret.returncode
