@@ -20,7 +20,7 @@
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/TexturesManager.h"
 #include "ResourceCacheDebug.h"
-#include "ScenesManagerEditor.h"
+#include "SceneManagerEditor.h"
 
 namespace ECSEngine
 {
