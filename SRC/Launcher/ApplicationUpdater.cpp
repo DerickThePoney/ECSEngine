@@ -2,6 +2,7 @@
 
 #include "ApplicationUpdater.h"
 
+#include "Application/SceneManager.h"
 #include "Common/MainOptions.h"
 #include "Common/TimeManager.h"
 #include "ECSGameplay_Common/GameScenarioUpdater.h"
@@ -15,26 +16,36 @@ namespace ECSEngine
 
 void ApplicationUpdater::Initialise()
 {
-    //#ifndef COMPILE_FINAL
+#ifndef COMPILE_FINAL
     if (Options.IsUsingEditor)
     {
-        scene = new ScenarioEditor();
+        FScene = new ScenarioEditor();
     }
     else
     {
-        scene = new GameScenarioUpdater();
+        const std::string startScene = SceneManager::Instance().GetSceneFilenameFromIndex(0);
+        AssertRelease(!startScene.empty());
+        GameScenarioUpdater* scene = new GameScenarioUpdater();
+        scene->SetScenario(startScene);
+        FScene = scene;
     }
-    //#else
-    //    scene = new GameScenarioUpdater();
-    //#endif
-    scene->Initialise();
+#else
+    const std::string startScene = SceneManager::Instance().GetSceneFilenameFromIndex(0);
+    AssertRelease(!startScene.empty());
+    GameScenarioUpdater* scene = new GameScenarioUpdater();
+    scene->SetScenario(startScene);
+    FScene = scene;
+#endif
+
+    AssertRelease(FScene != nullptr);
+    FScene->Initialise();
 }
 
 void ApplicationUpdater::Shutdown()
 {
-    scene->Destroy();
+    FScene->Destroy();
 
-    delete scene;
+    delete FScene;
 }
 
 bool ApplicationUpdater::CheckShouldFinish()
@@ -55,23 +66,23 @@ void ApplicationUpdater::UpdateGameplay()
     {
         SCOPED_PROFILE(ApplicationUpdater_OneGameplayTick);
         TimeManager::NewGameplayTick();
-        scene->GameplayUpdate();
+        FScene->GameplayUpdate();
     }
 }
 
 void ApplicationUpdater::UIUpdate()
 {
-    scene->UIUpdate();
+    FScene->UIUpdate();
 }
 
 void ApplicationUpdater::DebugRender()
 {
-    scene->DebugRender();
+    FScene->DebugRender();
 }
 
 void ApplicationUpdater::Render()
 {
-    scene->Render();
+    FScene->Render();
 
     {
         SCOPED_PROFILE(ApplicationUpdater_Render_Imgui);

@@ -20,6 +20,7 @@
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/TexturesManager.h"
 #include "ResourceCacheDebug.h"
+#include "ScenesManagerEditor.h"
 
 namespace ECSEngine
 {
@@ -67,6 +68,11 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
 
     if (ImGui::BeginMenu("Tools"))
     {
+        if (ImGui::BeginMenu("Scenes"))
+        {
+            ImGui::MenuItem("Scene manager", NULL, &options.showScenesManagerEditor);
+            ImGui::EndMenu();
+        }
         if (ImGui::BeginMenu("UI"))
         {
             ImGui::MenuItem("UI Style Editor", NULL, &options.showUIStyleEditor);
@@ -337,6 +343,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showResourceCache)
         DrawResourceCacheDebug(&parOutWindowsToShow.showResourceCache);
+
+    if (parOutWindowsToShow.showScenesManagerEditor)
+        DrawScenesManagerEditor(&parOutWindowsToShow.showScenesManagerEditor);
 }
 
 void DrawPlayScenarioWindow(bool& parOutPlayScenario)

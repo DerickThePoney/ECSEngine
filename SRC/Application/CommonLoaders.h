@@ -38,17 +38,22 @@ public:
     void save(Archive& ar) const
     {
         ar(cereal::base_class<ILoader>(this));
+        ar(FSceneManagerConfigFile);
     }
 
     template<typename Archive>
     void load(Archive& ar)
     {
         ar(cereal::base_class<ILoader>(this));
+        PROPERTYFIELD(SceneManagerConfigFile, "");
     }
 
 protected:
     bool VirtualInitialise() override;
     void VirtualShutdown() override;
+
+private:
+    std::string FSceneManagerConfigFile;
 };
 } // namespace ECSEngine
 

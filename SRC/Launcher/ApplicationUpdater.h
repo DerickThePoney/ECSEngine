@@ -32,7 +32,7 @@ public:
     }
 
 private:
-    IScenarioUpdater* scene;
+    IScenarioUpdater* FScene;
 };
 
 class ApplicationUpdaterWrapper final : public IGameplayUpdater
