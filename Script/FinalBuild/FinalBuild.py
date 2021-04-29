@@ -2,8 +2,10 @@
 
 import sys
 import os
+import os.path
 import subprocess
 from shutil import copyfile
+import zipfile
 
 import argparse
 
@@ -12,7 +14,43 @@ def clean():
     ret = subprocess.run(command)
     return ret.returncode
 
-def main():
+releaseFolder = '../Release'
+currentVersion = 0
+
+def Finalize():
+
+    if not os.path.isdir(releaseFolder):
+        os.mkdir(releaseFolder)
+
+    currentMinorVersion = 0
+    buildFolder = releaseFolder + '/v' + str(currentVersion)
+    if not os.path.isdir(buildFolder):
+        os.mkdir(buildFolder)
+    else:
+        onlyfiles = [f for f in os.listdir(buildFolder) if os.path.isfile(os.path.join(buildFolder, f))]
+        for file in onlyfiles:
+            num = int(file.split('.')[1])
+            currentMinorVersion = max(num+1, currentMinorVersion)
+
+    print('version is %d.%d.zip' % (currentVersion, currentMinorVersion))
+
+    try:
+        zipFile = zipfile.ZipFile(buildFolder + ('/%d.%d.zip'%(currentVersion, currentMinorVersion)), mode='w', compression=zipfile.ZIP_LZMA)
+
+        zipFile.write('bin/BuildingGame-x64-Final.exe','BuildingGame-x64-Final.exe')
+        zipFile.write('bin/Assets.datapack','Assets.datapack')
+        zipFile.write('bin/glfw3.dll','glfw3.dll')
+
+        zipFile.close()
+    except:
+        return -1
+
+    return 0
+
+
+
+def ProcessVersion():
+
     print('Flush everything')
     ret = clean()
     if ret != 0:
@@ -48,6 +86,22 @@ def main():
     ret = subprocess.run(command)
     if ret.returncode != 0:
         return ret.returncode
+
+    os.chdir('..')
+    return 0
+
+def main():
+
+    ret = ProcessVersion()
+    if(ret != 0):
+        return ret
+
+    print('Zipping up Version')
+    ret = Finalize()
+
+    return ret
+
+
 
 if __name__ == "__main__":
    sys.exit(main())
