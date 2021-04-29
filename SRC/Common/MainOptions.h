@@ -15,7 +15,8 @@ extern void ReadMainCommandLine(int argc, char** argv);
 namespace Configuration
 {
 extern const char* AssetsDirectory;
-}
+extern const char* DatapackDirectory;
+} // namespace Configuration
 
 bool InitialiseGlobalCache();
 void DestroyGlobalCache();
