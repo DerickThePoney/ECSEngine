@@ -40,7 +40,7 @@ int main(int argc, char** argv)
             }
         }
 
-        packer.Finalize("..\\Assets.datapack");
+        packer.Finalize(std::string(ECSEngine::Configuration::DatapackDirectory) + ".datapack");
     }
 
     // destroy Resources

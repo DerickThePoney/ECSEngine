@@ -13,12 +13,12 @@ bool InitialiseGlobalCache()
     GlobalResourceCache::CreateIFP();
 
 #ifdef COMPILE_FINAL
-    GlobalResourceCache::Instance().FCache = new ResourceCache(10, new DataPackDirectoryView(std::string(Configuration::AssetsDirectory) + ".datapack"));
+    GlobalResourceCache::Instance().FCache = new ResourceCache(10, new DataPackDirectoryView(std::string(Configuration::DatapackDirectory) + ".datapack"));
 #else
     if (Options.NoDatapack)
         GlobalResourceCache::Instance().FCache = new ResourceCache(10, new ResourceFileDirectoryView(Configuration::AssetsDirectory));
     else
-        GlobalResourceCache::Instance().FCache = new ResourceCache(10, new DataPackDirectoryView(std::string(Configuration::AssetsDirectory) + ".datapack"));
+        GlobalResourceCache::Instance().FCache = new ResourceCache(10, new DataPackDirectoryView(std::string(Configuration::DatapackDirectory) + ".datapack"));
 #endif
 
     if (!GlobalResourceCache::Instance().FCache->Initialize())
