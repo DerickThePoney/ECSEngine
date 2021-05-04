@@ -62,7 +62,7 @@ void ApplicationUpdater::StartUpdate()
 
 void ApplicationUpdater::UpdateGameplay()
 {
-    while (TimeManager::FrameStartTime() > TimeManager::CurrentGameplayTime())
+    while (TimeManager::FrameStartTime() >= TimeManager::CurrentGameplayTime())
     {
         SCOPED_PROFILE(ApplicationUpdater_OneGameplayTick);
         TimeManager::NewGameplayTick();

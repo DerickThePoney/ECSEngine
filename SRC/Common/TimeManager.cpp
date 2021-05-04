@@ -50,8 +50,8 @@ void TimeManagerImpl::NewFrame()
         FFrameDurationTimer.Stop();
     }
 
-    FFrameStartTime = DurationSinceStartRealTime();
-    FFrameDeltaTime = FFrameDurationTimer.ElapsedTime<ETimePeriod::SECONDS>();
+    FFrameDeltaTime = std::min(CurrentGameplayTime() - FFrameStartTime, FFrameDurationTimer.ElapsedTime<ETimePeriod::SECONDS>());
+    FFrameStartTime += FFrameDeltaTime;
     FFrameDurationTimer.Start();
     ++FFrameNumber;
 }
@@ -59,8 +59,6 @@ void TimeManagerImpl::NewFrame()
 void TimeManagerImpl::NewGameplayTick()
 {
     FCurrentGameplayTick++;
-
-    AlwaysCheckedAssert(FFrameStartTime <= CurrentGameplayTime());
 }
 
 void TimeManagerImpl::End()
