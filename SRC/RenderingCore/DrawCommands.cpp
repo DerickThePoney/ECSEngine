@@ -940,7 +940,11 @@ void DrawVerticesCommand::SubmitCommand() const
 
     VertexDataStream stream(FVerticesSize, hash.GetByteSize(), hash);
 
-    forrange(i, 0, FVerticesSize) { stream.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FVertices[i], (u32)i); }
+    forrange(i, 0, FVerticesSize)
+    {
+        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FVertices[i]);
+        stream.Advance();
+    }
 
     bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
 

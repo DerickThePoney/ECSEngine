@@ -47,6 +47,8 @@ struct VertexLayoutHash
     void operator=(const VertexLayoutHash& parOther);
     void operator=(VertexLayoutHash&& parOther) = delete;
 
+    bool operator==(const VertexLayoutHash& parOther);
+
     friend std::ostream& operator<<(std::ostream& output, const VertexLayoutHash& parLayoutHash);
     friend std::istream& operator>>(std::istream& input, VertexLayoutHash& parLayoutHash);
 
@@ -72,7 +74,7 @@ class VertexDataStream
 
 public:
     VertexDataStream();
-    VertexDataStream(const u32 parNbVertices, const u32 parVertexByteSize, const VertexLayoutHash& hash);
+    VertexDataStream(const u32 parNbVertices, const u32 parVertexByteSize, const VertexLayoutHash& hash, bool parAllowResize = false);
     VertexDataStream(const VertexDataStream& parOther);
     VertexDataStream(VertexDataStream&& parOther) = delete;
     ~VertexDataStream();
@@ -80,22 +82,26 @@ public:
     void operator=(const VertexDataStream& parOther);
     void operator=(VertexDataStream&& parOther) = delete;
 
-    u32 GetSize() const { return FSize; }
+    u32 GetCapacity() const { return FCapacity; }
+    u32 GetSize() const { return FCurrentVertexHead; }
     u32 GetVertexByteSize() const { return FVertexByteSize; }
-    u32 GetByteSize() const { return FByteSize; }
+    u32 GetByteSize() const { return GetSize() * GetVertexByteSize(); }
+    u32 GetByteCapacity() const { return GetCapacity() * GetVertexByteSize(); }
     const VertexLayoutHash& GetHash() const { return FHash; }
 
     template<typename T>
     void PushData(const VERTEX_LAYOUT_PARAMS::Type parType, const u32 parChannel, const T& parData)
     {
-        AssertRelease(FCurrentVertexHead < FSize);
+        AssertRelease(FAllowResize || FCurrentVertexHead < FCapacity);
+        GrowIFN();
+        AssertRelease(FCurrentVertexHead < FCapacity);
         const TypeChannelIdPair p = { parType, parChannel };
         AssertRelease(FOffsetMap.find(p) != FOffsetMap.end());
         const OffsetByteSizePair& o = FOffsetMap[p];
         AssertRelease((u32)sizeof(T) == o.second);
         const u32 ptrOffset = FCurrentVertexHead * FVertexByteSize + o.first;
-        AssertRelease(ptrOffset < FByteSize);
-        AssertRelease((ptrOffset + o.second) <= FByteSize);
+        AssertRelease(ptrOffset < GetByteCapacity());
+        AssertRelease((ptrOffset + o.second) <= GetByteCapacity());
         c8* writePosition = FData + ptrOffset;
         memcpy(writePosition, &parData, sizeof(T));
 
@@ -106,36 +112,16 @@ public:
     }
 
     template<typename T>
-    void SetValue(const VERTEX_LAYOUT_PARAMS::Type parType, const u32 parChannel, const T& parData, const u32 parVertexId)
+    const T& GetValue(const VERTEX_LAYOUT_PARAMS::Type parType, const u32 parChannel, const u32 parVertexId) const
     {
-        AssertRelease(parVertexId < FSize);
+        AssertRelease(parVertexId < FCapacity);
         const TypeChannelIdPair p = { parType, parChannel };
         AssertRelease(FOffsetMap.find(p) != FOffsetMap.end());
-        const OffsetByteSizePair& o = FOffsetMap[p];
+        const OffsetByteSizePair& o = FOffsetMap.at(p);
         AssertRelease((u32)sizeof(T) == o.second);
         const u32 ptrOffset = parVertexId * FVertexByteSize + o.first;
-        AssertRelease(ptrOffset < FByteSize);
-        AssertRelease((ptrOffset + o.second) <= FByteSize);
-        c8* writePosition = FData + ptrOffset;
-        memcpy(writePosition, &parData, sizeof(T));
-
-#ifdef PERFORM_SECURITY_CHECKS
-        const T writenValue = *reinterpret_cast<T*>(writePosition);
-        AssertRelease(writenValue == parData);
-#endif
-    }
-
-    template<typename T>
-    const T& GetValue(const VERTEX_LAYOUT_PARAMS::Type parType, const u32 parChannel, const u32 parVertexId)
-    {
-        AssertRelease(parVertexId < FSize);
-        const TypeChannelIdPair p = { parType, parChannel };
-        AssertRelease(FOffsetMap.find(p) != FOffsetMap.end());
-        const OffsetByteSizePair& o = FOffsetMap[p];
-        AssertRelease((u32)sizeof(T) == o.second);
-        const u32 ptrOffset = parVertexId * FVertexByteSize + o.first;
-        AssertRelease(ptrOffset < FByteSize);
-        AssertRelease((ptrOffset + o.second) <= FByteSize);
+        AssertRelease(ptrOffset < GetByteCapacity());
+        AssertRelease((ptrOffset + o.second) <= GetByteCapacity());
         c8* writePosition = FData + ptrOffset;
 
         return *reinterpret_cast<T*>(writePosition);
@@ -144,7 +130,7 @@ public:
     void Advance()
     {
         FCurrentVertexHead++;
-        AssertRelease(FCurrentVertexHead <= FSize);
+        AssertRelease(FCurrentVertexHead <= FCapacity);
     }
 
     const void* GetData() const
@@ -161,18 +147,20 @@ public:
 
 private:
     void InitOffsetData();
+    void GrowIFN();
 
 private:
     std::map<TypeChannelIdPair, OffsetByteSizePair> FOffsetMap;
 
     c8* FData;
     u32 FVertexByteSize;
-    u32 FByteSize;
-    u32 FSize;
+    u32 FCapacity;
 
     u32 FCurrentVertexHead;
 
     VertexLayoutHash FHash;
+
+    bool FAllowResize;
 };
 
 //----------------------------------------------------------------
