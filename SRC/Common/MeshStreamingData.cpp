@@ -47,6 +47,11 @@ VertexLayoutHash::VertexLayoutHash(const VertexLayoutHash& parOther)
     std::memcpy(&hash, &parOther.hash, hashSizeByte);
 }
 
+bool VertexLayoutHash::operator==(const VertexLayoutHash& parOther)
+{
+    return (std::memcmp(&hash, &parOther.hash, hashSizeByte) == 0);
+}
+
 void VertexLayoutHash::SetValue(const VERTEX_LAYOUT_PARAMS::Type parValue, bool parHasValue)
 {
     AssertRelease(parValue < VERTEX_LAYOUT_PARAMS::LENGTH);
@@ -152,55 +157,56 @@ std::istream& operator>>(std::istream& input, VertexLayoutHash& parLayoutHash)
 
 VertexDataStream::VertexDataStream()
     : FData(nullptr)
-    , FSize(0)
+    , FCapacity(0)
     , FVertexByteSize(0)
-    , FByteSize(0)
     , FCurrentVertexHead(0)
+    , FAllowResize(false)
 {
 }
 
-VertexDataStream::VertexDataStream(const u32 parNbVertices, const u32 parVertexByteSize, const VertexLayoutHash& hash)
+VertexDataStream::VertexDataStream(const u32 parNbVertices, const u32 parVertexByteSize, const VertexLayoutHash& hash, bool parAllowResize)
     : FData(nullptr)
-    , FSize(parNbVertices)
+    , FCapacity(parNbVertices)
     , FVertexByteSize(parVertexByteSize)
-    , FByteSize(parNbVertices * parVertexByteSize)
     , FCurrentVertexHead(0)
     , FHash(hash)
+    , FAllowResize(parAllowResize)
 {
-    FData = new c8[FByteSize];
+    FData = new c8[FCapacity * GetVertexByteSize()];
     InitOffsetData();
 }
 
 VertexDataStream::VertexDataStream(const VertexDataStream& parOther)
 {
-    FSize = parOther.FSize;
+    FCapacity = parOther.FCapacity;
     FVertexByteSize = parOther.FVertexByteSize;
-    FByteSize = parOther.FByteSize;
     FCurrentVertexHead = parOther.FCurrentVertexHead;
     FHash = parOther.FHash;
+    FAllowResize = parOther.FAllowResize;
 
-    FData = new c8[FByteSize];
-    memcpy(FData, parOther.FData, FByteSize);
+    const u32 byteSize = FCapacity * GetVertexByteSize();
+    FData = new c8[byteSize];
+    memcpy(FData, parOther.FData, byteSize);
 
     FOffsetMap = parOther.FOffsetMap;
 }
 
 VertexDataStream::~VertexDataStream()
 {
-    delete FData;
-    FData = nullptr;
+    delete[] FData;
 }
 
 void VertexDataStream::operator=(const VertexDataStream& parOther)
 {
-    FSize = parOther.FSize;
+    FCapacity = parOther.FCapacity;
     FVertexByteSize = parOther.FVertexByteSize;
-    FByteSize = parOther.FByteSize;
     FCurrentVertexHead = parOther.FCurrentVertexHead;
     FHash = parOther.FHash;
+    FAllowResize = parOther.FAllowResize;
 
-    FData = new c8[FByteSize];
-    memcpy(FData, parOther.FData, FByteSize);
+    const u32 byteSize = FCapacity * GetVertexByteSize();
+    FData = new c8[byteSize];
+    memcpy(FData, parOther.FData, byteSize);
 
     FOffsetMap = parOther.FOffsetMap;
 }
@@ -285,6 +291,24 @@ void VertexDataStream::InitOffsetData()
     }
 
     AssertRelease(currentOffset == FVertexByteSize);
+}
+
+void VertexDataStream::GrowIFN()
+{
+    if (!FAllowResize)
+        return;
+
+    if (FCurrentVertexHead < FCapacity)
+        return;
+
+    const u32 oldByteSize = FCapacity * GetVertexByteSize();
+    FCapacity = 2 * FCapacity;
+    const u32 newByteSize = FCapacity * GetVertexByteSize();
+
+    c8* newData = new c8[newByteSize];
+    memcpy(newData, FData, std::min(oldByteSize, newByteSize));
+    delete[] FData;
+    FData = newData;
 }
 
 } // namespace Rendering
