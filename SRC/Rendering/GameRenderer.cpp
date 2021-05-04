@@ -58,9 +58,11 @@ void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
 {
     bgfx::setViewFrameBuffer(RenderPassId::GEOMETRY_PASS, FGeometryFramebuffer->GetHandle());
     bgfx::setViewFrameBuffer(RenderPassId::FEEDBACK_PASS, FGeometryFramebuffer->GetHandle());
+    bgfx::setViewFrameBuffer(RenderPassId::GAME_UI_PASS, FGeometryFramebuffer->GetHandle());
 
     bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, parSize.x, parSize.y);
     bgfx::setViewRect(RenderPassId::FEEDBACK_PASS, 0, 0, parSize.x, parSize.y);
+    bgfx::setViewRect(RenderPassId::GAME_UI_PASS, 0, 0, parSize.x, parSize.y);
     bgfx::setViewRect(RenderPassId::COMBINE_PASS, 0, 0, parSize.x, parSize.y);
     bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, parSize.x, parSize.y);
 }
