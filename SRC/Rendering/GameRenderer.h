@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Common/Singleton.h"
+#include "UIRenderer.h"
 
 namespace ECSEngine
 {

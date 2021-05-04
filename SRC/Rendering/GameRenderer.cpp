@@ -52,6 +52,8 @@ void GameRenderer::Initialise()
     bgfx::setViewClear(RenderPassId::COMBINE_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 
     SetViewFramebuffers(size);
+
+    UIRendering::Initialise();
 }
 
 void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
@@ -69,6 +71,8 @@ void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
 
 void GameRenderer::Shutdown()
 {
+    UIRendering::Shutdown();
+
     FGeometryCommandBuffer->clear();
     FFeedbackCommandBuffer->clear();
     FCombineCommandBuffer->clear();
@@ -140,6 +144,8 @@ void GameRenderer::Render()
 
     GameplayFeedbackDrawer::Instance().DrawFeedback(FFeedbackCommandBuffer);
     FFeedbackCommandBuffer->Submit();
+
+    UIRendering::RenderScene();
 
     // combine pass
     MaterialInstanceHandle combineMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\combinepass.material");
