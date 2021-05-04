@@ -6,6 +6,8 @@ namespace bgfx
 {
 struct IndexBufferHandle;
 struct VertexBufferHandle;
+struct DynamicIndexBufferHandle;
+struct DynamicVertexBufferHandle;
 } // namespace bgfx
 
 namespace ECSEngine

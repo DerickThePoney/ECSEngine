@@ -30,5 +30,34 @@ private:
     bgfx::VertexBufferHandle FHandle;
 };
 
+class DynamicVertexBuffer final
+{
+public:
+    DynamicVertexBuffer(VertexLayoutHash parHash);
+    ~DynamicVertexBuffer();
+
+    const VertexLayoutHash Hash() const { return FHash; };
+    u32 GetNumberOfVertices() const { return FSize; }
+    u32 GetByteSize() const { return FByteSize; }
+
+    void PushRawBuffer(const VertexDataStream& parDataStream);
+
+    void DestroyHandleIFN();
+    const bgfx::DynamicVertexBufferHandle& GetVertexBufferHandle() const;
+    const bgfx::VertexLayoutHandle& GetVertexLayoutHandle() const;
+
+private:
+    void CreateVertexBufferHandle(const VertexDataStream& parDataStream);
+
+private:
+    VertexLayoutHash FHash;
+    u32 FSize = 0;
+    u32 FByteSize = 0;
+    u32 FAllocatedSize = 0;
+    bool FHandleHasBeenComputed = 0;
+    bgfx::DynamicVertexBufferHandle FHandle;
+    bgfx::VertexLayoutHandle FLayoutHandle;
+};
+
 } // namespace Rendering
 } // namespace ECSEngine
