@@ -99,6 +99,12 @@ void GameRenderer::Render()
     if (hasResized)
         SetViewFramebuffers(size);
 
+    bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, size.x, size.y);
+    bgfx::setViewRect(RenderPassId::FEEDBACK_PASS, 0, 0, size.x, size.y);
+    bgfx::setViewRect(RenderPassId::GAME_UI_PASS, 0, 0, size.x, size.y);
+    bgfx::setViewRect(RenderPassId::COMBINE_PASS, 0, 0, size.x, size.y);
+    bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, size.x, size.y);
+
     // Gameplay Camera fetch
     const float aspectRatio = GLFWDisplayWindowHandler::Instance().AspectRatio();
 
