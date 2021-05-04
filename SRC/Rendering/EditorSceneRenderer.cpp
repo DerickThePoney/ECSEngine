@@ -13,6 +13,7 @@
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
+#include "RenderingCore/RenderPass.h"
 
 namespace ECSEngine
 {
@@ -45,6 +46,7 @@ void EditorSceneRenderer::Shutdown()
 
 void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
 {
+
     AssertRelease(FDrawCommandBuffer != nullptr);
     FDrawCommandBuffer->clear();
 
@@ -52,6 +54,8 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
 
     const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
+
+    bgfx::setViewRect(Rendering::RenderPassId::EDITOR_PASS, 0, 0, windowSize.x, windowSize.y);
 
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
