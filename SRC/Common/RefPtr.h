@@ -36,6 +36,12 @@ public:
     {
     }
 
+    RefPtr(T* ptr)
+        : FPtr(ptr)
+    {
+        AddReference(FPtr);
+    }
+
     RefPtr(const RefPtr& other)
     {
         FPtr = other.FPtr;
@@ -76,7 +82,12 @@ public:
     T* get() { return FPtr; }
     const T* get() const { return FPtr; }
 
-    void reset(T* parNewPtr) { FPtr = parNewPtr; }
+    void reset(T* parNewPtr)
+    {
+        RemoveReference(FPtr);
+        FPtr = parNewPtr;
+        AddReference(FPtr);
+    }
 
     T* operator->() { return get(); }
     T& operator*() { return *get(); }
