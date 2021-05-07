@@ -3,6 +3,8 @@
 
 struct GLFWwindow;
 struct GLFWcursor;
+struct ImGuiIO;
+
 namespace ECSEngine
 {
 namespace Rendering
@@ -50,7 +52,7 @@ private:
     u32 FHeight;
 
     GLFWwindow* FWindow;
-    GLFWcursor* FMouseCursors[ImGuiMouseCursor_COUNT] = {};
+    GLFWcursor** FMouseCursors = nullptr;
 };
 } // namespace Rendering
 } // namespace ECSEngine

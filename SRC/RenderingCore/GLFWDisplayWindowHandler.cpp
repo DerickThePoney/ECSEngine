@@ -145,7 +145,9 @@ GLFWDisplayWindowHandler::GLFWDisplayWindowHandler()
     , FWidth(1280)
     , FHeight(720)
     , FName("DEFAULT_NAME_CHANGE_IT_OR DIE!!!")
+    , FMouseCursors()
 {
+    FMouseCursors = new GLFWcursor*[ImGuiMouseCursor_COUNT];
 }
 
 GLFWDisplayWindowHandler::~GLFWDisplayWindowHandler()
@@ -153,6 +155,8 @@ GLFWDisplayWindowHandler::~GLFWDisplayWindowHandler()
     AlwaysCheckedAssert(FWindow == nullptr);
     if (FWindow != nullptr)
         Destroy();
+
+    delete[] FMouseCursors;
 }
 
 void GLFWDisplayWindowHandler::Init()
