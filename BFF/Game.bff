@@ -34,6 +34,7 @@
 #include "Projects/Application.bff"
 #include "Projects/ECSCore.bff"
 #include "Projects/RenderingCore.bff"
+#include "Projects/UICore.bff"
 
 #include "Projects/ECSGameplay_Common.bff"
 #include "Projects/ECSGameplay_Specific.bff"

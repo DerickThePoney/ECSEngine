@@ -1,0 +1,15 @@
+#once
+{
+    .ProjectName = 'UICore'
+    .ProjectPath = 'SRC'
+    .AdditionnalIncludePaths = {"SRC" }
+
+    .SolutionFolder = 'Core'
+
+    .ExeName = .GameName
+
+    #define USE_PRECOMPILED_HEADERS
+    .BuildTarget = { '$ProjectName$' }
+    #include "../Utils/MakeProjectStandard.bff"
+    #undef USE_PRECOMPILED_HEADERS
+}
