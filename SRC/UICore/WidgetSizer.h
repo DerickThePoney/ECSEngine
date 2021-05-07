@@ -13,30 +13,42 @@ enum Type
     PIXEL,
     LENGTH
 };
-}
 
-namespace FParentAnchor
+const char* AsString(PositionningType::Type parValue);
+} // namespace PositionningType
+
+namespace ParentAnchor
 {
 enum Type
 {
     TOP_LEFT,
     TOP_CENTER,
-    TOP_RIGTH,
+    TOP_RIGHT,
     CENTER_LEFT,
     CENTER_CENTER,
-    CENTER_RIGTH,
+    CENTER_RIGHT,
     BOTTOM_LEFT,
     BOTTOM_CENTER,
-    BOTTOM_RIGTH,
+    BOTTOM_RIGHT,
+    LENGTH
 };
-}
 
-struct WidgetSizer
+const char* AsString(ParentAnchor::Type parValue);
+} // namespace ParentAnchor
+
+class WidgetScaler;
+struct WidgetPlacement
 {
+    void UpdatePlacementIFN(const WidgetScaler* parScaler);
 
-    glm::vec2 FAnchorPosition;
-    glm::vec2 FSize;
-    glm::vec4 FPositionInPixels;
+    PositionningType::Type FPositioningType = PositionningType::PIXEL;
+    ParentAnchor::Type FParentAnchor = ParentAnchor::TOP_LEFT;
+
+    glm::vec2 FPositionFromAnchor = glm::vec2(0.f, 0.f);
+    glm::vec2 FSize = glm::vec2(1.f, 1.f);
+    glm::vec4 FPositionInPixels = glm::vec4(0.f, 0.f, 0.f, 0.f);
+
+    bool FIsDirty = true;
 };
 } // namespace UI
 } // namespace ECSEngine
