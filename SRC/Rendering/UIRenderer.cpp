@@ -16,6 +16,8 @@
 #include "RenderingCore/RenderingState.h"
 #include "RenderingCore/VertexBuffer.h"
 #include "RenderingCore/VertexLayout.h"
+#include "UICore/Widget.h"
+#include "UICore/WidgetScaler.h"
 
 namespace ECSEngine
 {
@@ -41,12 +43,14 @@ public:
     void RenderScene();
 
 private:
-    void DrawUIElement(const TestUIElement& parUIElement, VertexDataStream& stream, std::vector<u32>& indices);
+    void PushUIElement(const UI::WidgetPtr parUIElement, VertexDataStream& stream, std::vector<u32>& indices);
+    void DrawUIElements(const UI::WidgetPtr parUIElement, VertexDataStream& stream, std::vector<u32>& indices);
+    void DrawThisElement(const UI::WidgetPtr parUIElement, VertexDataStream& stream, std::vector<u32>& indices);
 
 private:
     Rendering::MaterialInstanceHandle FUIVertexColorMaterial;
 
-    std::vector<TestUIElement> FUIElementsForTest;
+    std::vector<UI::WidgetPtr> FUIElementsForTest;
     DynamicVertexBuffer FVertexBuffer;
     DynamicIndexBuffer FIndexBuffer;
 
@@ -62,16 +66,26 @@ UIRenderer::UIRenderer()
 void UIRenderer::Initialise()
 {
     FUIVertexColorMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uivertexcolormaterial.material");
+    using namespace UI;
+    TestUIWidget* a = new TestUIWidget();
+    WidgetPlacement& aplacement = a->Placement();
+    aplacement.FPositionFromAnchor = glm::vec2(150.f, 150.f);
+    aplacement.FSize = glm::vec2(150.f, 200.f);
+    a->Color = ColorUtils::ConvertToU32(glm::vec4(RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), 1.0f));
+    FUIElementsForTest.push_back(WidgetPtr(a));
 
-    FUIElementsForTest.push_back({ glm::vec2(50.f, 50.f), glm::vec2(200.f, 200.f), ColorUtils::ConvertToU32(glm::vec4(0.7f, 0.8f, 0.2f, 1.f)) });
+    TestUIWidget* b = new TestUIWidget();
+    WidgetPlacement& bplacement = b->Placement();
+    bplacement.FPositionFromAnchor = glm::vec2(10.f, 10.f);
+    bplacement.FSize = glm::vec2(15.f, 20.f);
+    b->Color = ColorUtils::ConvertToU32(glm::vec4(RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), 1.0f));
+    a->AddChild(WidgetPtr(b));
 
-    FUIElementsForTest.push_back({ glm::vec2(70.f, 70.f), glm::vec2(50.f, 50.f), ColorUtils::ConvertToU32(glm::vec4(0.1f, 0.5f, 0.9f, 1.f)) });
-
-    FUIElementsForTest.push_back({ glm::vec2(110.f, 70.f), glm::vec2(50.f, 50.f), ColorUtils::ConvertToU32(glm::vec4(1.f, 0.0f, 0.0f, 1.f)) });
+    /*FUIElementsForTest.push_back({ glm::vec2(110.f, 70.f), glm::vec2(50.f, 50.f), ColorUtils::ConvertToU32(glm::vec4(1.f, 0.0f, 0.0f, 1.f)) });
 
     FUIElementsForTest.push_back({ glm::vec2(70.f, 150.f), glm::vec2(50.f, 50.f), ColorUtils::ConvertToU32(glm::vec4(0.1f, 1.0f, 0.0f, 1.f)) });
 
-    FUIElementsForTest.push_back({ glm::vec2(50.f, 220.f), glm::vec2(50.f, 50.f), ColorUtils::ConvertToU32(glm::vec4(1.0f, 1.0f, 0.0f, 1.f)) });
+    FUIElementsForTest.push_back({ glm::vec2(50.f, 220.f), glm::vec2(50.f, 50.f), ColorUtils::ConvertToU32(glm::vec4(1.0f, 1.0f, 0.0f, 1.f)) });*/
 }
 
 void UIRenderer::Shutdown()
@@ -80,7 +94,7 @@ void UIRenderer::Shutdown()
 
 void UIRenderer::RenderScene()
 {
-    if (FPing)
+    /*if (FPing)
     {
         if (FUIElementsForTest.size() < 10)
         {
@@ -122,58 +136,78 @@ void UIRenderer::RenderScene()
             FPing = true;
             FAddElement = AddElement;
         }
-    }
+    }*/
+
+    UI::WidgetScaler scaler;
+    foreachitem(uiel, FUIElementsForTest) { uiel->UpdatePlacement(&scaler); }
 
     bgfx::setViewName(RenderPassId::GAME_UI_PASS, "GAME_UI_PASS");
     bgfx::setViewMode(RenderPassId::GAME_UI_PASS, bgfx::ViewMode::Sequential);
 
     RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
 
-    VertexDataStream stream(4, FVertexBuffer.Hash().GetByteSize(), FVertexBuffer.Hash(), true);
-    std::vector<u32> indices;
+    foreachitemconst(element, FUIElementsForTest)
+    {
+        VertexDataStream stream(4, FVertexBuffer.Hash().GetByteSize(), FVertexBuffer.Hash(), true);
+        std::vector<u32> indices;
 
-    glm::vec4 cliprect(FUIElementsForTest[0].Pos.x, FUIElementsForTest[0].Pos.y, FUIElementsForTest[0].Size.x, FUIElementsForTest[0].Size.y);
+        PushUIElement(element, stream, indices);
+        FVertexBuffer.PushRawBuffer(stream);
+        FIndexBuffer.PushData(indices.data(), indices.size());
 
-    foreachitemconst(element, FUIElementsForTest) { DrawUIElement(element, stream, indices); }
+        auto size = GLFWDisplayWindowHandler::Instance().GetSize();
+        glm::mat4 transform = glm::ortho(0.f, (float)size.x, (float)size.y, 0.f);
 
-    FVertexBuffer.PushRawBuffer(stream);
-    FIndexBuffer.PushData(indices.data(), indices.size());
+        bgfx::setViewTransform(RenderPassId::GAME_UI_PASS, NULL, &transform);
+        bgfx::setViewRect(RenderPassId::GAME_UI_PASS, 0, 0, uint16_t(size.x), uint16_t(size.y));
+        state.ApplyState();
 
-    auto size = GLFWDisplayWindowHandler::Instance().GetSize();
-    glm::mat4 transform = glm::ortho(0.f, (float)size.x, (float)size.y, 0.f);
+        bgfx::setVertexBuffer(0, FVertexBuffer.GetVertexBufferHandle(), 0u, FVertexBuffer.GetNumberOfVertices(), FVertexBuffer.GetVertexLayoutHandle());
+        bgfx::setIndexBuffer(FIndexBuffer.GetIndexBufferHandle(), 0u, FIndexBuffer.GetSize());
 
-    bgfx::setViewTransform(RenderPassId::GAME_UI_PASS, NULL, &transform);
-    bgfx::setViewRect(RenderPassId::GAME_UI_PASS, 0, 0, uint16_t(size.x), uint16_t(size.y));
-    state.ApplyState();
-
-    bgfx::setScissor(cliprect.x, cliprect.y, cliprect.z, cliprect.w);
-
-    bgfx::setVertexBuffer(0, FVertexBuffer.GetVertexBufferHandle(), 0u, FVertexBuffer.GetNumberOfVertices(), FVertexBuffer.GetVertexLayoutHandle());
-    bgfx::setIndexBuffer(FIndexBuffer.GetIndexBufferHandle(), 0u, FIndexBuffer.GetSize());
-
-    const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FUIVertexColorMaterial);
-    AssertRelease(instance != nullptr);
-    bgfx::submit(RenderPassId::GAME_UI_PASS, instance->GetProgram()->ProgramHandle());
+        const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FUIVertexColorMaterial);
+        AssertRelease(instance != nullptr);
+        bgfx::submit(RenderPassId::GAME_UI_PASS, instance->GetProgram()->ProgramHandle());
+    }
 }
 
-void UIRenderer::DrawUIElement(const TestUIElement& parUIElement, VertexDataStream& stream, std::vector<u32>& indices)
+void UIRenderer::PushUIElement(const UI::WidgetPtr parUIElement, VertexDataStream& stream, std::vector<u32>& indices)
 {
+
+    const UI::WidgetPlacement& placement = parUIElement->Placement();
+    bgfx::setScissor(placement.FPositionInPixels.x, placement.FPositionInPixels.y, placement.FPositionInPixels.z, placement.FPositionInPixels.w);
+    DrawUIElements(parUIElement, stream, indices);
+}
+
+void UIRenderer::DrawUIElements(const UI::WidgetPtr parUIElement, VertexDataStream& stream, std::vector<u32>& indices)
+{
+    DrawThisElement(parUIElement, stream, indices);
+
+    foreachitem(child, parUIElement->Children()) { DrawThisElement(child, stream, indices); }
+}
+
+void UIRenderer::DrawThisElement(const UI::WidgetPtr parUIElement, VertexDataStream& stream, std::vector<u32>& indices)
+{
+    const UI::WidgetPlacement& placement = parUIElement->Placement();
+    glm::vec2 pos = glm::xy(placement.FPositionInPixels);
+    glm::vec2 size = glm::zw(placement.FPositionInPixels);
+    u32 cl = std::dynamic_pointer_cast<UI::TestUIWidget>(parUIElement)->Color;
     const u32 indexOffset = (u32)stream.GetSize();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(parUIElement.Pos, 0.f));
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, parUIElement.Color);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(pos, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, cl);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(parUIElement.Pos + glm::vec2(parUIElement.Size.x, 0.f), 0.f));
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, parUIElement.Color);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(pos + glm::vec2(size.x, 0.f), 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, cl);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(parUIElement.Pos + glm::vec2(parUIElement.Size.x, parUIElement.Size.y), 0.f));
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, parUIElement.Color);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(pos + size, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, cl);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(parUIElement.Pos + glm::vec2(0.f, parUIElement.Size.y), 0.f));
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, parUIElement.Color);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(pos + glm::vec2(0.f, size.y), 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, cl);
     stream.Advance();
 
     indices.push_back(indexOffset + 0);
