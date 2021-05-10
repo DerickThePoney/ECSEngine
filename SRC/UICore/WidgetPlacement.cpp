@@ -82,6 +82,8 @@ const char* AsString(WidgetSizeType::Type parValue)
 
 void WidgetPlacement::UpdatePlacementIFN(const WidgetScaler* parScaler, const Widget* parParent)
 {
+    FPositionInPixels.z = FSize.x;
+    FPositionInPixels.w = FSize.y;
     switch (FPositioningType)
     {
     case WidgetPositionningType::PIXEL:

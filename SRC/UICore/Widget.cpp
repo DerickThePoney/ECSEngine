@@ -7,7 +7,11 @@ namespace ECSEngine
 namespace UI
 {
 
-void Widget::SetParent(WidgetPtr parNewParent)
+Widget::~Widget()
+{
+}
+
+void Widget::SetParent(Widget* parNewParent)
 {
     FParent = parNewParent;
 }
@@ -20,6 +24,7 @@ void Widget::AddChild(WidgetPtr parNewChild)
 #endif
 
     FChildren.push_back(parNewChild);
+    parNewChild->SetParent(this);
 }
 
 void Widget::RemoveChild(WidgetPtr parOldChild)
@@ -27,7 +32,16 @@ void Widget::RemoveChild(WidgetPtr parOldChild)
     auto it = std::find(FChildren.begin(), FChildren.end(), parOldChild);
     AlwaysCheckedAssert(it != FChildren.end());
     if (it != FChildren.end())
+    {
+        (*it)->SetParent(nullptr);
         FChildren.erase(it);
+    }
+}
+
+void Widget::UpdatePlacement(const WidgetScaler* parScaler)
+{
+    FPlacement.UpdatePlacementIFN(parScaler, FParent);
+    foreachitem(child, FChildren) { child->UpdatePlacement(parScaler); }
 }
 
 } // namespace UI
