@@ -3,6 +3,7 @@
 #include "WidgetPlacement.h"
 
 #include "Widget.h"
+#include "WidgetScaler.h"
 
 namespace ECSEngine
 {
@@ -15,10 +16,10 @@ const char* AsString(WidgetPositionningType::Type parValue)
 {
     switch (parValue)
     {
-    case WidgetPositionningType::SCREEN_RELATIVE:
-        return "SCREEN_RELATIVE";
-    case WidgetPositionningType::PIXEL:
-        return "PIXEL";
+    case WidgetPositionningType::RELATIVE_POS:
+        return "RELATIVE_POS";
+    case WidgetPositionningType::PIXEL_POS:
+        return "PIXEL_POS";
     default:
         return "";
     }
@@ -82,30 +83,36 @@ const char* AsString(WidgetSizeType::Type parValue)
 
 void WidgetPlacement::UpdatePlacementIFN(const WidgetScaler* parScaler, const Widget* parParent)
 {
-    FPositionInPixels.z = FSize.x;
-    FPositionInPixels.w = FSize.y;
-    switch (FPositioningType)
+    glm::vec2 scale = glm::vec2(1.f);
+
+    if (FPositioningType == WidgetPositionningType::RELATIVE_POS)
     {
-    case WidgetPositionningType::PIXEL:
-    {
-        glm::vec2 anchorPosition = FPositionFromAnchor;
-        if (parParent != nullptr)
+        if (parParent == nullptr)
+        {
+            scale = parScaler->GetScale();
+        }
+        else
         {
             const WidgetPlacement& parentPlacement = parParent->Placement();
-            const glm::vec2 parentAnchorPlacement = parentPlacement.GetAnchorPositionInPixels(FParentAnchor);
-            anchorPosition += parentAnchorPlacement;
+            scale = glm::zw(parentPlacement.FPositionInPixels);
         }
-        const glm::vec2 selfAnchorPositionFromTopLeft = FSelfAnchor * glm::zw(FPositionInPixels);
-
-        const glm::vec2 topLeftPositionInPixel = anchorPosition - selfAnchorPositionFromTopLeft;
-        FPositionInPixels.x = topLeftPositionInPixel.x;
-        FPositionInPixels.y = topLeftPositionInPixel.y;
-
-        break;
     }
-    default:
-        AssertNotReached();
+
+    FPositionInPixels.z = scale.x * FSize.x;
+    FPositionInPixels.w = scale.y * FSize.y;
+
+    glm::vec2 anchorPosition = FPositionFromAnchor * scale;
+    if (parParent != nullptr)
+    {
+        const WidgetPlacement& parentPlacement = parParent->Placement();
+        const glm::vec2 parentAnchorPlacement = parentPlacement.GetAnchorPositionInPixels(FParentAnchor);
+        anchorPosition += parentAnchorPlacement;
     }
+    const glm::vec2 selfAnchorPositionFromTopLeft = FSelfAnchor * glm::zw(FPositionInPixels);
+
+    const glm::vec2 topLeftPositionInPixel = anchorPosition - selfAnchorPositionFromTopLeft;
+    FPositionInPixels.x = topLeftPositionInPixel.x;
+    FPositionInPixels.y = topLeftPositionInPixel.y;
 }
 
 glm::vec2 WidgetPlacement::GetAnchorPositionInPixels(WidgetParentAnchor::Type parAnchorType) const
@@ -116,47 +123,42 @@ glm::vec2 WidgetPlacement::GetAnchorPositionInPixels(WidgetParentAnchor::Type pa
         return glm::xy(FPositionInPixels);
     case WidgetParentAnchor::TOP_CENTER:
     {
-        const float displacement = 0.5f * (FPositionInPixels.z - FPositionInPixels.x);
+        const float displacement = 0.5f * FPositionInPixels.z;
         return glm::xy(FPositionInPixels) + glm::vec2(displacement, 0.f);
     }
     case WidgetParentAnchor::TOP_RIGHT:
     {
-        const float displacement = (FPositionInPixels.z - FPositionInPixels.x);
+        const float displacement = FPositionInPixels.z;
         return glm::xy(FPositionInPixels) + glm::vec2(displacement, 0.f);
     }
     case WidgetParentAnchor::CENTER_LEFT:
     {
-        const float displacementy = 0.5f * (FPositionInPixels.w - FPositionInPixels.y);
+        const float displacementy = 0.5f * FPositionInPixels.w;
         return glm::xy(FPositionInPixels) + glm::vec2(0.f, displacementy);
     }
     case WidgetParentAnchor::CENTER_CENTER:
     {
-        const float displacementx = 0.5f * (FPositionInPixels.z - FPositionInPixels.x);
-        const float displacementy = 0.5f * (FPositionInPixels.w - FPositionInPixels.y);
-        return glm::xy(FPositionInPixels) + glm::vec2(displacementx, displacementy);
+        return glm::xy(FPositionInPixels) + 0.5f * glm::zw(FPositionInPixels);
     }
     case WidgetParentAnchor::CENTER_RIGHT:
     {
-        const float displacementx = (FPositionInPixels.z - FPositionInPixels.x);
-        const float displacementy = 0.5f * (FPositionInPixels.w - FPositionInPixels.y);
+        const float displacementx = FPositionInPixels.z;
+        const float displacementy = 0.5f * FPositionInPixels.w;
         return glm::xy(FPositionInPixels) + glm::vec2(displacementx, displacementy);
     }
     case WidgetParentAnchor::BOTTOM_LEFT:
     {
-        const float displacementy = (FPositionInPixels.w - FPositionInPixels.y);
-        return glm::xy(FPositionInPixels) + glm::vec2(0.f, displacementy);
+        return glm::xy(FPositionInPixels) + glm::vec2(0.f, FPositionInPixels.w);
     }
     case WidgetParentAnchor::BOTTOM_CENTER:
     {
-        const float displacementx = 0.5f * (FPositionInPixels.z - FPositionInPixels.x);
-        const float displacementy = (FPositionInPixels.w - FPositionInPixels.y);
+        const float displacementx = 0.5f * FPositionInPixels.z;
+        const float displacementy = FPositionInPixels.w;
         return glm::xy(FPositionInPixels) + glm::vec2(displacementx, displacementy);
     }
     case WidgetParentAnchor::BOTTOM_RIGHT:
     {
-        const float displacementx = (FPositionInPixels.z - FPositionInPixels.x);
-        const float displacementy = (FPositionInPixels.w - FPositionInPixels.y);
-        return glm::xy(FPositionInPixels) + glm::vec2(displacementx, displacementy);
+        return glm::xy(FPositionInPixels) + glm::zw(FPositionInPixels);
     }
     default:
         AssertNotReached();

@@ -9,8 +9,8 @@ namespace WidgetPositionningType
 {
 enum Type
 {
-    SCREEN_RELATIVE,
-    PIXEL,
+    RELATIVE_POS,
+    PIXEL_POS,
     LENGTH
 };
 
@@ -58,7 +58,7 @@ struct WidgetPlacement
 
     glm::vec2 GetAnchorPositionInPixels(WidgetParentAnchor::Type parAnchorType) const;
 
-    WidgetPositionningType::Type FPositioningType = WidgetPositionningType::PIXEL;
+    WidgetPositionningType::Type FPositioningType = WidgetPositionningType::PIXEL_POS;
     WidgetParentAnchor::Type FParentAnchor = WidgetParentAnchor::TOP_LEFT;
     WidgetSizeType::Type FSizeType = WidgetSizeType::ABSOLUTE_PIXEL;
 
