@@ -87,6 +87,8 @@ void GameRenderer::Shutdown()
 
 void GameRenderer::Render()
 {
+    SCOPED_PROFILE_CLASS(GameRenderer, Render);
+
     // Clear command buffers
     FGeometryCommandBuffer->clear();
     FFeedbackCommandBuffer->clear();
@@ -117,48 +119,61 @@ void GameRenderer::Render()
     glm::mat4 view = c->GetWorldViewMatrix();
     glm::mat4 proj = c->GetProjectionMatrix(aspectRatio);
 
-    // Geometry pass
-    FGeometryCommandBuffer->SetViewTranform(view, proj);
-
-    foreachitemconst(gfxRep, GFXRepresentationManager::Instance())
     {
-        const Carrier* carrier = gfxRep.second->GetCarrier();
-        if (carrier == nullptr)
-            continue;
+        SCOPED_PROFILE(GameRenderer_Render_GeometryPass);
+        // Geometry pass
+        FGeometryCommandBuffer->SetViewTranform(view, proj);
 
-        const VisualModel* visuals = gfxRep.second->GetVisualModel();
-        if (visuals == nullptr || !visuals->Visible())
-            continue;
-
-        if (Rendering::MeshFrustumCulling::CullMesh(visuals->GetMeshHandle(), carrier->LocalToWorld(), frustum))
+        foreachitemconst(gfxRep, GFXRepresentationManager::Instance())
         {
-            if (gfxRep.second->GetPose() != nullptr)
+            const Carrier* carrier = gfxRep.second->GetCarrier();
+            if (carrier == nullptr)
+                continue;
+
+            const VisualModel* visuals = gfxRep.second->GetVisualModel();
+            if (visuals == nullptr || !visuals->Visible())
+                continue;
+
+            if (Rendering::MeshFrustumCulling::CullMesh(visuals->GetMeshHandle(), carrier->LocalToWorld(), frustum))
             {
-                FGeometryCommandBuffer->DrawMeshWithPose(gfxRep.second->GetPose(), visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
-            }
-            else
-            {
-                FGeometryCommandBuffer->DrawMesh(visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
+                if (gfxRep.second->GetPose() != nullptr)
+                {
+                    FGeometryCommandBuffer->DrawMeshWithPose(gfxRep.second->GetPose(), visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
+                }
+                else
+                {
+                    FGeometryCommandBuffer->DrawMesh(visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
+                }
             }
         }
+
+        FGeometryCommandBuffer->Submit();
     }
 
-    FGeometryCommandBuffer->Submit();
-
     // feedback pass
-    FFeedbackCommandBuffer->SetViewTranform(view, proj);
+    {
+        SCOPED_PROFILE(GameRenderer_Render_FeedbackPass);
+        FFeedbackCommandBuffer->SetViewTranform(view, proj);
 
-    GameplayFeedbackDrawer::Instance().DrawFeedback(FFeedbackCommandBuffer);
-    FFeedbackCommandBuffer->Submit();
+        GameplayFeedbackDrawer::Instance().DrawFeedback(FFeedbackCommandBuffer);
+        FFeedbackCommandBuffer->Submit();
+    }
 
-    UIRendering::RenderScene();
+    {
+        // UI pass
+        SCOPED_PROFILE(GameRenderer_Render_UIPass);
+        UIRendering::RenderScene();
+    }
 
     // combine pass
-    MaterialInstanceHandle combineMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\combinepass.material");
-    MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_GeometryTexture", FGeometryFramebuffer->GetTextureHandle(0).idx, 0);
+    {
+        SCOPED_PROFILE(GameRenderer_Render_CombinePass);
+        MaterialInstanceHandle combineMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\combinepass.material");
+        MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_GeometryTexture", FGeometryFramebuffer->GetTextureHandle(0).idx, 0);
 
-    FCombineCommandBuffer->BlitWithMaterial(combineMaterial);
-    FCombineCommandBuffer->Submit();
+        FCombineCommandBuffer->BlitWithMaterial(combineMaterial);
+        FCombineCommandBuffer->Submit();
+    }
 }
 
 } // namespace Rendering
