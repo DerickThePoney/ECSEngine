@@ -33,6 +33,8 @@ void UICommandBuffer::PopContext()
 
 void UICommandBuffer::Submit()
 {
+    AlwaysCheckedAssert(FCurrentContexts.empty());
+
     RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
     foreachitemconst(context, FBufferContexts)
     {
