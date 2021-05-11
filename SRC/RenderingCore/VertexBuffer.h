@@ -33,8 +33,15 @@ private:
 class DynamicVertexBuffer final
 {
 public:
+    DynamicVertexBuffer();
     DynamicVertexBuffer(VertexLayoutHash parHash);
     ~DynamicVertexBuffer();
+
+    void SetHash(const VertexLayoutHash& parHash)
+    {
+        AssertRelease(!FHandleHasBeenComputed);
+        FHash = parHash;
+    }
 
     const VertexLayoutHash Hash() const { return FHash; };
     u32 GetNumberOfVertices() const { return FSize; }
