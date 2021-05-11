@@ -83,25 +83,39 @@ const char* AsString(WidgetSizeType::Type parValue)
 
 void WidgetPlacement::UpdatePlacementIFN(const WidgetScaler* parScaler, const Widget* parParent)
 {
-    glm::vec2 scale = glm::vec2(1.f);
+    glm::vec2 positionScale = glm::vec2(1.f);
 
     if (FPositioningType == WidgetPositionningType::RELATIVE_POS)
     {
         if (parParent == nullptr)
         {
-            scale = parScaler->GetScale();
+            positionScale = parScaler->GetScale();
         }
         else
         {
             const WidgetPlacement& parentPlacement = parParent->Placement();
-            scale = glm::zw(parentPlacement.FPositionInPixels);
+            positionScale = glm::zw(parentPlacement.FPositionInPixels);
         }
     }
 
-    FPositionInPixels.z = scale.x * FSize.x;
-    FPositionInPixels.w = scale.y * FSize.y;
+    glm::vec2 sizeScale = glm::vec2(1.f);
+    if (FSizeType == WidgetSizeType::ABSOLUTE_RELATIVE)
+    {
+        if (parParent == nullptr)
+        {
+            sizeScale = parScaler->GetScale();
+        }
+        else
+        {
+            const WidgetPlacement& parentPlacement = parParent->Placement();
+            sizeScale = glm::zw(parentPlacement.FPositionInPixels);
+        }
+    }
 
-    glm::vec2 anchorPosition = FPositionFromAnchor * scale;
+    FPositionInPixels.z = sizeScale.x * FSize.x;
+    FPositionInPixels.w = sizeScale.y * FSize.y;
+
+    glm::vec2 anchorPosition = FPositionFromAnchor * positionScale;
     if (parParent != nullptr)
     {
         const WidgetPlacement& parentPlacement = parParent->Placement();
@@ -113,6 +127,21 @@ void WidgetPlacement::UpdatePlacementIFN(const WidgetScaler* parScaler, const Wi
     const glm::vec2 topLeftPositionInPixel = anchorPosition - selfAnchorPositionFromTopLeft;
     FPositionInPixels.x = topLeftPositionInPixel.x;
     FPositionInPixels.y = topLeftPositionInPixel.y;
+
+    if (FSizeType == WidgetSizeType::FIT_TO_PARENT)
+    {
+        const WidgetPlacement& parentPlacement = parParent->Placement();
+        const glm::vec2 bottomRight = glm::xy(FPositionInPixels) + glm::zw(FPositionInPixels);
+        const glm::vec2 parentBottomRight = glm::xy(parentPlacement.FPositionInPixels) + glm::zw(parentPlacement.FPositionInPixels);
+        const glm::vec2 clampedBottomRight = glm::min(bottomRight, parentBottomRight);
+        const glm::vec2 clampedSize = clampedBottomRight - glm::xy(FPositionInPixels);
+        FPositionInPixels.z = clampedSize.x;
+        FPositionInPixels.w = clampedSize.y;
+    }
+    else if (FSizeType == WidgetSizeType::FIT_TO_CHILDREN)
+    {
+        AssertNotReachedMsg("Not implemented yet !");
+    }
 }
 
 glm::vec2 WidgetPlacement::GetAnchorPositionInPixels(WidgetParentAnchor::Type parAnchorType) const
