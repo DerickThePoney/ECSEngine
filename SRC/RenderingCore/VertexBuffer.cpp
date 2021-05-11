@@ -65,6 +65,12 @@ DynamicVertexBuffer::DynamicVertexBuffer(VertexLayoutHash parHash)
     FLayoutHandle.idx = bgfx::kInvalidHandle;
 }
 
+DynamicVertexBuffer::DynamicVertexBuffer()
+{
+    FHandle.idx = bgfx::kInvalidHandle;
+    FLayoutHandle.idx = bgfx::kInvalidHandle;
+}
+
 DynamicVertexBuffer::~DynamicVertexBuffer()
 {
     DestroyHandleIFN();

@@ -23,6 +23,8 @@ public:
     const std::string& GetShadersBaseName() const { return FShadersBaseName; }
     const std::vector<std::pair<std::string, bgfx::UniformType::Enum>>& GetUniformsAndTypes() const { return FUniformsAndTypes; }
 
+    MeshLayoutDescription LayoutDescription() const { return FLayoutDescription; }
+
 #ifdef PERFORM_SECURITY_CHECKS
     bool UsesUniformOfType(const std::string& parName, bgfx::UniformType::Enum parType) const;
 #endif
