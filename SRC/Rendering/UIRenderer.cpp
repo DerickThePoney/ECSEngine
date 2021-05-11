@@ -72,25 +72,18 @@ void UIRenderer::Initialise()
     aplacement.FPositioningType = WidgetPositionningType::RELATIVE_POS;
     aplacement.FPositionFromAnchor = glm::vec2(0.5f);
     aplacement.FSelfAnchor = glm::vec2(.5f, .5f);
-    aplacement.FSize = glm::vec2(0.1);
+    aplacement.FSize = glm::vec2(500, 350);
     a->Color = ColorUtils::ConvertToU32(glm::vec4(RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), 1.0f));
     FUIElementsForTest.push_back(WidgetPtr(a));
 
     TestUIWidget* b = new TestUIWidget();
     WidgetPlacement& bplacement = b->Placement();
     bplacement.FPositioningType = WidgetPositionningType::RELATIVE_POS;
-    // bplacement.FParentAnchor = WidgetParentAnchor::TOP_LEFT;
     bplacement.FPositionFromAnchor = glm::vec2(0.5f);
     bplacement.FSelfAnchor = glm::vec2(.5f, .5f);
-    bplacement.FSize = glm::vec2(0.1f, 0.1f);
+    bplacement.FSize = glm::vec2(40, 300);
     b->Color = ColorUtils::ConvertToU32(glm::vec4(RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), 1.0f));
     a->AddChild(WidgetPtr(b));
-
-    /*FUIElementsForTest.push_back({ glm::vec2(110.f, 70.f), glm::vec2(50.f, 50.f), ColorUtils::ConvertToU32(glm::vec4(1.f, 0.0f, 0.0f, 1.f)) });
-
-    FUIElementsForTest.push_back({ glm::vec2(70.f, 150.f), glm::vec2(50.f, 50.f), ColorUtils::ConvertToU32(glm::vec4(0.1f, 1.0f, 0.0f, 1.f)) });
-
-    FUIElementsForTest.push_back({ glm::vec2(50.f, 220.f), glm::vec2(50.f, 50.f), ColorUtils::ConvertToU32(glm::vec4(1.0f, 1.0f, 0.0f, 1.f)) });*/
 }
 
 void UIRenderer::Shutdown()
