@@ -100,6 +100,11 @@ void UIRenderer::RenderScene()
 
     RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
 
+    auto size = GLFWDisplayWindowHandler::Instance().GetSize();
+    glm::mat4 transform = glm::ortho(0.f, (float)size.x, (float)size.y, 0.f);
+    bgfx::setViewTransform(RenderPassId::GAME_UI_PASS, NULL, &transform);
+    bgfx::setViewRect(RenderPassId::GAME_UI_PASS, 0, 0, uint16_t(size.x), uint16_t(size.y));
+
     foreachitemconst(element, FUIElementsForTest)
     {
         VertexDataStream stream(4, FVertexBuffer.Hash().GetByteSize(), FVertexBuffer.Hash(), true);
@@ -109,11 +114,6 @@ void UIRenderer::RenderScene()
         FVertexBuffer.PushRawBuffer(stream);
         FIndexBuffer.PushData(indices.data(), indices.size());
 
-        auto size = GLFWDisplayWindowHandler::Instance().GetSize();
-        glm::mat4 transform = glm::ortho(0.f, (float)size.x, (float)size.y, 0.f);
-
-        bgfx::setViewTransform(RenderPassId::GAME_UI_PASS, NULL, &transform);
-        bgfx::setViewRect(RenderPassId::GAME_UI_PASS, 0, 0, uint16_t(size.x), uint16_t(size.y));
         state.ApplyState();
 
         bgfx::setVertexBuffer(0, FVertexBuffer.GetVertexBufferHandle(), 0u, FVertexBuffer.GetNumberOfVertices(), FVertexBuffer.GetVertexLayoutHandle());
