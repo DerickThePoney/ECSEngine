@@ -69,15 +69,20 @@ void UIRenderer::Initialise()
     using namespace UI;
     TestUIWidget* a = new TestUIWidget();
     WidgetPlacement& aplacement = a->Placement();
-    aplacement.FPositionFromAnchor = glm::vec2(150.f, 150.f);
-    aplacement.FSize = glm::vec2(150.f, 200.f);
+    aplacement.FPositioningType = WidgetPositionningType::RELATIVE_POS;
+    aplacement.FPositionFromAnchor = glm::vec2(0.5f);
+    aplacement.FSelfAnchor = glm::vec2(.5f, .5f);
+    aplacement.FSize = glm::vec2(0.1);
     a->Color = ColorUtils::ConvertToU32(glm::vec4(RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), 1.0f));
     FUIElementsForTest.push_back(WidgetPtr(a));
 
     TestUIWidget* b = new TestUIWidget();
     WidgetPlacement& bplacement = b->Placement();
-    bplacement.FPositionFromAnchor = glm::vec2(10.f, 10.f);
-    bplacement.FSize = glm::vec2(15.f, 20.f);
+    bplacement.FPositioningType = WidgetPositionningType::RELATIVE_POS;
+    // bplacement.FParentAnchor = WidgetParentAnchor::TOP_LEFT;
+    bplacement.FPositionFromAnchor = glm::vec2(0.5f);
+    bplacement.FSelfAnchor = glm::vec2(.5f, .5f);
+    bplacement.FSize = glm::vec2(0.1f, 0.1f);
     b->Color = ColorUtils::ConvertToU32(glm::vec4(RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), 1.0f));
     a->AddChild(WidgetPtr(b));
 
@@ -94,50 +99,6 @@ void UIRenderer::Shutdown()
 
 void UIRenderer::RenderScene()
 {
-    /*if (FPing)
-    {
-        if (FUIElementsForTest.size() < 10)
-        {
-            if (FAddElement < 0.f)
-            {
-                const glm::vec2 pos = glm::vec2(20.f + RandomNumbers::NextFloat() * (250.f - 20.f), 20.f + RandomNumbers::NextFloat() * (250.f - 20.f));
-                const glm::vec2 size = glm::vec2(20.f + RandomNumbers::NextFloat() * (100.f - 20.f), 20.f + RandomNumbers::NextFloat() * (100.f - 20.f));
-                const u32 color = ColorUtils::ConvertToU32(glm::vec4(RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), RandomNumbers::NextFloat(), 1.0f));
-                FUIElementsForTest.push_back({ pos, size, color });
-                FAddElement = AddElement;
-            }
-            else
-            {
-                FAddElement -= TimeManager::FrameDeltaTime();
-            }
-        }
-        else
-        {
-            FPing = false;
-            FAddElement = AddElement;
-        }
-    }
-    else
-    {
-        if (FUIElementsForTest.size() > 5)
-        {
-            if (FAddElement < 0.f)
-            {
-                FUIElementsForTest.pop_back();
-                FAddElement = AddElement;
-            }
-            else
-            {
-                FAddElement -= TimeManager::FrameDeltaTime();
-            }
-        }
-        else
-        {
-            FPing = true;
-            FAddElement = AddElement;
-        }
-    }*/
-
     UI::WidgetScaler scaler;
     foreachitem(uiel, FUIElementsForTest) { uiel->UpdatePlacement(&scaler); }
 
