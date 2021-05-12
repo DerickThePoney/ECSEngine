@@ -12,19 +12,26 @@ namespace ECSEngine
 namespace Rendering
 {
 
+void UICommandBuffer::Clear()
+{
+    while (!FCurrentContexts.empty())
+    {
+        FCurrentContexts.pop();
+    }
+
+    FBufferContexts.clear();
+}
+
 void UICommandBuffer::PushContext(const glm::vec4 parRectSize)
 {
-    AssertRelease(!FCurrentContexts.empty() || FBufferContexts.size() == 0);
-
     UIBufferContext newContext;
     newContext.RectSize = parRectSize;
+    FCurrentContexts.push((u32)FBufferContexts.size());
     FBufferContexts.push_back(newContext);
-    FCurrentContexts.push((u32)FCurrentContexts.size());
 }
 
 void UICommandBuffer::PopContext()
 {
-    AssertRelease(!FCurrentContexts.empty() || FBufferContexts.size() == 0);
     if (FCurrentContexts.empty())
         return;
 
@@ -36,26 +43,19 @@ void UICommandBuffer::Submit()
     AlwaysCheckedAssert(FCurrentContexts.empty());
 
     RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
-    foreachitemconst(context, FBufferContexts)
+    foreachitem(context, FBufferContexts)
     {
         bgfx::setScissor(context.RectSize.x, context.RectSize.y, context.RectSize.z, context.RectSize.w);
-        foreachitemconst(bufferStream, context.BufferContextTriangleBags)
+        foreachitem(bufferStream, context.BufferContextTriangleBags)
         {
-            auto itFind = FBufferBags.find(bufferStream.first);
-            if (itFind == FBufferBags.end())
-            {
-                itFind = FBufferBags.insert_or_assign(bufferStream.first, UICommandBufferBufferBag()).first;
-                itFind->second.VertexBuffer.SetHash(bufferStream.second.FStream.GetHash());
-            }
-
-            itFind->second.VertexBuffer.PushRawBuffer(bufferStream.second.FStream);
-            itFind->second.IndexBuffer.PushData(bufferStream.second.FIndices.data(), (u32)bufferStream.second.FIndices.size());
+            bufferStream.second.FBufferBag.VertexBuffer.PushRawBuffer(bufferStream.second.FStream);
+            bufferStream.second.FBufferBag.IndexBuffer.PushData(bufferStream.second.FIndices.data(), (u32)bufferStream.second.FIndices.size());
 
             state.ApplyState();
 
-            bgfx::setVertexBuffer(0, itFind->second.VertexBuffer.GetVertexBufferHandle(), 0u, itFind->second.VertexBuffer.GetNumberOfVertices(),
-                  itFind->second.VertexBuffer.GetVertexLayoutHandle());
-            bgfx::setIndexBuffer(itFind->second.IndexBuffer.GetIndexBufferHandle(), 0u, itFind->second.IndexBuffer.GetSize());
+            bgfx::setVertexBuffer(0, bufferStream.second.FBufferBag.VertexBuffer.GetVertexBufferHandle(), 0u, bufferStream.second.FBufferBag.VertexBuffer.GetNumberOfVertices(),
+                  bufferStream.second.FBufferBag.VertexBuffer.GetVertexLayoutHandle());
+            bgfx::setIndexBuffer(bufferStream.second.FBufferBag.IndexBuffer.GetIndexBufferHandle(), 0u, bufferStream.second.FBufferBag.IndexBuffer.GetSize());
 
             const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(bufferStream.first);
             AssertRelease(instance != nullptr);
@@ -64,7 +64,7 @@ void UICommandBuffer::Submit()
     }
 }
 
-void UICommandBuffer::GetCurrentStreams(const MaterialInstanceHandle parMaterialHandle, VertexDataStream* outVertexStream, std::vector<u32>* outIndexStream)
+void UICommandBuffer::GetCurrentStreams(const MaterialInstanceHandle parMaterialHandle, VertexDataStream*& outVertexStream, std::vector<u32>*& outIndexStream)
 {
     const u32 currentContextIdx = CurrentContext();
 
@@ -87,6 +87,7 @@ void UICommandBuffer::GetCurrentStreams(const MaterialInstanceHandle parMaterial
         newTriBags.FStream = str;
 
         itFind = currentContext.BufferContextTriangleBags.insert_or_assign(parMaterialHandle, newTriBags).first;
+        itFind->second.FBufferBag.VertexBuffer.SetHash(vertexHash);
     }
 #ifdef ENABLE_SECURITY_CHECKS
     else
