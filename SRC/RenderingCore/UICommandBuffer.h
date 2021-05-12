@@ -12,12 +12,14 @@ namespace Rendering
 class UICommandBuffer
 {
 public:
+    void Clear();
+
     void PushContext(const glm::vec4 parRectSize);
     void PopContext();
 
     void Submit();
 
-    void GetCurrentStreams(const MaterialInstanceHandle parMaterialHandle, VertexDataStream* outVertexStream, std::vector<u32>* outIndexStream);
+    void GetCurrentStreams(const MaterialInstanceHandle parMaterialHandle, VertexDataStream*& outVertexStream, std::vector<u32>*& outIndexStream);
 
 private:
     u32 CurrentContext() const { return FCurrentContexts.top(); }
@@ -33,6 +35,7 @@ private:
     {
         VertexDataStream FStream;
         std::vector<u32> FIndices;
+        UICommandBufferBufferBag FBufferBag;
     };
 
     struct UIBufferContext
@@ -41,7 +44,6 @@ private:
         std::map<MaterialInstanceHandle, UIBufferContextTriangleBag> BufferContextTriangleBags;
     };
 
-    std::map<MaterialInstanceHandle, UICommandBufferBufferBag> FBufferBags;
     std::vector<UIBufferContext> FBufferContexts;
     std::stack<u32> FCurrentContexts;
 };
