@@ -54,6 +54,10 @@ class WidgetScaler;
 class Widget;
 struct WidgetPlacement
 {
+    SERIALIZE() { ar(FPositioningType, FParentAnchor, FSizeType, FPositionFromAnchor, FSelfAnchor, FSize, FPadding); }
+
+    void DrawEditor();
+
     void UpdatePlacementIFN(const WidgetScaler* parScaler, const Widget* parParent);
 
     glm::vec2 GetAnchorPositionInPixels(WidgetParentAnchor::Type parAnchorType) const;

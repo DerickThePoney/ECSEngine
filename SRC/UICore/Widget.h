@@ -4,14 +4,43 @@
 
 namespace ECSEngine
 {
+namespace Rendering
+{
+class UICommandBuffer;
+}
+
 namespace UI
 {
 class Widget;
 using WidgetPtr = std::shared_ptr<Widget>;
 
+class WidgetDescriptor
+{
+public:
+    virtual ~WidgetDescriptor() = default;
+
+    WidgetPtr CreateWidgetAndHierarchy() const;
+    void DrawEditor();
+
+    std::vector<std::unique_ptr<WidgetDescriptor>>& Children() { return FChildren; }
+    const WidgetPlacement& InitialPlacement() const { return FInitialPlacement; }
+    WidgetPlacement& InitialPlacement() { return FInitialPlacement; }
+
+    SERIALIZE() { PROPERTYFIELD(InitialPlacement, WidgetPlacement()); }
+
+protected:
+    virtual WidgetPtr CreateThisWidget() const = 0;
+    virtual bool VirtualDrawEditor();
+
+private:
+    std::vector<std::unique_ptr<WidgetDescriptor>> FChildren;
+    WidgetPlacement FInitialPlacement;
+};
+
 class Widget
 {
 public:
+    Widget(const WidgetPlacement& parInitialPlacement);
     virtual ~Widget();
     void SetParent(Widget* parNewParent);
     void AddChild(WidgetPtr parNewChild);
@@ -25,17 +54,20 @@ public:
 
     virtual void UpdatePlacement(const WidgetScaler* parScaler);
 
+    void Draw(Rendering::UICommandBuffer& parBuffer);
+
+protected:
+    virtual void VirtualOnDraw(Rendering::UICommandBuffer& parBuffer);
+
 private:
     Widget* FParent = nullptr;
     std::vector<WidgetPtr> FChildren;
 
     WidgetPlacement FPlacement;
-};
 
-class TestUIWidget : public Widget
-{
-public:
-    u32 Color = 0xFFFFFFFF;
+#ifdef ENABLE_SECURITY_CHECKS
+    bool FVirtualOnDrawCalled = false;
+#endif
 };
 } // namespace UI
 } // namespace ECSEngine
