@@ -16,5 +16,14 @@ u32 ConvertToU32(const glm::vec4 parColor)
     return a << 24 | b << 16 | g << 8 | r;
 }
 
+glm::vec4 ConvertToFVEC4(const u32 parColor)
+{
+    const float a = (float)((parColor >> 24) & 0xFF) / 255.f;
+    const float b = (float)((parColor >> 16) & 0xFF) / 255.f;
+    const float g = (float)((parColor >> 8) & 0xFF) / 255.f;
+    const float r = (float)(parColor & 0xFF) / 255.f;
+    return glm::vec4(r, g, b, a);
+}
+
 } // namespace ColorUtils
 } // namespace ECSEngine
