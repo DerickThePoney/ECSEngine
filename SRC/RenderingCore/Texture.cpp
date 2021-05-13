@@ -30,6 +30,12 @@ Texture::~Texture()
         Unload();
 }
 
+void Texture::SetTextureData_IKnowWhatImDoing(bgfx::TextureHandle parHandle, bgfx::TextureInfo parInfo)
+{
+    FHandle = parHandle;
+    FInfo = parInfo;
+}
+
 void Texture::Load()
 {
     AssertRelease(FTextureDescriptor != nullptr);
