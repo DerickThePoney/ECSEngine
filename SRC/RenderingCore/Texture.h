@@ -18,6 +18,7 @@ public:
     Texture(const TextureDescriptor* parTextureDescriptor, const std::string& parTextureName);
     ~Texture();
 
+    void SetTextureData_IKnowWhatImDoing(bgfx::TextureHandle parHandle, bgfx::TextureInfo parInfo);
     void Load();
     void Unload();
     bool Valid() const;
