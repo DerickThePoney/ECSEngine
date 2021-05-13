@@ -7,6 +7,7 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "ECSGameplay_Specific/GameplayFeedbackDrawer.h"
+#include "FontTextureManager.h"
 #include "GFXKeyHelper.h"
 #include "GFXOperator.h"
 #include "GFXRepresentationDescriptorManager.h"
@@ -35,6 +36,8 @@ bool RenderingLoader::VirtualInitialise()
 
     Rendering::TextureManager::CreateIFP();
     Rendering::TextureManager::Instance().Initialise();
+
+    Rendering::FontTextureManager::CreateIFP();
 
     Rendering::MaterialManager::Initialise();
 
@@ -86,6 +89,8 @@ void RenderingLoader::VirtualShutdown()
     Rendering::ImGUI::Shutdown();
 
     Rendering::MaterialManager::Shutdown();
+
+    Rendering::FontTextureManager::Destroy();
 
     Rendering::TextureManager::Instance().Shutdown();
     Rendering::TextureManager::Destroy();
