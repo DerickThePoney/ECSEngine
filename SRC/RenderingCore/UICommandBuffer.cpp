@@ -2,10 +2,12 @@
 
 #include "UICommandBuffer.h"
 
+#include "IndexBuffer.h"
 #include "Material.h"
 #include "MaterialManager.h"
 #include "RenderPass.h"
 #include "RenderingState.h"
+#include "VertexBuffer.h"
 
 namespace ECSEngine
 {
@@ -45,17 +47,21 @@ void UICommandBuffer::Submit()
     RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
     foreachitem(context, FBufferContexts)
     {
-        bgfx::setScissor(context.RectSize.x, context.RectSize.y, context.RectSize.z, context.RectSize.w);
+        bgfx::setViewScissor(RenderPassId::GAME_UI_PASS, context.RectSize.x, context.RectSize.y, context.RectSize.z, context.RectSize.w);
         foreachitem(bufferStream, context.BufferContextTriangleBags)
         {
-            bufferStream.second.FBufferBag.VertexBuffer.PushRawBuffer(bufferStream.second.FStream);
-            bufferStream.second.FBufferBag.IndexBuffer.PushData(bufferStream.second.FIndices.data(), (u32)bufferStream.second.FIndices.size());
+            DynamicVertexBuffer vertexBuffer;
+            DynamicIndexBuffer indexBuffer;
+
+            vertexBuffer.SetHash(bufferStream.second.FStream.GetHash());
+
+            vertexBuffer.PushRawBuffer(bufferStream.second.FStream);
+            indexBuffer.PushData(bufferStream.second.FIndices.data(), (u32)bufferStream.second.FIndices.size());
 
             state.ApplyState();
 
-            bgfx::setVertexBuffer(0, bufferStream.second.FBufferBag.VertexBuffer.GetVertexBufferHandle(), 0u, bufferStream.second.FBufferBag.VertexBuffer.GetNumberOfVertices(),
-                  bufferStream.second.FBufferBag.VertexBuffer.GetVertexLayoutHandle());
-            bgfx::setIndexBuffer(bufferStream.second.FBufferBag.IndexBuffer.GetIndexBufferHandle(), 0u, bufferStream.second.FBufferBag.IndexBuffer.GetSize());
+            bgfx::setVertexBuffer(0, vertexBuffer.GetVertexBufferHandle(), 0u, vertexBuffer.GetNumberOfVertices(), vertexBuffer.GetVertexLayoutHandle());
+            bgfx::setIndexBuffer(indexBuffer.GetIndexBufferHandle(), 0u, indexBuffer.GetSize());
 
             const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(bufferStream.first);
             AssertRelease(instance != nullptr);
@@ -87,7 +93,7 @@ void UICommandBuffer::GetCurrentStreams(const MaterialInstanceHandle parMaterial
         newTriBags.FStream = str;
 
         itFind = currentContext.BufferContextTriangleBags.insert_or_assign(parMaterialHandle, newTriBags).first;
-        itFind->second.FBufferBag.VertexBuffer.SetHash(vertexHash);
+        // itFind->second.FBufferBag.VertexBuffer.SetHash(vertexHash);
     }
 #ifdef ENABLE_SECURITY_CHECKS
     else
