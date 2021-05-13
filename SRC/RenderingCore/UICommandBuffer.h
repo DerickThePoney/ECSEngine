@@ -1,8 +1,6 @@
 #pragma once
 #include "Common/MeshStreamingData.h"
 #include "Common/RenderingHandles.h"
-#include "IndexBuffer.h"
-#include "VertexBuffer.h"
 
 namespace ECSEngine
 {
@@ -25,17 +23,10 @@ private:
     u32 CurrentContext() const { return FCurrentContexts.top(); }
 
 private:
-    struct UICommandBufferBufferBag
-    {
-        DynamicVertexBuffer VertexBuffer;
-        DynamicIndexBuffer IndexBuffer;
-    };
-
     struct UIBufferContextTriangleBag
     {
         VertexDataStream FStream;
         std::vector<u32> FIndices;
-        UICommandBufferBufferBag FBufferBag;
     };
 
     struct UIBufferContext
