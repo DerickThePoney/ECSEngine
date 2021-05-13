@@ -2,6 +2,7 @@
 
 #include "WidgetPlacement.h"
 
+#include "Application/PropertyDrawer.h"
 #include "Widget.h"
 #include "WidgetScaler.h"
 
@@ -80,6 +81,51 @@ const char* AsString(WidgetSizeType::Type parValue)
 }
 
 } // namespace WidgetSizeType
+
+void WidgetPlacement::DrawEditor()
+{
+    if (ImGui::BeginCombo("Parent Anchor", WidgetParentAnchor::AsString(FParentAnchor)))
+    {
+        forrange(i, 0, WidgetParentAnchor::LENGTH)
+        {
+            WidgetParentAnchor::Type current = (WidgetParentAnchor::Type)i;
+            if (ImGui::Selectable(WidgetParentAnchor::AsString(current), FParentAnchor == current))
+            {
+                FParentAnchor = current;
+            }
+        }
+    }
+
+    if (ImGui::BeginCombo("Positionning type", WidgetPositionningType::AsString(FPositioningType)))
+    {
+        forrange(i, 0, WidgetPositionningType::LENGTH)
+        {
+            WidgetPositionningType::Type current = (WidgetPositionningType::Type)i;
+            if (ImGui::Selectable(WidgetPositionningType::AsString(current), FPositioningType == current))
+            {
+                FPositioningType = current;
+            }
+        }
+    }
+
+    EDITOR_PROPERTY_SIMPLE("Position from parent anchor", FPositionFromAnchor);
+    EDITOR_PROPERTY_SIMPLE("Self anchor positon", FSelfAnchor);
+
+    if (ImGui::BeginCombo("Size type", WidgetSizeType::AsString(FSizeType)))
+    {
+        forrange(i, 0, WidgetSizeType::LENGTH)
+        {
+            WidgetSizeType::Type current = (WidgetSizeType::Type)i;
+            if (ImGui::Selectable(WidgetSizeType::AsString(current), FSizeType == current))
+            {
+                FSizeType = current;
+            }
+        }
+    }
+
+    EDITOR_PROPERTY_SIMPLE("Size", FSize);
+    EDITOR_PROPERTY_SIMPLE("Padding", FPadding);
+}
 
 void WidgetPlacement::UpdatePlacementIFN(const WidgetScaler* parScaler, const Widget* parParent)
 {
