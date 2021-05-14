@@ -6,6 +6,7 @@
 #include "Common/FixedSizedArray.h"
 #include "Common/RandomGenerator.h"
 #include "Common/RenderingHandles.h"
+#include "Common/Resource.h"
 #include "Common/Singleton.h"
 #include "Common/TimeManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -17,6 +18,7 @@
 #include "RenderingCore/UICommandBuffer.h"
 #include "RenderingCore/VertexBuffer.h"
 #include "RenderingCore/VertexLayout.h"
+#include "UICore/Font.h"
 #include "UICore/PanelWidgets.h"
 #include "UICore/Widget.h"
 #include "UICore/WidgetScaler.h"
@@ -73,6 +75,12 @@ void UIRenderer::Initialise()
     panelDesc->SetColor(ColorUtils::ConvertToU32(glm::vec4(1.f, 0.f, 0.f, 0.5f)));
 
     FPanels.push_back(std::move(panelDesc));
+
+    Resource r("Fonts\\OpenSans-Regular.ttf");
+    Font font;
+    font.InitFromResource(r);
+
+    font.RasterizeText("Test string to rasterize");
 }
 
 void UIRenderer::Shutdown()
