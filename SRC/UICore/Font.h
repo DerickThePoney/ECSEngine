@@ -19,6 +19,7 @@ struct FontGlyph
     float v1 = 0;
 
     float advance = 0.f;
+    bool visible = false;
 };
 
 class Font
@@ -36,12 +37,19 @@ public:
 
     const FontGlyph* GetGlyph(u32 codePoint);
 
+    void RasterizeText(const std::string& parText);
+
+private:
+    glm::vec2 CalculateTextWidth(const c8* parBegin, const c8* parEnd);
+
 private:
     float FFontSize = 30.f;
 
     std::vector<FontGlyph> FGlyphs;
     std::unordered_map<u32, u32> FCodepointToGlyphMap;
     Rendering::TextureHandle FFontTexture;
+
+    u32 FFallbackGlyphIndex = -1;
 };
 } // namespace UI
 } // namespace ECSEngine
