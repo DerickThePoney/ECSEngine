@@ -55,11 +55,8 @@ private:
     FixedSizedArrayInSitu<ImGuiContext*, PassesNumber> FImguiContexts;
     bgfx::VertexLayout FVertexLayout;
     bgfx::ProgramHandle FProgam;
-    bgfx::ProgramHandle FImageProgram;
     bgfx::TextureHandle FTextureHandle;
     bgfx::UniformHandle FTextureSampleUniform;
-    bgfx::UniformHandle FImageLodEnabledUniform;
-    // ImFont* m_font[ImGui::Font::Count];
 };
 
 void ImguiRenderer::Init(const u32 parContext)
@@ -99,9 +96,6 @@ void ImguiRenderer::Init(const u32 parContext)
     {
         bgfx::RendererType::Enum type = bgfx::getRendererType();
         FProgam = LoadProgram("Shaders\\Perso\\", "ImGUI", "ocornut_imgui");
-
-        FImageLodEnabledUniform = bgfx::createUniform("u_imageLodEnabled", bgfx::UniformType::Vec4);
-        FImageProgram = LoadProgram("Shaders\\Perso\\", "ImGUI", "imgui_image");
 
         FVertexLayout.begin()
               .add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
@@ -235,8 +229,6 @@ void ImguiRenderer::Shutdown(const u32 parContext)
         bgfx::destroy(FTextureSampleUniform);
         bgfx::destroy(FTextureHandle);
 
-        bgfx::destroy(FImageLodEnabledUniform);
-        bgfx::destroy(FImageProgram);
         bgfx::destroy(FProgam);
     }
 }
