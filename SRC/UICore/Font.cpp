@@ -5,6 +5,7 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "RenderingCore/FontTextureManager.h"
+#include "UTF8Helpers.h"
 
 #ifndef STB_RECT_PACK_IMPLEMENTATION
 #define STB_RECT_PACK_IMPLEMENTATION
@@ -131,8 +132,13 @@ void Font::InitFromResource(const Resource& parRes)
         glyph.u1 = q.s1;
         glyph.v1 = q.t1;
         glyph.advance = pc.xadvance;
+        glyph.visible = (glyph.x0 != glyph.x1) && (glyph.y0 != glyph.y1);
         PushGlyph(glyph);
     }
+
+    auto fallback = FCodepointToGlyphMap.find('?');
+    AssertRelease(fallback != FCodepointToGlyphMap.end());
+    FFallbackGlyphIndex = fallback->second;
 
     // Create the texture
     FFontTexture = Rendering::FontTextureManager::Instance().AddNewFontTexture(parRes.FName, wantedWidth, wantedHeight, textureData);
@@ -147,6 +153,58 @@ const FontGlyph* Font::GetGlyph(u32 codePoint)
         return nullptr;
     AssertRelease(itFind->second < FGlyphs.size());
     return &FGlyphs[itFind->second];
+}
+
+void Font::RasterizeText(const std::string& parText)
+{
+    const glm::vec2 textSize = CalculateTextWidth(parText.data(), parText.data() + parText.size());
+}
+
+glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd)
+{
+    glm::vec2 res(0.f);
+    float lineWidth = 0.f;
+    const c8* c = parBegin;
+
+    while (c < parEnd)
+    {
+        const c8* prevC = c;
+        u32 cp = (u32)*c;
+        if (cp < 0x80)
+        {
+            c += 1;
+        }
+        else
+        {
+            c += UTF8Helpers::CodepointFromUtf8Char(&cp, c, parEnd);
+            if (c == 0) // malformed?
+                break;
+        }
+
+        if (cp < 32)
+        {
+            if (cp == '\n')
+            {
+                res.x = glm::max(res.x, lineWidth);
+                res.y += FFontSize;
+                lineWidth = 0.f;
+                continue;
+            }
+
+            if (cp == '\r')
+                continue;
+        }
+
+        auto itFind = FCodepointToGlyphMap.find(cp);
+        const float codepointWidth = (itFind != FCodepointToGlyphMap.end()) ? FGlyphs[itFind->second].advance : FGlyphs[FFallbackGlyphIndex].advance;
+        lineWidth += codepointWidth;
+    }
+    if (res.x < lineWidth)
+        res.x = lineWidth;
+    if (lineWidth > 0 || res.y == 0.f)
+        res.y += FFontSize;
+
+    return res;
 }
 
 } // namespace UI
