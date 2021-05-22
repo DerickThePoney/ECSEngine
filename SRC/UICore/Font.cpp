@@ -2,6 +2,7 @@
 
 #include "Font.h"
 
+#include "Common/MeshStreamingData.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "RenderingCore/FontTextureManager.h"
@@ -18,6 +19,7 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "imgui/imstb_truetype.h"
 #endif
+#include "Common/ColorUtils.h"
 
 namespace ECSEngine
 {
@@ -155,9 +157,11 @@ const FontGlyph* Font::GetGlyph(u32 codePoint)
     return &FGlyphs[itFind->second];
 }
 
-void Font::RasterizeText(const std::string& parText)
+void Font::RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices)
 {
     const glm::vec2 textSize = CalculateTextWidth(parText.data(), parText.data() + parText.size());
+
+    FillVerticesStream(parText.data(), parText.data() + parText.size(), startPosition, textSize, outStream, outIndices);
 }
 
 glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd)
@@ -205,6 +209,95 @@ glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd)
         res.y += FFontSize;
 
     return res;
+}
+
+void Font::FillVerticesStream(const c8* parBegin,
+      const c8* parEnd,
+      const glm::vec2 parStartPosition,
+      const glm::vec2 parTextSize,
+      Rendering::VertexDataStream& outStream,
+      std::vector<u32>& outIndices)
+{
+    glm::vec3 cursor(parStartPosition, 0.f);
+    const c8* c = parBegin;
+    while (c < parEnd)
+    {
+        const c8* prevC = c;
+        u32 cp = (u32)*c;
+        if (cp < 0x80)
+        {
+            c += 1;
+        }
+        else
+        {
+            c += UTF8Helpers::CodepointFromUtf8Char(&cp, c, parEnd);
+            if (c == 0) // malformed?
+                break;
+        }
+
+        if (cp < 32)
+        {
+            if (cp == '\n')
+            {
+                cursor.x = parStartPosition.x;
+                cursor.y += FFontSize;
+                continue;
+            }
+
+            if (cp == '\r')
+                continue;
+        }
+
+        auto itFind = FCodepointToGlyphMap.find(cp);
+        const FontGlyph& glyph = (itFind != FCodepointToGlyphMap.end()) ? FGlyphs[itFind->second] : FGlyphs[FFallbackGlyphIndex];
+
+        if (glyph.visible)
+        {
+            const glm::vec3 pa = glm::vec3(glyph.x0, glyph.y0, 0.f) + cursor;
+            const glm::vec3 pb = glm::vec3(glyph.x0, glyph.y1, 0.f) + cursor;
+            const glm::vec3 pc = glm::vec3(glyph.x1, glyph.y1, 0.f) + cursor;
+            const glm::vec3 pd = glm::vec3(glyph.x1, glyph.y0, 0.f) + cursor;
+
+            const glm::vec2 uva = glm::vec2(glyph.u0, glyph.v0);
+            const glm::vec2 uvb = glm::vec2(glyph.u0, glyph.v1);
+            const glm::vec2 uvc = glm::vec2(glyph.u1, glyph.v1);
+            const glm::vec2 uvd = glm::vec2(glyph.u1, glyph.v0);
+
+            u32 color = ColorUtils::ConvertToU32(glm::vec4(0.f, 0.f, 1.f, 1.f));
+
+            const u32 currentVertexOffset = outStream.GetSize();
+
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, pa);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uva);
+            outStream.Advance();
+
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, pb);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uvb);
+            outStream.Advance();
+
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, pc);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uvc);
+            outStream.Advance();
+
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, pd);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uvd);
+            outStream.Advance();
+
+            outIndices.push_back(0 + currentVertexOffset);
+            outIndices.push_back(1 + currentVertexOffset);
+            outIndices.push_back(2 + currentVertexOffset);
+
+            outIndices.push_back(0 + currentVertexOffset);
+            outIndices.push_back(2 + currentVertexOffset);
+            outIndices.push_back(3 + currentVertexOffset);
+        }
+
+        cursor.x += glyph.advance;
+    }
 }
 
 } // namespace UI
