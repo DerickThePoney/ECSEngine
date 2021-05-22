@@ -4,6 +4,11 @@
 namespace ECSEngine
 {
 class Resource;
+namespace Rendering
+{
+class VertexDataStream;
+}
+
 namespace UI
 {
 struct FontGlyph
@@ -28,6 +33,7 @@ public:
     void InitFromResource(const Resource& parRes);
 
     float FontSize() const { return FFontSize; }
+    const Rendering::TextureHandle& FontTexture() const { return FFontTexture; }
 
     void PushGlyph(FontGlyph parGlyph)
     {
@@ -37,10 +43,16 @@ public:
 
     const FontGlyph* GetGlyph(u32 codePoint);
 
-    void RasterizeText(const std::string& parText);
+    void RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices);
 
 private:
     glm::vec2 CalculateTextWidth(const c8* parBegin, const c8* parEnd);
+    void FillVerticesStream(const c8* parBegin,
+          const c8* parEnd,
+          const glm::vec2 parStartPosition,
+          const glm::vec2 parTextSize,
+          Rendering::VertexDataStream& outStream,
+          std::vector<u32>& outIndices);
 
 private:
     float FFontSize = 30.f;
