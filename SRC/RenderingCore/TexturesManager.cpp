@@ -6,6 +6,7 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
 #include "Common/ResourceHandle.h"
+#include "FontTextureManager.h"
 namespace ECSEngine
 {
 namespace Rendering
@@ -70,6 +71,8 @@ const TextureHandle TextureManager::GetTextureHandle(const TextureName& parTextu
 
 const Texture* TextureManager::GetTexture(const TextureHandle& parTextureHandle)
 {
+    if (parTextureHandle.GetBankId() == -1)
+        return FontTextureManager::Instance().GetFontTexture(parTextureHandle);
     AssertRelease(FTextureBanks[parTextureHandle.GetBankId()] != nullptr);
     return FTextureBanks[parTextureHandle.GetBankId()]->GetTexture(parTextureHandle);
 }
