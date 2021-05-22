@@ -53,6 +53,8 @@ public:
     const bgfx::DynamicVertexBufferHandle& GetVertexBufferHandle() const;
     const bgfx::VertexLayoutHandle& GetVertexLayoutHandle() const;
 
+    bool HandleHasBeenComputed() const { return FHandleHasBeenComputed; }
+
 private:
     void CreateVertexBufferHandle(const VertexDataStream& parDataStream);
 
