@@ -53,9 +53,13 @@ private:
     std::vector<UI::WidgetPtr> FUIElementsForTest;
 
     UICommandBuffer FBuffer;
+    UI::Font FFont;
 
     bool FPing = true;
     float FAddElement = AddElement;
+
+    DynamicVertexBuffer vertices;
+    DynamicIndexBuffer indicesBuffer;
 };
 
 UIRenderer::UIRenderer()
@@ -64,7 +68,7 @@ UIRenderer::UIRenderer()
 
 void UIRenderer::Initialise()
 {
-    FUIVertexColorMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uivertexcolormaterial.material");
+    FUIVertexColorMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uisimpletextmaterial.material");
     using namespace UI;
 
     std::unique_ptr<PanelWidgetDescriptor> panelDesc = std::make_unique<PanelWidgetDescriptor>();
@@ -77,10 +81,7 @@ void UIRenderer::Initialise()
     FPanels.push_back(std::move(panelDesc));
 
     Resource r("Fonts\\OpenSans-Regular.ttf");
-    Font font;
-    font.InitFromResource(r);
-
-    font.RasterizeText("Test string to rasterize");
+    FFont.InitFromResource(r);
 }
 
 void UIRenderer::Shutdown()
@@ -115,6 +116,31 @@ void UIRenderer::RenderScene()
     FBuffer.PopContext();
 
     FBuffer.Submit();
+
+    bgfx::setViewScissor(RenderPassId::GAME_UI_PASS, 0, 0, size.x, size.y);
+
+    std::string testString = "Test string to rasterize";
+    Rendering::VertexLayoutHash vertexHash(true, 1, 1, false, false, false, false);
+    Rendering::VertexDataStream stream(testString.size() * 4, vertexHash.GetByteSize(), vertexHash, true);
+    std::vector<u32> indices;
+
+    FFont.RasterizeText(testString, glm::vec2(200.f), stream, indices);
+    if (!vertices.HandleHasBeenComputed())
+        vertices.SetHash(vertexHash);
+    vertices.PushRawBuffer(stream);
+
+    indicesBuffer.PushData(indices.data(), (u32)indices.size());
+
+    const MaterialInstance* materialInstance = MaterialManager::GetMaterialInstance(FUIVertexColorMaterial);
+    auto& slot = materialInstance->GetMaterialDescriptor()->GetTexturesInput()[0];
+    MaterialManager::SetSamplerUniform(slot.GetTextureSlotName(), FFont.FontTexture(), slot.GetSlot());
+
+    RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
+    state.ApplyState();
+
+    bgfx::setVertexBuffer(0, vertices.GetVertexBufferHandle(), 0u, vertices.GetNumberOfVertices(), vertices.GetVertexLayoutHandle());
+    bgfx::setIndexBuffer(indicesBuffer.GetIndexBufferHandle(), 0u, indicesBuffer.GetSize());
+    bgfx::submit(RenderPassId::GAME_UI_PASS, materialInstance->GetProgram()->ProgramHandle());
 }
 
 namespace UIRendering
