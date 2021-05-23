@@ -254,10 +254,10 @@ void Font::FillVerticesStream(const c8* parBegin,
         if (glyph.visible)
         {
             // todo Align on pixels
-            const glm::vec3 pa = glm::round(glm::vec3(glyph.x0, glyph.y0, 0.f) + cursor);
-            const glm::vec3 pb = glm::round(glm::vec3(glyph.x0, glyph.y1, 0.f) + cursor);
-            const glm::vec3 pc = glm::round(glm::vec3(glyph.x1, glyph.y1, 0.f) + cursor);
-            const glm::vec3 pd = glm::round(glm::vec3(glyph.x1, glyph.y0, 0.f) + cursor);
+            const glm::vec3 pa = glm::round(glm::vec3(glyph.x0, glyph.y0, 0.f) + cursor); // top left
+            const glm::vec3 pb = glm::round(glm::vec3(glyph.x0, glyph.y1, 0.f) + cursor); // top right
+            const glm::vec3 pc = glm::round(glm::vec3(glyph.x1, glyph.y1, 0.f) + cursor); // bottom right
+            const glm::vec3 pd = glm::round(glm::vec3(glyph.x1, glyph.y0, 0.f) + cursor); // bottom left
 
             const glm::vec2 uva = glm::vec2(glyph.u0, glyph.v0);
             const glm::vec2 uvb = glm::vec2(glyph.u0, glyph.v1);

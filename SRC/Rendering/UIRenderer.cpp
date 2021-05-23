@@ -73,8 +73,9 @@ void UIRenderer::Initialise()
 
     std::unique_ptr<PanelWidgetDescriptor> panelDesc = std::make_unique<PanelWidgetDescriptor>();
     WidgetPlacement& placement = panelDesc->InitialPlacement();
-    placement.FSizeType = WidgetSizeType::ABSOLUTE_RELATIVE;
-    placement.FSize = glm::vec2(1.f, 0.5f);
+    placement.FSizeType = WidgetSizeType::ABSOLUTE_PIXEL;
+    placement.FSize = glm::vec2(200.0f, 30.f);
+    placement.FPositionFromAnchor = glm::vec2(200.f);
 
     panelDesc->SetColor(ColorUtils::ConvertToU32(glm::vec4(1.f, 0.f, 0.f, 0.5f)));
 

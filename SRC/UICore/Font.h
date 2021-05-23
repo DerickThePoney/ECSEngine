@@ -37,6 +37,7 @@ public:
 
     void PushGlyph(FontGlyph parGlyph)
     {
+        AssertRelease(FCodepointToGlyphMap.find(parGlyph.codePoint) == FCodepointToGlyphMap.end());
         FCodepointToGlyphMap[parGlyph.codePoint] = FGlyphs.size();
         FGlyphs.push_back(parGlyph);
     }
