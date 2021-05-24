@@ -35,7 +35,7 @@ TextureHandle::TextureHandle(u32 parBankId /*= HandlesId::InvalidTextureBankId*/
 
 bool TextureHandle::IsValid() const
 {
-    return FBankId != HandlesId::InvalidTextureBankId && FTextureHandleId != HandlesId::InvalidTextureHandle;
+    return FTextureHandleId != HandlesId::InvalidTextureHandle;
 }
 
 TextureName::TextureName(const std::string& parBankName, const std::string& parTextureName)
