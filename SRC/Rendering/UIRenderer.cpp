@@ -19,6 +19,7 @@
 #include "RenderingCore/VertexBuffer.h"
 #include "RenderingCore/VertexLayout.h"
 #include "UICore/Font.h"
+#include "UICore/LabelWidget.h"
 #include "UICore/PanelWidgets.h"
 #include "UICore/Widget.h"
 #include "UICore/WidgetScaler.h"
@@ -53,7 +54,6 @@ private:
     std::vector<UI::WidgetPtr> FUIElementsForTest;
 
     UICommandBuffer FBuffer;
-    UI::Font FFont;
 
     bool FPing = true;
     float FAddElement = AddElement;
@@ -72,17 +72,23 @@ void UIRenderer::Initialise()
     using namespace UI;
 
     std::unique_ptr<PanelWidgetDescriptor> panelDesc = std::make_unique<PanelWidgetDescriptor>();
-    WidgetPlacement& placement = panelDesc->InitialPlacement();
-    placement.FSizeType = WidgetSizeType::ABSOLUTE_PIXEL;
-    placement.FSize = glm::vec2(200.0f, 30.f);
-    placement.FPositionFromAnchor = glm::vec2(200.f);
+    WidgetPlacement& panelPlacement = panelDesc->InitialPlacement();
+    panelPlacement.FSizeType = WidgetSizeType::ABSOLUTE_PIXEL;
+    panelPlacement.FSize = glm::vec2(400.0f, 500.f);
+    panelPlacement.FPositionFromAnchor = glm::vec2(200.f);
 
     panelDesc->SetColor(ColorUtils::ConvertToU32(glm::vec4(1.f, 0.f, 0.f, 0.5f)));
 
-    FPanels.push_back(std::move(panelDesc));
+    std::unique_ptr<LabelWidgetDescriptor> labelDesc = std::make_unique<LabelWidgetDescriptor>();
+    WidgetPlacement& labelPlacement = labelDesc->InitialPlacement();
+    labelPlacement.FPositionFromAnchor = glm::vec2(0.f);
+    labelDesc->SetTextToDraw("Test string to \nrasterize");
+    labelDesc->SetTextColor(ColorUtils::ConvertToU32(glm::vec4(0.f, 0.f, 1.f, 1.f)));
+    labelDesc->SetFont("Fonts\\OpenSans-Regular.ttf", 30.f);
 
-    Resource r("Fonts\\OpenSans-Regular.ttf");
-    FFont.InitFromResource(r);
+    panelDesc->Children().push_back(std::move(labelDesc));
+
+    FPanels.push_back(std::move(panelDesc));
 }
 
 void UIRenderer::Shutdown()
@@ -95,13 +101,6 @@ void UIRenderer::RenderScene()
     {
         foreachitem(panel, FPanels) { FUIElementsForTest.push_back(panel->CreateWidgetAndHierarchy()); }
     }
-
-    std::string testString = "Test string to rasterize";
-    Rendering::VertexLayoutHash vertexHash(true, 1, 1, false, false, false, false);
-    Rendering::VertexDataStream stream(testString.size() * 4, vertexHash.GetByteSize(), vertexHash, true);
-    std::vector<u32> indices;
-    const glm::vec2 textSize = glm::round(FFont.CalculateTextWidth(testString));
-    FUIElementsForTest[0]->Placement().FSize = textSize;
 
     UI::WidgetScaler scaler;
     foreachitem(uiel, FUIElementsForTest) { uiel->UpdatePlacement(&scaler); }
@@ -124,26 +123,6 @@ void UIRenderer::RenderScene()
     FBuffer.PopContext();
 
     FBuffer.Submit();
-
-    bgfx::setViewScissor(RenderPassId::GAME_UI_PASS, 0, 0, size.x, size.y);
-
-    FFont.RasterizeText(testString, glm::vec2(200.f), stream, indices);
-    if (!vertices.HandleHasBeenComputed())
-        vertices.SetHash(vertexHash);
-    vertices.PushRawBuffer(stream);
-
-    indicesBuffer.PushData(indices.data(), (u32)indices.size());
-
-    const MaterialInstance* materialInstance = MaterialManager::GetMaterialInstance(FUIVertexColorMaterial);
-    auto& slot = materialInstance->GetMaterialDescriptor()->GetTexturesInput()[0];
-    MaterialManager::SetSamplerUniform(slot.GetTextureSlotName(), FFont.FontTexture(), slot.GetSlot());
-
-    RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
-    state.ApplyState();
-
-    bgfx::setVertexBuffer(0, vertices.GetVertexBufferHandle(), 0u, vertices.GetNumberOfVertices(), vertices.GetVertexLayoutHandle());
-    bgfx::setIndexBuffer(indicesBuffer.GetIndexBufferHandle(), 0u, indicesBuffer.GetSize());
-    bgfx::submit(RenderPassId::GAME_UI_PASS, materialInstance->GetProgram()->ProgramHandle());
 }
 
 namespace UIRendering
