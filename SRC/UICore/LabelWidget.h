@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/PoolAllocator.h"
 #include "Common/RenderingHandles.h"
 #include "Font.h"
 #include "Widget.h"
@@ -15,6 +16,12 @@ public:
 
     const std::string& TextToDraw() const { return FTextToDraw; }
     void SetTextToDraw(const std::string& parTextToDraw) { FTextToDraw = parTextToDraw; }
+
+    void SetFont(const std::string& parFont, const float parSize)
+    {
+        FFontName = parFont;
+        FFontSize = parSize;
+    }
 
     SERIALIZE()
     {
@@ -38,6 +45,8 @@ private:
 
 class SimpleLabel : public Widget
 {
+    DECLARE_POOL_ALLOCATED(SimpleLabel);
+
 public:
     SimpleLabel(const std::string& parText, const u32 parColor, const std::string& parFontName, const float parFontSize, const WidgetPlacement& parPlacement);
 
