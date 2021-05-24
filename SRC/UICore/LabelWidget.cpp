@@ -13,7 +13,7 @@ namespace UI
 
 WidgetPtr LabelWidgetDescriptor::CreateThisWidget() const
 {
-    return nullptr;
+    return WidgetPtr(new SimpleLabel(FTextToDraw, FTextColor, FFontName, FFontSize, InitialPlacement()));
 }
 
 bool LabelWidgetDescriptor::VirtualDrawEditor()
@@ -26,6 +26,7 @@ bool LabelWidgetDescriptor::VirtualDrawEditor()
     return false;
 }
 
+IMPLEMENT_POOL_ALLOCATED(SimpleLabel);
 SimpleLabel::SimpleLabel(const std::string& parText, const u32 parColor, const std::string& parFontName, const float parFontSize, const WidgetPlacement& parPlacement)
     : Widget(parPlacement)
     , FText(parText)
@@ -45,7 +46,13 @@ void SimpleLabel::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
 
     Rendering::VertexDataStream* stream = nullptr;
     std::vector<u32>* indices = nullptr;
-    parBuffer.GetCurrentStreams(FMaterial, stream, indices);
+    parBuffer.GetCurrentStreams(FMaterial, FFont.FontTexture(), stream, indices);
+
+    AssertRelease(stream != nullptr);
+    AssertRelease(indices != nullptr);
+
+    WidgetPlacement& placement = Placement();
+    FFont.RasterizeText(FText, placement.GetAnchorPositionInPixels(WidgetParentAnchor::TOP_LEFT), *stream, *indices);
 }
 
 } // namespace UI
