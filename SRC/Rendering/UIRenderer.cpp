@@ -96,6 +96,13 @@ void UIRenderer::RenderScene()
         foreachitem(panel, FPanels) { FUIElementsForTest.push_back(panel->CreateWidgetAndHierarchy()); }
     }
 
+    std::string testString = "Test string to rasterize";
+    Rendering::VertexLayoutHash vertexHash(true, 1, 1, false, false, false, false);
+    Rendering::VertexDataStream stream(testString.size() * 4, vertexHash.GetByteSize(), vertexHash, true);
+    std::vector<u32> indices;
+    const glm::vec2 textSize = glm::round(FFont.CalculateTextWidth(testString));
+    FUIElementsForTest[0]->Placement().FSize = textSize;
+
     UI::WidgetScaler scaler;
     foreachitem(uiel, FUIElementsForTest) { uiel->UpdatePlacement(&scaler); }
 
@@ -119,11 +126,6 @@ void UIRenderer::RenderScene()
     FBuffer.Submit();
 
     bgfx::setViewScissor(RenderPassId::GAME_UI_PASS, 0, 0, size.x, size.y);
-
-    std::string testString = "Test string to rasterize";
-    Rendering::VertexLayoutHash vertexHash(true, 1, 1, false, false, false, false);
-    Rendering::VertexDataStream stream(testString.size() * 4, vertexHash.GetByteSize(), vertexHash, true);
-    std::vector<u32> indices;
 
     FFont.RasterizeText(testString, glm::vec2(200.f), stream, indices);
     if (!vertices.HandleHasBeenComputed())
