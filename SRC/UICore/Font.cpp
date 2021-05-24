@@ -148,7 +148,7 @@ void Font::InitFromResource(const Resource& parRes)
     delete[] textureData;
 }
 
-const FontGlyph* Font::GetGlyph(u32 codePoint)
+const FontGlyph* Font::GetGlyph(u32 codePoint) const
 {
     auto itFind = FCodepointToGlyphMap.find(codePoint);
     if (itFind == FCodepointToGlyphMap.end())
@@ -157,14 +157,17 @@ const FontGlyph* Font::GetGlyph(u32 codePoint)
     return &FGlyphs[itFind->second];
 }
 
-void Font::RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices)
+void Font::RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const
 {
-    const glm::vec2 textSize = CalculateTextWidth(parText.data(), parText.data() + parText.size());
-
-    FillVerticesStream(parText.data(), parText.data() + parText.size(), startPosition, textSize, outStream, outIndices);
+    FillVerticesStream(parText.data(), parText.data() + parText.size(), startPosition, outStream, outIndices);
 }
 
-glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd)
+glm::vec2 Font::CalculateTextWidth(const std::string& parText) const
+{
+    return CalculateTextWidth(parText.data(), parText.data() + parText.size());
+}
+
+glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd) const
 {
     glm::vec2 res(0.f);
     float lineWidth = 0.f;
@@ -201,7 +204,7 @@ glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd)
 
         auto itFind = FCodepointToGlyphMap.find(cp);
         const float codepointWidth = (itFind != FCodepointToGlyphMap.end()) ? FGlyphs[itFind->second].advance : FGlyphs[FFallbackGlyphIndex].advance;
-        lineWidth += codepointWidth;
+        lineWidth += glm::round(codepointWidth);
     }
     if (res.x < lineWidth)
         res.x = lineWidth;
@@ -211,12 +214,7 @@ glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd)
     return res;
 }
 
-void Font::FillVerticesStream(const c8* parBegin,
-      const c8* parEnd,
-      const glm::vec2 parStartPosition,
-      const glm::vec2 parTextSize,
-      Rendering::VertexDataStream& outStream,
-      std::vector<u32>& outIndices)
+void Font::FillVerticesStream(const c8* parBegin, const c8* parEnd, const glm::vec2 parStartPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const
 {
     glm::vec3 cursor(parStartPosition, 0.f);
     const c8* c = parBegin;
