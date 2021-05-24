@@ -18,23 +18,30 @@ public:
     void Submit();
 
     void GetCurrentStreams(const MaterialInstanceHandle parMaterialHandle, VertexDataStream*& outVertexStream, std::vector<u32>*& outIndexStream);
-
-private:
-    u32 CurrentContext() const { return FCurrentContexts.top(); }
+    void GetCurrentStreams(const MaterialInstanceHandle parMaterialHandle,
+          const TextureHandle parTextureHandle,
+          VertexDataStream*& outVertexStream,
+          std::vector<u32>*& outIndexStream);
 
 private:
     struct UIBufferContextTriangleBag
     {
         VertexDataStream FStream;
         std::vector<u32> FIndices;
+        TextureHandle FTextureHandle;
     };
 
     struct UIBufferContext
     {
         glm::vec4 RectSize;
-        std::map<MaterialInstanceHandle, UIBufferContextTriangleBag> BufferContextTriangleBags;
+        std::map<MaterialInstanceHandle, std::vector<UIBufferContextTriangleBag>> BufferContextTriangleBags;
     };
 
+private:
+    u32 CurrentContext() const { return FCurrentContexts.top(); }
+    void InitTriBag(const MaterialInstanceHandle parMaterialHandle, const TextureHandle parTextureHandle, UIBufferContextTriangleBag& initTriBag);
+
+private:
     std::vector<UIBufferContext> FBufferContexts;
     std::stack<u32> FCurrentContexts;
 };

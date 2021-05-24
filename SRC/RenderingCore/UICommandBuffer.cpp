@@ -16,6 +16,7 @@ namespace Rendering
 
 void UICommandBuffer::Clear()
 {
+    // todo optimise this for reuse
     while (!FCurrentContexts.empty())
     {
         FCurrentContexts.pop();
@@ -48,29 +49,47 @@ void UICommandBuffer::Submit()
     foreachitem(context, FBufferContexts)
     {
         bgfx::setViewScissor(RenderPassId::GAME_UI_PASS, context.RectSize.x, context.RectSize.y, context.RectSize.z, context.RectSize.w);
-        foreachitem(bufferStream, context.BufferContextTriangleBags)
+        foreachitem(bufferStreams, context.BufferContextTriangleBags)
         {
-            DynamicVertexBuffer vertexBuffer;
-            DynamicIndexBuffer indexBuffer;
-
-            vertexBuffer.SetHash(bufferStream.second.FStream.GetHash());
-
-            vertexBuffer.PushRawBuffer(bufferStream.second.FStream);
-            indexBuffer.PushData(bufferStream.second.FIndices.data(), (u32)bufferStream.second.FIndices.size());
-
-            state.ApplyState();
-
-            bgfx::setVertexBuffer(0, vertexBuffer.GetVertexBufferHandle(), 0u, vertexBuffer.GetNumberOfVertices(), vertexBuffer.GetVertexLayoutHandle());
-            bgfx::setIndexBuffer(indexBuffer.GetIndexBufferHandle(), 0u, indexBuffer.GetSize());
-
-            const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(bufferStream.first);
+            const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(bufferStreams.first);
             AssertRelease(instance != nullptr);
-            bgfx::submit(RenderPassId::GAME_UI_PASS, instance->GetProgram()->ProgramHandle());
+
+            foreachitem(bufferStream, bufferStreams.second)
+            {
+                DynamicVertexBuffer vertexBuffer;
+                DynamicIndexBuffer indexBuffer;
+
+                vertexBuffer.SetHash(bufferStream.FStream.GetHash());
+
+                vertexBuffer.PushRawBuffer(bufferStream.FStream);
+                indexBuffer.PushData(bufferStream.FIndices.data(), (u32)bufferStream.FIndices.size());
+
+                if (bufferStream.FTextureHandle.IsValid())
+                {
+                    auto& slot = instance->GetMaterialDescriptor()->GetTexturesInput()[0];
+                    MaterialManager::SetSamplerUniform(slot.GetTextureSlotName(), bufferStream.FTextureHandle, slot.GetSlot());
+                }
+
+                state.ApplyState();
+
+                bgfx::setVertexBuffer(0, vertexBuffer.GetVertexBufferHandle(), 0u, vertexBuffer.GetNumberOfVertices(), vertexBuffer.GetVertexLayoutHandle());
+                bgfx::setIndexBuffer(indexBuffer.GetIndexBufferHandle(), 0u, indexBuffer.GetSize());
+
+                bgfx::submit(RenderPassId::GAME_UI_PASS, instance->GetProgram()->ProgramHandle());
+            }
         }
     }
 }
 
 void UICommandBuffer::GetCurrentStreams(const MaterialInstanceHandle parMaterialHandle, VertexDataStream*& outVertexStream, std::vector<u32>*& outIndexStream)
+{
+    GetCurrentStreams(parMaterialHandle, TextureHandle(), outVertexStream, outIndexStream);
+}
+
+void UICommandBuffer::GetCurrentStreams(const MaterialInstanceHandle parMaterialHandle,
+      const TextureHandle parTextureHandle,
+      VertexDataStream*& outVertexStream,
+      std::vector<u32>*& outIndexStream)
 {
     const u32 currentContextIdx = CurrentContext();
 
@@ -78,37 +97,55 @@ void UICommandBuffer::GetCurrentStreams(const MaterialInstanceHandle parMaterial
     UIBufferContext& currentContext = FBufferContexts[currentContextIdx];
 
     auto itFind = currentContext.BufferContextTriangleBags.find(parMaterialHandle);
+    std::vector<UIBufferContextTriangleBag>::iterator foundIt;
     if (itFind == currentContext.BufferContextTriangleBags.end())
     {
         UIBufferContextTriangleBag newTriBags;
-        const MaterialInstance* instance = MaterialManager::GetMaterialInstance(parMaterialHandle);
-        AssertRelease(instance != nullptr);
-        const Program* program = instance->GetProgram();
-        AssertRelease(program != nullptr);
-
-        VertexLayoutHash vertexHash(program->Descriptor()->LayoutDescription());
-
-        // ouais c'est moche. Sue me
-        VertexDataStream str(16, vertexHash.GetByteSize(), vertexHash, true);
-        newTriBags.FStream = str;
-
-        itFind = currentContext.BufferContextTriangleBags.insert_or_assign(parMaterialHandle, newTriBags).first;
-        // itFind->second.FBufferBag.VertexBuffer.SetHash(vertexHash);
+        InitTriBag(parMaterialHandle, parTextureHandle, newTriBags);
+        std::vector<UIBufferContextTriangleBag> triBags = { newTriBags };
+        itFind = currentContext.BufferContextTriangleBags.insert_or_assign(parMaterialHandle, triBags).first;
+        foundIt = itFind->second.begin();
     }
-#ifdef ENABLE_SECURITY_CHECKS
     else
     {
+        foundIt = std::find_if(
+              itFind->second.begin(), itFind->second.end(), [parTextureHandle](const UIBufferContextTriangleBag& val) { return val.FTextureHandle == parTextureHandle; });
+
+        if (foundIt == itFind->second.end())
+        {
+            UIBufferContextTriangleBag newTriBags;
+            InitTriBag(parMaterialHandle, parTextureHandle, newTriBags);
+            itFind->second.push_back(newTriBags);
+            foundIt = itFind->second.begin() + itFind->second.size();
+        }
+
+#ifdef ENABLE_SECURITY_CHECKS
         const MaterialInstance* instance = MaterialManager::GetMaterialInstance(parMaterialHandle);
         AssertRelease(instance != nullptr);
         const Program* program = instance->GetProgram();
         AssertRelease(program != nullptr);
         VertexLayoutHash vertexHash(program->Descriptor()->LayoutDescription());
-        AssertRelease(vertexHash == itFind->second.FStream.GetHash());
+        AssertRelease(vertexHash == foundIt->FStream.GetHash());
     }
 #endif
 
-    outVertexStream = &itFind->second.FStream;
-    outIndexStream = &itFind->second.FIndices;
+    outVertexStream = &foundIt->FStream;
+    outIndexStream = &foundIt->FIndices;
+}
+
+void UICommandBuffer::InitTriBag(const MaterialInstanceHandle parMaterialHandle, const TextureHandle parTextureHandle, UIBufferContextTriangleBag& initTriBag)
+{
+    const MaterialInstance* instance = MaterialManager::GetMaterialInstance(parMaterialHandle);
+    AssertRelease(instance != nullptr);
+    const Program* program = instance->GetProgram();
+    AssertRelease(program != nullptr);
+
+    VertexLayoutHash vertexHash(program->Descriptor()->LayoutDescription());
+
+    // ouais c'est moche. Sue me
+    VertexDataStream str(16, vertexHash.GetByteSize(), vertexHash, true);
+    initTriBag.FStream = str;
+    initTriBag.FTextureHandle = parTextureHandle;
 }
 
 } // namespace Rendering
