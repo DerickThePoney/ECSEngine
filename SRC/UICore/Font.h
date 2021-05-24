@@ -42,18 +42,14 @@ public:
         FGlyphs.push_back(parGlyph);
     }
 
-    const FontGlyph* GetGlyph(u32 codePoint);
+    const FontGlyph* GetGlyph(u32 codePoint) const;
 
-    void RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices);
+    void RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const;
+    glm::vec2 CalculateTextWidth(const std::string& parText) const;
 
 private:
-    glm::vec2 CalculateTextWidth(const c8* parBegin, const c8* parEnd);
-    void FillVerticesStream(const c8* parBegin,
-          const c8* parEnd,
-          const glm::vec2 parStartPosition,
-          const glm::vec2 parTextSize,
-          Rendering::VertexDataStream& outStream,
-          std::vector<u32>& outIndices);
+    glm::vec2 CalculateTextWidth(const c8* parBegin, const c8* parEnd) const;
+    void FillVerticesStream(const c8* parBegin, const c8* parEnd, const glm::vec2 parStartPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const;
 
 private:
     float FFontSize = 30.f;
