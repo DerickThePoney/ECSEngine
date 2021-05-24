@@ -47,6 +47,8 @@ public:
     void RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const;
     glm::vec2 CalculateTextWidth(const std::string& parText) const;
 
+    void SetFontSize(const float parFontSize) { FFontSize = parFontSize; }
+
 private:
     glm::vec2 CalculateTextWidth(const c8* parBegin, const c8* parEnd) const;
     void FillVerticesStream(const c8* parBegin, const c8* parEnd, const glm::vec2 parStartPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const;
