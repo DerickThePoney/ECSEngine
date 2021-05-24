@@ -126,8 +126,8 @@ void UICommandBuffer::GetCurrentStreams(const MaterialInstanceHandle parMaterial
         AssertRelease(program != nullptr);
         VertexLayoutHash vertexHash(program->Descriptor()->LayoutDescription());
         AssertRelease(vertexHash == foundIt->FStream.GetHash());
-    }
 #endif
+    }
 
     outVertexStream = &foundIt->FStream;
     outIndexStream = &foundIt->FIndices;
