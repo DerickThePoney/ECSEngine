@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/PoolAllocator.h"
 #include "Common/RenderingHandles.h"
 #include "Widget.h"
 
@@ -30,6 +31,8 @@ private:
 
 class SimplePanel : public Widget
 {
+    DECLARE_POOL_ALLOCATED(SimplePanel);
+
 public:
     SimplePanel(const PanelWidgetDescriptor* parDescriptor, const WidgetPlacement& parPlacement);
 

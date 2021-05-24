@@ -33,6 +33,7 @@ bool PanelWidgetDescriptor::VirtualDrawEditor()
     return false;
 }
 
+IMPLEMENT_POOL_ALLOCATED(SimplePanel);
 SimplePanel::SimplePanel(const PanelWidgetDescriptor* parDescriptor, const WidgetPlacement& parPlacement)
     : Widget(parPlacement)
     , FDescriptor(parDescriptor)
