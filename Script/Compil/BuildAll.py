@@ -98,7 +98,7 @@ def main():
     group.add_argument('-e', '--engine', action="store_true", help='Build Engine')
     group.add_argument('-et', '--enginetools', action="store_true", help='Build Engine tools')
     parser.add_argument('-sln', '--solution', action="store_true", help='Build Solution')
-    parser.add_argument('-c', '--config', type=str, help='Configuration to build', default='Release')
+    parser.add_argument('-c', '--config', type=str, help='Configuration to build', default='Release', choices=['Debug','Release','Profile','Final'])
     parser.add_argument('-m', '--msbuild', type=str, help='Path to MSBuild')
     parser.add_argument('-t', '--bgfxtools', action="store_true", help='Build BGFX Tools')
     parser.add_argument('-s', '--bgfxsamples', action="store_true", help='Build BGFX Samples')
