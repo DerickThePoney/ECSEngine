@@ -27,37 +27,38 @@ struct FontGlyph
     bool visible = false;
 };
 
+struct FontGlyphInfo
+{
+    std::vector<FontGlyph> Glyphs;
+    std::unordered_map<u32, u32> CodepointToGlyphMap;
+};
+
 class Font
 {
 public:
-    void InitFromResource(const Resource& parRes);
+    void InitFromResource(const Resource& parRes, std::set<float> parFontSizes);
 
-    float FontSize() const { return FFontSize; }
     const Rendering::TextureHandle& FontTexture() const { return FFontTexture; }
 
-    void PushGlyph(FontGlyph parGlyph)
-    {
-        AssertRelease(FCodepointToGlyphMap.find(parGlyph.codePoint) == FCodepointToGlyphMap.end());
-        FCodepointToGlyphMap[parGlyph.codePoint] = FGlyphs.size();
-        FGlyphs.push_back(parGlyph);
-    }
+    void PushGlyph(float parFontSize, FontGlyph parGlyph);
 
-    const FontGlyph* GetGlyph(u32 codePoint) const;
+    const FontGlyph* GetGlyph(float parFontSize, u32 codePoint) const;
 
+    // use font size
     void RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const;
+    // use font size
     glm::vec2 CalculateTextWidth(const std::string& parText) const;
 
-    void SetFontSize(const float parFontSize) { FFontSize = parFontSize; }
+    // void SetFontSize(const float parFontSize) { FFontSize = parFontSize; }
 
 private:
     glm::vec2 CalculateTextWidth(const c8* parBegin, const c8* parEnd) const;
     void FillVerticesStream(const c8* parBegin, const c8* parEnd, const glm::vec2 parStartPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const;
 
 private:
-    float FFontSize = 30.f;
+    std::set<float> FFontSizes;
 
-    std::vector<FontGlyph> FGlyphs;
-    std::unordered_map<u32, u32> FCodepointToGlyphMap;
+    std::unordered_map<float, FontGlyphInfo> FFontSizeToGlyphInfoMap;
     Rendering::TextureHandle FFontTexture;
 
     u32 FFallbackGlyphIndex = -1;
