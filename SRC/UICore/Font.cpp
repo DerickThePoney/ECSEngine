@@ -30,10 +30,12 @@ constexpr i32 FontTexturePadding = 1;
 constexpr i32 HOversample = 3;
 constexpr i32 VOversample = 1;
 
-void Font::InitFromResource(const Resource& parRes)
+void Font::InitFromResource(const Resource& parRes, std::set<float> parFontSizes)
 {
     std::shared_ptr<ResourceHandle> resHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&parRes);
     AssertRelease(resHandle != nullptr);
+
+    FFontSizes = parFontSizes;
 
     // font init
     stbtt_fontinfo fontInfo;
@@ -52,7 +54,7 @@ void Font::InitFromResource(const Resource& parRes)
         codepoints.push_back(code);
     }
 
-    // rect packing
+    // rect packing -- Must be done more inteligently !!
     std::vector<stbrp_rect> glyphRects;
     std::vector<stbtt_packedchar> packedChars;
     glyphRects.resize(codepoints.size());
@@ -138,8 +140,8 @@ void Font::InitFromResource(const Resource& parRes)
         PushGlyph(glyph);
     }
 
-    auto fallback = FCodepointToGlyphMap.find('?');
-    AssertRelease(fallback != FCodepointToGlyphMap.end());
+    auto fallback = FFontSizeToGlyphInfoMap.begin()->second.CodepointToGlyphMap.find('?');
+    AssertRelease(fallback != FFontSizeToGlyphInfoMap.begin()->second.CodepointToGlyphMap.end());
     FFallbackGlyphIndex = fallback->second;
 
     // Create the texture
@@ -148,22 +150,36 @@ void Font::InitFromResource(const Resource& parRes)
     delete[] textureData;
 }
 
-const FontGlyph* Font::GetGlyph(u32 codePoint) const
+void Font::PushGlyph(float parFontSize, FontGlyph parGlyph)
 {
-    auto itFind = FCodepointToGlyphMap.find(codePoint);
-    if (itFind == FCodepointToGlyphMap.end())
+    auto itFind = FFontSizeToGlyphInfoMap.find(parFontSize);
+    AssertRelease(itFind != FFontSizeToGlyphInfoMap.end());
+    AssertRelease(itFind->second.CodepointToGlyphMap.find(parGlyph.codePoint) == itFind->second.CodepointToGlyphMap.end());
+    itFind->second.CodepointToGlyphMap[parGlyph.codePoint] = itFind->second.Glyphs.size();
+    itFind->second.Glyphs.push_back(parGlyph);
+}
+
+const FontGlyph* Font::GetGlyph(float parFontSize, u32 codePoint) const
+{
+    auto itFind = FFontSizeToGlyphInfoMap.find(parFontSize);
+    AssertRelease(itFind != FFontSizeToGlyphInfoMap.end());
+
+    auto itFindCp = itFind->second.CodepointToGlyphMap.find(codePoint);
+    if (itFindCp == itFind->second.CodepointToGlyphMap.end())
         return nullptr;
-    AssertRelease(itFind->second < FGlyphs.size());
-    return &FGlyphs[itFind->second];
+    AssertRelease(itFindCp->second < itFind->second.Glyphs.size());
+    return &itFind->second.Glyphs[itFindCp->second];
 }
 
 void Font::RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const
 {
+    // Use font size
     FillVerticesStream(parText.data(), parText.data() + parText.size(), startPosition, outStream, outIndices);
 }
 
 glm::vec2 Font::CalculateTextWidth(const std::string& parText) const
 {
+    // use font size
     return CalculateTextWidth(parText.data(), parText.data() + parText.size());
 }
 

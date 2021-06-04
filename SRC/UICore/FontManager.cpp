@@ -74,6 +74,8 @@ const Font* FontManager::GetFont(const FontFamilyName& parName, const FontSize p
 
 void FontManager::LoadFontsFamilies()
 {
+    // Algo -- Scrap that, each font is an atlas, we pass it the list of size, and go on with...
+    //
 }
 
 namespace Fonts
