@@ -40,7 +40,7 @@ private:
     std::string FFontName = "";
     std::string FTextToDraw = "";
     u32 FTextColor = 0xFFFFFFFF;
-    float FFontSize;
+    float FFontSize = 30.f;
 };
 
 class SimpleLabel : public Widget
@@ -60,6 +60,7 @@ private:
     std::string FText = "";
     u32 FTextColor = 0xFFFFFFFF;
     Font FFont;
+    float FFontSize = 30.f;
 };
 } // namespace UI
 } // namespace ECSEngine
