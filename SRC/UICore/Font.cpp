@@ -30,7 +30,7 @@ constexpr i32 FontTexturePadding = 1;
 constexpr i32 HOversample = 3;
 constexpr i32 VOversample = 1;
 
-void Font::InitFromResource(const Resource& parRes, std::set<float> parFontSizes)
+void Font::InitFromResource(const Resource& parRes, std::set<float>& parFontSizes)
 {
     std::shared_ptr<ResourceHandle> resHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&parRes);
     AssertRelease(resHandle != nullptr);
@@ -57,29 +57,40 @@ void Font::InitFromResource(const Resource& parRes, std::set<float> parFontSizes
     // rect packing -- Must be done more inteligently !!
     std::vector<stbrp_rect> glyphRects;
     std::vector<stbtt_packedchar> packedChars;
-    glyphRects.resize(codepoints.size());
-    packedChars.resize(codepoints.size());
+    glyphRects.resize(codepoints.size() * FFontSizes.size());
+    packedChars.resize(codepoints.size() * FFontSizes.size());
 
-    stbtt_pack_range packRange;
-    packRange.font_size = FFontSize;
-    packRange.first_unicode_codepoint_in_range = 0;
-    packRange.array_of_unicode_codepoints = codepoints.data();
-    packRange.num_chars = codepoints.size();
-    packRange.chardata_for_range = &packedChars[0];
-    packRange.h_oversample = HOversample;
-    packRange.v_oversample = VOversample;
+    std::vector<stbtt_pack_range> packRanges;
+    packRanges.resize(FFontSizes.size());
 
-    const float scale = stbtt_ScaleForPixelHeight(&fontInfo, FFontSize);
+    std::vector<float> fontsSurface;
     float surface = 0.f;
-    forrange(i, 0, codepoints.size())
+    u32 j = 0;
+    foreachitemconst(fontSize, FFontSizes)
     {
-        i32 x0, y0, x1, y1;
-        const i32 glyphIndexInFont = stbtt_FindGlyphIndex(&fontInfo, codepoints[i]);
-        AssertRelease(glyphIndexInFont != 0);
-        stbtt_GetGlyphBitmapBoxSubpixel(&fontInfo, glyphIndexInFont, scale * HOversample, scale * VOversample, 0, 0, &x0, &y0, &x1, &y1);
-        glyphRects[i].w = (stbrp_coord)(x1 - x0 + FontTexturePadding + HOversample - 1);
-        glyphRects[i].h = (stbrp_coord)(y1 - y0 + FontTexturePadding + VOversample - 1);
-        surface += glyphRects[i].w * glyphRects[i].h;
+        const float scale = stbtt_ScaleForPixelHeight(&fontInfo, fontSize);
+        stbtt_pack_range& packRange = packRanges[j];
+        packRange.font_size = fontSize;
+        packRange.first_unicode_codepoint_in_range = 0;
+        packRange.array_of_unicode_codepoints = codepoints.data();
+        packRange.num_chars = codepoints.size();
+        packRange.chardata_for_range = &packedChars[j * codepoints.size()];
+        packRange.h_oversample = HOversample;
+        packRange.v_oversample = VOversample;
+        forrange(i, 0, codepoints.size())
+        {
+            u32 glyphIndex = j * codepoints.size() + i;
+            i32 x0, y0, x1, y1;
+            const i32 glyphIndexInFont = stbtt_FindGlyphIndex(&fontInfo, codepoints[i]);
+            AssertRelease(glyphIndexInFont != 0);
+            stbtt_GetGlyphBitmapBoxSubpixel(&fontInfo, glyphIndexInFont, scale * HOversample, scale * VOversample, 0, 0, &x0, &y0, &x1, &y1);
+            glyphRects[glyphIndex].w = (stbrp_coord)(x1 - x0 + FontTexturePadding + HOversample - 1);
+            glyphRects[glyphIndex].h = (stbrp_coord)(y1 - y0 + FontTexturePadding + VOversample - 1);
+            surface += glyphRects[glyphIndex].w * glyphRects[glyphIndex].h;
+        }
+
+        FFontSizeToGlyphInfoMap.insert_or_assign(fontSize, FontGlyphInfo());
+        j += 1;
     }
 
     const i32 surface_sqrt = (i32)glm::sqrt(surface);
@@ -104,8 +115,7 @@ void Font::InitFromResource(const Resource& parRes, std::set<float> parFontSizes
     memset(textureData, 0, wantedWidth * wantedHeight);
     spc.pixels = textureData;
     spc.height = wantedHeight;
-
-    stbtt_PackFontRangesRenderIntoRects(&spc, &fontInfo, &packRange, 1, glyphRects.data());
+    stbtt_PackFontRangesRenderIntoRects(&spc, &fontInfo, packRanges.data(), packRanges.size(), glyphRects.data());
 
     stbtt_PackEnd(&spc);
 
@@ -113,31 +123,38 @@ void Font::InitFromResource(const Resource& parRes, std::set<float> parFontSizes
 
     int unscaled_ascent, unscaled_descent, unscaled_line_gap;
     stbtt_GetFontVMetrics(&fontInfo, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
-
-    const float ascent = glm::floor(unscaled_ascent * scale + ((unscaled_ascent > 0.0f) ? +1 : -1));
-    const float descent = glm::floor(unscaled_descent * scale + ((unscaled_descent > 0.0f) ? +1 : -1));
-    const float font_off_x = 0.f;
-    const float font_off_y = glm::round(ascent);
-
-    forrange(i, 0, codepoints.size())
+    j = 0;
+    foreachitemconst(fontSize, FFontSizes)
     {
-        const stbtt_packedchar& pc = packedChars[i];
-        stbtt_aligned_quad q;
-        float unused_x = 0.0f, unused_y = 0.0f;
-        stbtt_GetPackedQuad(packedChars.data(), wantedWidth, wantedHeight, i, &unused_x, &unused_y, &q, 0);
-        FontGlyph glyph;
-        glyph.codePoint = codepoints[i];
-        glyph.x0 = q.x0 + font_off_x;
-        glyph.y0 = q.y0 + font_off_y;
-        glyph.x1 = q.x1 + font_off_x;
-        glyph.y1 = q.y1 + font_off_y;
-        glyph.u0 = q.s0;
-        glyph.v0 = q.t0;
-        glyph.u1 = q.s1;
-        glyph.v1 = q.t1;
-        glyph.advance = pc.xadvance;
-        glyph.visible = (glyph.x0 != glyph.x1) && (glyph.y0 != glyph.y1);
-        PushGlyph(glyph);
+        const float scale = stbtt_ScaleForPixelHeight(&fontInfo, fontSize);
+
+        const float ascent = glm::floor(unscaled_ascent * scale + ((unscaled_ascent > 0.0f) ? +1 : -1));
+        const float descent = glm::floor(unscaled_descent * scale + ((unscaled_descent > 0.0f) ? +1 : -1));
+        const float font_off_x = 0.f;
+        const float font_off_y = glm::round(ascent);
+
+        forrange(i, 0, codepoints.size())
+        {
+            const u32 glyphIndex = j * codepoints.size() + i;
+            const stbtt_packedchar& pc = packedChars[glyphIndex];
+            stbtt_aligned_quad q;
+            float unused_x = 0.0f, unused_y = 0.0f;
+            stbtt_GetPackedQuad(packedChars.data(), wantedWidth, wantedHeight, glyphIndex, &unused_x, &unused_y, &q, 0);
+            FontGlyph glyph;
+            glyph.codePoint = codepoints[i];
+            glyph.x0 = q.x0 + font_off_x;
+            glyph.y0 = q.y0 + font_off_y;
+            glyph.x1 = q.x1 + font_off_x;
+            glyph.y1 = q.y1 + font_off_y;
+            glyph.u0 = q.s0;
+            glyph.v0 = q.t0;
+            glyph.u1 = q.s1;
+            glyph.v1 = q.t1;
+            glyph.advance = pc.xadvance;
+            glyph.visible = (glyph.x0 != glyph.x1) && (glyph.y0 != glyph.y1);
+            PushGlyph(fontSize, glyph);
+        }
+        j += 1;
     }
 
     auto fallback = FFontSizeToGlyphInfoMap.begin()->second.CodepointToGlyphMap.find('?');
@@ -171,23 +188,39 @@ const FontGlyph* Font::GetGlyph(float parFontSize, u32 codePoint) const
     return &itFind->second.Glyphs[itFindCp->second];
 }
 
-void Font::RasterizeText(const std::string& parText, const glm::vec2 startPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const
+void Font::RasterizeText(const std::string& parText,
+      const float parFontSize,
+      const glm::vec2 startPosition,
+      Rendering::VertexDataStream& outStream,
+      std::vector<u32>& outIndices) const
 {
+    AlwaysCheckedAssertMsg(FFontSizes.find(parFontSize) != FFontSizes.end(), fmt::format("The requested font size {} has not been configured!", parFontSize).c_str());
+    if (FFontSizes.find(parFontSize) == FFontSizes.end())
+        return;
     // Use font size
-    FillVerticesStream(parText.data(), parText.data() + parText.size(), startPosition, outStream, outIndices);
+    FillVerticesStream(parText.data(), parText.data() + parText.size(), parFontSize, startPosition, outStream, outIndices);
 }
 
-glm::vec2 Font::CalculateTextWidth(const std::string& parText) const
+glm::vec2 Font::CalculateTextWidth(const std::string& parText, const float parFontSize) const
 {
+    AlwaysCheckedAssertMsg(FFontSizes.find(parFontSize) != FFontSizes.end(), fmt::format("The requested font size {} has not been configured!", parFontSize).c_str());
+    if (FFontSizes.find(parFontSize) == FFontSizes.end())
+        return glm::vec2(0.f);
     // use font size
-    return CalculateTextWidth(parText.data(), parText.data() + parText.size());
+    return CalculateTextWidth(parText.data(), parText.data() + parText.size(), parFontSize);
 }
 
-glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd) const
+glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd, const float parFontSize) const
 {
+    AlwaysCheckedAssertMsg(FFontSizes.find(parFontSize) != FFontSizes.end(), fmt::format("The requested font size {} has not been configured!", parFontSize).c_str());
+    if (FFontSizes.find(parFontSize) == FFontSizes.end())
+        return glm::vec2(0.f);
+
     glm::vec2 res(0.f);
     float lineWidth = 0.f;
     const c8* c = parBegin;
+
+    const FontGlyphInfo& glyphsInfo = FFontSizeToGlyphInfoMap.find(parFontSize)->second;
 
     while (c < parEnd)
     {
@@ -209,7 +242,7 @@ glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd) const
             if (cp == '\n')
             {
                 res.x = glm::max(res.x, lineWidth);
-                res.y += FFontSize;
+                res.y += parFontSize;
                 lineWidth = 0.f;
                 continue;
             }
@@ -218,20 +251,31 @@ glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd) const
                 continue;
         }
 
-        auto itFind = FCodepointToGlyphMap.find(cp);
-        const float codepointWidth = (itFind != FCodepointToGlyphMap.end()) ? FGlyphs[itFind->second].advance : FGlyphs[FFallbackGlyphIndex].advance;
+        auto itFind = glyphsInfo.CodepointToGlyphMap.find(cp);
+        const float codepointWidth = (itFind != glyphsInfo.CodepointToGlyphMap.end()) ? glyphsInfo.Glyphs[itFind->second].advance : glyphsInfo.Glyphs[FFallbackGlyphIndex].advance;
         lineWidth += glm::round(codepointWidth);
     }
     if (res.x < lineWidth)
         res.x = lineWidth;
     if (lineWidth > 0 || res.y == 0.f)
-        res.y += FFontSize;
+        res.y += parFontSize;
 
     return res;
 }
 
-void Font::FillVerticesStream(const c8* parBegin, const c8* parEnd, const glm::vec2 parStartPosition, Rendering::VertexDataStream& outStream, std::vector<u32>& outIndices) const
+void Font::FillVerticesStream(const c8* parBegin,
+      const c8* parEnd,
+      const float parFontSize,
+      const glm::vec2 parStartPosition,
+      Rendering::VertexDataStream& outStream,
+      std::vector<u32>& outIndices) const
 {
+    AlwaysCheckedAssertMsg(FFontSizes.find(parFontSize) != FFontSizes.end(), fmt::format("The requested font size {} has not been configured!", parFontSize).c_str());
+    if (FFontSizes.find(parFontSize) == FFontSizes.end())
+        return;
+
+    const FontGlyphInfo& glyphsInfo = FFontSizeToGlyphInfoMap.find(parFontSize)->second;
+
     glm::vec3 cursor(parStartPosition, 0.f);
     const c8* c = parBegin;
     while (c < parEnd)
@@ -254,7 +298,7 @@ void Font::FillVerticesStream(const c8* parBegin, const c8* parEnd, const glm::v
             if (cp == '\n')
             {
                 cursor.x = parStartPosition.x;
-                cursor.y += FFontSize;
+                cursor.y += parFontSize;
                 continue;
             }
 
@@ -262,8 +306,8 @@ void Font::FillVerticesStream(const c8* parBegin, const c8* parEnd, const glm::v
                 continue;
         }
 
-        auto itFind = FCodepointToGlyphMap.find(cp);
-        const FontGlyph& glyph = (itFind != FCodepointToGlyphMap.end()) ? FGlyphs[itFind->second] : FGlyphs[FFallbackGlyphIndex];
+        auto itFind = glyphsInfo.CodepointToGlyphMap.find(cp);
+        const FontGlyph& glyph = (itFind != glyphsInfo.CodepointToGlyphMap.end()) ? glyphsInfo.Glyphs[itFind->second] : glyphsInfo.Glyphs[FFallbackGlyphIndex];
 
         if (glyph.visible)
         {

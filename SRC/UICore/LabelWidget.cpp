@@ -31,11 +31,13 @@ SimpleLabel::SimpleLabel(const std::string& parText, const u32 parColor, const s
     : Widget(parPlacement)
     , FText(parText)
     , FTextColor(parColor)
+    , FFontSize(parFontSize)
 {
     Resource r(parFontName);
-
-    FFont.SetFontSize(parFontSize);
-    FFont.InitFromResource(r);
+    std::set<float> sizes;
+    sizes.insert(parFontSize);
+    sizes.insert(parFontSize / 2);
+    FFont.InitFromResource(r, sizes);
 
     FMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uisimpletextmaterial.material");
 }
@@ -52,7 +54,7 @@ void SimpleLabel::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
     AssertRelease(indices != nullptr);
 
     WidgetPlacement& placement = Placement();
-    FFont.RasterizeText(FText, placement.GetAnchorPositionInPixels(WidgetParentAnchor::TOP_LEFT), *stream, *indices);
+    FFont.RasterizeText(FText, FFontSize, placement.GetAnchorPositionInPixels(WidgetParentAnchor::TOP_LEFT), *stream, *indices);
 }
 
 } // namespace UI
