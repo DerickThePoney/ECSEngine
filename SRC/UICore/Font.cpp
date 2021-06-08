@@ -30,7 +30,7 @@ constexpr i32 FontTexturePadding = 1;
 constexpr i32 HOversample = 3;
 constexpr i32 VOversample = 1;
 
-void Font::InitFromResource(const Resource& parRes, std::set<float>& parFontSizes)
+void Font::InitFromResource(const Resource& parRes, const std::set<float>& parFontSizes)
 {
     std::shared_ptr<ResourceHandle> resHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&parRes);
     AssertRelease(resHandle != nullptr);
