@@ -48,8 +48,6 @@ public:
     void RenderScene();
 
 private:
-    Rendering::MaterialInstanceHandle FUIVertexColorMaterial;
-
     std::vector<std::unique_ptr<UI::PanelWidgetDescriptor>> FPanels;
     std::vector<UI::WidgetPtr> FUIElementsForTest;
 
@@ -68,7 +66,6 @@ UIRenderer::UIRenderer()
 
 void UIRenderer::Initialise()
 {
-    FUIVertexColorMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uisimpletextmaterial.material");
     using namespace UI;
 
     std::unique_ptr<PanelWidgetDescriptor> panelDesc = std::make_unique<PanelWidgetDescriptor>();

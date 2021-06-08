@@ -20,8 +20,7 @@ public:
     void SaveFontFamiles(const std::string& parFontsConfigurationFile);
     void Shutdown();
 
-    const Rendering::TextureHandle& FontAtlas() const { return FFontAtlas; };
-    const FontFamilies& GetFontFamilies() const { return FFontFamilies; }
+    const FontFamiliesSizes& GetFontFamilies() const { return FFontFamilies; }
 
     const Font* GetFont(const FontFamilyName& parName, const FontSize parFontSize);
 
@@ -30,8 +29,8 @@ private:
 
 private:
     FontsDatabase FFontDatabase;
-    FontFamilies FFontFamilies;
-    Rendering::TextureHandle FFontAtlas;
+    FontFamiliesSizes FFontFamilies;
+    const Font* FDefaultFont = nullptr;
 };
 
 void FontManager::Initialise(const std::string& parFontsConfigurationFile)
@@ -46,6 +45,19 @@ void FontManager::Initialise(const std::string& parFontsConfigurationFile)
         cereal::JSONInputArchive archive(istr);
         archive(NAMEDPROPERTY("FontFamilies", FFontFamilies));
     }
+    else
+    {
+        AlwaysCheckedAssert(FFontFamilies.empty());
+        std::set<float> sizes;
+        sizes.insert(30.f);
+        FFontFamilies.insert_or_assign("Fonts\\OpenSans-Regular.ttf", sizes);
+        SaveFontFamiles(parFontsConfigurationFile);
+    }
+
+    LoadFontsFamilies();
+
+    FDefaultFont = GetFont("Fonts\\OpenSans-Regular.ttf", 30.f);
+    AssertRelease(FDefaultFont != nullptr);
 }
 
 void FontManager::SaveFontFamiles(const std::string& parFontsConfigurationFile)
@@ -63,19 +75,28 @@ void FontManager::Shutdown()
 const Font* FontManager::GetFont(const FontFamilyName& parName, const FontSize parFontSize)
 {
     auto itFind = FFontDatabase.find(parName);
+    AlwaysCheckedAssert(itFind != FFontDatabase.end());
     if (itFind == FFontDatabase.end())
-        return nullptr;
+        return FDefaultFont;
 
-    auto itFind2 = itFind->second.find(parFontSize);
-    if (itFind2 == itFind->second.end())
-        return nullptr;
-    return &itFind2->second;
+#ifdef ENABLE_SECURITY_CHECKS
+    auto itFindSize = FFontFamilies.find(parName);
+    AlwaysCheckedAssert(itFindSize != FFontFamilies.end());
+    AlwaysCheckedAssert(itFindSize->second.find(parFontSize) != itFindSize->second.end());
+#endif
+
+    return &itFind->second;
 }
 
 void FontManager::LoadFontsFamilies()
 {
     // Algo -- Scrap that, each font is an atlas, we pass it the list of size, and go on with...
-    //
+    foreachitemconst(fontFamily, FFontFamilies)
+    {
+        auto it = FFontDatabase.insert_or_assign(fontFamily.first, Font());
+        Resource r(fontFamily.first);
+        it.first->second.InitFromResource(r, fontFamily.second);
+    }
 }
 
 namespace Fonts
@@ -95,26 +116,26 @@ void InitialiseFontManager(const std::string& parFontsConfigurationFile)
 
 void SaveFontFamiles(const std::string& parFontsConfigurationFile)
 {
+    AssertRelease(FontManager::HasInstance());
+    FontManager::Instance().SaveFontFamiles(parFontsConfigurationFile);
 }
 
 void ShutdownFontManager()
 {
+    AssertRelease(FontManager::HasInstance());
     FontManager::Destroy();
 }
 
-const FontFamilies& GetFontFamilies()
+const FontFamiliesSizes& GetFontFamilies()
 {
+    AssertRelease(FontManager::HasInstance());
     return FontManager::Instance().GetFontFamilies();
 }
 
 const Font* GetFont(const FontFamilyName& parName, const FontSize parFontSize)
 {
-    return nullptr;
-}
-
-const Rendering::TextureHandle& FontAtlas()
-{
-    return FontManager::Instance().FontAtlas();
+    AssertRelease(FontManager::HasInstance());
+    return FontManager::Instance().GetFont(parName, parFontSize);
 }
 
 } // namespace Fonts
