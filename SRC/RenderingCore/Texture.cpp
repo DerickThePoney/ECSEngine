@@ -53,6 +53,7 @@ void Texture::Load()
 void Texture::Unload()
 {
     bgfx::destroy(FHandle);
+    FHandle = BGFX_INVALID_HANDLE;
 }
 
 bool Texture::Valid() const
