@@ -17,10 +17,10 @@ namespace Fonts
 {
 void CreateFontManager();
 void InitialiseFontManager(const std::string& parFontsConfigurationFile);
-void SaveFontFamiles(const std::string& parFontsConfigurationFile);
+void SaveFontFamiles();
 void ShutdownFontManager();
 
-const FontFamiliesSizes& GetFontFamilies();
+FontFamiliesSizes& GetFontFamilies();
 const Font* GetFont(const FontFamilyName& parName, const FontSize parFontSize);
 } // namespace Fonts
 } // namespace UI

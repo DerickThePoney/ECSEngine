@@ -17,10 +17,10 @@ class FontManager : public Singleton<FontManager>
 {
 public:
     void Initialise(const std::string& parFontsConfigurationFile);
-    void SaveFontFamiles(const std::string& parFontsConfigurationFile);
+    void SaveFontFamiles();
     void Shutdown();
 
-    const FontFamiliesSizes& GetFontFamilies() const { return FFontFamilies; }
+    FontFamiliesSizes& GetFontFamilies() { return FFontFamilies; }
 
     const Font* GetFont(const FontFamilyName& parName, const FontSize parFontSize);
 
@@ -31,19 +31,26 @@ private:
     FontsDatabase FFontDatabase;
     FontFamiliesSizes FFontFamilies;
     const Font* FDefaultFont = nullptr;
+
+    std::string FFontsConfig = "";
 };
 
 void FontManager::Initialise(const std::string& parFontsConfigurationFile)
 {
+    FFontsConfig = parFontsConfigurationFile;
     Resource fontConf(parFontsConfigurationFile);
-    std::shared_ptr<ResourceHandle> fileHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&fontConf);
-    AlwaysCheckedAssert(fileHandle != nullptr);
-    if (fileHandle != nullptr)
+
+    if (GlobalResourceCache::Instance().FCache->FileExists(&fontConf))
     {
-        ResourceBuffer buff = fileHandle->GetResourceBuffer();
-        std::istream istr(&buff, std::istream::in);
-        cereal::JSONInputArchive archive(istr);
-        archive(NAMEDPROPERTY("FontFamilies", FFontFamilies));
+        std::shared_ptr<ResourceHandle> fileHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&fontConf);
+        AlwaysCheckedAssert(fileHandle != nullptr);
+        if (fileHandle != nullptr)
+        {
+            ResourceBuffer buff = fileHandle->GetResourceBuffer();
+            std::istream istr(&buff, std::istream::in);
+            cereal::JSONInputArchive archive(istr);
+            archive(NAMEDPROPERTY("FontFamilies", FFontFamilies));
+        }
     }
     else
     {
@@ -51,7 +58,7 @@ void FontManager::Initialise(const std::string& parFontsConfigurationFile)
         std::set<float> sizes;
         sizes.insert(30.f);
         FFontFamilies.insert_or_assign("Fonts\\OpenSans-Regular.ttf", sizes);
-        SaveFontFamiles(parFontsConfigurationFile);
+        SaveFontFamiles();
     }
 
     LoadFontsFamilies();
@@ -60,9 +67,10 @@ void FontManager::Initialise(const std::string& parFontsConfigurationFile)
     AssertRelease(FDefaultFont != nullptr);
 }
 
-void FontManager::SaveFontFamiles(const std::string& parFontsConfigurationFile)
+void FontManager::SaveFontFamiles()
 {
-    std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + '\\' + parFontsConfigurationFile);
+    AssertRelease(!FFontsConfig.empty());
+    std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + '\\' + FFontsConfig);
     AssertRelease(ofstr.good());
     cereal::JSONOutputArchive archive(ofstr);
     archive(NAMEDPROPERTY("FontFamilies", FFontFamilies));
@@ -93,7 +101,7 @@ void FontManager::LoadFontsFamilies()
     // Algo -- Scrap that, each font is an atlas, we pass it the list of size, and go on with...
     foreachitemconst(fontFamily, FFontFamilies)
     {
-        auto it = FFontDatabase.insert_or_assign(fontFamily.first, Font());
+        auto it = FFontDatabase.insert_or_assign(fontFamily.first, std::move(Font()));
         Resource r(fontFamily.first);
         it.first->second.InitFromResource(r, fontFamily.second);
     }
@@ -114,10 +122,10 @@ void InitialiseFontManager(const std::string& parFontsConfigurationFile)
     FontManager::Instance().Initialise(parFontsConfigurationFile);
 }
 
-void SaveFontFamiles(const std::string& parFontsConfigurationFile)
+void SaveFontFamiles()
 {
     AssertRelease(FontManager::HasInstance());
-    FontManager::Instance().SaveFontFamiles(parFontsConfigurationFile);
+    FontManager::Instance().SaveFontFamiles();
 }
 
 void ShutdownFontManager()
@@ -126,7 +134,7 @@ void ShutdownFontManager()
     FontManager::Destroy();
 }
 
-const FontFamiliesSizes& GetFontFamilies()
+FontFamiliesSizes& GetFontFamilies()
 {
     AssertRelease(FontManager::HasInstance());
     return FontManager::Instance().GetFontFamilies();

@@ -59,7 +59,7 @@ private:
     Rendering::MaterialInstanceHandle FMaterial;
     std::string FText = "";
     u32 FTextColor = 0xFFFFFFFF;
-    Font FFont;
+    const Font* FFont = nullptr;
     float FFontSize = 30.f;
 };
 } // namespace UI
