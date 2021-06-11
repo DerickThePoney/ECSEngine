@@ -36,6 +36,8 @@ struct FontGlyphInfo
 class Font
 {
 public:
+    ~Font();
+
     void InitFromResource(const Resource& parRes, const std::set<float>& parFontSizes);
 
     const Rendering::TextureHandle& FontTexture() const { return FFontTexture; }

@@ -34,6 +34,15 @@ TextureHandle FontTextureManager::AddNewFontTexture(const std::string& parName, 
     return TextureHandle(-1, (u32)FFontTextures.size() - 1);
 }
 
+void FontTextureManager::RemoveFontTextureIFN(const TextureHandle& parTextureHandle)
+{
+    AssertRelease(parTextureHandle.GetBankId() == -1);
+    if (parTextureHandle.GetTextureId() >= FFontTextures.size())
+        return;
+
+    FFontTextures[parTextureHandle.GetTextureId()]->Unload();
+}
+
 const Texture* FontTextureManager::GetFontTexture(const TextureHandle& parHandle) const
 {
     AssertRelease(parHandle.GetBankId() == -1);

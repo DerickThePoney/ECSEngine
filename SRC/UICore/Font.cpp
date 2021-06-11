@@ -30,6 +30,11 @@ constexpr i32 FontTexturePadding = 1;
 constexpr i32 HOversample = 3;
 constexpr i32 VOversample = 1;
 
+Font::~Font()
+{
+    Rendering::FontTextureManager::Instance().RemoveFontTextureIFN(FFontTexture);
+}
+
 void Font::InitFromResource(const Resource& parRes, const std::set<float>& parFontSizes)
 {
     std::shared_ptr<ResourceHandle> resHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&parRes);
