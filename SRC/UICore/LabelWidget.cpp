@@ -3,6 +3,7 @@
 #include "LabelWidget.h"
 
 #include "Common/Resource.h"
+#include "FontManager.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/UICommandBuffer.h"
 
@@ -33,12 +34,8 @@ SimpleLabel::SimpleLabel(const std::string& parText, const u32 parColor, const s
     , FTextColor(parColor)
     , FFontSize(parFontSize)
 {
-    Resource r(parFontName);
-    std::set<float> sizes;
-    sizes.insert(parFontSize);
-    sizes.insert(parFontSize / 2);
-    FFont.InitFromResource(r, sizes);
-
+    FFont = Fonts::GetFont(parFontName, parFontSize);
+    AssertRelease(FFont != nullptr);
     FMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uisimpletextmaterial.material");
 }
 
@@ -48,13 +45,13 @@ void SimpleLabel::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
 
     Rendering::VertexDataStream* stream = nullptr;
     std::vector<u32>* indices = nullptr;
-    parBuffer.GetCurrentStreams(FMaterial, FFont.FontTexture(), stream, indices);
+    parBuffer.GetCurrentStreams(FMaterial, FFont->FontTexture(), stream, indices);
 
     AssertRelease(stream != nullptr);
     AssertRelease(indices != nullptr);
 
     WidgetPlacement& placement = Placement();
-    FFont.RasterizeText(FText, FFontSize, placement.GetAnchorPositionInPixels(WidgetParentAnchor::TOP_LEFT), *stream, *indices);
+    FFont->RasterizeText(FText, FFontSize, placement.GetAnchorPositionInPixels(WidgetParentAnchor::TOP_LEFT), *stream, *indices);
 }
 
 } // namespace UI

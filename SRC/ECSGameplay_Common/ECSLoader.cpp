@@ -13,6 +13,7 @@
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/WorldManager.h"
 #include "NavMeshPathfindingManager.h"
+#include "UICore/FontManager.h"
 #include "WorldDeclaration.h"
 
 namespace ECSEngine
@@ -21,6 +22,9 @@ namespace ECSEngine
 bool ECSLoader::VirtualInitialise()
 {
     ILoader::VirtualInitialise();
+
+    UI::Fonts::CreateFontManager();
+    UI::Fonts::InitialiseFontManager(FFontsFile);
 
     CreateAdjustables();
 
@@ -69,6 +73,8 @@ void ECSLoader::VirtualShutdown()
     GenericMessageManager::Destroy();
 
     DestroyAdjustables();
+
+    UI::Fonts::ShutdownFontManager();
 }
 
 } // namespace ECSEngine

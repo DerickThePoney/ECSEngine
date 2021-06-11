@@ -32,7 +32,8 @@ constexpr i32 VOversample = 1;
 
 Font::~Font()
 {
-    Rendering::FontTextureManager::Instance().RemoveFontTextureIFN(FFontTexture);
+    if (Rendering::FontTextureManager::HasInstance())
+        Rendering::FontTextureManager::Instance().RemoveFontTextureIFN(FFontTexture);
 }
 
 void Font::InitFromResource(const Resource& parRes, const std::set<float>& parFontSizes)
