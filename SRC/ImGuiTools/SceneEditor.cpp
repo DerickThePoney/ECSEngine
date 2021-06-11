@@ -11,6 +11,7 @@
 #include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "ECSGameplay_Common/ScenarioEditor.h"
 #include "EntityTemplatesEditor.h"
+#include "FontsConfigurator.h"
 #include "GFXRepresentationsEditor.h"
 #include "GameRulesEditor.h"
 #include "InputDebug.h"
@@ -76,6 +77,7 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
         if (ImGui::BeginMenu("UI"))
         {
             ImGui::MenuItem("UI Style Editor", NULL, &options.showUIStyleEditor);
+            ImGui::MenuItem("Fonts editor", NULL, &options.showFontsManagerEditor);
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Gameplay"))
@@ -346,6 +348,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showScenesManagerEditor)
         DrawScenesManagerEditor(&parOutWindowsToShow.showScenesManagerEditor);
+
+    if (parOutWindowsToShow.showFontsManagerEditor)
+        DrawFontsConfigurator(&parOutWindowsToShow.showFontsManagerEditor, menuBarHeight.y);
 }
 
 void DrawPlayScenarioWindow(bool& parOutPlayScenario)
