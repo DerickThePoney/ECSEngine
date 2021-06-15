@@ -50,6 +50,7 @@ void SimplePanel::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
 
     parBuffer.GetCurrentStreams(FMaterialInstanceHandle, stream, indices);
 
+    // TODO DRAWER FOR ADDING SPECIFIC STUFF IN THERE FOR FACTORIZATION
     const UI::WidgetPlacement& placement = Placement();
     glm::vec2 pos = glm::xy(placement.FPositionInPixels);
     glm::vec2 size = glm::zw(placement.FPositionInPixels);
