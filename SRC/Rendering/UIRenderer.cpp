@@ -81,7 +81,7 @@ void UIRenderer::Initialise()
     labelPlacement.FPositionFromAnchor = glm::vec2(0.f);
     labelDesc->SetTextToDraw("Test string to \nrasterize");
     labelDesc->SetTextColor(ColorUtils::ConvertToU32(glm::vec4(0.f, 0.f, 1.f, 1.f)));
-    labelDesc->SetFont("Fonts\\OpenSans-Regular.ttf", 30.f);
+    labelDesc->SetFont("fonts\\kenvector_future.ttf", 14.f);
 
     panelDesc->Children().push_back(std::move(labelDesc));
 
