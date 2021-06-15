@@ -57,13 +57,13 @@ void FontManager::Initialise(const std::string& parFontsConfigurationFile)
         AlwaysCheckedAssert(FFontFamilies.empty());
         std::set<float> sizes;
         sizes.insert(30.f);
-        FFontFamilies.insert_or_assign("Fonts\\OpenSans-Regular.ttf", sizes);
+        FFontFamilies.insert_or_assign("fonts\\opensans-regular.ttf", sizes);
         SaveFontFamiles();
     }
 
     LoadFontsFamilies();
 
-    FDefaultFont = GetFont("Fonts\\OpenSans-Regular.ttf", 30.f);
+    FDefaultFont = GetFont("fonts\\opensans-regular.ttf", 30.f);
     AssertRelease(FDefaultFont != nullptr);
 }
 
