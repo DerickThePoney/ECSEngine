@@ -1,6 +1,7 @@
 #pragma once
 #include "Common/PoolAllocator.h"
 #include "Common/RenderingHandles.h"
+#include "UIDrawer.h"
 #include "Widget.h"
 
 namespace ECSEngine
@@ -41,7 +42,7 @@ protected:
 
 private:
     const PanelWidgetDescriptor* FDescriptor = nullptr;
-    Rendering::MaterialInstanceHandle FMaterialInstanceHandle;
+    UIBackgroundDrawer FBackgroundDrawer;
 };
 } // namespace UI
 } // namespace ECSEngine
