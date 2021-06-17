@@ -5,8 +5,8 @@
 #include "Application/PropertyDrawer.h"
 #include "Common/ColorUtils.h"
 #include "Common/MeshStreamingData.h"
-#include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/UICommandBuffer.h"
+#include "UIMaterialsHelpers.h"
 
 namespace ECSEngine
 {
@@ -39,7 +39,7 @@ SimplePanel::SimplePanel(const PanelWidgetDescriptor* parDescriptor, const Widge
     , FDescriptor(parDescriptor)
 {
     FBackgroundDrawer.FColor = FDescriptor->Color();
-    FBackgroundDrawer.FMaterialInstanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uivertexcolormaterial.material");
+    FBackgroundDrawer.FMaterialInstanceHandle = GetVertexColorMaterial();
 }
 
 void SimplePanel::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)

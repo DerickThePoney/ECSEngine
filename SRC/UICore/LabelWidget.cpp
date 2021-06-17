@@ -4,8 +4,8 @@
 
 #include "Common/Resource.h"
 #include "FontManager.h"
-#include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/UICommandBuffer.h"
+#include "UIMaterialsHelpers.h"
 
 namespace ECSEngine
 {
@@ -36,7 +36,7 @@ SimpleLabel::SimpleLabel(const std::string& parText, const u32 parColor, const s
 {
     FFont = Fonts::GetFont(parFontName, parFontSize);
     AssertRelease(FFont != nullptr);
-    FMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uisimpletextmaterial.material");
+    FMaterial = GetTextMaterial();
 }
 
 void SimpleLabel::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
