@@ -53,7 +53,11 @@ void SimplePanel::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
     FBackgroundDrawer.Draw(parBuffer, pos, size);
 
     parBuffer.PushContext(placement.FPositionInPixels);
-    foreachitem(child, Children()) { child->Draw(parBuffer); }
+}
+
+void SimplePanel::VirtualPostDraw(Rendering::UICommandBuffer& parBuffer)
+{
+    Widget::VirtualPostDraw(parBuffer);
     parBuffer.PopContext();
 }
 
