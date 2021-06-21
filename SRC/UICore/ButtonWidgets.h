@@ -17,6 +17,7 @@ public:
     void SetColor(u32 parValue) { FColor = parValue; }
 
     const LabelWidgetDescriptor& LabelWidgetDescription() const { return FLabelWidget; }
+    LabelWidgetDescriptor& LabelWidgetDescription() { return FLabelWidget; }
 
     SERIALIZE()
     {
@@ -40,6 +41,7 @@ class SimpleButton : public Widget
 
 public:
     SimpleButton(const ButtonWidgetDescriptor* parDescriptor);
+    virtual ~SimpleButton();
 
     u32 Color() const { return FColor; }
     void SetColor(u32 parValue) { FColor = parValue; }

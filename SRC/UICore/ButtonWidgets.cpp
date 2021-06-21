@@ -35,6 +35,34 @@ SimpleButton::SimpleButton(const ButtonWidgetDescriptor* parDescriptor)
     AddChild(FLabelWidget);
 }
 
+SimpleButton::~SimpleButton()
+{
+    FLabelWidget = nullptr;
+}
+
+const std::string& SimpleButton::Text() const
+{
+    if (FLabelWidget != nullptr)
+    {
+        std::shared_ptr<SimpleLabel> labelAsSimpleLabel = std::dynamic_pointer_cast<SimpleLabel>(FLabelWidget);
+        AssertRelease(labelAsSimpleLabel != nullptr);
+        return labelAsSimpleLabel->Text();
+    }
+
+    static std::string emptyString = "";
+    return emptyString;
+}
+
+void SimpleButton::SetText(const std::string& parValue)
+{
+    if (FLabelWidget != nullptr)
+    {
+        std::shared_ptr<SimpleLabel> labelAsSimpleLabel = std::dynamic_pointer_cast<SimpleLabel>(FLabelWidget);
+        AssertRelease(labelAsSimpleLabel != nullptr);
+        labelAsSimpleLabel->SetText(parValue);
+    }
+}
+
 void SimpleButton::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
 {
     Widget::VirtualOnDraw(parBuffer);
@@ -44,8 +72,6 @@ void SimpleButton::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
     glm::vec2 size = glm::zw(placement.FPositionInPixels);
 
     FBackgroundDrawer.Draw(parBuffer, pos, size);
-
-    FLabelWidget->Draw(parBuffer);
 }
 
 } // namespace UI
