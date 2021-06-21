@@ -196,6 +196,7 @@ const FontGlyph* Font::GetGlyph(float parFontSize, u32 codePoint) const
 
 void Font::RasterizeText(const std::string& parText,
       const float parFontSize,
+      const u32 parTextColor,
       const glm::vec2 startPosition,
       Rendering::VertexDataStream& outStream,
       std::vector<u32>& outIndices) const
@@ -204,7 +205,7 @@ void Font::RasterizeText(const std::string& parText,
     if (FFontSizes.find(parFontSize) == FFontSizes.end())
         return;
     // Use font size
-    FillVerticesStream(parText.data(), parText.data() + parText.size(), parFontSize, startPosition, outStream, outIndices);
+    FillVerticesStream(parText.data(), parText.data() + parText.size(), parFontSize, parTextColor, startPosition, outStream, outIndices);
 }
 
 glm::vec2 Font::CalculateTextWidth(const std::string& parText, const float parFontSize) const
@@ -272,6 +273,7 @@ glm::vec2 Font::CalculateTextWidth(const c8* parBegin, const c8* parEnd, const f
 void Font::FillVerticesStream(const c8* parBegin,
       const c8* parEnd,
       const float parFontSize,
+      const u32 parTextColor,
       const glm::vec2 parStartPosition,
       Rendering::VertexDataStream& outStream,
       std::vector<u32>& outIndices) const
@@ -328,27 +330,25 @@ void Font::FillVerticesStream(const c8* parBegin,
             const glm::vec2 uvc = glm::vec2(glyph.u1, glyph.v1);
             const glm::vec2 uvd = glm::vec2(glyph.u1, glyph.v0);
 
-            u32 color = ColorUtils::ConvertToU32(glm::vec4(0.f, 0.f, 1.f, 1.f));
-
             const u32 currentVertexOffset = outStream.GetSize();
 
             outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, pa);
-            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, parTextColor);
             outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uva);
             outStream.Advance();
 
             outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, pb);
-            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, parTextColor);
             outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uvb);
             outStream.Advance();
 
             outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, pc);
-            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, parTextColor);
             outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uvc);
             outStream.Advance();
 
             outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, pd);
-            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
+            outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, parTextColor);
             outStream.PushData(Rendering::VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uvd);
             outStream.Advance();
 

@@ -50,6 +50,7 @@ public:
     SimpleLabel(const std::string& parText, const u32 parColor, const std::string& parFontName, const float parFontSize, const WidgetPlacement& parPlacement);
 
     void SetText(const std::string& parText) { FText = parText; }
+    const std::string& Text() const { return FText; }
 
 protected:
     virtual void VirtualOnDraw(Rendering::UICommandBuffer& parBuffer);
