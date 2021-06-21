@@ -51,7 +51,7 @@ void SimpleLabel::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
     AssertRelease(indices != nullptr);
 
     WidgetPlacement& placement = Placement();
-    FFont->RasterizeText(FText, FFontSize, placement.GetAnchorPositionInPixels(WidgetParentAnchor::TOP_LEFT), *stream, *indices);
+    FFont->RasterizeText(FText, FFontSize, FTextColor, placement.GetAnchorPositionInPixels(WidgetParentAnchor::TOP_LEFT), *stream, *indices);
 }
 
 } // namespace UI

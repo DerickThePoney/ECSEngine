@@ -49,6 +49,7 @@ public:
     // use font size
     void RasterizeText(const std::string& parText,
           const float parFontSize,
+          const u32 parTextColor,
           const glm::vec2 startPosition,
           Rendering::VertexDataStream& outStream,
           std::vector<u32>& outIndices) const;
@@ -62,6 +63,7 @@ private:
     void FillVerticesStream(const c8* parBegin,
           const c8* parEnd,
           const float parFontSize,
+          const u32 parTextColor,
           const glm::vec2 parStartPosition,
           Rendering::VertexDataStream& outStream,
           std::vector<u32>& outIndices) const;
