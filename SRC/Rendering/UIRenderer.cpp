@@ -18,6 +18,7 @@
 #include "RenderingCore/UICommandBuffer.h"
 #include "RenderingCore/VertexBuffer.h"
 #include "RenderingCore/VertexLayout.h"
+#include "UICore/ButtonWidgets.h"
 #include "UICore/Font.h"
 #include "UICore/LabelWidget.h"
 #include "UICore/PanelWidgets.h"
@@ -83,7 +84,21 @@ void UIRenderer::Initialise()
     labelDesc->SetTextColor(ColorUtils::ConvertToU32(glm::vec4(0.f, 0.f, 1.f, 1.f)));
     labelDesc->SetFont("fonts\\kenvector_future.ttf", 14.f);
 
+    std::unique_ptr<ButtonWidgetDescriptor> buttonDesc = std::make_unique<ButtonWidgetDescriptor>();
+    WidgetPlacement& buttonPlacement = buttonDesc->InitialPlacement();
+    buttonPlacement.FPositionFromAnchor = glm::vec2(50.f, 50.f);
+    buttonPlacement.FSize = glm::vec2(100.0f, 40.f);
+    buttonDesc->SetColor(ColorUtils::ConvertToU32(glm::vec4(0.f, 1.f, 0.f, 1.f))); // Vert
+    LabelWidgetDescriptor& bLab = buttonDesc->LabelWidgetDescription();
+    WidgetPlacement& bLabelPlacement = bLab.InitialPlacement();
+    bLabelPlacement.FPositionFromAnchor = glm::vec2(0.f);
+    bLabelPlacement.FParentAnchor = WidgetParentAnchor::CENTER_LEFT;
+    bLab.SetTextToDraw("Button String");
+    bLab.SetTextColor(ColorUtils::ConvertToU32(glm::vec4(1.f, 0.f, 0.f, 1.f)));
+    bLab.SetFont("fonts\\kenvector_future.ttf", 14.f);
+
     panelDesc->Children().push_back(std::move(labelDesc));
+    panelDesc->Children().push_back(std::move(buttonDesc));
 
     FPanels.push_back(std::move(panelDesc));
 }
