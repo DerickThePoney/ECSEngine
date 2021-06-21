@@ -58,6 +58,8 @@ public:
 
 protected:
     virtual void VirtualOnDraw(Rendering::UICommandBuffer& parBuffer);
+    virtual void VirtualPreDraw(Rendering::UICommandBuffer& parBuffer);
+    virtual void VirtualPostDraw(Rendering::UICommandBuffer& parBuffer);
 
 private:
     Widget* FParent = nullptr;
@@ -67,6 +69,8 @@ private:
 
 #ifdef ENABLE_SECURITY_CHECKS
     bool FVirtualOnDrawCalled = false;
+    bool FVirtualPreDrawCalled = false;
+    bool FVirtualPostDrawCalled = false;
 #endif
 };
 } // namespace UI

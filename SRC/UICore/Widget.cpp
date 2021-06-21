@@ -14,6 +14,7 @@ Widget::Widget(const WidgetPlacement& parInitialPlacement)
 
 Widget::~Widget()
 {
+    FChildren.clear();
 }
 
 void Widget::SetParent(Widget* parNewParent)
@@ -53,14 +54,31 @@ void Widget::Draw(Rendering::UICommandBuffer& parBuffer)
 {
     OnlyWithAssertions(FVirtualOnDrawCalled = false);
 
-    VirtualOnDraw(parBuffer);
+    VirtualPreDraw(parBuffer);
+    AlwaysCheckedAssertMsg(FVirtualPreDrawCalled, "A call to Widget::VirtualOnDraw was forgotten");
 
-    AlwaysCheckedAssertMsg(FVirtualOnDrawCalled, "A call to Widget::VirtualOnDraw was forgotten");
+    VirtualOnDraw(parBuffer);
+    AlwaysCheckedAssertMsg(FVirtualOnDrawCalled, "A call to Widget::VirtualPreDraw was forgotten");
+
+    foreachitem(child, FChildren) { child->Draw(parBuffer); }
+
+    VirtualPostDraw(parBuffer);
+    AlwaysCheckedAssertMsg(FVirtualPostDrawCalled, "A call to Widget::VirtualPostDraw was forgotten");
 }
 
 void Widget::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)
 {
     OnlyWithAssertions(FVirtualOnDrawCalled = true);
+}
+
+void Widget::VirtualPreDraw(Rendering::UICommandBuffer& parBuffer)
+{
+    OnlyWithAssertions(FVirtualPreDrawCalled = true);
+}
+
+void Widget::VirtualPostDraw(Rendering::UICommandBuffer& parBuffer)
+{
+    OnlyWithAssertions(FVirtualPostDrawCalled = true);
 }
 
 WidgetPtr WidgetDescriptor::CreateWidgetAndHierarchy() const

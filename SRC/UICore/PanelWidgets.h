@@ -37,7 +37,8 @@ public:
     SimplePanel(const PanelWidgetDescriptor* parDescriptor, const WidgetPlacement& parPlacement);
 
 protected:
-    virtual void VirtualOnDraw(Rendering::UICommandBuffer& parBuffer);
+    virtual void VirtualOnDraw(Rendering::UICommandBuffer& parBuffer) override;
+    virtual void VirtualPostDraw(Rendering::UICommandBuffer& parBuffer) override;
 
 private:
     const PanelWidgetDescriptor* FDescriptor = nullptr;
