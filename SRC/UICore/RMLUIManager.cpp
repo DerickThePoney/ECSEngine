@@ -11,6 +11,7 @@
 #include "RmlSystemInterface.h"
 
 #include <RmlUi/Core.h>
+#include <RmlUi/Debugger.h>
 
 namespace ECSEngine
 {
@@ -39,6 +40,10 @@ void RmlUiManager::Initialise()
     // Create a context to display documents within.
     auto size = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     FContext = Rml::CreateContext("main", Rml::Vector2i(size.x, size.y));
+    FDebuggerContext = Rml::CreateContext("debugger", Rml::Vector2i(size.x, size.y));
+
+    Rml::Debugger::Initialise(FContext);
+    Rml::Debugger::SetVisible(true);
 
     // Tell RmlUi to load the given fonts.
     success = Rml::LoadFontFace(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\fonts\\LatoLatin-Regular.ttf");
@@ -88,10 +93,22 @@ void RmlUiManager::Shutdown()
 
 void RmlUiManager::ProcessInput() const
 {
+    ProcessMouse();
+    SetKeyboardButtons();
+}
+
+void RmlUiManager::ProcessMouse() const
+{
     if (glm::length2(Input::GetMousePositionDelta()) > 0.f)
     {
         SetMousePositionHasChanged(Input::GetMousePosition());
     }
+
+    SetMouseButtons();
+
+    const glm::vec2 delta = Input::GetMouseScrollDelta();
+    if (glm::length2(delta) > 0.f)
+        FContext->ProcessMouseWheel(-delta.y, 0);
 }
 
 void RmlUiManager::SetMousePositionHasChanged(glm::vec2 parPos) const
@@ -101,6 +118,40 @@ void RmlUiManager::SetMousePositionHasChanged(glm::vec2 parPos) const
 
     LOG_UI(fmt::format("Mouse : x = {} - y = {}", parPos.x, parPos.y));
     FContext->ProcessMouseMove((int)parPos.x, (int)parPos.y, 0);
+}
+
+void RmlUiManager::SetMouseButtons() const
+{
+    forrange(i, 0, MouseButtons::MOUSE_BUTTON_LAST)
+    {
+        if (Input::GetMouseButtonHasChanged(i))
+        {
+            bool res = Input::GetMouseButtonState(i);
+            if (res)
+                FContext->ProcessMouseButtonDown(i, 0);
+            else
+                FContext->ProcessMouseButtonUp(i, 0);
+        }
+    }
+}
+
+void RmlUiManager::SetKeyboardButtons() const
+{
+    forrange(i, 0, InputKeyNames::INPUT_KEY_LAST)
+    {
+        if (Input::GetButtonHasChanged(i))
+        {
+            bool res = Input::GetButtonDown(i);
+            Rml::Input::KeyIdentifier id = FSystemInterface->ConvertToRml((InputKeyNames::Type)i);
+            if (id == Rml::Input::KeyIdentifier::KI_UNKNOWN)
+                continue;
+
+            if (res)
+                FContext->ProcessKeyDown(id, 0);
+            else
+                FContext->ProcessKeyUp(id, 0);
+        }
+    }
 }
 
 } // namespace UI

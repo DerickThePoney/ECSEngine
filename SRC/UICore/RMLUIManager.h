@@ -24,10 +24,14 @@ public:
 
 private:
     void ProcessInput() const;
+    void ProcessMouse() const;
     void SetMousePositionHasChanged(glm::vec2 parPos) const;
+    void SetMouseButtons() const;
+    void SetKeyboardButtons() const;
 
 private:
     Rml::Context* FContext = nullptr;
+    Rml::Context* FDebuggerContext = nullptr;
     RmlSystemInterface* FSystemInterface = nullptr;
     Rendering::RmlRenderer* FRenderInterface = nullptr;
 };
