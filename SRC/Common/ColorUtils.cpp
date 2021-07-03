@@ -16,6 +16,11 @@ u32 ConvertToU32(const glm::vec4 parColor)
     return a << 24 | b << 16 | g << 8 | r;
 }
 
+u32 FromRGBA(const u8 r, const u8 g, const u8 b, const u8 a)
+{
+    return a << 24 | b << 16 | g << 8 | r;
+}
+
 glm::vec4 ConvertToFVEC4(const u32 parColor)
 {
     const float a = (float)((parColor >> 24) & 0xFF) / 255.f;

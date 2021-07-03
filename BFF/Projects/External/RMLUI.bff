@@ -1,0 +1,11 @@
+#once
+{
+    ^ProjectIncludePath + {"External/RMLUI/RMLUI/include"}
+
+    ^AdditionalLibraryPath + {'External/RMLUI/RMLUI/lib'}
+
+    ^AdditionalLibs_x64_Debug + {"RmlDebuggerd", "RmlCored"}
+    ^AdditionalLibs_x64_Release + {"RmlCore", "RmlDebugger"}
+    ^AdditionalLibs_x64_Final + {"RmlCore"}
+    ^AdditionalLibs_x64_Profile + {"RmlCore"}
+}

@@ -7,6 +7,7 @@
 #include "Common/ResourceFile.h"
 #include "Common/ResourceHandle.h"
 #include "FontTextureManager.h"
+#include "Texture.h"
 namespace ECSEngine
 {
 namespace Rendering
@@ -69,12 +70,81 @@ const TextureHandle TextureManager::GetTextureHandle(const TextureName& parTextu
     return FTextureBanks[it->second]->GetTextureHandle(parTextureName);
 }
 
-const Texture* TextureManager::GetTexture(const TextureHandle& parTextureHandle)
+const Texture* TextureManager::GetTexture(const TextureHandle& parTextureHandle) const
 {
     if (parTextureHandle.GetBankId() == -1)
         return FontTextureManager::Instance().GetFontTexture(parTextureHandle);
     AssertRelease(FTextureBanks[parTextureHandle.GetBankId()] != nullptr);
     return FTextureBanks[parTextureHandle.GetBankId()]->GetTexture(parTextureHandle);
+}
+
+const u32 TextureManager::CreateFreeFormTexture(const std::string parFilename)
+{
+    u32 index = -1;
+    forrange(i, 0, FFreeFormTextures.size())
+    {
+        if (FFreeFormTextures[i] == nullptr)
+        {
+            index = i;
+            break;
+        }
+    }
+    if (index == -1)
+    {
+        index = FFreeFormTextures.size();
+        FFreeFormTextures.resize(FFreeFormTextures.size() + 1);
+    }
+
+    FFreeFormTextures[index].reset(new Texture(nullptr, parFilename));
+    FFreeFormTextures[index]->LoadFromTextureFile(BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MIN_POINT);
+    return index;
+}
+
+const u32 TextureManager::CreateFreeFormTexture(const u8* parData, u32 parWidth, u32 parHeight)
+{
+    bgfx::TextureHandle handle = bgfx::createTexture2D((u16)parWidth, (u16)parHeight, false, 1, bgfx::TextureFormat::RGBA8, 0, bgfx::copy(parData, parWidth * parHeight * 4));
+
+    AssertRelease(bgfx::isValid(handle));
+    bgfx::TextureInfo info;
+    info.bitsPerPixel = 32;
+    info.format = bgfx::TextureFormat::RGBA8;
+    info.numLayers = 1;
+    info.height = parHeight;
+    info.width = parWidth;
+    info.numMips = 1;
+
+    u32 index = -1;
+    forrange(i, 0, FFreeFormTextures.size())
+    {
+        if (FFreeFormTextures[i] == nullptr)
+        {
+            index = i;
+            break;
+        }
+    }
+    if (index == -1)
+    {
+        index = FFreeFormTextures.size();
+        FFreeFormTextures.resize(FFreeFormTextures.size() + 1);
+    }
+
+    FFreeFormTextures[index].reset(new Texture(nullptr, "FreeFormFromData"));
+    FFreeFormTextures[index]->SetTextureData_IKnowWhatImDoing(handle, info);
+    return index;
+}
+
+void TextureManager::ReleaseFreeFormTexture(const u32 parId)
+{
+    if (parId >= FFreeFormTextures.size())
+        return;
+    FFreeFormTextures[parId].reset(nullptr);
+}
+
+const Texture* TextureManager::GetFreeFormTexture(const u32 parId) const
+{
+    if (parId >= FFreeFormTextures.size())
+        return nullptr;
+    return FFreeFormTextures[parId].get();
 }
 
 } // namespace Rendering

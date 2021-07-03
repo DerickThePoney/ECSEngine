@@ -50,6 +50,17 @@ void Texture::Load()
     AssertRelease(Valid());
 }
 
+void Texture::LoadFromTextureFile(u64 parFlags)
+{
+    AssertRelease(FTextureDescriptor == nullptr);
+    Resource r(FTextureName);
+    std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
+    AssertRelease(handle != nullptr);
+
+    FHandle = bgfx::createTexture(bgfx::copy(handle->Buffer(), handle->Size()), parFlags, (u8)0, &FInfo);
+    AssertRelease(Valid());
+}
+
 void Texture::Unload()
 {
     bgfx::destroy(FHandle);
