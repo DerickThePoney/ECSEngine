@@ -1,0 +1,11 @@
+#once
+{
+    ^ProjectIncludePath + {"External/RMLUI/FreeType/include"}
+
+    ^AdditionalLibraryPath + {'External/RMLUI/FreeType/lib'}
+
+    ^AdditionalLibs_x64_Debug + {"freetype"}
+    ^AdditionalLibs_x64_Release + {"freetype"}
+    ^AdditionalLibs_x64_Final + {"freetype"}
+    ^AdditionalLibs_x64_Profile + {"freetype"}
+}

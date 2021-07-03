@@ -30,13 +30,13 @@ MeshManager::~MeshManager()
 
 const MeshHandle MeshManager::CreateMesh(const VertexDataStream& parVertexData, const void* parIndexData, const u32 parIndexDataSizeInBytes)
 {
-    MeshHandle handle((u32)FMeshes.size());
+    MeshHandle handle = GetNextHandle();
     Mesh* mesh = MeshHelpers::CreateIMesh(parVertexData.GetHash());
 
     mesh->SetRawVertexData(parVertexData);
     mesh->SetRawIndexData(parIndexData, parIndexDataSizeInBytes);
 
-    FMeshes.push_back(mesh);
+    FMeshes[handle] = mesh;
 
     return handle;
 }
@@ -60,10 +60,10 @@ const MeshHandle MeshManager::CreateMesh(const Resource& parResource)
         MeshFileReader reader;
         Mesh* mesh = nullptr;
 
-        MeshHandle handle((u32)FMeshes.size());
+        MeshHandle handle = GetNextHandle();
         reader.ReadMesh(handle, mesh, parResource);
         AssertRelease(mesh != nullptr);
-        FMeshes.push_back(mesh);
+        FMeshes[handle] = mesh;
         FFileToMesh[parResource.FName] = handle.GetMeshId();
         return handle;
     }
@@ -75,6 +75,38 @@ Mesh* MeshManager::GetMesh(const MeshHandle& meshHandle) const
     AssertRelease(meshHandle.GetMeshId() < FMeshes.size());
     AssertRelease(FMeshes[meshHandle.GetMeshId()] != nullptr);
     return FMeshes[meshHandle.GetMeshId()];
+}
+
+void MeshManager::ReleaseMesh(MeshHandle parHandle)
+{
+    if (parHandle.GetMeshId() >= FMeshes.size())
+        return;
+    if (FMeshes[parHandle] == nullptr)
+        return;
+
+    delete FMeshes[parHandle];
+    FMeshes[parHandle] = nullptr;
+
+    for (auto it = FFileToMesh.begin(); it != FFileToMesh.end(); ++it)
+    {
+        if (it->second == parHandle)
+        {
+            FFileToMesh.erase(it);
+            return;
+        }
+    }
+}
+
+MeshHandle MeshManager::GetNextHandle()
+{
+    forrange(i, 0, FMeshes.size())
+    {
+        if (FMeshes[i] == nullptr)
+            return MeshHandle(i);
+    }
+    MeshHandle handle(FMeshes.size());
+    FMeshes.push_back(nullptr);
+    return handle;
 }
 
 } // namespace Rendering

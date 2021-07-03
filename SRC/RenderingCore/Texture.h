@@ -20,6 +20,7 @@ public:
 
     void SetTextureData_IKnowWhatImDoing(bgfx::TextureHandle parHandle, bgfx::TextureInfo parInfo);
     void Load();
+    void LoadFromTextureFile(u64 parFlags);
     void Unload();
     bool Valid() const;
 

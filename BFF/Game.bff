@@ -23,6 +23,8 @@
 #include "Projects/External/polypartition.bff"
 #include "Projects/External/fmt.bff"
 #include "Projects/External/Remotery.bff"
+#include "Projects/External/freetype.bff"
+#include "Projects/External/RMLUI.bff"
 
 #include "Projects/AssimpWrapper.bff"
 

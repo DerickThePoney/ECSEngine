@@ -135,5 +135,13 @@ void MaterialInstance::SetTextures() const
     foreachitemconst(textureInput, FTextureInput) { textureInput.SetTexture(); }
 }
 
+void MaterialInstance::SetFreeFormSamplerUniform(const std::string& parUniformName, const u32& parHandle, const u32 parSlot) const
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Sampler));
+#endif
+    MaterialManager::SetFreeFormSamplerUniform(parUniformName, parHandle, parSlot);
+}
+
 } // namespace Rendering
 } // namespace ECSEngine

@@ -21,6 +21,11 @@ public:
 
     Mesh* GetMesh(const MeshHandle& meshHandle) const;
 
+    void ReleaseMesh(MeshHandle parHandle);
+
+private:
+    MeshHandle GetNextHandle();
+
 private:
     std::vector<Mesh*> FMeshes;
     std::map<std::string, u32> FFileToMesh;

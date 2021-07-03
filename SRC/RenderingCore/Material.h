@@ -111,6 +111,7 @@ public:
     void SetTextures() const;
 
     void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parHandle, const u32 parSlot);
+    void SetFreeFormSamplerUniform(const std::string& parUniformName, const u32& parHandle, const u32 parSlot) const;
     void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue);
     void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue);
     void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue);
