@@ -11,7 +11,7 @@ namespace UI
 
 double RmlSystemInterface::GetElapsedTime()
 {
-    return TimeManager::FrameDeltaTime();
+    return (double)TimeManager::DurationSinceStartRealTime();
 }
 
 } // namespace UI
