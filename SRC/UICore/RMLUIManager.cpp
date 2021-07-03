@@ -3,6 +3,8 @@
 #include "RMLUIManager.h"
 
 #define RMLUI_STATIC_LIB
+#include "Common/InputManager.h"
+#include "Common/Logger.h"
 #include "Common/ResourceCache.h"
 #include "Rendering/RmlRenderer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -21,8 +23,6 @@ struct ApplicationData
     Rml::String animal = "dog";
 } my_data;
 
-Rml::Context* context = nullptr;
-
 void RmlUiManager::Initialise()
 {
     FSystemInterface = new RmlSystemInterface();
@@ -38,7 +38,7 @@ void RmlUiManager::Initialise()
 
     // Create a context to display documents within.
     auto size = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    context = Rml::CreateContext("main", Rml::Vector2i(size.x, size.y));
+    FContext = Rml::CreateContext("main", Rml::Vector2i(size.x, size.y));
 
     // Tell RmlUi to load the given fonts.
     success = Rml::LoadFontFace(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\fonts\\LatoLatin-Regular.ttf");
@@ -48,13 +48,13 @@ void RmlUiManager::Initialise()
     AssertRelease(success);
 
     // Set up data bindings to synchronize application data.
-    if (Rml::DataModelConstructor constructor = context->CreateDataModel("animals"))
+    if (Rml::DataModelConstructor constructor = FContext->CreateDataModel("animals"))
     {
         constructor.Bind("show_text", &my_data.show_text);
         constructor.Bind("animal", &my_data.animal);
     }
 
-    Rml::ElementDocument* document = context->LoadDocument(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\UI\\HelloWorld\\helloworld.rml");
+    Rml::ElementDocument* document = FContext->LoadDocument(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\UI\\HelloWorld\\helloworld.rml");
     document->Show();
 
     // Replace and style some text in the loaded document.
@@ -65,12 +65,13 @@ void RmlUiManager::Initialise()
 
 void RmlUiManager::Update()
 {
-    context->Update();
+    ProcessInput();
+    FContext->Update();
 
     FRenderInterface->OnPreUpdate();
     // Render the user interface. All geometry and other rendering commands are now
     // submitted through the render interface.
-    context->Render();
+    FContext->Render();
 }
 
 void RmlUiManager::Shutdown()
@@ -83,6 +84,23 @@ void RmlUiManager::Shutdown()
 
     delete FSystemInterface;
     FSystemInterface = nullptr;
+}
+
+void RmlUiManager::ProcessInput() const
+{
+    if (glm::length2(Input::GetMousePositionDelta()) > 0.f)
+    {
+        SetMousePositionHasChanged(Input::GetMousePosition());
+    }
+}
+
+void RmlUiManager::SetMousePositionHasChanged(glm::vec2 parPos) const
+{
+    if (FContext == nullptr)
+        return;
+
+    LOG_UI(fmt::format("Mouse : x = {} - y = {}", parPos.x, parPos.y));
+    FContext->ProcessMouseMove((int)parPos.x, (int)parPos.y, 0);
 }
 
 } // namespace UI

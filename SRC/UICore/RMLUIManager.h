@@ -1,6 +1,11 @@
 #pragma once
 #include "Common/Singleton.h"
 
+namespace Rml
+{
+class Context;
+}
+
 namespace ECSEngine
 {
 namespace Rendering
@@ -18,6 +23,11 @@ public:
     void Shutdown();
 
 private:
+    void ProcessInput() const;
+    void SetMousePositionHasChanged(glm::vec2 parPos) const;
+
+private:
+    Rml::Context* FContext = nullptr;
     RmlSystemInterface* FSystemInterface = nullptr;
     Rendering::RmlRenderer* FRenderInterface = nullptr;
 };

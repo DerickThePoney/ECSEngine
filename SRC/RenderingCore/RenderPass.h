@@ -15,6 +15,7 @@ enum Type : u16
     GAME_UI_PASS = 4,
     COMBINE_PASS = 5,
     EDITOR_PASS = 6,
+    EDITOR_UI_PASS = 7,
     DEBUG_PASS = 252,
     IMGUI_EDITOR_PASS = 253,
     IMGUI_UI_PASS = 254,

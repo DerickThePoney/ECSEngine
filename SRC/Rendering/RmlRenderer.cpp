@@ -22,6 +22,8 @@ namespace Rendering
 {
 using namespace Rml;
 
+constexpr RenderPassId::Type renderPass = RenderPassId::EDITOR_UI_PASS;
+
 void RmlRenderer::FillVextexStream(VertexDataStream& parStream, Rml::Vertex* vertices, int num_vertices)
 {
     forrange(i, 0, num_vertices)
@@ -55,7 +57,7 @@ void RmlRenderer::RenderGeometry(Vertex* vertices, int num_vertices, int* indice
     bx::memCopy(indexBuffer.data, indices, num_indices * sizeof(u32));
 
     glm::mat4 mat = glm::translate(glm::vec3(translation.x, translation.y, 0.f)) * FCurrentMatrix;
-    bgfx::setViewTransform(RenderPassId::EDITOR_PASS, &mat, &FProjMat);
+    bgfx::setViewTransform(renderPass, &mat, &FProjMat);
 
     bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_BLEND_ALPHA);
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, num_vertices, vertexBuffer.layoutHandle);
@@ -75,7 +77,7 @@ void RmlRenderer::RenderGeometry(Vertex* vertices, int num_vertices, int* indice
         instance = Rendering::MaterialManager::GetMaterialInstance(FRenderMaterial);
     AssertRelease(instance != nullptr);
 
-    bgfx::submit(RenderPassId::EDITOR_PASS, instance->GetProgram()->ProgramHandle());
+    bgfx::submit(renderPass, instance->GetProgram()->ProgramHandle());
 }
 
 Rml::CompiledGeometryHandle RmlRenderer::CompileGeometry(Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture)
@@ -96,7 +98,7 @@ Rml::CompiledGeometryHandle RmlRenderer::CompileGeometry(Vertex* vertices, int n
 void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, const Vector2f& translation)
 {
     glm::mat4 mat = glm::translate(glm::vec3(translation.x, translation.y, 0.f)) * FCurrentMatrix;
-    bgfx::setViewTransform(RenderPassId::EDITOR_PASS, &mat, &FProjMat);
+    bgfx::setTransform(&mat);
 
     std::pair<MeshHandle, u32> p = { MeshHandle(), -1 };
     foreachitemconst(cg, FCompiledGeometry)
@@ -131,7 +133,7 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
         instance = Rendering::MaterialManager::GetMaterialInstance(FRenderMaterial);
 
     AssertRelease(instance != nullptr);
-    bgfx::submit(Rendering::RenderPassId::EDITOR_PASS, instance->GetProgram()->ProgramHandle());
+    bgfx::submit(Rendering::renderPass, instance->GetProgram()->ProgramHandle());
 }
 
 void RmlRenderer::ReleaseCompiledGeometry(Rml::CompiledGeometryHandle geometry)
@@ -165,7 +167,7 @@ void RmlRenderer::ReleaseCompiledGeometry(Rml::CompiledGeometryHandle geometry)
 void RmlRenderer::EnableScissorRegion(bool enable)
 {
     glm::vec4 scissor = (enable) ? FScissor : glm::vec4(0.f);
-    bgfx::setViewScissor(RenderPassId::EDITOR_PASS, scissor.x, scissor.y, scissor.z, scissor.w);
+    bgfx::setViewScissor(renderPass, scissor.x, scissor.y, scissor.z, scissor.w);
 }
 
 void RmlRenderer::SetScissorRegion(int x, int y, int width, int height)
@@ -238,12 +240,14 @@ void RmlRenderer::Shutdown()
 
 void RmlRenderer::OnPreUpdate()
 {
-    bgfx::setViewName(RenderPassId::EDITOR_PASS, "GAME_UI_PASS");
-    bgfx::setViewMode(RenderPassId::EDITOR_PASS, bgfx::ViewMode::Sequential);
+    bgfx::setViewName(renderPass, "GAME_UI_PASS");
+    bgfx::setViewMode(renderPass, bgfx::ViewMode::Sequential);
 
     auto size = GLFWDisplayWindowHandler::Instance().GetSize();
     FProjMat = glm::ortho(0.f, (float)size.x, (float)size.y, 0.f);
-    bgfx::setViewRect(RenderPassId::EDITOR_PASS, 0, 0, uint16_t(size.x), uint16_t(size.y));
+    auto id = glm::identity<glm::mat4>();
+    bgfx::setViewTransform(renderPass, &id, &FProjMat);
+    bgfx::setViewRect(renderPass, 0, 0, uint16_t(size.x), uint16_t(size.y));
 }
 
 } // namespace Rendering
