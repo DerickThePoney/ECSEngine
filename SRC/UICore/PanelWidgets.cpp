@@ -15,16 +15,13 @@ namespace UI
 
 WidgetPtr PanelWidgetDescriptor::CreateThisWidget() const
 {
-    return WidgetPtr(new SimplePanel(this, InitialPlacement()));
+    return WidgetPtr(new SimplePanel(FName, this, InitialPlacement()));
 }
 
 bool PanelWidgetDescriptor::VirtualDrawEditor()
 {
-    if (ImGui::CollapsingHeader("Panel widget"))
+    if (WidgetDescriptor::VirtualDrawEditor())
     {
-        WidgetDescriptor::VirtualDrawEditor();
-        ImGui::Separator();
-
         glm::vec4 color = ColorUtils::ConvertToFVEC4(FColor);
         EDITOR_PROPERTY_COLOR("Panel color", color);
         FColor = ColorUtils::ConvertToU32(color);
@@ -34,8 +31,8 @@ bool PanelWidgetDescriptor::VirtualDrawEditor()
 }
 
 IMPLEMENT_POOL_ALLOCATED(SimplePanel);
-SimplePanel::SimplePanel(const PanelWidgetDescriptor* parDescriptor, const WidgetPlacement& parPlacement)
-    : Widget(parPlacement)
+SimplePanel::SimplePanel(const std::string& parName, const PanelWidgetDescriptor* parDescriptor, const WidgetPlacement& parPlacement)
+    : Widget(parName, parPlacement)
     , FDescriptor(parDescriptor)
 {
     FBackgroundDrawer.FColor = FDescriptor->Color();
