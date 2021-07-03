@@ -40,7 +40,7 @@ class SimpleButton : public Widget
     DECLARE_POOL_ALLOCATED(SimpleButton);
 
 public:
-    SimpleButton(const ButtonWidgetDescriptor* parDescriptor);
+    SimpleButton(const std::string& parName, const ButtonWidgetDescriptor* parDescriptor);
     virtual ~SimpleButton();
 
     u32 Color() const { return FColor; }
@@ -48,6 +48,8 @@ public:
 
     const std::string& Text() const;
     void SetText(const std::string& parValue);
+
+    virtual void UpdatePlacement(const WidgetScaler* parScaler) override;
 
 protected:
     virtual void VirtualOnDraw(Rendering::UICommandBuffer& parBuffer);

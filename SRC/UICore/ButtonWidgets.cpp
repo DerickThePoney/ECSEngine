@@ -11,22 +11,21 @@ namespace UI
 
 WidgetPtr ButtonWidgetDescriptor::CreateThisWidget() const
 {
-    return WidgetPtr(new SimpleButton(this));
+    return WidgetPtr(new SimpleButton(FName, this));
 }
 
 bool ButtonWidgetDescriptor::VirtualDrawEditor()
 {
-    if (ImGui::CollapsingHeader("Button widget"))
+    if (WidgetDescriptor::VirtualDrawEditor())
     {
-        WidgetDescriptor::VirtualDrawEditor();
         return true;
     }
     return false;
 }
 
 IMPLEMENT_POOL_ALLOCATED(SimpleButton);
-SimpleButton::SimpleButton(const ButtonWidgetDescriptor* parDescriptor)
-    : Widget(parDescriptor->InitialPlacement())
+SimpleButton::SimpleButton(const std::string& parName, const ButtonWidgetDescriptor* parDescriptor)
+    : Widget(parName, parDescriptor->InitialPlacement())
     , FColor(parDescriptor->Color())
 {
     FBackgroundDrawer.FColor = parDescriptor->Color();
@@ -61,6 +60,11 @@ void SimpleButton::SetText(const std::string& parValue)
         AssertRelease(labelAsSimpleLabel != nullptr);
         labelAsSimpleLabel->SetText(parValue);
     }
+}
+
+void SimpleButton::UpdatePlacement(const WidgetScaler* parScaler)
+{
+    Widget::UpdatePlacement(parScaler);
 }
 
 void SimpleButton::VirtualOnDraw(Rendering::UICommandBuffer& parBuffer)

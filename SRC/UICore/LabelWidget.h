@@ -47,7 +47,12 @@ class SimpleLabel : public Widget
     DECLARE_POOL_ALLOCATED(SimpleLabel);
 
 public:
-    SimpleLabel(const std::string& parText, const u32 parColor, const std::string& parFontName, const float parFontSize, const WidgetPlacement& parPlacement);
+    SimpleLabel(const std::string& parName,
+          const std::string& parText,
+          const u32 parColor,
+          const std::string& parFontName,
+          const float parFontSize,
+          const WidgetPlacement& parPlacement);
 
     void SetText(const std::string& parText) { FText = parText; }
     const std::string& Text() const { return FText; }

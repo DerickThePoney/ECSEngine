@@ -32,6 +32,9 @@ protected:
     virtual WidgetPtr CreateThisWidget() const = 0;
     virtual bool VirtualDrawEditor();
 
+protected:
+    std::string FName;
+
 private:
     std::vector<std::unique_ptr<WidgetDescriptor>> FChildren;
     WidgetPlacement FInitialPlacement;
@@ -40,7 +43,7 @@ private:
 class Widget
 {
 public:
-    Widget(const WidgetPlacement& parInitialPlacement);
+    Widget(const std::string& parName, const WidgetPlacement& parInitialPlacement);
     virtual ~Widget();
     void SetParent(Widget* parNewParent);
     void AddChild(WidgetPtr parNewChild);
@@ -66,6 +69,7 @@ private:
     std::vector<WidgetPtr> FChildren;
 
     WidgetPlacement FPlacement;
+    std::string FWidgetName = "";
 
 #ifdef ENABLE_SECURITY_CHECKS
     bool FVirtualOnDrawCalled = false;

@@ -34,7 +34,7 @@ class SimplePanel : public Widget
     DECLARE_POOL_ALLOCATED(SimplePanel);
 
 public:
-    SimplePanel(const PanelWidgetDescriptor* parDescriptor, const WidgetPlacement& parPlacement);
+    SimplePanel(const std::string& parName, const PanelWidgetDescriptor* parDescriptor, const WidgetPlacement& parPlacement);
 
 protected:
     virtual void VirtualOnDraw(Rendering::UICommandBuffer& parBuffer) override;

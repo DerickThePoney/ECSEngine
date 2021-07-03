@@ -144,6 +144,7 @@ private:
 
         void Initialise(const u32 parNbKeys);
         void Swap();
+        bool HasChangedDuringLastFrame();
     };
 
     struct KeyboardState
@@ -155,6 +156,8 @@ private:
         bool IsAltDown = false;
 
         bool AlreadyUsed = false;
+
+        bool HasChangedDuringLastFrame();
     };
 
     KeyboardState FKeyboardState;
@@ -171,6 +174,8 @@ private:
         bool AlreadyUsed = false;
 
         void Initialise(const glm::vec2& parMousePosition, const u32 parNbButtons);
+
+        bool HasChangedDuringLastFrame();
     };
 
     MouseState FMouse;
@@ -181,6 +186,7 @@ private:
         std::vector<float> PreviousFrameValues;
         void Initialise(const u32 parNbAxes);
         void Swap();
+        bool HasChangedDuringLastFrame();
     };
 
     struct Gamepad
@@ -190,6 +196,7 @@ private:
         AxesState AxesStates;
         void Initialise();
         void Swap();
+        bool HasChangedDuringLastFrame();
     };
 
     std::map<int, Gamepad> FGamepads;
@@ -490,6 +497,16 @@ void InputManager::ButtonsState::Swap()
     PreviousFrameValues = ThisFrameValues;
 }
 
+bool InputManager::ButtonsState::HasChangedDuringLastFrame()
+{
+    return ThisFrameValues != PreviousFrameValues;
+}
+
+bool InputManager::KeyboardState::HasChangedDuringLastFrame()
+{
+    return !AlreadyUsed && KeyStates.HasChangedDuringLastFrame();
+}
+
 void InputManager::MouseState::Initialise(const glm::vec2& parMousePosition, const u32 parNbButtons)
 {
     MousePosition = parMousePosition;
@@ -500,16 +517,31 @@ void InputManager::MouseState::Initialise(const glm::vec2& parMousePosition, con
     MouseButtons.Initialise(parNbButtons);
 }
 
+bool InputManager::MouseState::HasChangedDuringLastFrame()
+{
+    return !AlreadyUsed && (MouseButtons.HasChangedDuringLastFrame() || MousePosition != PreviousMousePosition || MouseScrollDelta != PreviousMouseScrollDelta);
+}
+
 void InputManager::AxesState::Initialise(const u32 parNbAxes)
 {
     ThisFrameValues.resize(parNbAxes, 0.0f);
     PreviousFrameValues.resize(parNbAxes, 0.0f);
 }
 
+bool InputManager::AxesState::HasChangedDuringLastFrame()
+{
+    return ThisFrameValues != PreviousFrameValues;
+}
+
 void InputManager::Gamepad::Initialise()
 {
     GamepadButtonsStates.Initialise(GamepadButtons::GAMEPAD_BUTTON_LAST);
     AxesStates.Initialise(GamepadAxes::GAMEPAD_AXIS_LAST);
+}
+
+bool InputManager::Gamepad::HasChangedDuringLastFrame()
+{
+    return GamepadButtonsStates.HasChangedDuringLastFrame() || AxesStates.HasChangedDuringLastFrame();
 }
 
 } // namespace ECSEngine

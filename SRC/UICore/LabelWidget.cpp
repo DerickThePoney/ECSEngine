@@ -14,22 +14,26 @@ namespace UI
 
 WidgetPtr LabelWidgetDescriptor::CreateThisWidget() const
 {
-    return WidgetPtr(new SimpleLabel(FTextToDraw, FTextColor, FFontName, FFontSize, InitialPlacement()));
+    return WidgetPtr(new SimpleLabel(FName, FTextToDraw, FTextColor, FFontName, FFontSize, InitialPlacement()));
 }
 
 bool LabelWidgetDescriptor::VirtualDrawEditor()
 {
-    if (ImGui::CollapsingHeader("Label widget"))
+    if (WidgetDescriptor::VirtualDrawEditor())
     {
-        WidgetDescriptor::VirtualDrawEditor();
         return true;
     }
     return false;
 }
 
 IMPLEMENT_POOL_ALLOCATED(SimpleLabel);
-SimpleLabel::SimpleLabel(const std::string& parText, const u32 parColor, const std::string& parFontName, const float parFontSize, const WidgetPlacement& parPlacement)
-    : Widget(parPlacement)
+SimpleLabel::SimpleLabel(const std::string& parName,
+      const std::string& parText,
+      const u32 parColor,
+      const std::string& parFontName,
+      const float parFontSize,
+      const WidgetPlacement& parPlacement)
+    : Widget(parName, parPlacement)
     , FText(parText)
     , FTextColor(parColor)
     , FFontSize(parFontSize)

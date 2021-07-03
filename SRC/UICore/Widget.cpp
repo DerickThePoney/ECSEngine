@@ -7,7 +7,7 @@ namespace ECSEngine
 namespace UI
 {
 
-Widget::Widget(const WidgetPlacement& parInitialPlacement)
+Widget::Widget(const std::string& parName, const WidgetPlacement& parInitialPlacement)
     : FPlacement(parInitialPlacement)
 {
 }
@@ -107,8 +107,16 @@ void WidgetDescriptor::DrawEditor()
 
 bool WidgetDescriptor::VirtualDrawEditor()
 {
-    FInitialPlacement.DrawEditor();
-    return true;
+    if (ImGui::CollapsingHeader(FName.c_str()))
+    {
+        static char buf[1024];
+        strcpy(buf, FName.c_str());
+        ImGui::InputText("Name", buf, 1024);
+        FName = buf;
+        FInitialPlacement.DrawEditor();
+        return true;
+    }
+    return false;
 }
 
 } // namespace UI
