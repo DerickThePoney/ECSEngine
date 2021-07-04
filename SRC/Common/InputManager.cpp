@@ -92,6 +92,10 @@ public:
     void SetMouseButtonState(int button, bool value);
     void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtrlDown, bool isAltDown);
 
+    void AddCharacterInput(u32 character);
+    bool TextInputHasChanged() const;
+    MemoryView<const u32> TextInput() const;
+
     void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed);
 
     const glm::vec2 GetMousePosition() { return (FMouse.AlreadyUsed) ? glm::vec2(0.f) : FMouse.MousePosition; }
@@ -200,6 +204,8 @@ private:
     };
 
     std::map<int, Gamepad> FGamepads;
+
+    std::vector<u32> FTextInput;
 };
 
 namespace Input
@@ -240,6 +246,21 @@ void SetMouseButtonState(int button, bool value)
 void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtrlDown, bool isAltDown)
 {
     InputManager::Instance().SetKeyboardButtonState(button, value, isShiftDown, isCtrlDown, isAltDown);
+}
+
+void AddCharacterInput(u32 character)
+{
+    InputManager::Instance().AddCharacterInput(character);
+}
+
+bool TextInputHasChanged()
+{
+    return InputManager::Instance().TextInputHasChanged();
+}
+
+MemoryView<const u32> TextInput()
+{
+    return InputManager::Instance().TextInput();
 }
 
 void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed)
@@ -375,6 +396,7 @@ void InputManager::EndFrame()
     FMouse.PreviousMouseScrollDelta = FMouse.MouseScrollDelta;
     FMouse.MouseScrollDelta = glm::vec2(0.f);
     FMouse.MouseButtons.Swap();
+    FTextInput.clear();
 }
 
 void InputManager::Shutdown()
@@ -484,6 +506,22 @@ void InputManager::SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const b
 {
     FKeyboardState.AlreadyUsed = parKeyboardInputUsed;
     FMouse.AlreadyUsed = parMouseInputUsed;
+}
+
+void InputManager::AddCharacterInput(u32 character)
+{
+    if (character != 0)
+        FTextInput.push_back(character);
+}
+
+bool InputManager::TextInputHasChanged() const
+{
+    return !FTextInput.empty();
+}
+
+MemoryView<const u32> InputManager::TextInput() const
+{
+    return MemoryView<const u32>(FTextInput.data(), FTextInput.size());
 }
 
 void InputManager::ButtonsState::Initialise(const u32 parNbKeys)
