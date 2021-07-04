@@ -14,6 +14,7 @@
 #if !defined(COMPILE_FINAL) and !defined(ENABLE_PROFILING)
 #include <RmlUi/Debugger.h>
 #endif
+#include "RmlFileInterface.h"
 
 namespace ECSEngine
 {
@@ -33,8 +34,11 @@ void RmlUiManager::Initialise()
     FRenderInterface = new Rendering::RmlRenderer();
     FRenderInterface->Initialise();
 
+    FFileInterface = new RmlFileInterface();
+
     Rml::SetSystemInterface(FSystemInterface);
     Rml::SetRenderInterface(FRenderInterface);
+    Rml::SetFileInterface(FFileInterface);
 
     // TODO FILE INTERFACE
 
@@ -50,10 +54,10 @@ void RmlUiManager::Initialise()
 #endif
 
     // Tell RmlUi to load the given fonts.
-    success = Rml::LoadFontFace(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\fonts\\LatoLatin-Regular.ttf");
+    success = Rml::LoadFontFace("fonts\\LatoLatin-Regular.ttf");
     AssertRelease(success);
     // Fonts can be registered as fallback fonts, as in this case to display emojis.
-    success = Rml::LoadFontFace(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\fonts\\NotoEmoji-Regular.ttf", true);
+    success = Rml::LoadFontFace("fonts\\NotoEmoji-Regular.ttf", true);
     AssertRelease(success);
 
     // Set up data bindings to synchronize application data.
@@ -63,7 +67,7 @@ void RmlUiManager::Initialise()
         constructor.Bind("animal", &my_data.animal);
     }
 
-    Rml::ElementDocument* document = FContext->LoadDocument(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\UI\\HelloWorld\\helloworld.rml");
+    Rml::ElementDocument* document = FContext->LoadDocument("UI\\HelloWorld\\helloworld.rml");
     document->Show();
 
     // Replace and style some text in the loaded document.
@@ -101,6 +105,9 @@ void RmlUiManager::Render()
 void RmlUiManager::Shutdown()
 {
     Rml::Shutdown();
+
+    delete FFileInterface;
+    FFileInterface = nullptr;
 
     FRenderInterface->Shutdown();
     delete FRenderInterface;
