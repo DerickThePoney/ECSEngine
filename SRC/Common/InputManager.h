@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "FixedSizedArray.h"
+#include "MemoryView.h"
 #include "Singleton.h"
 
 namespace ECSEngine
@@ -64,6 +65,10 @@ void SetMousePosition(const glm::vec2& parMousePosition);
 void SetMouseScrollDelta(const glm::vec2& parMouseScrollDelta);
 void SetMouseButtonState(int button, bool value);
 void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtrlDown, bool isAltDown);
+
+void AddCharacterInput(u32 character);
+bool TextInputHasChanged();
+MemoryView<const u32> TextInput();
 
 void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed);
 
