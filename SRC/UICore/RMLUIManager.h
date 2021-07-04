@@ -34,7 +34,6 @@ private:
 
 private:
     Rml::Context* FContext = nullptr;
-    Rml::Context* FDebuggerContext = nullptr;
     RmlSystemInterface* FSystemInterface = nullptr;
     Rendering::RmlRenderer* FRenderInterface = nullptr;
 };

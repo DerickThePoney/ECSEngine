@@ -11,7 +11,9 @@
 #include "RmlSystemInterface.h"
 
 #include <RmlUi/Core.h>
+#if !defined(COMPILE_FINAL) and !defined(ENABLE_PROFILING)
 #include <RmlUi/Debugger.h>
+#endif
 
 namespace ECSEngine
 {
@@ -34,16 +36,18 @@ void RmlUiManager::Initialise()
     Rml::SetSystemInterface(FSystemInterface);
     Rml::SetRenderInterface(FRenderInterface);
 
+    // TODO FILE INTERFACE
+
     bool success = Rml::Initialise();
     AssertRelease(success);
 
     // Create a context to display documents within.
     auto size = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     FContext = Rml::CreateContext("main", Rml::Vector2i(size.x, size.y));
-    FDebuggerContext = Rml::CreateContext("debugger", Rml::Vector2i(size.x, size.y));
-
+#if !defined(COMPILE_FINAL) and !defined(ENABLE_PROFILING)
     Rml::Debugger::Initialise(FContext);
     Rml::Debugger::SetVisible(true);
+#endif
 
     // Tell RmlUi to load the given fonts.
     success = Rml::LoadFontFace(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\fonts\\LatoLatin-Regular.ttf");
