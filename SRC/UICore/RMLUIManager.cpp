@@ -68,11 +68,26 @@ void RmlUiManager::Initialise()
     element->SetProperty("font-size", "1.5em");
 }
 
+void RmlUiManager::NewFrame()
+{
+    SCOPED_PROFILE_CLASS(RmlUiManager, NewFrame);
+    ProcessInput();
+}
+
 void RmlUiManager::Update()
 {
-    ProcessInput();
+    SCOPED_PROFILE_CLASS(RmlUiManager, Update);
+    NewFrame();
+    Rml::Vector2i d = FContext->GetDimensions();
+    auto size = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    if (size.x != d.x || size.y != d.y)
+        FContext->SetDimensions(Rml::Vector2i(size.x, size.y));
     FContext->Update();
+}
 
+void RmlUiManager::Render()
+{
+    SCOPED_PROFILE_CLASS(RmlUiManager, Render);
     FRenderInterface->OnPreUpdate();
     // Render the user interface. All geometry and other rendering commands are now
     // submitted through the render interface.
@@ -93,63 +108,92 @@ void RmlUiManager::Shutdown()
 
 void RmlUiManager::ProcessInput() const
 {
-    ProcessMouse();
-    SetKeyboardButtons();
+    // TODO Check if used
+    bool mouse = ProcessMouse();
+    bool keys = SetKeyboardButtons();
+    SetTextInput();
+
+    Input::SetInputsAlreadyUsed(keys, mouse);
 }
 
-void RmlUiManager::ProcessMouse() const
+bool RmlUiManager::ProcessMouse() const
 {
+    bool res = true;
     if (glm::length2(Input::GetMousePositionDelta()) > 0.f)
     {
-        SetMousePositionHasChanged(Input::GetMousePosition());
+        bool thisRes = SetMousePositionHasChanged(Input::GetMousePosition());
+        res = res && thisRes;
     }
 
-    SetMouseButtons();
+    bool thisRes = SetMouseButtons();
+    res = res && thisRes;
 
     const glm::vec2 delta = Input::GetMouseScrollDelta();
     if (glm::length2(delta) > 0.f)
-        FContext->ProcessMouseWheel(-delta.y, 0);
+    {
+        bool mw = FContext->ProcessMouseWheel(-delta.y, 0);
+        res = res && mw;
+    }
+    return !res;
 }
 
-void RmlUiManager::SetMousePositionHasChanged(glm::vec2 parPos) const
+bool RmlUiManager::SetMousePositionHasChanged(glm::vec2 parPos) const
 {
     if (FContext == nullptr)
-        return;
+        return true;
 
-    LOG_UI(fmt::format("Mouse : x = {} - y = {}", parPos.x, parPos.y));
-    FContext->ProcessMouseMove((int)parPos.x, (int)parPos.y, 0);
+    return !FContext->ProcessMouseMove((int)parPos.x, (int)parPos.y, 0);
 }
 
-void RmlUiManager::SetMouseButtons() const
+bool RmlUiManager::SetMouseButtons() const
 {
+    bool res = true;
     forrange(i, 0, MouseButtons::MOUSE_BUTTON_LAST)
     {
         if (Input::GetMouseButtonHasChanged(i))
         {
-            bool res = Input::GetMouseButtonState(i);
-            if (res)
-                FContext->ProcessMouseButtonDown(i, 0);
+            bool button = Input::GetMouseButtonState(i);
+            bool thisRes = false;
+            if (button)
+                thisRes = FContext->ProcessMouseButtonDown(i, 0);
             else
-                FContext->ProcessMouseButtonUp(i, 0);
+                thisRes = FContext->ProcessMouseButtonUp(i, 0);
+            res = res && thisRes;
         }
     }
+    return !res;
 }
 
-void RmlUiManager::SetKeyboardButtons() const
+bool RmlUiManager::SetKeyboardButtons() const
 {
+    bool res = true;
     forrange(i, 0, InputKeyNames::INPUT_KEY_LAST)
     {
         if (Input::GetButtonHasChanged(i))
         {
-            bool res = Input::GetButtonDown(i);
+            bool button = Input::GetButtonDown(i);
             Rml::Input::KeyIdentifier id = FSystemInterface->ConvertToRml((InputKeyNames::Type)i);
             if (id == Rml::Input::KeyIdentifier::KI_UNKNOWN)
                 continue;
-
-            if (res)
-                FContext->ProcessKeyDown(id, 0);
+            bool thisRes = false;
+            if (button)
+                thisRes = FContext->ProcessKeyDown(id, 0);
             else
-                FContext->ProcessKeyUp(id, 0);
+                thisRes = FContext->ProcessKeyUp(id, 0);
+            res = res && thisRes;
+        }
+    }
+    return res;
+}
+
+void RmlUiManager::SetTextInput() const
+{
+    if (Input::TextInputHasChanged())
+    {
+        foreachitemconst(c, Input::TextInput())
+        {
+            Rml::Character cr = (c <= 0xFFFF) ? (Rml::Character)c : Rml::Character::Replacement;
+            FContext->ProcessTextInput(cr);
         }
     }
 }

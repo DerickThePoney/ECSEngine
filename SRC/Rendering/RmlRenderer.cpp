@@ -173,6 +173,7 @@ void RmlRenderer::EnableScissorRegion(bool enable)
 void RmlRenderer::SetScissorRegion(int x, int y, int width, int height)
 {
     FScissor = glm::vec4(x, y, width, height);
+    bgfx::setViewScissor(renderPass, FScissor.x, FScissor.y, FScissor.z, FScissor.w);
 }
 
 bool RmlRenderer::LoadTexture(Rml::TextureHandle& texture_handle, Vector2i& texture_dimensions, const String& source)
@@ -240,6 +241,7 @@ void RmlRenderer::Shutdown()
 
 void RmlRenderer::OnPreUpdate()
 {
+    SCOPED_PROFILE_CLASS(RmlRenderer, OnPreUpdate);
     bgfx::setViewName(renderPass, "GAME_UI_PASS");
     bgfx::setViewMode(renderPass, bgfx::ViewMode::Sequential);
 

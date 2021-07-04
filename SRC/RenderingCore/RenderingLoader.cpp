@@ -18,6 +18,7 @@
 #include "MeshManager.h"
 #include "SkelettonManager.h"
 #include "TexturesManager.h"
+#include "UICore/RMLUIManager.h"
 
 namespace ECSEngine
 {
@@ -42,6 +43,9 @@ bool RenderingLoader::VirtualInitialise()
     Rendering::MaterialManager::Initialise();
 
     Rendering::ImGUI::Init();
+
+    UI::RmlUiManager::CreateIFP();
+    UI::RmlUiManager::Instance().Initialise();
 
     Rendering::MeshManager::CreateIFP();
 
@@ -84,9 +88,12 @@ void RenderingLoader::VirtualShutdown()
     Rendering::GFXRepresentationManager::Destroy();
     Rendering::SkelettonManager::Destroy();
 
-    Rendering::MeshManager::Destroy();
+    UI::RmlUiManager::Instance().Shutdown();
+    UI::RmlUiManager::Destroy();
 
     Rendering::ImGUI::Shutdown();
+
+    Rendering::MeshManager::Destroy();
 
     Rendering::MaterialManager::Shutdown();
 
