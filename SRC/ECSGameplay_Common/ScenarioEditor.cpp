@@ -44,16 +44,10 @@ void ScenarioEditor::Initialise()
     FEditorGridRenderer->Initialise();
 
     FEditorCamera.Initialise();
-
-    UI::RmlUiManager::CreateIFP();
-    UI::RmlUiManager::Instance().Initialise();
 }
 
 void ScenarioEditor::Destroy()
 {
-    UI::RmlUiManager::Instance().Shutdown();
-    UI::RmlUiManager::Destroy();
-
     if (FCurrentScenario != nullptr)
         FCurrentScenario->Destroy();
 
@@ -280,7 +274,6 @@ void ScenarioEditor::RenderForSceneEditing()
     }
 
     FEditorGridRenderer->RenderScene();
-    UI::RmlUiManager::Instance().Update();
 }
 
 void ScenarioEditor::RenderForEditorPlaying()

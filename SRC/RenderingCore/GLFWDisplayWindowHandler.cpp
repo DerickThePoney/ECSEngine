@@ -77,6 +77,8 @@ void WindowCharCallback(GLFWwindow* window, unsigned int c)
         ImGuiIO& io = ImGui::GetIO();
         io.AddInputCharacter(c);
     }
+
+    Input::AddCharacterInput(c);
 }
 
 void WindowMousePosCallback(GLFWwindow* window, double xpos, double ypos)
