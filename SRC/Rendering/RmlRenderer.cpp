@@ -59,7 +59,7 @@ void RmlRenderer::RenderGeometry(Vertex* vertices, int num_vertices, int* indice
     glm::mat4 mat = glm::translate(glm::vec3(translation.x, translation.y, 0.f)) * FCurrentMatrix;
     bgfx::setTransform(&mat);
 
-    bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_BLEND_ALPHA);
+    RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, num_vertices, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, num_indices);
 

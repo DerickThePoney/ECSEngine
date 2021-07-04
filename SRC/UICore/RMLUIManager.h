@@ -15,6 +15,7 @@ class RmlRenderer;
 namespace UI
 {
 class RmlSystemInterface;
+class RmlFileInterface;
 class RmlUiManager : public Singleton<RmlUiManager>
 {
 public:
@@ -36,6 +37,7 @@ private:
     Rml::Context* FContext = nullptr;
     RmlSystemInterface* FSystemInterface = nullptr;
     Rendering::RmlRenderer* FRenderInterface = nullptr;
+    RmlFileInterface* FFileInterface = nullptr;
 };
 } // namespace UI
 } // namespace ECSEngine
