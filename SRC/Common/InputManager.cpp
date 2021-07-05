@@ -129,6 +129,7 @@ public:
     bool IsShiftDown() { return !FKeyboardState.AlreadyUsed && FKeyboardState.IsShiftDown; }
     bool IsCtrlDown() { return !FKeyboardState.AlreadyUsed && FKeyboardState.IsCtrlDown; }
     bool IsAltDown() { return !FKeyboardState.AlreadyUsed && FKeyboardState.IsAltDown; }
+    bool IsCapsLock() { return !FKeyboardState.AlreadyUsed && FKeyboardState.CapsLock; }
 
     void GamepadIsConnected(const int parGamepadId, const char* parGamepadName);
     void GamepadIsDisconnected(const int parGamepadId);
@@ -163,6 +164,8 @@ private:
         bool IsAltDown = false;
 
         bool AlreadyUsed = false;
+
+        bool CapsLock = false;
 
         bool HasChangedDuringLastFrame();
     };
@@ -268,7 +271,7 @@ MemoryView<const u32> TextInput()
 
 void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed)
 {
-    LOG_INPUT(fmt::format("keyboard {} - mouse {}", ((parKeyboardInputUsed) ? "true" : "false"), ((parMouseInputUsed) ? "true" : "false")));
+    //LOG_INPUT(fmt::format("keyboard {} - mouse {}", ((parKeyboardInputUsed) ? "true" : "false"), ((parMouseInputUsed) ? "true" : "false")));
     InputManager::Instance().SetInputsAlreadyUsed(parKeyboardInputUsed, parMouseInputUsed);
 }
 
@@ -326,6 +329,11 @@ bool IsCtrlDown()
 bool IsAltDown()
 {
     return InputManager::Instance().IsAltDown();
+}
+
+bool IsCapsLock()
+{
+    return InputManager::Instance().IsCapsLock();
 }
 
 void GamepadIsConnected(const int parGamepadId, const char* parGamepadName)
@@ -438,6 +446,9 @@ void InputManager::SetKeyboardButtonState(int button, bool value, bool isShiftDo
     FKeyboardState.IsShiftDown = isShiftDown;
     FKeyboardState.IsCtrlDown = isCtrlDown;
     FKeyboardState.IsAltDown = isAltDown;
+
+    if (value && button == InputKeyNames::INPUT_KEY_CAPS_LOCK)
+        FKeyboardState.CapsLock = !FKeyboardState.CapsLock;
 }
 
 void InputManager::GamepadIsConnected(const int parGamepadId, const char* parGamepadName)

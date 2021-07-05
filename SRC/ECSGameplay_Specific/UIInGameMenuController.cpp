@@ -14,6 +14,16 @@ UIInGameMenuController::UIInGameMenuController()
     , FPosition(0.5f, 1.f)
 {
     FPosition.WindowAnchor = glm::vec2(0.5f, 1.f);
+    FMainMenuBarController.Show(true);
+}
+
+void UIInGameMenuController::VirtualInit()
+{
+    UIController::VirtualInit();
+
+    FMainMenuBarController.Init();
+    FColonySelectionPanel.Init();
+    FBuildMenuController.Init();
 }
 
 void UIInGameMenuController::VirtualUpdate()
@@ -22,8 +32,17 @@ void UIInGameMenuController::VirtualUpdate()
 
     DrawInGameMenu();
 
+    FMainMenuBarController.Update();
     FColonySelectionPanel.Update();
     FBuildMenuController.Update();
+}
+
+void UIInGameMenuController::VirtualDestroy()
+{
+    UIController::VirtualDestroy();
+    FBuildMenuController.Destroy();
+    FColonySelectionPanel.Destroy();
+    FMainMenuBarController.Destroy();
 }
 
 void UIInGameMenuController::DrawInGameMenu()
