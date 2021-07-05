@@ -61,10 +61,12 @@ void RmlUiManager::NewFrame()
     SCOPED_PROFILE_CLASS(RmlUiManager, NewFrame);
     ProcessInput();
 
+#if !defined(COMPILE_FINAL) and !defined(ENABLE_PROFILING)
     if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F8) && Input::GetButtonHasChanged(InputKeyNames::INPUT_KEY_F8))
     {
         Rml::Debugger::SetVisible(!Rml::Debugger::IsVisible());
     }
+#endif
 }
 
 void RmlUiManager::Update()
