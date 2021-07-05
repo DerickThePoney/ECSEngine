@@ -4,7 +4,8 @@
 namespace Rml
 {
 class Context;
-}
+class ElementDocument;
+} // namespace Rml
 
 namespace ECSEngine
 {
@@ -33,11 +34,14 @@ private:
     bool SetKeyboardButtons() const;
     void SetTextInput() const;
 
+    void LoadDocument();
+
 private:
     Rml::Context* FContext = nullptr;
     RmlSystemInterface* FSystemInterface = nullptr;
     Rendering::RmlRenderer* FRenderInterface = nullptr;
     RmlFileInterface* FFileInterface = nullptr;
+    Rml::ElementDocument* doc = nullptr;
 };
 } // namespace UI
 } // namespace ECSEngine

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 
-#include "RMLUIManager.h"
+#include "RmlUiManager.h"
 
 #define RMLUI_STATIC_LIB
 #include "Common/InputManager.h"
@@ -20,12 +20,6 @@ namespace ECSEngine
 {
 namespace UI
 {
-
-struct ApplicationData
-{
-    bool show_text = true;
-    Rml::String animal = "dog";
-} my_data;
 
 void RmlUiManager::Initialise()
 {
@@ -50,7 +44,6 @@ void RmlUiManager::Initialise()
     FContext = Rml::CreateContext("main", Rml::Vector2i(size.x, size.y));
 #if !defined(COMPILE_FINAL) and !defined(ENABLE_PROFILING)
     Rml::Debugger::Initialise(FContext);
-    Rml::Debugger::SetVisible(true);
 #endif
 
     // Tell RmlUi to load the given fonts.
@@ -60,26 +53,18 @@ void RmlUiManager::Initialise()
     success = Rml::LoadFontFace("fonts\\NotoEmoji-Regular.ttf", true);
     AssertRelease(success);
 
-    // Set up data bindings to synchronize application data.
-    if (Rml::DataModelConstructor constructor = FContext->CreateDataModel("animals"))
-    {
-        constructor.Bind("show_text", &my_data.show_text);
-        constructor.Bind("animal", &my_data.animal);
-    }
-
-    Rml::ElementDocument* document = FContext->LoadDocument("UI\\HelloWorld\\helloworld.rml");
-    document->Show();
-
-    // Replace and style some text in the loaded document.
-    Rml::Element* element = document->GetElementById("world");
-    element->SetInnerRML(reinterpret_cast<const char*>(u8"🌍"));
-    element->SetProperty("font-size", "1.5em");
+    LoadDocument();
 }
 
 void RmlUiManager::NewFrame()
 {
     SCOPED_PROFILE_CLASS(RmlUiManager, NewFrame);
     ProcessInput();
+
+    if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F8) && Input::GetButtonHasChanged(InputKeyNames::INPUT_KEY_F8))
+    {
+        Rml::Debugger::SetVisible(!Rml::Debugger::IsVisible());
+    }
 }
 
 void RmlUiManager::Update()
@@ -120,10 +105,23 @@ void RmlUiManager::Shutdown()
 void RmlUiManager::ProcessInput() const
 {
     // TODO Check if used
-    bool mouse = ProcessMouse();
-    bool keys = SetKeyboardButtons();
-    SetTextInput();
 
+    bool mouse, keys;
+    Input::GetInputsAlreadyUsed(keys, mouse);
+
+    if (mouse && keys)
+        return;
+
+    if (!mouse)
+        mouse = ProcessMouse();
+
+    if (!keys)
+    {
+        bool keys = SetKeyboardButtons();
+        SetTextInput();
+    }
+
+    LOG_INPUT(fmt::format("RML:  {} - mouse {}", ((keys) ? "true" : "false"), ((mouse) ? "true" : "false")));
     Input::SetInputsAlreadyUsed(keys, mouse);
 }
 
@@ -207,6 +205,18 @@ void RmlUiManager::SetTextInput() const
             FContext->ProcessTextInput(cr);
         }
     }
+}
+
+void RmlUiManager::LoadDocument()
+{
+    AssertRelease(FContext != nullptr);
+    if (doc != nullptr)
+    {
+        FContext->UnloadDocument(doc);
+    }
+
+    doc = FContext->LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
+    doc->Show();
 }
 
 } // namespace UI

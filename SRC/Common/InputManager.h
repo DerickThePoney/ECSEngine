@@ -71,6 +71,7 @@ bool TextInputHasChanged();
 MemoryView<const u32> TextInput();
 
 void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed);
+void GetInputsAlreadyUsed(bool& parKeyboardInputUsed, bool& parMouseInputUsed);
 
 const glm::vec2 GetMousePosition();
 const glm::vec2 GetMousePositionDelta();

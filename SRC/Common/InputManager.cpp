@@ -2,6 +2,8 @@
 
 #include "InputManager.h"
 
+#include "Logger.h"
+
 namespace ECSEngine
 {
 
@@ -97,6 +99,7 @@ public:
     MemoryView<const u32> TextInput() const;
 
     void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed);
+    void GetInputsAlreadyUsed(bool& parKeyboardInputUsed, bool& parMouseInputUsed);
 
     const glm::vec2 GetMousePosition() { return (FMouse.AlreadyUsed) ? glm::vec2(0.f) : FMouse.MousePosition; }
     const glm::vec2 GetMousePositionDelta() { return (FMouse.AlreadyUsed) ? glm::vec2(0.f) : FMouse.MousePosition - FMouse.PreviousMousePosition; }
@@ -265,7 +268,13 @@ MemoryView<const u32> TextInput()
 
 void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed)
 {
+    LOG_INPUT(fmt::format("keyboard {} - mouse {}", ((parKeyboardInputUsed) ? "true" : "false"), ((parMouseInputUsed) ? "true" : "false")));
     InputManager::Instance().SetInputsAlreadyUsed(parKeyboardInputUsed, parMouseInputUsed);
+}
+
+void GetInputsAlreadyUsed(bool& parKeyboardInputUsed, bool& parMouseInputUsed)
+{
+    InputManager::Instance().GetInputsAlreadyUsed(parKeyboardInputUsed, parMouseInputUsed);
 }
 
 const glm::vec2 GetMousePosition()
@@ -506,6 +515,12 @@ void InputManager::SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const b
 {
     FKeyboardState.AlreadyUsed = parKeyboardInputUsed;
     FMouse.AlreadyUsed = parMouseInputUsed;
+}
+
+void InputManager::GetInputsAlreadyUsed(bool& parKeyboardInputUsed, bool& parMouseInputUsed)
+{
+    parKeyboardInputUsed = FKeyboardState.AlreadyUsed;
+    parMouseInputUsed = FMouse.AlreadyUsed;
 }
 
 void InputManager::AddCharacterInput(u32 character)

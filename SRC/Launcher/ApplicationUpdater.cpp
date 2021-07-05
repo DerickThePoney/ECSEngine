@@ -10,7 +10,7 @@
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
-#include "UICore/RMLUIManager.h"
+#include "UICore/RmlUiManager.h"
 
 namespace ECSEngine
 {
