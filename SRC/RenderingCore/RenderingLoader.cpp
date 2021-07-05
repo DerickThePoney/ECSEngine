@@ -18,7 +18,7 @@
 #include "MeshManager.h"
 #include "SkelettonManager.h"
 #include "TexturesManager.h"
-#include "UICore/RMLUIManager.h"
+#include "UICore/RmlUiManager.h"
 
 namespace ECSEngine
 {

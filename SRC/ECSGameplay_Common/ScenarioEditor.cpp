@@ -13,7 +13,7 @@
 #include "RenderingCore/GFXOperator.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/RenderPass.h"
-#include "UICore/RMLUIManager.h"
+#include "UICore/RmlUiManager.h"
 
 namespace ECSEngine
 {
