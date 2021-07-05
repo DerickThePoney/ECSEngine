@@ -2,7 +2,9 @@
 
 #include "RmlUiManager.h"
 
+#ifndef RMLUI_STATIC_LIB
 #define RMLUI_STATIC_LIB
+#endif
 #include "Common/InputManager.h"
 #include "Common/Logger.h"
 #include "Common/ResourceCache.h"
@@ -52,8 +54,6 @@ void RmlUiManager::Initialise()
     // Fonts can be registered as fallback fonts, as in this case to display emojis.
     success = Rml::LoadFontFace("fonts\\NotoEmoji-Regular.ttf", true);
     AssertRelease(success);
-
-    LoadDocument();
 }
 
 void RmlUiManager::NewFrame()
@@ -112,49 +112,50 @@ void RmlUiManager::ProcessInput() const
     if (mouse && keys)
         return;
 
+    u32 keymods = GetKeyModifiers();
+
     if (!mouse)
-        mouse = ProcessMouse();
+        mouse = ProcessMouse(keymods);
 
     if (!keys)
     {
-        bool keys = SetKeyboardButtons();
+        bool keys = SetKeyboardButtons(keymods);
         SetTextInput();
     }
 
-    LOG_INPUT(fmt::format("RML:  {} - mouse {}", ((keys) ? "true" : "false"), ((mouse) ? "true" : "false")));
     Input::SetInputsAlreadyUsed(keys, mouse);
 }
 
-bool RmlUiManager::ProcessMouse() const
+bool RmlUiManager::ProcessMouse(u32 parKeyMods) const
 {
     bool res = true;
     if (glm::length2(Input::GetMousePositionDelta()) > 0.f)
     {
-        bool thisRes = SetMousePositionHasChanged(Input::GetMousePosition());
+        bool thisRes = SetMousePositionHasChanged(Input::GetMousePosition(), parKeyMods);
         res = res && thisRes;
     }
 
-    bool thisRes = SetMouseButtons();
+    bool thisRes = SetMouseButtons(parKeyMods);
     res = res && thisRes;
 
     const glm::vec2 delta = Input::GetMouseScrollDelta();
     if (glm::length2(delta) > 0.f)
     {
-        bool mw = FContext->ProcessMouseWheel(-delta.y, 0);
+        bool mw = FContext->ProcessMouseWheel(-delta.y, parKeyMods);
         res = res && mw;
     }
     return !res;
 }
 
-bool RmlUiManager::SetMousePositionHasChanged(glm::vec2 parPos) const
+bool RmlUiManager::SetMousePositionHasChanged(glm::vec2 parPos, u32 parKeyMods) const
 {
     if (FContext == nullptr)
         return true;
 
-    return !FContext->ProcessMouseMove((int)parPos.x, (int)parPos.y, 0);
+    return !FContext->ProcessMouseMove((int)parPos.x, (int)parPos.y, parKeyMods);
 }
 
-bool RmlUiManager::SetMouseButtons() const
+bool RmlUiManager::SetMouseButtons(u32 parKeyMods) const
 {
     bool res = true;
     forrange(i, 0, MouseButtons::MOUSE_BUTTON_LAST)
@@ -164,16 +165,16 @@ bool RmlUiManager::SetMouseButtons() const
             bool button = Input::GetMouseButtonState(i);
             bool thisRes = false;
             if (button)
-                thisRes = FContext->ProcessMouseButtonDown(i, 0);
+                thisRes = FContext->ProcessMouseButtonDown(i, parKeyMods);
             else
-                thisRes = FContext->ProcessMouseButtonUp(i, 0);
+                thisRes = FContext->ProcessMouseButtonUp(i, parKeyMods);
             res = res && thisRes;
         }
     }
     return !res;
 }
 
-bool RmlUiManager::SetKeyboardButtons() const
+bool RmlUiManager::SetKeyboardButtons(u32 parKeyMods) const
 {
     bool res = true;
     forrange(i, 0, InputKeyNames::INPUT_KEY_LAST)
@@ -186,9 +187,9 @@ bool RmlUiManager::SetKeyboardButtons() const
                 continue;
             bool thisRes = false;
             if (button)
-                thisRes = FContext->ProcessKeyDown(id, 0);
+                thisRes = FContext->ProcessKeyDown(id, parKeyMods);
             else
-                thisRes = FContext->ProcessKeyUp(id, 0);
+                thisRes = FContext->ProcessKeyUp(id, parKeyMods);
             res = res && thisRes;
         }
     }
@@ -207,16 +208,57 @@ void RmlUiManager::SetTextInput() const
     }
 }
 
-void RmlUiManager::LoadDocument()
+u32 RmlUiManager::GetKeyModifiers() const
+{
+    u32 res = 0;
+
+    if (Input::IsCtrlDown())
+        res |= Rml::Input::KeyModifier::KM_CTRL;
+    if (Input::IsAltDown())
+        res |= Rml::Input::KeyModifier::KM_ALT;
+    if (Input::IsShiftDown())
+        res |= Rml::Input::KeyModifier::KM_SHIFT;
+    if (Input::IsCapsLock())
+        res |= Rml::Input::KeyModifier::KM_CAPSLOCK;
+
+    return res;
+}
+
+Rml::ElementDocument* RmlUiManager::LoadDocument(const std::string& parDocumentFile) const
 {
     AssertRelease(FContext != nullptr);
-    if (doc != nullptr)
-    {
-        FContext->UnloadDocument(doc);
-    }
+    Rml::ElementDocument* doc = FContext->LoadDocument(parDocumentFile);
+    return doc;
+}
 
-    doc = FContext->LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
-    doc->Show();
+void RmlUiManager::UnloadDocument(Rml::ElementDocument* parDoc) const
+{
+    AssertRelease(FContext != nullptr);
+    FContext->UnloadDocument(parDoc);
+}
+
+bool RmlUiManager::CreateDataModel(const std::string& parModelName, MemoryView<const std::pair<std::string, u32*>> parData) const
+{
+    AssertRelease(FContext != nullptr);
+    Rml::DataModelConstructor ctr = FContext->CreateDataModel(parModelName);
+
+    if (!ctr)
+        return false;
+
+    foreachitemconst(data, parData) ctr.Bind(data.first, data.second);
+    return true;
+}
+
+Rml::DataModelConstructor RmlUiManager::CreateDataModel(const std::string& parModelName) const
+{
+    AssertRelease(FContext != nullptr);
+    return FContext->CreateDataModel(parModelName);
+}
+
+void RmlUiManager::RemoveDataModel(const std::string& parModelName) const
+{
+    AssertRelease(FContext != nullptr);
+    FContext->RemoveDataModel(parModelName);
 }
 
 } // namespace UI

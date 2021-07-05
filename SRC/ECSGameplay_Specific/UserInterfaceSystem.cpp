@@ -22,4 +22,16 @@ void UserInterfaceSystem::VirtualUpdate()
     FInGameMenu.Update();
 }
 
+void UserInterfaceSystem::VirtualInit()
+{
+    ModuleSystem::VirtualInit();
+    FInGameMenu.Init();
+}
+
+void UserInterfaceSystem::VirtualDestroy()
+{
+    ModuleSystem::VirtualDestroy();
+    FInGameMenu.Destroy();
+}
+
 } // namespace ECSEngine

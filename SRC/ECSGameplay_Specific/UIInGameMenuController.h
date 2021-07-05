@@ -3,6 +3,7 @@
 #include "ColonySelectionPanelController.h"
 #include "ECSCore/UIController.h"
 #include "ECSGameplay_Common/UIWindowsPositionning.h"
+#include "MainMenuBarController.h"
 
 namespace ECSEngine
 {
@@ -22,7 +23,9 @@ public:
     UIInGameMenuController();
 
 protected:
+    void VirtualInit() override;
     void VirtualUpdate() override;
+    void VirtualDestroy() override;
 
 private:
     void DrawInGameMenu();
@@ -30,6 +33,7 @@ private:
 private:
     ColonySelectionPanelController FColonySelectionPanel;
     BuildMenuController FBuildMenuController;
+    MainMenuBarController FMainMenuBarController;
 
     InGameMenuElements FMenuElements;
 

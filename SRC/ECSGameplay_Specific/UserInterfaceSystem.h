@@ -12,7 +12,9 @@ public:
     ~UserInterfaceSystem();
 
 protected:
+    void VirtualInit() override;
     void VirtualUpdate() override;
+    void VirtualDestroy() override;
 
 private:
     UI::UIInGameMenuController FInGameMenu;

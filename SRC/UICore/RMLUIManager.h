@@ -1,10 +1,12 @@
 #pragma once
+#include "Common/MemoryView.h"
 #include "Common/Singleton.h"
 
 namespace Rml
 {
 class Context;
 class ElementDocument;
+class DataModelConstructor;
 } // namespace Rml
 
 namespace ECSEngine
@@ -26,22 +28,26 @@ public:
     void Render();
     void Shutdown();
 
+    Rml::ElementDocument* LoadDocument(const std::string& parDocumentFile) const;
+    void UnloadDocument(Rml::ElementDocument* parDoc) const;
+    bool CreateDataModel(const std::string& parModelName, MemoryView<const std::pair<std::string, u32*>> parData) const;
+    Rml::DataModelConstructor CreateDataModel(const std::string& parModelName) const;
+    void RemoveDataModel(const std::string& parModelName) const;
+
 private:
     void ProcessInput() const;
-    bool ProcessMouse() const;
-    bool SetMousePositionHasChanged(glm::vec2 parPos) const;
-    bool SetMouseButtons() const;
-    bool SetKeyboardButtons() const;
+    bool ProcessMouse(u32 parKeyMods) const;
+    bool SetMousePositionHasChanged(glm::vec2 parPos, u32 parKeyMods) const;
+    bool SetMouseButtons(u32 parKeyMods) const;
+    bool SetKeyboardButtons(u32 parKeyMods) const;
     void SetTextInput() const;
-
-    void LoadDocument();
+    u32 GetKeyModifiers() const;
 
 private:
     Rml::Context* FContext = nullptr;
     RmlSystemInterface* FSystemInterface = nullptr;
     Rendering::RmlRenderer* FRenderInterface = nullptr;
     RmlFileInterface* FFileInterface = nullptr;
-    Rml::ElementDocument* doc = nullptr;
 };
 } // namespace UI
 } // namespace ECSEngine
