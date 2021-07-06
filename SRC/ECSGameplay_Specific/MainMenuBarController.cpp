@@ -7,11 +7,15 @@
 #ifndef RMLUI_STATIC_LIB
 #define RMLUI_STATIC_LIB
 #endif
+#include "Common/Logger.h"
 #include "Common/TimeManager.h"
 
 #include <RmlUi/Core/DataModelHandle.h>
 #include <RmlUi/Core/Element.h>
 #include <RmlUi/Core/ElementDocument.h>
+#include <RmlUi/Core/EventListener.h>
+#include <RmlUi/Core/EventListenerInstancer.h>
+#include <RmlUi/Core/Factory.h>
 
 namespace ECSEngine
 {
@@ -35,6 +39,19 @@ private:
     Rml::DataModelHandle FHandle;
 };
 
+class TestListener : public Rml::EventListener
+{
+public:
+    virtual void ProcessEvent(Rml::Event& event) override
+    {
+        AlwaysCheckedAssert(event.GetId() == Rml::EventId::Click);
+        auto value = event.GetTargetElement()->GetAttribute("onclick");
+        event.StopImmediatePropagation();
+    }
+};
+
+std::unique_ptr<TestListener> listener = std::unique_ptr<TestListener>(new TestListener);
+
 MainMenuBarController::MainMenuBarController()
 {
 }
@@ -55,6 +72,7 @@ void MainMenuBarController::VirtualInit()
     FDataModelWrapper.reset(new RmlDataModelWrapper(ctr.GetModelHandle()));
 
     FDocument = RmlUiManager::Instance().LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
+    FDocument->AddEventListener("click", listener.get());
 }
 
 void MainMenuBarController::VirtualUpdate()
@@ -108,7 +126,10 @@ void MainMenuBarController::VirtualDestroy()
 {
     UIControllerWithModuleAccessors::VirtualDestroy();
     if (FDocument != nullptr)
+    {
+        FDocument->RemoveEventListener("click", listener.get());
         RmlUiManager::Instance().UnloadDocument(FDocument);
+    }
     RmlUiManager::Instance().RemoveDataModel("colony-model");
 }
 
