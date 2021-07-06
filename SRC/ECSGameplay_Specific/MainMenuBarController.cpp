@@ -7,7 +7,10 @@
 #ifndef RMLUI_STATIC_LIB
 #define RMLUI_STATIC_LIB
 #endif
+#include "Common/TimeManager.h"
+
 #include <RmlUi/Core/DataModelHandle.h>
+#include <RmlUi/Core/Element.h>
 #include <RmlUi/Core/ElementDocument.h>
 
 namespace ECSEngine
@@ -79,6 +82,26 @@ void MainMenuBarController::VirtualUpdate()
     FModel.IdlePeons = peonManagerModule->IdlePeons().size();
     FDataModelWrapper->DirtyVariable("peons");
     FDataModelWrapper->DirtyVariable("idle");
+
+    static float value = 0.f;
+    static float direction = 1.f;
+
+    value += direction * 5 * TimeManager::FrameDeltaTime();
+    if (value > 10.f)
+    {
+        direction = -1.f;
+        value = 10.f;
+    }
+
+    if (value < 0.f)
+    {
+        direction = 1.f;
+        value = 0.f;
+    }
+
+    Rml::Element* progressBar = FDocument->GetElementById("progress");
+    AssertRelease(progressBar != nullptr);
+    progressBar->SetAttribute("value", value);
 }
 
 void MainMenuBarController::VirtualDestroy()
