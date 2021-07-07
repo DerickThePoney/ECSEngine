@@ -42,15 +42,32 @@ private:
 class TestListener : public Rml::EventListener
 {
 public:
+    TestListener(const Rml::String& value, Rml::Element* element)
+        : FValue(value)
+        , FElement(element)
+    {
+    }
     virtual void ProcessEvent(Rml::Event& event) override
     {
         AlwaysCheckedAssert(event.GetId() == Rml::EventId::Click);
         auto value = event.GetTargetElement()->GetAttribute("onclick");
         event.StopImmediatePropagation();
+        auto p = Rml::Transform::MakeProperty({ Rml::Transforms::TranslateX{ 50.f } });
+        event.GetTargetElement()->Animate("background", p, 2, Rml::Tween::Bounce);
     }
+
+private:
+    std::string FValue;
+    Rml::Element* FElement;
 };
 
-std::unique_ptr<TestListener> listener = std::unique_ptr<TestListener>(new TestListener);
+class TestListenerInstancer : public Rml::EventListenerInstancer
+{
+public:
+    virtual Rml::EventListener* InstanceEventListener(const Rml::String& value, Rml::Element* element) override { return new TestListener(value, element); }
+};
+
+std::unique_ptr<TestListenerInstancer> listener = std::unique_ptr<TestListenerInstancer>(new TestListenerInstancer);
 
 MainMenuBarController::MainMenuBarController()
 {
@@ -64,6 +81,7 @@ void MainMenuBarController::VirtualInit()
 {
     UIControllerWithModuleAccessors::VirtualInit();
 
+    Rml::Factory::RegisterEventListenerInstancer(listener.get());
     Rml::DataModelConstructor ctr = RmlUiManager::Instance().CreateDataModel("colony-model");
     AssertRelease((bool)ctr);
     ctr.Bind("peons", &FModel.TotalPeons);
@@ -72,7 +90,6 @@ void MainMenuBarController::VirtualInit()
     FDataModelWrapper.reset(new RmlDataModelWrapper(ctr.GetModelHandle()));
 
     FDocument = RmlUiManager::Instance().LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
-    FDocument->AddEventListener("click", listener.get());
 }
 
 void MainMenuBarController::VirtualUpdate()
@@ -127,7 +144,6 @@ void MainMenuBarController::VirtualDestroy()
     UIControllerWithModuleAccessors::VirtualDestroy();
     if (FDocument != nullptr)
     {
-        FDocument->RemoveEventListener("click", listener.get());
         RmlUiManager::Instance().UnloadDocument(FDocument);
     }
     RmlUiManager::Instance().RemoveDataModel("colony-model");
