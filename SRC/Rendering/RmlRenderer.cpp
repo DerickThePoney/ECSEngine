@@ -59,7 +59,8 @@ void RmlRenderer::RenderGeometry(Vertex* vertices, int num_vertices, int* indice
     glm::mat4 mat = glm::translate(glm::vec3(translation.x, translation.y, 0.f)) * FCurrentMatrix;
     bgfx::setTransform(&mat);
 
-    RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
+    RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
+    state.ApplyState();
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, num_vertices, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, num_indices);
 
@@ -133,7 +134,7 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
         instance = Rendering::MaterialManager::GetMaterialInstance(FRenderMaterial);
 
     AssertRelease(instance != nullptr);
-    bgfx::submit(Rendering::renderPass, instance->GetProgram()->ProgramHandle());
+    bgfx::submit(renderPass, instance->GetProgram()->ProgramHandle());
 }
 
 void RmlRenderer::ReleaseCompiledGeometry(Rml::CompiledGeometryHandle geometry)
@@ -166,8 +167,9 @@ void RmlRenderer::ReleaseCompiledGeometry(Rml::CompiledGeometryHandle geometry)
 
 void RmlRenderer::EnableScissorRegion(bool enable)
 {
-    glm::vec4 scissor = (enable) ? FScissor : glm::vec4(0.f);
-    bgfx::setViewScissor(renderPass, scissor.x, scissor.y, scissor.z, scissor.w);
+    FScissor = (enable) ? FScissor : glm::vec4(0.f);
+    if (!enable)
+        bgfx::setViewScissor(renderPass, FScissor.x, FScissor.y, FScissor.z, FScissor.w);
 }
 
 void RmlRenderer::SetScissorRegion(int x, int y, int width, int height)
