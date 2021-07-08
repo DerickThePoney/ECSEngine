@@ -21,24 +21,6 @@ namespace ECSEngine
 {
 namespace UI
 {
-
-class RmlDataModelWrapper final : public IDataModelWrapper
-{
-public:
-    RmlDataModelWrapper(Rml::DataModelHandle parHandle)
-        : FHandle(parHandle)
-    {
-    }
-
-    bool IsVariableDirty(const std::string& variable_name) override { return FHandle.IsVariableDirty(variable_name); }
-
-    void DirtyVariable(const std::string& variable_name) override { FHandle.DirtyVariable(variable_name); }
-    explicit operator bool() override { return (bool)FHandle; }
-
-private:
-    Rml::DataModelHandle FHandle;
-};
-
 class TestListener : public Rml::EventListener
 {
 public:
@@ -50,10 +32,7 @@ public:
     virtual void ProcessEvent(Rml::Event& event) override
     {
         AlwaysCheckedAssert(event.GetId() == Rml::EventId::Click);
-        auto value = event.GetTargetElement()->GetAttribute("onclick");
         event.StopImmediatePropagation();
-        auto p = Rml::Transform::MakeProperty({ Rml::Transforms::TranslateX{ 50.f } });
-        event.GetTargetElement()->Animate("background", p, 2, Rml::Tween::Bounce);
     }
 
 private:
@@ -86,8 +65,9 @@ void MainMenuBarController::VirtualInit()
     AssertRelease((bool)ctr);
     ctr.Bind("peons", &FModel.TotalPeons);
     ctr.Bind("idle", &FModel.IdlePeons);
+    ctr.Bind("remaining_feeding_time", &FModel.RemainingFeedingTime);
 
-    FDataModelWrapper.reset(new RmlDataModelWrapper(ctr.GetModelHandle()));
+    FDataModelWrapper = RmlDataModelWrapperFactory::CreateDataModelWrapper(ctr.GetModelHandle());
 
     FDocument = RmlUiManager::Instance().LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
 }
@@ -113,30 +93,19 @@ void MainMenuBarController::VirtualUpdate()
     PeonSpawnModule* peonSpawnModule = GetModule<PeonSpawnModule>(colonyId);
     AssertRelease(peonSpawnModule != nullptr);
 
+    const PeonFeedingTimeModule* peonFeedingTimeModule = GetModule<PeonFeedingTimeModule>(colonyId);
+
     FModel.TotalPeons = peonManagerModule->PeonsInColony();
     FModel.IdlePeons = peonManagerModule->IdlePeons().size();
+    FModel.RemainingFeedingTime = peonFeedingTimeModule->RemainingTimeBeforeNextFeed();
     FDataModelWrapper->DirtyVariable("peons");
     FDataModelWrapper->DirtyVariable("idle");
+    FDataModelWrapper->DirtyVariable("remaining_feeding_time");
 
-    static float value = 0.f;
-    static float direction = 1.f;
-
-    value += direction * 5 * TimeManager::FrameDeltaTime();
-    if (value > 10.f)
-    {
-        direction = -1.f;
-        value = 10.f;
-    }
-
-    if (value < 0.f)
-    {
-        direction = 1.f;
-        value = 0.f;
-    }
-
+    const float progress = peonFeedingTimeModule->RemainTimeBeforeNextFeedAsRatio();
     Rml::Element* progressBar = FDocument->GetElementById("progress");
     AssertRelease(progressBar != nullptr);
-    progressBar->SetAttribute("value", value);
+    progressBar->SetAttribute("value", progress);
 }
 
 void MainMenuBarController::VirtualDestroy()
