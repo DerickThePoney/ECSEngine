@@ -13,7 +13,7 @@
 #include "RmlSystemInterface.h"
 
 #include <RmlUi/Core.h>
-#if !defined(COMPILE_FINAL) and !defined(ENABLE_PROFILING)
+#if !defined(COMPILE_FINAL) and !defined(COMPILE_PROFILE)
 #include <RmlUi/Debugger.h>
 #endif
 #include "RmlFileInterface.h"
@@ -44,7 +44,7 @@ void RmlUiManager::Initialise()
     // Create a context to display documents within.
     auto size = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     FContext = Rml::CreateContext("main", Rml::Vector2i(size.x, size.y));
-#if !defined(COMPILE_FINAL) and !defined(ENABLE_PROFILING)
+#if !defined(COMPILE_FINAL) and !defined(COMPILE_PROFILE)
     Rml::Debugger::Initialise(FContext);
 #endif
 
@@ -61,7 +61,7 @@ void RmlUiManager::NewFrame()
     SCOPED_PROFILE_CLASS(RmlUiManager, NewFrame);
     ProcessInput();
 
-#if !defined(COMPILE_FINAL) and !defined(ENABLE_PROFILING)
+#if !defined(COMPILE_FINAL) and !defined(COMPILE_PROFILE)
     if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F8) && Input::GetButtonHasChanged(InputKeyNames::INPUT_KEY_F8))
     {
         Rml::Debugger::SetVisible(!Rml::Debugger::IsVisible());
