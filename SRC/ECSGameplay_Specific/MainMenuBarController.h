@@ -7,6 +7,7 @@
 #include "PeonFeedingTimeModule.h"
 #include "PeonSpawnModule.h"
 #include "ResourceStorageModule.h"
+#include "UICore/RmlDataModelWrapper.h"
 
 namespace Rml
 {
@@ -17,15 +18,6 @@ namespace ECSEngine
 {
 namespace UI
 {
-
-class IDataModelWrapper
-{
-public:
-    virtual bool IsVariableDirty(const std::string& variable_name) = 0;
-    virtual void DirtyVariable(const std::string& variable_name) = 0;
-
-    virtual explicit operator bool() = 0;
-};
 
 class MainMenuBarController : public UIControllerWithModuleAccessors<MC<ColonyModule, Worlds::COLONY>,
                                     MC<ResourceStorageModule, Worlds::COLONY>,
@@ -50,6 +42,7 @@ private:
     {
         u32 TotalPeons = 0;
         u32 IdlePeons = 0;
+        int RemainingFeedingTime = 0;
     };
 
     MainMenuBarModel FModel;
