@@ -38,9 +38,6 @@ void RmlRenderer::FillVextexStream(VertexDataStream& parStream, Rml::Vertex* ver
 
 void RmlRenderer::RenderGeometry(Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture, const Vector2f& translation)
 {
-    std::cout << FScissor.x << "\t" << FScissor.y << "\t" << FScissor.z << "\t" << FScissor.w << std::endl;
-    // bgfx::setScissor(FScissor.x, FScissor.y, FScissor.z, FScissor.w);
-
     VertexLayoutHash hash(true, 1, 1, false, false, false, false);
     bgfx::VertexLayout layout = GetVertexLayout(hash);
 
@@ -247,8 +244,6 @@ void RmlRenderer::OnPreUpdate()
     SCOPED_PROFILE_CLASS(RmlRenderer, OnPreUpdate);
     bgfx::setViewName(renderPass, "GAME_UI_PASS");
     bgfx::setViewMode(renderPass, bgfx::ViewMode::Sequential);
-
-    EnableScissorRegion(false);
 
     auto size = GLFWDisplayWindowHandler::Instance().GetSize();
     FProjMat = glm::ortho(0.f, (float)size.x, (float)size.y, 0.f);

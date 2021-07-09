@@ -72,6 +72,10 @@ void MainMenuBarController::VirtualInit()
     FDocument = RmlUiManager::Instance().LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
 
     FDocumentDemo = RmlUiManager::Instance().LoadDocument("UI\\DemoWindow\\tutorial.rml");
+    if (FDocumentDemo)
+    {
+        FDocumentDemo->GetElementById("title")->SetInnerRML(FDocumentDemo->GetTitle());
+    }
 }
 
 void MainMenuBarController::VirtualUpdate()
