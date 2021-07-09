@@ -33,15 +33,40 @@ void CookMesh(const std::string& parMeshFile)
 
 void CookMeshes(const std::vector<std::string>& parMeshFiles)
 {
-#if 0
+#if 1
 
     std::vector<std::thread> threads;
-    threads.reserve(parMeshFiles.size());
-    foreachitemconst(meshFile, parMeshFiles)
-    {
-        LOG_COOKING("Cooking mesh " + meshFile);
+    const u32 maxCpus = std::thread::hardware_concurrency() - 1;
+    threads.reserve(maxCpus);
 
-        threads.push_back(std::move(std::thread([meshFile] { MeshCooking::CookMesh(meshFile); })));
+    const u32 numberOfFilesPerThreads = glm::max((u32)parMeshFiles.size() / maxCpus, 10u);
+
+    u32 currentFileStart = 0;
+    u32 currentThread = 0;
+    while (currentFileStart < parMeshFiles.size() && currentThread < maxCpus)
+    {
+        const u32 thisEnd = glm::min(currentFileStart + numberOfFilesPerThreads, (u32)parMeshFiles.size());
+        threads.push_back(std::move(std::thread([&parMeshFiles, currentFileStart, thisEnd] {
+            std::cout << "Cooking mesh thread start" << std::endl;
+            LOG_COOKING("Cooking mesh thread start");
+            forrange(i, currentFileStart, thisEnd)
+            {
+                LOG_COOKING("Cooking mesh " + parMeshFiles[i]);
+                MeshCooking::CookMesh(parMeshFiles[i]);
+            }
+            LOG_COOKING("Cooking mesh thread end");
+        })));
+        currentFileStart += numberOfFilesPerThreads;
+        currentThread++;
+    }
+
+    if (currentFileStart < parMeshFiles.size())
+    {
+        forrange(i, currentFileStart, parMeshFiles.size())
+        {
+            LOG_COOKING("Cooking mesh " + parMeshFiles[i]);
+            MeshCooking::CookMesh(parMeshFiles[i]);
+        }
     }
 
     foreachitem(th, threads)
@@ -61,9 +86,9 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
 
 namespace TextureCooking
 {
-void CookTexture(const std::string& parCookedTextureName, const Rendering::TextureDescriptor& parTextureDescriptor, PROCESS_INFORMATION& pi)
+void CookTexture(const std::string& parCookedTextureName, const std::string& parTextureDescriptor, PROCESS_INFORMATION& pi)
 {
-    std::cout << "cooking " << parTextureDescriptor.TextureFile() << std::endl;
+    std::cout << "cooking " << parTextureDescriptor << std::endl;
 
     // additional information
     STARTUPINFO si;
@@ -75,7 +100,7 @@ void CookTexture(const std::string& parCookedTextureName, const Rendering::Textu
 
     std::wstring wideString = L"..\\External\\BGFX\\ToolBinaries\\texturecRelease.exe -f ";
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    const std::string& file = parTextureDescriptor.TextureFile();
+    const std::string& file = parTextureDescriptor;
     std::wstring filename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + file);
 
     auto pos = file.find_last_of('\\');
@@ -126,7 +151,7 @@ void CookTextureBank(const std::string& parTextureBankFile)
     foreachitemconst(textureDesc, textureBank.Descriptors())
     {
         processes.push_back(PROCESS_INFORMATION());
-        CookTexture(textureDesc.first, textureDesc.second, processes.back());
+        CookTexture(textureDesc.first, textureDesc.second.TextureFile(), processes.back());
     }
 
     foreachitem(pi, processes)
@@ -154,6 +179,41 @@ void CookTextures(const std::vector<std::string>& parTexturesDescriptorFiles)
     {
         LOG_COOKING("Cooking texture bank : " + bank);
         TextureCooking::CookTextureBank(bank);
+    }
+}
+
+void CookFreeFormTextures(const std::string& parFreeFormTextures)
+{
+    Resource freeForm(parFreeFormTextures);
+    std::shared_ptr<ResourceHandle> freeFormRH = GlobalResourceCache::Instance().FCache->GetResourceHandle(&freeForm);
+    AssertRelease(freeFormRH != nullptr);
+    ResourceBuffer buff = freeFormRH->GetResourceBuffer();
+    std::istream istr(&buff, std::istream::in);
+
+    std::vector<PROCESS_INFORMATION> processes;
+    while (!istr.eof())
+    {
+        std::string file, name;
+        istr >> file >> name;
+        processes.push_back(PROCESS_INFORMATION());
+        TextureCooking::CookTexture(name, file, processes.back());
+    }
+
+    foreachitem(pi, processes)
+    { // Wait until child process exits.
+        WaitForSingleObject(pi.hProcess, INFINITE);
+
+        // TODO GetExitCodeProcess().
+
+        DWORD exitCode;
+        if (GetExitCodeProcess(pi.hProcess, &exitCode))
+        {
+            std::cout << exitCode << std::endl;
+        }
+
+        // Close process and thread handles.
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
     }
 }
 

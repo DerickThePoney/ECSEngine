@@ -60,6 +60,13 @@ void AssetCookerUpdater::Update()
 
     {
         Timer t(true);
+        CookFreeFormTextures("2D\\Textures\\Banks\\FreeFormTexture.specialbank");
+        const float textureCookingTimings = t.Stop();
+        timings.push_back({ "FreeFormTextures cooking", textureCookingTimings });
+    }
+
+    {
+        Timer t(true);
         CompileShaders(FShaderFiles);
         const float shaderCompilingTimings = t.Stop();
         timings.push_back({ "Shader compiling", shaderCompilingTimings });
