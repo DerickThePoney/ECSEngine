@@ -48,7 +48,7 @@ void UICommandBuffer::Submit()
     RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
     foreachitem(context, FBufferContexts)
     {
-        bgfx::setViewScissor(RenderPassId::GAME_UI_PASS, context.RectSize.x, context.RectSize.y, context.RectSize.z, context.RectSize.w);
+        bgfx::setScissor(context.RectSize.x, context.RectSize.y, context.RectSize.z, context.RectSize.w);
         foreachitem(bufferStreams, context.BufferContextTriangleBags)
         {
             const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(bufferStreams.first);

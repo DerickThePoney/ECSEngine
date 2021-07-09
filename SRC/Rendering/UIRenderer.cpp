@@ -109,6 +109,7 @@ void UIRenderer::Shutdown()
 
 void UIRenderer::RenderScene()
 {
+    return;
     if (!FPanels.empty() && FUIElementsForTest.empty())
     {
         foreachitem(panel, FPanels) { FUIElementsForTest.push_back(panel->CreateWidgetAndHierarchy()); }
