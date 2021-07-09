@@ -22,7 +22,7 @@ namespace Rendering
 {
 using namespace Rml;
 
-constexpr RenderPassId::Type renderPass = RenderPassId::EDITOR_UI_PASS;
+constexpr RenderPassId::Type renderPass = RenderPassId::GAME_UI_PASS;
 
 void RmlRenderer::FillVextexStream(VertexDataStream& parStream, Rml::Vertex* vertices, int num_vertices)
 {
@@ -38,6 +38,9 @@ void RmlRenderer::FillVextexStream(VertexDataStream& parStream, Rml::Vertex* ver
 
 void RmlRenderer::RenderGeometry(Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture, const Vector2f& translation)
 {
+    std::cout << FScissor.x << "\t" << FScissor.y << "\t" << FScissor.z << "\t" << FScissor.w << std::endl;
+    // bgfx::setScissor(FScissor.x, FScissor.y, FScissor.z, FScissor.w);
+
     VertexLayoutHash hash(true, 1, 1, false, false, false, false);
     bgfx::VertexLayout layout = GetVertexLayout(hash);
 
@@ -115,8 +118,6 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
     Mesh* mesh = MeshManager::Instance().GetMesh(p.first);
     AssertRelease(mesh != nullptr);
 
-    bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
-    bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
     RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
     state.ApplyState();
 
@@ -133,6 +134,8 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
     else
         instance = Rendering::MaterialManager::GetMaterialInstance(FRenderMaterial);
 
+    bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
+    bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
     AssertRelease(instance != nullptr);
     bgfx::submit(renderPass, instance->GetProgram()->ProgramHandle());
 }
@@ -167,15 +170,13 @@ void RmlRenderer::ReleaseCompiledGeometry(Rml::CompiledGeometryHandle geometry)
 
 void RmlRenderer::EnableScissorRegion(bool enable)
 {
-    FScissor = (enable) ? FScissor : glm::vec4(0.f);
     if (!enable)
-        bgfx::setViewScissor(renderPass, FScissor.x, FScissor.y, FScissor.z, FScissor.w);
+        bgfx::setScissor(0, 0, 0, 0);
 }
 
 void RmlRenderer::SetScissorRegion(int x, int y, int width, int height)
 {
-    FScissor = glm::vec4(x, y, width, height);
-    bgfx::setViewScissor(renderPass, FScissor.x, FScissor.y, FScissor.z, FScissor.w);
+    bgfx::setScissor(x, y, width, height);
 }
 
 bool RmlRenderer::LoadTexture(Rml::TextureHandle& texture_handle, Vector2i& texture_dimensions, const String& source)
@@ -246,6 +247,8 @@ void RmlRenderer::OnPreUpdate()
     SCOPED_PROFILE_CLASS(RmlRenderer, OnPreUpdate);
     bgfx::setViewName(renderPass, "GAME_UI_PASS");
     bgfx::setViewMode(renderPass, bgfx::ViewMode::Sequential);
+
+    EnableScissorRegion(false);
 
     auto size = GLFWDisplayWindowHandler::Instance().GetSize();
     FProjMat = glm::ortho(0.f, (float)size.x, (float)size.y, 0.f);
