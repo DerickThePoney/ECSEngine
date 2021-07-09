@@ -70,6 +70,8 @@ void MainMenuBarController::VirtualInit()
     FDataModelWrapper = RmlDataModelWrapperFactory::CreateDataModelWrapper(ctr.GetModelHandle());
 
     FDocument = RmlUiManager::Instance().LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
+
+    FDocumentDemo = RmlUiManager::Instance().LoadDocument("UI\\DemoWindow\\tutorial.rml");
 }
 
 void MainMenuBarController::VirtualUpdate()
@@ -114,6 +116,7 @@ void MainMenuBarController::VirtualDestroy()
     if (FDocument != nullptr)
     {
         RmlUiManager::Instance().UnloadDocument(FDocument);
+        RmlUiManager::Instance().UnloadDocument(FDocumentDemo);
     }
     RmlUiManager::Instance().RemoveDataModel("colony-model");
 }
@@ -122,9 +125,15 @@ bool MainMenuBarController::HandleVisibility()
 {
     const bool visible = FDocument->IsVisible();
     if (FShow && !visible)
+    {
         FDocument->Show();
+        FDocumentDemo->Show();
+    }
     else if (!FShow && visible)
+    {
         FDocument->Hide();
+        FDocumentDemo->Hide();
+    }
     return FShow;
 }
 
