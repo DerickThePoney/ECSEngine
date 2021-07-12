@@ -43,7 +43,11 @@ private:
 class TestListenerInstancer : public Rml::EventListenerInstancer
 {
 public:
-    virtual Rml::EventListener* InstanceEventListener(const Rml::String& value, Rml::Element* element) override { return new TestListener(value, element); }
+    virtual Rml::EventListener* InstanceEventListener(const Rml::String& value, Rml::Element* element) override
+    {
+        std::cout << value << "\t" << element->GetTagName() << "\n";
+        return new TestListener(value, element);
+    }
 };
 
 std::unique_ptr<TestListenerInstancer> listener = std::unique_ptr<TestListenerInstancer>(new TestListenerInstancer);
@@ -71,7 +75,7 @@ void MainMenuBarController::VirtualInit()
 
     FDocument = RmlUiManager::Instance().LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
 
-    FDocumentDemo = RmlUiManager::Instance().LoadDocument("UI\\DemoWindow\\tutorial.rml");
+    FDocumentDemo = RmlUiManager::Instance().LoadDocument("UI\\BuildMenu\\BuildMenu.rml");
     if (FDocumentDemo)
     {
         FDocumentDemo->GetElementById("title")->SetInnerRML(FDocumentDemo->GetTitle());
