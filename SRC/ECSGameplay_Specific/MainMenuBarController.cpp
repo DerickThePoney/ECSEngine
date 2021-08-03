@@ -33,6 +33,10 @@ public:
     {
         AlwaysCheckedAssert(event.GetId() == Rml::EventId::Click);
         event.StopImmediatePropagation();
+
+        std::cout << "CLICK:" << std::endl;
+        std::cout << "\tCorrect Element: " << (event.GetTargetElement() == FElement) << std::endl;
+        std::cout << "\tValue: " << FValue << std::endl;
     }
 
 private:
@@ -79,6 +83,10 @@ void MainMenuBarController::VirtualInit()
     if (FDocumentDemo)
     {
         FDocumentDemo->GetElementById("title")->SetInnerRML(FDocumentDemo->GetTitle());
+        Rml::ElementPtr newElement = FDocumentDemo->CreateElement("template");
+        newElement->SetAttribute("src", "buildicon");
+        newElement->SetInnerRML("Test 4");
+        FDocumentDemo->GetElementById("tab-2-panel")->AppendChild(std::move(newElement));
     }
 }
 
