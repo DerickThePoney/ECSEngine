@@ -56,6 +56,12 @@ public:
 
 std::unique_ptr<TestListenerInstancer> listener = std::unique_ptr<TestListenerInstancer>(new TestListenerInstancer);
 
+void ClickedTestData(Rml::DataModelHandle model_handle, Rml::Event& ev, const Rml::VariantList& ag)
+{
+    std::cout << "oh yeah!!!"
+              << "\n";
+}
+
 MainMenuBarController::MainMenuBarController()
 {
 }
@@ -75,6 +81,9 @@ void MainMenuBarController::VirtualInit()
     ctr.Bind("idle", &FModel.IdlePeons);
     ctr.Bind("remaining_feeding_time", &FModel.RemainingFeedingTime);
 
+    Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("build-menu-model");
+    ctr2.BindEventCallback("clickedicontest", &ClickedTestData);
+
     FDataModelWrapper = RmlDataModelWrapperFactory::CreateDataModelWrapper(ctr.GetModelHandle());
 
     FDocument = RmlUiManager::Instance().LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
@@ -83,10 +92,11 @@ void MainMenuBarController::VirtualInit()
     if (FDocumentDemo)
     {
         FDocumentDemo->GetElementById("title")->SetInnerRML(FDocumentDemo->GetTitle());
-        Rml::ElementPtr newElement = FDocumentDemo->CreateElement("template");
-        newElement->SetAttribute("src", "buildicon");
+        Rml::ElementPtr newElement = FDocumentDemo->CreateElement("icon");
+        newElement->SetAttribute("data-event-click", "clickedicontest");
         newElement->SetInnerRML("Test 4");
-        FDocumentDemo->GetElementById("tab-2-panel")->AppendChild(std::move(newElement));
+        Rml::Element* panel = FDocumentDemo->GetElementById("tab-2-panel");
+        panel->AppendChild(std::move(newElement));
     }
 }
 
@@ -135,6 +145,7 @@ void MainMenuBarController::VirtualDestroy()
         RmlUiManager::Instance().UnloadDocument(FDocumentDemo);
     }
     RmlUiManager::Instance().RemoveDataModel("colony-model");
+    RmlUiManager::Instance().RemoveDataModel("build-menu-model");
 }
 
 bool MainMenuBarController::HandleVisibility()
