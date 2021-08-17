@@ -23,6 +23,7 @@ const char* AsString(Type parValue)
         break;
     default:
         AssertNotReached();
+        return "UNKNOWN";
         break;
     }
 }

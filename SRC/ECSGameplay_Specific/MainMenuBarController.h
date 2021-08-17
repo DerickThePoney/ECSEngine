@@ -7,12 +7,8 @@
 #include "PeonFeedingTimeModule.h"
 #include "PeonSpawnModule.h"
 #include "ResourceStorageModule.h"
+#include "UICore/RML_fwd.h"
 #include "UICore/RmlDataModelWrapper.h"
-
-namespace Rml
-{
-class ElementDocument;
-}
 
 namespace ECSEngine
 {
