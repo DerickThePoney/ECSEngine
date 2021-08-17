@@ -7,6 +7,13 @@
 #include "MousePolicyManager.h"
 #include "PlaceBuildingMousePolicy.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RmlUi/Core/DataModelHandle.h"
+#include "UICore/RMLUIManager.h"
+
+#include <RmlUi/Core/DataModelHandle.h>
+#include <RmlUi/Core/Element.h>
+#include <RmlUi/Core/ElementDocument.h>
+#include <RmlUi/Core/Types.h>
 
 namespace ECSEngine
 {
@@ -14,35 +21,88 @@ namespace UI
 {
 
 BuildMenuController::BuildMenuController()
-    : FSize(0.6f, 0.2f)
-    , FPosition(0.5f, 0.9f)
 {
-    FPosition.WindowAnchor = glm::vec2(0.5f, 1.f);
+}
+
+void BuildMenuController::VirtualInit()
+{
+    UIController::VirtualInit();
+
+    Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("build-menu-model");
+    //    ctr2.BindEventCallback("clickedicontest", &ClickedTestData);
+    FDataModelWrapper = RmlDataModelWrapperFactory::CreateDataModelWrapper(ctr2.GetModelHandle());
+    FDocument = RmlUiManager::Instance().LoadDocument("UI\\BuildMenu\\BuildMenu.rml");
+    AssertRelease(FDocument != nullptr);
+    FDocument->GetElementById("title")->SetInnerRML(FDocument->GetTitle());
+
+    FillWindow();
 }
 
 void BuildMenuController::VirtualUpdate()
 {
     UIController::VirtualUpdate();
 
-    glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    FPosition.PushPos(windowSize);
-    FSize.PushSize(windowSize);
+    if (!HandleVisibility())
+        return;
+}
 
-    ImGui::Begin("Build Menu");
+void BuildMenuController::VirtualDestroy()
+{
+    UIController::VirtualDestroy();
 
-    foreachitemconst(costRule, GameplayRulesManager::Instance().FBuildingCostManager.GetBuildingCostDescriptors())
+    RmlUiManager::Instance().RemoveDataModel("build-menu-model");
+}
+
+bool BuildMenuController::HandleVisibility()
+{
+    const bool visible = FDocument->IsVisible();
+    if (FShow && !visible)
     {
-        if (ImGui::Button(costRule.BuildingTemplateName().c_str()))
-        {
-            PlaceBuildingMousePolicy* mousePolicy = MousePolicyManager::Instance().GetMousePolicy<PlaceBuildingMousePolicy>(MousePolicyType::PLACE_BUILDING);
-            if (mousePolicy->IsActivated())
-                mousePolicy->Deactivate();
-            mousePolicy->SetupMousePolicy(costRule.BuildingTemplateName());
-            mousePolicy->Activate();
-        }
+        FDocument->Show();
+    }
+    else if (!FShow && visible)
+    {
+        FDocument->Hide();
+    }
+    return FShow;
+}
+
+void BuildMenuController::FillWindow()
+{
+    // AddTabs
+    Rml::ElementList tabs;
+    FDocument->GetElementsByTagName(tabs, "tabs");
+    AssertRelease(tabs.size() == 1);
+    AssertRelease(tabs[0] != nullptr);
+
+    Rml::ElementList panels;
+    FDocument->GetElementsByTagName(panels, "panels");
+    AssertRelease(panels.size() == 1);
+    AssertRelease(panels[0] != nullptr);
+
+    forrange(i, 0, BuildingCategory::LENGTH)
+    {
+        Rml::ElementPtr newTab = FDocument->CreateElement("tab");
+        newTab->SetInnerRML(BuildingCategory::AsString((BuildingCategory::Type)i));
+        tabs[0]->AppendChild(std::move(newTab));
+
+        Rml::ElementPtr newPanel = FDocument->CreateElement("panel");
+        newPanel->SetId(fmt::format("{}-panel", BuildingCategory::AsString((BuildingCategory::Type)i)).c_str());
+        panels[0]->AppendChild(std::move(newPanel));
     }
 
-    ImGui::End();
+    auto& buildCostDesc = GameplayRulesManager::Instance().FBuildingCostManager.GetBuildingCostDescriptors();
+    forrange(i, 0, buildCostDesc.size())
+    {
+        auto& costRule = buildCostDesc[i];
+
+        Rml::Element* tabToUse = FDocument->GetElementById(fmt::format("{}-panel", BuildingCategory::AsString(costRule.BuildingType())).c_str());
+        AssertRelease(tabToUse != nullptr);
+        Rml::ElementPtr newBuilding = FDocument->CreateElement("buildicon");
+        newBuilding->SetId(costRule.BuildingTemplateName().c_str());
+        newBuilding->SetInnerRML(costRule.BuildingTemplateName().c_str());
+        tabToUse->AppendChild(std::move(newBuilding));
+    }
 }
 
 } // namespace UI
