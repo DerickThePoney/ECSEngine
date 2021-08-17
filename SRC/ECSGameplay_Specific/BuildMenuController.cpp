@@ -7,13 +7,8 @@
 #include "MousePolicyManager.h"
 #include "PlaceBuildingMousePolicy.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
-#include "RmlUi/Core/DataModelHandle.h"
 #include "UICore/RMLUIManager.h"
-
-#include <RmlUi/Core/DataModelHandle.h>
-#include <RmlUi/Core/Element.h>
-#include <RmlUi/Core/ElementDocument.h>
-#include <RmlUi/Core/Types.h>
+#include "UICore/RML_includes.h"
 
 namespace ECSEngine
 {
@@ -49,6 +44,11 @@ void BuildMenuController::VirtualUpdate()
 void BuildMenuController::VirtualDestroy()
 {
     UIController::VirtualDestroy();
+
+    if (FDocument != nullptr)
+    {
+        RmlUiManager::Instance().UnloadDocument(FDocument);
+    }
 
     RmlUiManager::Instance().RemoveDataModel("build-menu-model");
 }

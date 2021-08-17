@@ -2,20 +2,10 @@
 
 #include "MainMenuBarController.h"
 
-#include "UICore/RMLUIManager.h"
-
-#ifndef RMLUI_STATIC_LIB
-#define RMLUI_STATIC_LIB
-#endif
 #include "Common/Logger.h"
 #include "Common/TimeManager.h"
-
-#include <RmlUi/Core/DataModelHandle.h>
-#include <RmlUi/Core/Element.h>
-#include <RmlUi/Core/ElementDocument.h>
-#include <RmlUi/Core/EventListener.h>
-#include <RmlUi/Core/EventListenerInstancer.h>
-#include <RmlUi/Core/Factory.h>
+#include "UICore/RMLUIManager.h"
+#include "UICore/RML_includes.h"
 
 namespace ECSEngine
 {
