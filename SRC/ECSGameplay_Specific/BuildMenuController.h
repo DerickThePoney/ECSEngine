@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "ECSCore/UIController.h"
 #include "ECSGameplay_Common/UIWindowsPositionning.h"
+#include "UICore/RML_fwd.h"
+#include "UICore/RmlDataModelWrapper.h"
 
 namespace ECSEngine
 {
@@ -12,13 +14,20 @@ public:
     BuildMenuController();
 
 protected:
+    void VirtualInit() override;
     void VirtualUpdate() override;
+    void VirtualDestroy() override;
+
+    bool HandleVisibility();
+
+private:
+    void FillWindow();
 
 private:
     bool FIsPlacingBuilding = false;
 
-    WindowSizer FSize;
-    WindowPosition FPosition;
+    std::unique_ptr<IDataModelWrapper> FDataModelWrapper;
+    Rml::ElementDocument* FDocument = nullptr;
 };
 } // namespace UI
 } // namespace ECSEngine

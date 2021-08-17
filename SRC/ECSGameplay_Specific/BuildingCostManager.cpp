@@ -8,6 +8,26 @@
 
 namespace ECSEngine
 {
+namespace BuildingCategory
+{
+
+const char* AsString(Type parValue)
+{
+    switch (parValue)
+    {
+    case ECSEngine::BuildingCategory::ENERGY:
+        return "Energy";
+        break;
+    case ECSEngine::BuildingCategory::PRODUCTION:
+        return "Production";
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
+}
+
+} // namespace BuildingCategory
 
 const EntityTemplate* BuildingCostDescriptor::BuildingTemplate() const
 {
@@ -27,6 +47,7 @@ void BuildingCostDescriptor::DrawEditor()
 {
     const EntityTemplate* et = BuildingTemplate();
     EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED("##Template", et, FBuildingTemplateName, Worlds::BUILDINGS);
+    EDITOR_PROPERTY_BUILDING_CATEGORY("##Category", FBuildingType);
     ImGui::NextColumn();
     ImGui::BeginChild(ImGui::GetID(this), ImVec2(ImGui::GetContentRegionAvailWidth(), 100.f));
     ImGui::Columns(2);

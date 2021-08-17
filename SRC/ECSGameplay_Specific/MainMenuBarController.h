@@ -49,7 +49,6 @@ private:
     std::unique_ptr<IDataModelWrapper> FDataModelWrapper;
 
     Rml::ElementDocument* FDocument = nullptr;
-    Rml::ElementDocument* FDocumentDemo = nullptr;
 };
 } // namespace UI
 } // namespace ECSEngine

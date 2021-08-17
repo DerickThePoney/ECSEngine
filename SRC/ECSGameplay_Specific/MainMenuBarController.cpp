@@ -21,45 +21,10 @@ namespace ECSEngine
 {
 namespace UI
 {
-class TestListener : public Rml::EventListener
-{
-public:
-    TestListener(const Rml::String& value, Rml::Element* element)
-        : FValue(value)
-        , FElement(element)
-    {
-    }
-    virtual void ProcessEvent(Rml::Event& event) override
-    {
-        AlwaysCheckedAssert(event.GetId() == Rml::EventId::Click);
-        event.StopImmediatePropagation();
-
-        std::cout << "CLICK:" << std::endl;
-        std::cout << "\tCorrect Element: " << (event.GetTargetElement() == FElement) << std::endl;
-        std::cout << "\tValue: " << FValue << std::endl;
-    }
-
-private:
-    std::string FValue;
-    Rml::Element* FElement;
-};
-
-class TestListenerInstancer : public Rml::EventListenerInstancer
-{
-public:
-    virtual Rml::EventListener* InstanceEventListener(const Rml::String& value, Rml::Element* element) override
-    {
-        std::cout << value << "\t" << element->GetTagName() << "\n";
-        return new TestListener(value, element);
-    }
-};
-
-std::unique_ptr<TestListenerInstancer> listener = std::unique_ptr<TestListenerInstancer>(new TestListenerInstancer);
 
 void ClickedTestData(Rml::DataModelHandle model_handle, Rml::Event& ev, const Rml::VariantList& ag)
 {
-    std::cout << "oh yeah!!!"
-              << "\n";
+    std::cout << "oh yeah!!! " << ev.GetTargetElement()->GetInnerRML() << "\n";
 }
 
 MainMenuBarController::MainMenuBarController()
@@ -74,30 +39,15 @@ void MainMenuBarController::VirtualInit()
 {
     UIControllerWithModuleAccessors::VirtualInit();
 
-    Rml::Factory::RegisterEventListenerInstancer(listener.get());
     Rml::DataModelConstructor ctr = RmlUiManager::Instance().CreateDataModel("colony-model");
     AssertRelease((bool)ctr);
     ctr.Bind("peons", &FModel.TotalPeons);
     ctr.Bind("idle", &FModel.IdlePeons);
     ctr.Bind("remaining_feeding_time", &FModel.RemainingFeedingTime);
 
-    Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("build-menu-model");
-    ctr2.BindEventCallback("clickedicontest", &ClickedTestData);
-
     FDataModelWrapper = RmlDataModelWrapperFactory::CreateDataModelWrapper(ctr.GetModelHandle());
 
     FDocument = RmlUiManager::Instance().LoadDocument("UI\\MainMenuBar\\MainMenuBar.rml");
-
-    FDocumentDemo = RmlUiManager::Instance().LoadDocument("UI\\BuildMenu\\BuildMenu.rml");
-    if (FDocumentDemo)
-    {
-        FDocumentDemo->GetElementById("title")->SetInnerRML(FDocumentDemo->GetTitle());
-        Rml::ElementPtr newElement = FDocumentDemo->CreateElement("icon");
-        newElement->SetAttribute("data-event-click", "clickedicontest");
-        newElement->SetInnerRML("Test 4");
-        Rml::Element* panel = FDocumentDemo->GetElementById("tab-2-panel");
-        panel->AppendChild(std::move(newElement));
-    }
 }
 
 void MainMenuBarController::VirtualUpdate()
@@ -142,10 +92,8 @@ void MainMenuBarController::VirtualDestroy()
     if (FDocument != nullptr)
     {
         RmlUiManager::Instance().UnloadDocument(FDocument);
-        RmlUiManager::Instance().UnloadDocument(FDocumentDemo);
     }
     RmlUiManager::Instance().RemoveDataModel("colony-model");
-    RmlUiManager::Instance().RemoveDataModel("build-menu-model");
 }
 
 bool MainMenuBarController::HandleVisibility()
@@ -154,12 +102,10 @@ bool MainMenuBarController::HandleVisibility()
     if (FShow && !visible)
     {
         FDocument->Show();
-        FDocumentDemo->Show();
     }
     else if (!FShow && visible)
     {
         FDocument->Hide();
-        FDocumentDemo->Hide();
     }
     return FShow;
 }
