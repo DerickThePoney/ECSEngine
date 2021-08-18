@@ -8,6 +8,7 @@ namespace ECSEngine
 {
 namespace UI
 {
+
 class BuildMenuController : public UIController
 {
 public:
