@@ -15,6 +15,28 @@ namespace ECSEngine
 namespace UI
 {
 
+struct BuildMenuModel
+{
+    BuildMenuModel(const BuildMenuController* parController);
+    void OnBuildIconClicked(Rml::DataModelHandle parHandle, Rml::Event& parEvent, const Rml::VariantList& parArgs);
+
+    const BuildMenuController* FController = nullptr;
+};
+
+BuildMenuModel::BuildMenuModel(const BuildMenuController* parController)
+    : FController(parController)
+{
+}
+
+void BuildMenuModel::OnBuildIconClicked(Rml::DataModelHandle parHandle, Rml::Event& parEvent, const Rml::VariantList& parArgs)
+{
+    std::cout << "it's been cliiiiiiiicked, it's fantastic !!!\n";
+    u32 val = static_cast<u32>(parArgs[0].Get<double>());
+    std::cout << "val = " << val << std::endl;
+}
+
+static std::unique_ptr<BuildMenuModel> sBuildMenuModel;
+
 BuildMenuController::BuildMenuController()
 {
 }
@@ -23,8 +45,10 @@ void BuildMenuController::VirtualInit()
 {
     UIController::VirtualInit();
 
+    sBuildMenuModel.reset(new BuildMenuModel(this));
+
     Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("build-menu-model");
-    //    ctr2.BindEventCallback("clickedicontest", &ClickedTestData);
+    ctr2.BindEventCallback("buildiconclicked", &BuildMenuModel::OnBuildIconClicked, sBuildMenuModel.get());
     FDataModelWrapper = RmlDataModelWrapperFactory::CreateDataModelWrapper(ctr2.GetModelHandle());
     FDocument = RmlUiManager::Instance().LoadDocument("UI\\BuildMenu\\BuildMenu.rml");
     AssertRelease(FDocument != nullptr);
@@ -51,6 +75,8 @@ void BuildMenuController::VirtualDestroy()
     }
 
     RmlUiManager::Instance().RemoveDataModel("build-menu-model");
+
+    sBuildMenuModel.reset(nullptr);
 }
 
 bool BuildMenuController::HandleVisibility()
@@ -101,6 +127,7 @@ void BuildMenuController::FillWindow()
         Rml::ElementPtr newBuilding = FDocument->CreateElement("buildicon");
         newBuilding->SetId(costRule.BuildingTemplateName().c_str());
         newBuilding->SetInnerRML(costRule.BuildingTemplateName().c_str());
+        newBuilding->SetAttribute("data-event-click", fmt::format("buildiconclicked({})", i).c_str());
         tabToUse->AppendChild(std::move(newBuilding));
     }
 }
