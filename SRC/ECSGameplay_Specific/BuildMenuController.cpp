@@ -17,22 +17,21 @@ namespace UI
 
 struct BuildMenuModel
 {
-    BuildMenuModel(const BuildMenuController* parController);
+    BuildMenuModel(BuildMenuController* parController);
     void OnBuildIconClicked(Rml::DataModelHandle parHandle, Rml::Event& parEvent, const Rml::VariantList& parArgs);
 
-    const BuildMenuController* FController = nullptr;
+    BuildMenuController* FController = nullptr;
 };
 
-BuildMenuModel::BuildMenuModel(const BuildMenuController* parController)
+BuildMenuModel::BuildMenuModel(BuildMenuController* parController)
     : FController(parController)
 {
 }
 
 void BuildMenuModel::OnBuildIconClicked(Rml::DataModelHandle parHandle, Rml::Event& parEvent, const Rml::VariantList& parArgs)
 {
-    std::cout << "it's been cliiiiiiiicked, it's fantastic !!!\n";
     u32 val = static_cast<u32>(parArgs[0].Get<double>());
-    std::cout << "val = " << val << std::endl;
+    FController->SetIsPlacingBuilding(val);
 }
 
 static std::unique_ptr<BuildMenuModel> sBuildMenuModel;
@@ -91,6 +90,20 @@ bool BuildMenuController::HandleVisibility()
         FDocument->Hide();
     }
     return FShow;
+}
+
+void BuildMenuController::SetIsPlacingBuilding(const u32 parBuildingIndex)
+{
+    auto& buildCostDesc = GameplayRulesManager::Instance().FBuildingCostManager.GetBuildingCostDescriptors();
+    AssertRelease(parBuildingIndex < buildCostDesc.size());
+
+    auto& costRule = buildCostDesc[parBuildingIndex];
+
+    PlaceBuildingMousePolicy* mousePolicy = MousePolicyManager::Instance().GetMousePolicy<PlaceBuildingMousePolicy>(MousePolicyType::PLACE_BUILDING);
+    if (mousePolicy->IsActivated())
+        mousePolicy->Deactivate();
+    mousePolicy->SetupMousePolicy(costRule.BuildingTemplateName());
+    mousePolicy->Activate();
 }
 
 void BuildMenuController::FillWindow()

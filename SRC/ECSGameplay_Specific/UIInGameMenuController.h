@@ -10,13 +10,6 @@ namespace ECSEngine
 namespace UI
 {
 
-struct InGameMenuElements
-{
-    bool ShowInGameMenu = true;
-    bool BuildMenu = false;
-    bool ColonySelectionMenu = false; // TOREMOVE JUST FOR THE LOLS
-};
-
 class UIInGameMenuController : public UIController
 {
 public:
@@ -28,17 +21,9 @@ protected:
     void VirtualDestroy() override;
 
 private:
-    void DrawInGameMenu();
-
-private:
     ColonySelectionPanelController FColonySelectionPanel;
     BuildMenuController FBuildMenuController;
     MainMenuBarController FMainMenuBarController;
-
-    InGameMenuElements FMenuElements;
-
-    WindowSizer FSize;
-    WindowPosition FPosition;
 };
 
 } // namespace UI
