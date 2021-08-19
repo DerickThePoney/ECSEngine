@@ -14,6 +14,8 @@ class BuildMenuController : public UIController
 public:
     BuildMenuController();
 
+    void SetIsPlacingBuilding(const u32 parBuildingIndex);
+
 protected:
     void VirtualInit() override;
     void VirtualUpdate() override;
