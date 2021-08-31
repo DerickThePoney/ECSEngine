@@ -18,10 +18,15 @@ public:
 
     Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
-    SERIALIZE() { }
+    SERIALIZE() { PROPERTYFIELD(ProducedEnergy, 0); }
+
+    u32 ProducedEnergy() const { return FProducedEnergy; }
 
 protected:
     void VirtualDrawEditor() override;
+
+private:
+    u32 FProducedEnergy = 0;
 };
 
 class EnergyProducerModule : public Module
@@ -31,6 +36,8 @@ class EnergyProducerModule : public Module
 public:
     EnergyProducerModule();
     ~EnergyProducerModule();
+
+    u32 ProducedEnergy() const;
 };
 
 } // namespace ECSEngine
