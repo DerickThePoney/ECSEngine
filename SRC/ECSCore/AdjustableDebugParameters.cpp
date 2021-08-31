@@ -3,6 +3,7 @@
 #include "AdjustableDebugParameters.h"
 
 #ifdef ENABLE_DEBUG_PARAMETERS
+#include "Common/InputManager.h"
 #include "Common/PoolAllocator.h"
 #include "Common/Singleton.h"
 namespace ECSEngine
@@ -568,10 +569,18 @@ void DestroyAdjustables()
 
 void DrawAdjustables()
 {
-    static bool open = true;
-    ImGui::Begin("Debug values", &open, ImGuiWindowFlags_AlwaysAutoResize);
-    GetOrCreate().DrawDebugs();
-    ImGui::End();
+    static bool open = false;
+    if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F1) && Input::GetButtonHasChanged(InputKeyNames::INPUT_KEY_F1))
+        open = !open;
+
+    if (open)
+    {
+        ImGui::Begin("Debug values", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+
+        GetOrCreate().DrawDebugs();
+
+        ImGui::End();
+    }
 }
 
 u32 GetOrCreateAdjustableDebugParameter(const char* parName, const char* parFamily, u32 parDefaultValue, u32 parMinValue, u32 parMaxValue)
