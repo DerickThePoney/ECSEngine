@@ -3,6 +3,7 @@
 #include "ColonyPeonsManagementModule.h"
 #include "ECSCore/UIController.h"
 #include "ECSCore/WorldIds.h"
+#include "EnergyProducerModule.h"
 #include "HousingPlaceModule.h"
 #include "PeonFeedingTimeModule.h"
 #include "PeonSpawnModule.h"
@@ -20,7 +21,8 @@ class MainMenuBarController : public UIControllerWithModuleAccessors<MC<ColonyMo
                                     MC<PeonSpawnModule, Worlds::COLONY>,
                                     MC<ColonyPeonsManagementModule, Worlds::COLONY>,
                                     MC<PeonFeedingTimeModule, Worlds::COLONY>,
-                                    MC<HousingPlaceModule, Worlds::BUILDINGS>>
+                                    MC<HousingPlaceModule, Worlds::BUILDINGS>,
+                                    MC<EnergyProducerModule, Worlds::BUILDINGS>>
 {
 public:
     MainMenuBarController();
@@ -34,10 +36,14 @@ protected:
     bool HandleVisibility();
 
 private:
+    void UpdateEnergy();
+
+private:
     struct MainMenuBarModel
     {
         u32 TotalPeons = 0;
         u32 IdlePeons = 0;
+        u32 Energy = 0;
         int RemainingFeedingTime = 0;
     };
 

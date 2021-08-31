@@ -3,6 +3,7 @@
 
 #include "EnergyProducerModule.h"
 
+#include "Application/PropertyDrawer.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleUtils.h"
 
@@ -20,6 +21,7 @@ Module* EnergyProducerModuleTemplate::CreateInstance(const EntityId& parUnitId, 
 
 void EnergyProducerModuleTemplate::VirtualDrawEditor()
 {
+    EDITOR_PROPERTY_SIMPLE("Produced energy", FProducedEnergy);
 }
 
 EnergyProducerModule::EnergyProducerModule()
@@ -29,6 +31,13 @@ EnergyProducerModule::EnergyProducerModule()
 
 EnergyProducerModule::~EnergyProducerModule()
 {
+}
+
+u32 EnergyProducerModule::ProducedEnergy() const
+{
+    const auto* moduleTemplate = Template<EnergyProducerModuleTemplate>();
+    AssertRelease(moduleTemplate != nullptr);
+    return moduleTemplate->ProducedEnergy();
 }
 
 } // namespace ECSEngine

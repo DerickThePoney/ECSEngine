@@ -33,6 +33,7 @@ void MainMenuBarController::VirtualInit()
     AssertRelease((bool)ctr);
     ctr.Bind("peons", &FModel.TotalPeons);
     ctr.Bind("idle", &FModel.IdlePeons);
+    ctr.Bind("energy", &FModel.Energy);
     ctr.Bind("remaining_feeding_time", &FModel.RemainingFeedingTime);
 
     FDataModelWrapper = RmlDataModelWrapperFactory::CreateDataModelWrapper(ctr.GetModelHandle());
@@ -70,6 +71,8 @@ void MainMenuBarController::VirtualUpdate()
     FDataModelWrapper->DirtyVariable("idle");
     FDataModelWrapper->DirtyVariable("remaining_feeding_time");
 
+    UpdateEnergy();
+
     const float progress = peonFeedingTimeModule->RemainTimeBeforeNextFeedAsRatio();
     Rml::Element* progressBar = FDocument->GetElementById("progress");
     AssertRelease(progressBar != nullptr);
@@ -98,6 +101,14 @@ bool MainMenuBarController::HandleVisibility()
         FDocument->Hide();
     }
     return FShow;
+}
+
+void MainMenuBarController::UpdateEnergy()
+{
+    ModuleAccessor<EnergyProducerModule> accessor(Worlds::BUILDINGS);
+    FModel.Energy = 0;
+    foreachitemconst(energyModule, accessor) { FModel.Energy += energyModule.ProducedEnergy(); }
+    FDataModelWrapper->DirtyVariable("energy");
 }
 
 } // namespace UI
