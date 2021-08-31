@@ -94,6 +94,12 @@ void GameScenarioUpdater::Destroy()
     Rendering::GameRenderer::Destroy();
 }
 
+void GameScenarioUpdater::RealtimeUpdate()
+{
+    SCOPED_PROFILE(GameScenarioUpdater_RealtimeUpdate);
+    FCameraMoverSystem.Update();
+}
+
 void GameScenarioUpdater::GameplayUpdate()
 {
     {
@@ -101,7 +107,6 @@ void GameScenarioUpdater::GameplayUpdate()
 
         AssertRelease(FScenario != nullptr);
         FScenario->Update();
-        FCameraMoverSystem.Update();
         FMovementSystem.Update();
 
         FColonyManagementSystem.Update();

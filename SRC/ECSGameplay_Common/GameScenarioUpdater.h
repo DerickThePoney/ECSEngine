@@ -27,6 +27,7 @@ public:
 
     void Initialise() override;
     void Destroy() override;
+    void RealtimeUpdate() override;
     void GameplayUpdate() override;
     void UIUpdate() override;
     void DebugRender() override;

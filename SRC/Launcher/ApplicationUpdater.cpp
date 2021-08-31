@@ -60,7 +60,7 @@ void ApplicationUpdater::StartUpdate()
 
     Rendering::ImGUI::NewFrame();
 
-    // UI::RmlUiManager::Instance().NewFrame();
+    FScene->RealtimeUpdate();
 }
 
 void ApplicationUpdater::UpdateGameplay()
