@@ -11,6 +11,7 @@
 #include "ECSGameplay_Specific/ColonyModule.h"
 #include "ECSGameplay_Specific/ColonyPeonsManagementModule.h"
 #include "ECSGameplay_Specific/ColonyTraitsModule.h"
+#include "ECSGameplay_Specific/EnergyProducerModule.h"
 #include "ECSGameplay_Specific/HousingPlaceModule.h"
 #include "ECSGameplay_Specific/LinkToHousingPlaceModule.h"
 #include "ECSGameplay_Specific/LinkToWorkPlaceModule.h"
@@ -59,7 +60,8 @@ using BuildingControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::ResourceProductionModule,
       ECSEngine::HousingPlaceModule,
       ECSEngine::BuildingGridOccupancyModule,
-      ECSEngine::WorkPlaceModule>;
+      ECSEngine::WorkPlaceModule,
+      ECSEngine::EnergyProducerModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 
