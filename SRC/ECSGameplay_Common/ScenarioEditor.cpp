@@ -315,4 +315,20 @@ void ScenarioEditor::DebugRender()
     }
 }
 
+void ScenarioEditor::RealtimeUpdate()
+{
+    switch (FState)
+    {
+    case ECSEngine::ScenarioEditorStatus::EDITING_SCENARIO:
+        break;
+    case ECSEngine::ScenarioEditorStatus::PLAYING_SCENARIO:
+        AssertRelease(FInGameScenarioPlayer != nullptr);
+        FInGameScenarioPlayer->RealtimeUpdate();
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
+}
+
 } // namespace ECSEngine

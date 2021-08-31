@@ -45,7 +45,7 @@ void CameraMoverSystem::VirtualUpdate()
     ModuleAccessor<OrientationModule> orientationAccessor(Worlds::CAMERA);
     AssertRelease(cameraMoverAccessor.size() <= 1); // Pour l'instant on en prend qu'un !!
 
-    const float deltaTime = TimeManager::GameplayDeltaTime();
+    const float deltaTime = TimeManager::FrameDeltaTime();
     foreachitem(moverModule, cameraMoverAccessor)
     {
         OrientationModule* orientationModule = orientationAccessor[moverModule.UnitId()];
