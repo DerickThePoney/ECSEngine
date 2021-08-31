@@ -136,8 +136,8 @@ void NavMeshPathfindingManager::ProcessOneRequest(const PathfindingRequest& parR
 
     if (path.isValid())
     {
-        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(smoothPath, false, "Smooth path", "Pathfinding/NavMesh");
-        
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(smoothPath, true, "Smooth path", "Pathfinding/NavMesh");
+
         if (smoothPath)
         {
             Navigation::NavMeshPathSmoother smoother;
