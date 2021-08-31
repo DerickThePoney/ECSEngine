@@ -141,7 +141,7 @@ def main():
         for line in lines:
             f.write(line)
 
-    result = subprocess.run(['./tools/premake5.exe', 'vs2019'])
+    result = subprocess.run(['py', '-u', 'Script/Compil/BuildAll.py', '-sln'])
 
     return result.returncode
 
