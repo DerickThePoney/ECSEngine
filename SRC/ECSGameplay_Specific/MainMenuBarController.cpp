@@ -4,6 +4,7 @@
 
 #include "Common/Logger.h"
 #include "Common/TimeManager.h"
+#include "EnergySystem.h"
 #include "UICore/RMLUIManager.h"
 #include "UICore/RML_includes.h"
 
@@ -105,9 +106,7 @@ bool MainMenuBarController::HandleVisibility()
 
 void MainMenuBarController::UpdateEnergy()
 {
-    ModuleAccessor<EnergyProducerModule> accessor(Worlds::BUILDINGS);
-    FModel.Energy = 0;
-    foreachitemconst(energyModule, accessor) { FModel.Energy += energyModule.ProducedEnergy(); }
+    FModel.Energy = EnergySystem::Instance().TotalEnergy();
     FDataModelWrapper->DirtyVariable("energy");
 }
 
