@@ -43,7 +43,8 @@ private:
     {
         u32 TotalPeons = 0;
         u32 IdlePeons = 0;
-        u32 Energy = 0;
+        u32 Influence = 0;
+        i32 Energy = 0;
         int RemainingFeedingTime = 0;
     };
 
