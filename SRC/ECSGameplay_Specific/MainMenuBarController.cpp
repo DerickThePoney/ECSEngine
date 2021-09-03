@@ -34,6 +34,7 @@ void MainMenuBarController::VirtualInit()
     AssertRelease((bool)ctr);
     ctr.Bind("peons", &FModel.TotalPeons);
     ctr.Bind("idle", &FModel.IdlePeons);
+    ctr.Bind("influence", &FModel.Influence);
     ctr.Bind("energy", &FModel.Energy);
     ctr.Bind("remaining_feeding_time", &FModel.RemainingFeedingTime);
 
@@ -68,8 +69,10 @@ void MainMenuBarController::VirtualUpdate()
     FModel.TotalPeons = peonManagerModule->PeonsInColony();
     FModel.IdlePeons = peonManagerModule->IdlePeons().size();
     FModel.RemainingFeedingTime = peonFeedingTimeModule->RemainingTimeBeforeNextFeed();
+    FModel.Influence = resourceStorage->GetResourceQuantity(GameResource::INFLUENCE);
     FDataModelWrapper->DirtyVariable("peons");
     FDataModelWrapper->DirtyVariable("idle");
+    FDataModelWrapper->DirtyVariable("influence");
     FDataModelWrapper->DirtyVariable("remaining_feeding_time");
 
     UpdateEnergy();
