@@ -11,6 +11,7 @@
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Specific/CircularBuildingGrid.h"
+#include "ECSGameplay_Specific/EnergySystem.h"
 #include "ECSGameplay_Specific/MousePolicyManager.h"
 #include "ImGuiTools/ResourceCacheDebug.h"
 #include "NavMeshPathfindingManager.h"
@@ -44,6 +45,8 @@ void GameScenarioUpdater::Initialise()
     MousePolicyManager::Instance().Initialise();
 
     AssertRelease(FScenario != nullptr);
+    EnergySystem::CreateIFP();
+    EnergySystem::Instance().Init();
     FCameraMoverSystem.Init();
     FMovementSystem.Init();
     FRenderingSystem.Init();
@@ -84,6 +87,8 @@ void GameScenarioUpdater::Destroy()
     FRenderingSystem.Destroy();
     FMovementSystem.Destroy();
     FCameraMoverSystem.Destroy();
+    EnergySystem::Instance().Finalize();
+    EnergySystem::Delete();
 
     WorldManager::Instance().DestroyAllRemainingEntities();
 
@@ -109,6 +114,7 @@ void GameScenarioUpdater::GameplayUpdate()
         FScenario->Update();
         FMovementSystem.Update();
 
+        EnergySystem::Instance().Update();
         FColonyManagementSystem.Update();
         FPeonHarvestingSytem.Update();
         FProductionSystem.Update();
