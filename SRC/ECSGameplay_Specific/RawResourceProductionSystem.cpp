@@ -1,31 +1,31 @@
 ﻿#include "stdafx.h"
 
-#include "ResourceProductionSystem.h"
+#include "RawResourceProductionSystem.h"
 
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
-#include "ResourceProductionModule.h"
+#include "RawResourceProductionModule.h"
 #include "ResourceStorageModule.h"
 
 namespace ECSEngine
 {
 
-ResourceProductionSystem::ResourceProductionSystem()
+RawResourceProductionSystem::RawResourceProductionSystem()
     : ModuleSystem()
 {
-    RegisterDepency<ResourceProductionModule>(Worlds::RESOURCE_PROD);
+    RegisterDepency<RawResourceProductionModule>(Worlds::RESOURCE_PROD);
     RegisterDepency<ResourceStorageModule>(Worlds::RESOURCE_PROD);
 }
 
-ResourceProductionSystem::~ResourceProductionSystem()
+RawResourceProductionSystem::~RawResourceProductionSystem()
 {
 }
 
-void ResourceProductionSystem::VirtualUpdate()
+void RawResourceProductionSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<ResourceProductionModule> resourceProductionAccessor(Worlds::RESOURCE_PROD);
+    ModuleAccessor<RawResourceProductionModule> resourceProductionAccessor(Worlds::RESOURCE_PROD);
     ModuleAccessor<ResourceStorageModule> resourceStorageAccesor(Worlds::RESOURCE_PROD);
 
     foreachitem(producer, resourceProductionAccessor)
@@ -36,7 +36,7 @@ void ResourceProductionSystem::VirtualUpdate()
         const u32 remainingStorageSpace = producerStorage->GetRemainingStorageSpace();
         u32 producedResources = 0;
         const float dt = TimeManager::GameplayDeltaTime();
-        MemoryView<ResourceProductionModule::ProducedResourceTiming> resourceTimings = producer.ProducedResourcesTimings();
+        MemoryView<RawResourceProductionModule::ProducedRawResourceTiming> resourceTimings = producer.ProducedResourcesTimings();
         foreachitem(resource, resourceTimings)
         {
             if (producedResources >= remainingStorageSpace)
