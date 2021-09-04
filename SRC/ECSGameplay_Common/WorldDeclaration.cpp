@@ -18,8 +18,8 @@
 #include "ECSGameplay_Specific/LinkToWorkPlaceModule.h"
 #include "ECSGameplay_Specific/PeonFeedingTimeModule.h"
 #include "ECSGameplay_Specific/PeonSpawnModule.h"
+#include "ECSGameplay_Specific/RawResourceProductionModule.h"
 #include "ECSGameplay_Specific/ResourceHarvesterModule.h"
-#include "ECSGameplay_Specific/ResourceProductionModule.h"
 #include "ECSGameplay_Specific/ResourceStorageModule.h"
 #include "ECSGameplay_Specific/WorkPlaceModule.h"
 #include "EntityLinksModules.h"
@@ -44,7 +44,7 @@ using PeonsControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::LinkToWorkPlaceModule>;
 
 using ResourceProducerControllers =
-      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule, ECSEngine::ResourceProductionModule>;
+      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule, ECSEngine::RawResourceProductionModule>;
 
 using ColonyControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::ColonyModule,
@@ -58,7 +58,7 @@ using BuildingControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::OrientationModule,
       ECSEngine::ApparenceModule,
       ECSEngine::ResourceStorageModule,
-      ECSEngine::ResourceProductionModule,
+      ECSEngine::RawResourceProductionModule,
       ECSEngine::HousingPlaceModule,
       ECSEngine::BuildingGridOccupancyModule,
       ECSEngine::WorkPlaceModule,

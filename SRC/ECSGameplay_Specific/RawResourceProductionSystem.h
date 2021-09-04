@@ -3,11 +3,11 @@
 
 namespace ECSEngine
 {
-class ResourceProductionSystem final : public ModuleSystem
+class RawResourceProductionSystem final : public ModuleSystem
 {
 public:
-    ResourceProductionSystem();
-    ~ResourceProductionSystem();
+    RawResourceProductionSystem();
+    ~RawResourceProductionSystem();
 
 protected:
     void VirtualUpdate() override;
