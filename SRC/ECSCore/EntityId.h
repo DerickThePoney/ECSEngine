@@ -18,7 +18,7 @@ struct PackedEntityId
     bool operator==(const PackedEntityId& other) const { return FId == other.FId; }
 
 private:
-    u32 FId;
+    u32 FId = 0xFFFFFFFF;
 };
 
 class EntityId
