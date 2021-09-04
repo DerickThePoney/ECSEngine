@@ -15,6 +15,7 @@
 #include "ECSGameplay_Specific/EnergyProducerModule.h"
 #include "ECSGameplay_Specific/HousingPlaceModule.h"
 #include "ECSGameplay_Specific/LinkToHousingPlaceModule.h"
+#include "ECSGameplay_Specific/LinkToStorageModule.h"
 #include "ECSGameplay_Specific/LinkToWorkPlaceModule.h"
 #include "ECSGameplay_Specific/PeonFeedingTimeModule.h"
 #include "ECSGameplay_Specific/PeonSpawnModule.h"
@@ -63,7 +64,8 @@ using BuildingControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::BuildingGridOccupancyModule,
       ECSEngine::WorkPlaceModule,
       ECSEngine::EnergyProducerModule,
-      ECSEngine::EnergyConsumerModule>;
+      ECSEngine::EnergyConsumerModule,
+      ECSEngine::LinkToStorageModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 
