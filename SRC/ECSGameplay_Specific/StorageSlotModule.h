@@ -1,5 +1,6 @@
 
 #pragma once
+#include "Common/MemoryView.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "GameResources.h"
@@ -57,6 +58,8 @@ public:
     u32 NumberOfSlots() const;
     u32 SlotSize() const;
     float RadiusOfEffect() const;
+
+    bool ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<const GameResource::Type> parRessources);
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;

@@ -55,6 +55,42 @@ float StorageSlotModule::RadiusOfEffect() const
     return t->RadiusOfEffect();
 }
 
+bool StorageSlotModule::ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<const GameResource::Type> parRessources)
+{
+    AlwaysCheckedAssert(parRessources.size() < NumberOfSlots());
+    if (parRessources.size() >= NumberOfSlots())
+        return false;
+
+    std::vector<u32> possibleSlotsIndices;
+    possibleSlotsIndices.reserve(parRessources.size());
+
+    forrange(i, 0, FSlots.size())
+    {
+        const StorageSlot& slot = FSlots[i];
+        if (slot.FReservedForBuilding.Valid())
+            continue;
+
+        possibleSlotsIndices.push_back(i);
+
+        if (possibleSlotsIndices.size() == parRessources.size())
+            break;
+    }
+
+    AlwaysCheckedAssert(possibleSlotsIndices.size() <= parRessources.size());
+    if (possibleSlotsIndices.size() != parRessources.size())
+        return false;
+
+    u32 resIdx = 0;
+    foreachitemconst(idx, possibleSlotsIndices)
+    {
+        StorageSlot& slot = FSlots[idx];
+        slot.FReservedForBuilding = parUnitId;
+        slot.Quantity = 0;
+        slot.Resource = parRessources[resIdx++];
+    }
+    return true;
+}
+
 void StorageSlotModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
     parent_type::VirtualInit(parUnitId, parParameters);
