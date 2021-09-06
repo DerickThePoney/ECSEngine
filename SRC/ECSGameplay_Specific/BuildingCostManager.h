@@ -11,6 +11,7 @@ enum Type
 {
     ENERGY,
     PRODUCTION,
+    STORAGE,
     LENGTH
 };
 

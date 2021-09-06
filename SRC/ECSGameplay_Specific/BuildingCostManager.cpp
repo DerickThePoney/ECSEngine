@@ -21,6 +21,9 @@ const char* AsString(Type parValue)
     case ECSEngine::BuildingCategory::PRODUCTION:
         return "Production";
         break;
+    case ECSEngine::BuildingCategory::STORAGE:
+        return "Storage";
+        break;
     default:
         AssertNotReached();
         return "UNKNOWN";
