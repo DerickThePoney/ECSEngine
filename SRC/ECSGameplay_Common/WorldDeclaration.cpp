@@ -22,6 +22,7 @@
 #include "ECSGameplay_Specific/RawResourceProductionModule.h"
 #include "ECSGameplay_Specific/ResourceHarvesterModule.h"
 #include "ECSGameplay_Specific/ResourceStorageModule.h"
+#include "ECSGameplay_Specific/StorageSlotModule.h"
 #include "ECSGameplay_Specific/WorkPlaceModule.h"
 #include "EntityLinksModules.h"
 #include "MovementModule.h"
@@ -65,7 +66,8 @@ using BuildingControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::WorkPlaceModule,
       ECSEngine::EnergyProducerModule,
       ECSEngine::EnergyConsumerModule,
-      ECSEngine::LinkToStorageModule>;
+      ECSEngine::LinkToStorageModule,
+      ECSEngine::StorageSlotModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 
