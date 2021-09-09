@@ -24,10 +24,14 @@ public:
         if (FMessagesQueues.size() <= Id)
             return;
 
-        std::scoped_lock<std::mutex> lock(FMutex);
-
-        foreachitem(message, FMessagesQueues[Id]) { parFunctor(*message->UserDataAs<UserData>()); }
-        FMessagesQueues[Id].clear();
+        std::vector<std::unique_ptr<GenericMessage>> messages;
+        {
+            std::scoped_lock<std::mutex> lock(FMutex);
+            messages.reserve(FMessagesQueues[Id].size());
+            foreachitem(message, FMessagesQueues[Id]) { messages.push_back(std::move(message)); }
+            FMessagesQueues[Id].clear();
+        }
+        foreachitem(message, messages) { parFunctor(*message->UserDataAs<UserData>()); }
     }
 
 private:

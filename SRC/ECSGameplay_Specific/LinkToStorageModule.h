@@ -33,6 +33,10 @@ public:
     ~LinkToStorageModule();
 
     const EntityId StorageId() const { return FStorageId; }
+    void SetStorageId(const EntityId parId) { FStorageId = parId; }
+
+protected:
+    void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
 private:
     EntityId FStorageId;

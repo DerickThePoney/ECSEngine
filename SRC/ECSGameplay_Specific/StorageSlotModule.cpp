@@ -23,6 +23,7 @@ void StorageSlotModuleTemplate::VirtualDrawEditor()
 {
     EDITOR_PROPERTY_SIMPLE("Number of slots", FNumberOfSlots);
     EDITOR_PROPERTY_SIMPLE("Slot size", FSlotSize);
+    EDITOR_PROPERTY_SIMPLE("Radius of effect", FRadiusOfEffect);
 }
 
 StorageSlotModule::StorageSlotModule()
@@ -53,6 +54,11 @@ float StorageSlotModule::RadiusOfEffect() const
     const StorageSlotModuleTemplate* t = Template<StorageSlotModuleTemplate>();
     AssertRelease(t != nullptr);
     return t->RadiusOfEffect();
+}
+
+i32 StorageSlotModule::FreeSlots() const
+{
+    return FFreeSlots;
 }
 
 bool StorageSlotModule::ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<const GameResource::Type> parRessources)
@@ -87,6 +93,8 @@ bool StorageSlotModule::ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<co
         slot.FReservedForBuilding = parUnitId;
         slot.Quantity = 0;
         slot.Resource = parRessources[resIdx++];
+        FFreeSlots -= 1;
+        AlwaysCheckedAssert(FFreeSlots >= 0);
     }
     return true;
 }
@@ -97,6 +105,7 @@ void StorageSlotModule::VirtualInit(const EntityId& parUnitId, const ModuleParam
 
     const u32 nbSlots = NumberOfSlots();
     FSlots.resize(nbSlots);
+    FFreeSlots = (i32)nbSlots;
 }
 
 } // namespace ECSEngine
