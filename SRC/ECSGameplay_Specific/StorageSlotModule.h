@@ -58,6 +58,7 @@ public:
     u32 NumberOfSlots() const;
     u32 SlotSize() const;
     float RadiusOfEffect() const;
+    i32 FreeSlots() const;
 
     bool ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<const GameResource::Type> parRessources);
 
@@ -66,6 +67,7 @@ protected:
 
 private:
     std::vector<StorageSlot> FSlots;
+    i32 FFreeSlots = 0;
 };
 
 } // namespace ECSEngine
