@@ -99,6 +99,55 @@ bool StorageSlotModule::ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<co
     return true;
 }
 
+u32 StorageSlotModule::GetFreeSpaceInSlot(const EntityId& parUnitId, const GameResource::Type parResource) const
+{
+    foreachitemconst(slot, FSlots)
+    {
+        if (slot.FReservedForBuilding != parUnitId)
+            continue;
+        if (slot.Resource != parResource)
+            continue;
+        return SlotSize() - slot.Quantity;
+    }
+
+    AssertNotReached();
+    return 0;
+}
+
+u32 StorageSlotModule::AddResourceInSlot(const EntityId& parUnitId, const GameResource::Type parResource, const u32 parQuantity)
+{
+    foreachitem(slot, FSlots)
+    {
+        if (slot.FReservedForBuilding != parUnitId)
+            continue;
+        if (slot.Resource != parResource)
+            continue;
+        AlwaysCheckedAssert((SlotSize() - slot.Quantity) >= parQuantity);
+        slot.Quantity += parQuantity;
+        return parQuantity;
+    }
+
+    AssertNotReached();
+    return 0;
+}
+
+u32 StorageSlotModule::RemoveResourceInSlot(const EntityId& parUnitId, const GameResource::Type parResource, const u32 parQuantity)
+{
+    foreachitem(slot, FSlots)
+    {
+        if (slot.FReservedForBuilding != parUnitId)
+            continue;
+        if (slot.Resource != parResource)
+            continue;
+        AlwaysCheckedAssert(slot.Quantity >= parQuantity);
+        slot.Quantity -= parQuantity;
+        return parQuantity;
+    }
+
+    AssertNotReached();
+    return 0;
+}
+
 void StorageSlotModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
     parent_type::VirtualInit(parUnitId, parParameters);

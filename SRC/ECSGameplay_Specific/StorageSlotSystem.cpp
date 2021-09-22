@@ -10,6 +10,7 @@
 #include "ECSGameplay_Common/PositionModule.h"
 #include "LinkToStorageModule.h"
 #include "RawResourceProductionModule.h"
+#include "ResourceStorageModule.h"
 #include "StorageSlotModule.h"
 
 namespace ECSEngine
@@ -18,6 +19,7 @@ StorageSlotSystem::StorageSlotSystem()
     : ModuleSystem()
 {
     RegisterDepency<StorageSlotModule>(Worlds::BUILDINGS);
+    RegisterDepency<ResourceStorageModule>(Worlds::BUILDINGS);
     RegisterDepency<LinkToStorageModule>(Worlds::BUILDINGS);
     RegisterDepency<PositionModule>(Worlds::BUILDINGS);
     RegisterDepency<RawResourceProductionModule>(Worlds::BUILDINGS);
@@ -28,6 +30,7 @@ void StorageSlotSystem::VirtualUpdate()
     ModuleSystem::VirtualUpdate();
 
     ModuleAccessor<StorageSlotModule> storageSlotAccessor(Worlds::BUILDINGS);
+    ModuleAccessor<ResourceStorageModule> resourceStorageAccessor(Worlds::BUILDINGS);
     ModuleAccessor<LinkToStorageModule> linkToStorageAccessor(Worlds::BUILDINGS);
     ModuleAccessor<PositionModule> positionAccessor(Worlds::BUILDINGS);
     ModuleAccessor<RawResourceProductionModule> rawProdAccessor(Worlds::BUILDINGS);
@@ -36,6 +39,8 @@ void StorageSlotSystem::VirtualUpdate()
         this->ProcessMessages(parMessage, storageSlotAccessor, positionAccessor, linkToStorageAccessor, rawProdAccessor);
     };
     GenericMessageManager::Instance().ProcessMessages<GenericMessageId::BUILDING_NEEDS_STORAGE, BuildingNeedsStorageMessage>(functor);
+
+    TransfertResourcesFromRawProducersToStorage(resourceStorageAccessor, storageSlotAccessor, linkToStorageAccessor, rawProdAccessor);
 }
 
 void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMessage,
@@ -59,6 +64,8 @@ void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMe
     }
 
     AlwaysCheckedAssert(!resourcesToReserve.empty());
+    if (resourcesToReserve.empty())
+        return;
 
     foreachitem(storage, parStorageSlotAccessor)
     {
@@ -83,6 +90,42 @@ void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMe
     // If we arrive here, we got no storage, so push back the message on the stack for next update
     BuildingNeedsStorageMessage* newMessage = new BuildingNeedsStorageMessage(parMessage);
     GenericMessageManager::Instance().PushMessage<GenericMessageId::BUILDING_NEEDS_STORAGE>(newMessage);
+}
+
+void StorageSlotSystem::TransfertResourcesFromRawProducersToStorage(ModuleAccessor<ResourceStorageModule>& parResourceStorageAccessor,
+      ModuleAccessor<StorageSlotModule>& parStorageSlotAccessor,
+      ModuleAccessor<LinkToStorageModule>& parLinkToStorageAccessor,
+      ModuleAccessor<RawResourceProductionModule>& parRawProductionAccessor)
+{
+    foreachitemconst(rawProducer, parRawProductionAccessor)
+    {
+        auto producedRes = rawProducer.ProducedResourcesTimings();
+        ResourceStorageModule* resStorage = parResourceStorageAccessor[rawProducer.UnitId()];
+        AssertRelease(resStorage != nullptr);
+        const LinkToStorageModule* linkToStorage = parLinkToStorageAccessor[rawProducer.UnitId()];
+        AssertRelease(linkToStorage != nullptr);
+
+        const EntityId storage = linkToStorage->StorageId();
+        if (!storage.Valid())
+            continue;
+
+        StorageSlotModule* storageSlotModule = parStorageSlotAccessor[storage];
+        AssertRelease(storageSlotModule != nullptr);
+
+        foreachitemconst(res, producedRes)
+        {
+            const u32 resQ = resStorage->GetResourceQuantity(res.first);
+            if (resQ > 0)
+            {
+                const u32 maxFreeSpaceInStorage = storageSlotModule->GetFreeSpaceInSlot(rawProducer.UnitId(), res.first);
+                if (maxFreeSpaceInStorage > 0)
+                {
+                    const u32 resRemoved = resStorage->RemoveResource(res.first, glm::min(resQ, maxFreeSpaceInStorage));
+                    storageSlotModule->AddResourceInSlot(rawProducer.UnitId(), res.first, resRemoved);
+                }
+            }
+        }
+    }
 }
 
 } // namespace ECSEngine
