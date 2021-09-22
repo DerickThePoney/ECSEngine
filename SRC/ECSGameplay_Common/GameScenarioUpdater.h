@@ -46,7 +46,7 @@ private:
     ColonyBuildingSystem FColonyBuildingSystem;
     ColonyPeonsTaskAssignmentSystem FColonyManagementSystem;
     PeonsHaverstingSystem FPeonHarvestingSytem;
-    RawResourceProductionSystem FProductionSystem;
+    RawResourceProductionSystem FRawResourceProductionSystem;
     PeonSpawnSystem FPeonSpawnSystem;
     PeonFeedingTimeSystem FPeonLifeSpanSystem;
     ResourceStatisticsUpdateSystem FResourceStatsUpdateSystem;

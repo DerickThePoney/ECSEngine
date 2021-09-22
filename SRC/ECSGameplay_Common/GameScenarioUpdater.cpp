@@ -13,6 +13,7 @@
 #include "ECSGameplay_Specific/CircularBuildingGrid.h"
 #include "ECSGameplay_Specific/EnergySystem.h"
 #include "ECSGameplay_Specific/MousePolicyManager.h"
+#include "ECSGameplay_Specific/ResourceManager.h"
 #include "ImGuiTools/ResourceCacheDebug.h"
 #include "NavMeshPathfindingManager.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
@@ -47,12 +48,14 @@ void GameScenarioUpdater::Initialise()
     AssertRelease(FScenario != nullptr);
     EnergySystem::CreateIFP();
     EnergySystem::Instance().Init();
+    ResourceManager::CreateIFP();
+    ResourceManager::Instance().Init();
     FCameraMoverSystem.Init();
     FMovementSystem.Init();
     FRenderingSystem.Init();
     FColonyManagementSystem.Init();
     FPeonHarvestingSytem.Init();
-    FProductionSystem.Init();
+    FRawResourceProductionSystem.Init();
     FPeonSpawnSystem.Init();
     FPeonLifeSpanSystem.Init();
     FResourceStatsUpdateSystem.Init();
@@ -83,12 +86,14 @@ void GameScenarioUpdater::Destroy()
     FResourceStatsUpdateSystem.Destroy();
     FPeonLifeSpanSystem.Destroy();
     FPeonSpawnSystem.Destroy();
-    FProductionSystem.Destroy();
+    FRawResourceProductionSystem.Destroy();
     FPeonHarvestingSytem.Destroy();
     FColonyManagementSystem.Destroy();
     FRenderingSystem.Destroy();
     FMovementSystem.Destroy();
     FCameraMoverSystem.Destroy();
+    ResourceManager::Instance().Finalize();
+    ResourceManager::Delete();
     EnergySystem::Instance().Finalize();
     EnergySystem::Delete();
 
@@ -119,7 +124,7 @@ void GameScenarioUpdater::GameplayUpdate()
         EnergySystem::Instance().Update();
         FColonyManagementSystem.Update();
         FPeonHarvestingSytem.Update();
-        FProductionSystem.Update();
+        FRawResourceProductionSystem.Update();
         FPeonSpawnSystem.Update();
         FPeonLifeSpanSystem.Update();
         FResourceStatsUpdateSystem.Update();
@@ -128,6 +133,8 @@ void GameScenarioUpdater::GameplayUpdate()
         FWorkSystem.Update();
 
         FColonyBuildingSystem.Update();
+
+        ResourceManager::Instance().Update();
 
         WorldManager::Instance().ProcessDestroyEntities();
     }

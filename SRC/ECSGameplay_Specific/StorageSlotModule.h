@@ -66,6 +66,8 @@ public:
     u32 AddResourceInSlot(const EntityId& parUnitId, const GameResource::Type parResource, const u32 parQuantity);
     u32 RemoveResourceInSlot(const EntityId& parUnitId, const GameResource::Type parResource, const u32 parQuantity);
 
+    MemoryView<const StorageSlot> StorageSlots() const { return MemoryView(FSlots.data(), FSlots.size()); }
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
