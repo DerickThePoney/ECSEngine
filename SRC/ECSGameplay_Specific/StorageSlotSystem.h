@@ -9,6 +9,7 @@ class StorageSlotModule;
 class PositionModule;
 class LinkToStorageModule;
 class RawResourceProductionModule;
+class ResourceStorageModule;
 
 struct BuildingNeedsStorageMessage;
 class StorageSlotSystem final : public ModuleSystem
@@ -24,6 +25,11 @@ public:
 
 protected:
     void VirtualUpdate() override;
+
+    void TransfertResourcesFromRawProducersToStorage(ModuleAccessor<ResourceStorageModule>& parResourceStorageAccessor,
+          ModuleAccessor<StorageSlotModule>& parStorageSlotAccessor,
+          ModuleAccessor<LinkToStorageModule>& parLinkToStorageAccessor,
+          ModuleAccessor<RawResourceProductionModule>& parRawProductionAccessor);
 
 private:
     std::vector<EntityId> FBuildingInNeedForStorage;

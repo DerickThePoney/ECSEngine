@@ -13,8 +13,8 @@ namespace ECSEngine
 RawResourceProductionSystem::RawResourceProductionSystem()
     : ModuleSystem()
 {
-    RegisterDepency<RawResourceProductionModule>(Worlds::RESOURCE_PROD);
-    RegisterDepency<ResourceStorageModule>(Worlds::RESOURCE_PROD);
+    RegisterDepency<RawResourceProductionModule>(Worlds::BUILDINGS);
+    RegisterDepency<ResourceStorageModule>(Worlds::BUILDINGS);
 }
 
 RawResourceProductionSystem::~RawResourceProductionSystem()
@@ -25,8 +25,8 @@ void RawResourceProductionSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<RawResourceProductionModule> resourceProductionAccessor(Worlds::RESOURCE_PROD);
-    ModuleAccessor<ResourceStorageModule> resourceStorageAccesor(Worlds::RESOURCE_PROD);
+    ModuleAccessor<RawResourceProductionModule> resourceProductionAccessor(Worlds::BUILDINGS);
+    ModuleAccessor<ResourceStorageModule> resourceStorageAccesor(Worlds::BUILDINGS);
 
     foreachitem(producer, resourceProductionAccessor)
     {

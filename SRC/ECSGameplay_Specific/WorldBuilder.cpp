@@ -69,14 +69,14 @@ void WorldBuilder::CreateWorld() const
     firePlaceContainer.Set<ModuleParameters::Position>(glm::vec3(0.f));
     const EntityId firePlaceId = EntityFactory::CreateEntity(firePlaceTemplate, firePlaceContainer);
 
-    const EntityTemplate* foodTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FFoodTemplateName);
+    /*const EntityTemplate* foodTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FFoodTemplateName);
     AssertRelease(foodTemplate != nullptr);
     AssertRelease(foodTemplate->GetWorldId() == Worlds::RESOURCE_PROD);
     std::vector<EntityId> createdEntities;
     createdEntities.reserve(FGenerationParameters.FNbFoodEntities);
     ModuleParameters::ParameterContainer foodParamContainer;
     CreateNEntityInCicle(
-          FGenerationParameters.FMinFoodRadius, FGenerationParameters.FMaxFoodRadius, FGenerationParameters.FNbFoodEntities, foodTemplate, createdEntities, foodParamContainer);
+          FGenerationParameters.FMinFoodRadius, FGenerationParameters.FMaxFoodRadius, FGenerationParameters.FNbFoodEntities, foodTemplate, createdEntities, foodParamContainer);*/
 
     const EntityTemplate* peonTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FPeonTemplateName);
     AssertRelease(peonTemplate != nullptr);
