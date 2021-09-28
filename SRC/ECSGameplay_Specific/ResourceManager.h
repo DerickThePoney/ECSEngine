@@ -17,6 +17,9 @@ public:
     void Finalize();
     static void Delete();
 
+    u32 GetResourceQuantity(GameResource::Type parResource) const;
+    const ResourceToStoragePair* GetStoragesForResourceIFP(GameResource::Type parResource) const;
+
 protected:
     void VirtualUpdate() override;
 

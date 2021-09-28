@@ -13,6 +13,7 @@ UIInGameMenuController::UIInGameMenuController()
 {
     FMainMenuBarController.Show(true);
     FBuildMenuController.Show(true);
+    FResourcesPanel.Show(true);
 }
 
 void UIInGameMenuController::VirtualInit()
@@ -22,6 +23,7 @@ void UIInGameMenuController::VirtualInit()
     FMainMenuBarController.Init();
     FColonySelectionPanel.Init();
     FBuildMenuController.Init();
+    FResourcesPanel.Init();
 }
 
 void UIInGameMenuController::VirtualUpdate()
@@ -31,6 +33,7 @@ void UIInGameMenuController::VirtualUpdate()
     FMainMenuBarController.Update();
     FColonySelectionPanel.Update();
     FBuildMenuController.Update();
+    FResourcesPanel.Update();
 }
 
 void UIInGameMenuController::VirtualDestroy()
@@ -39,6 +42,7 @@ void UIInGameMenuController::VirtualDestroy()
     FBuildMenuController.Destroy();
     FColonySelectionPanel.Destroy();
     FMainMenuBarController.Destroy();
+    FResourcesPanel.Destroy();
 }
 
 } // namespace UI

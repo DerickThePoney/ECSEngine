@@ -4,6 +4,7 @@
 #include "ECSCore/UIController.h"
 #include "ECSGameplay_Common/UIWindowsPositionning.h"
 #include "MainMenuBarController.h"
+#include "ResourcePanelController.h"
 
 namespace ECSEngine
 {
@@ -24,6 +25,7 @@ private:
     ColonySelectionPanelController FColonySelectionPanel;
     BuildMenuController FBuildMenuController;
     MainMenuBarController FMainMenuBarController;
+    ResourcePanelController FResourcesPanel;
 };
 
 } // namespace UI
