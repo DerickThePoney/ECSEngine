@@ -60,4 +60,22 @@ void ResourceManager::Delete()
     Singleton<ResourceManager>::Destroy();
 }
 
+u32 ResourceManager::GetResourceQuantity(GameResource::Type parResource) const
+{
+    auto itFind = FResources.find(parResource);
+    if (itFind != FResources.end())
+        return itFind->second.first;
+    else
+        return 0;
+}
+
+const ResourceToStoragePair* ResourceManager::GetStoragesForResourceIFP(GameResource::Type parResource) const
+{
+    auto itFind = FResources.find(parResource);
+    if (itFind != FResources.end())
+        return &itFind->second;
+    else
+        return nullptr;
+}
+
 } // namespace ECSEngine
