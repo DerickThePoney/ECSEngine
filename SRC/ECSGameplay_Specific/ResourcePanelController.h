@@ -1,6 +1,8 @@
 #pragma once
 #include "ECSCore/UIController.h"
 #include "ECSGameplay_Common/UIWindowsPositionning.h"
+#include "GameResources.h"
+#include "RmlUi/Config/Config.h"
 #include "UICore/RML_fwd.h"
 #include "UICore/RmlDataModelWrapper.h"
 
@@ -27,7 +29,15 @@ private:
     void FillWindow();
 
 private:
-    bool FIsPlacingBuilding = false;
+    struct ResourceView
+    {
+        GameResource::Type Resource = GameResource::LENGTH;
+        std::string ResourceName;
+        int Quantity = 0;
+    };
+
+    std::map<GameResource::Type, u32> FResourceToIndex;
+    std::vector<ResourceView> FResourceView;
 
     std::unique_ptr<IDataModelWrapper> FDataModelWrapper;
     Rml::ElementDocument* FDocument = nullptr;
