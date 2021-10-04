@@ -36,6 +36,7 @@ void ProductionRecipesManager::DrawInEditor()
         ImGui::SameLine();
 
         FRecipes[i].DrawInEditor();
+        ImGui::Separator();
         ImGui::PopID();
     }
     ImGui::Unindent();
@@ -65,11 +66,21 @@ void ProductionRecipesManager::DrawInEditor()
             AssertNotReached();
         }
     }
-
+    ImGui::Separator();
     if (ImGui::Button(fmt::format("Add Recipe").c_str()))
     {
         FRecipes.push_back(ProductionRecipe());
     }
+}
+
+const ProductionRecipe* ProductionRecipesManager::GetProductionRecipe(const std::string& parName) const
+{
+    foreachitemconst(recipe, FRecipes)
+    {
+        if (recipe.Name() == parName)
+            return &recipe;
+    }
+    return nullptr;
 }
 
 } // namespace ECSEngine
