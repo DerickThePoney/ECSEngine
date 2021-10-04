@@ -21,9 +21,10 @@ private:
     void DrawSpawnRulesEditor();
     void DrawBuildingCostsEditor();
     void DrawConstantsEditor();
+    void DrawProductionRecipes();
 
 private:
-    bool isEditingSpawnRules = true;
+    bool isEditingRules = true;
 };
 
 void GameRulesEditor::DrawEditor(bool* parOpen, float parMenuBarHeight)
@@ -36,21 +37,27 @@ void GameRulesEditor::DrawEditor(bool* parOpen, float parMenuBarHeight)
 
     if (ImGui::BeginTabBar("##GameplayRulesTabBar"))
     {
-        if (ImGui::BeginTabItem("Peon Spawn Rules", &isEditingSpawnRules))
+        if (ImGui::BeginTabItem("Peon Spawn Rules", &isEditingRules))
         {
             DrawSpawnRulesEditor();
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Gameplay constants", &isEditingSpawnRules))
+        if (ImGui::BeginTabItem("Gameplay constants", &isEditingRules))
         {
             DrawConstantsEditor();
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Building costs rules", &isEditingSpawnRules))
+        if (ImGui::BeginTabItem("Building costs rules", &isEditingRules))
         {
             DrawBuildingCostsEditor();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Production recipes", &isEditingRules))
+        {
+            DrawProductionRecipes();
             ImGui::EndTabItem();
         }
 
@@ -113,6 +120,18 @@ void GameRulesEditor::DrawConstantsEditor()
     ImGui::BeginChild(ImGui::GetID("Game rules editor"), utilityPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
     GameplayRulesManager::Instance().DrawConstantsEditor();
+
+    ImGui::EndChild();
+}
+
+void GameRulesEditor::DrawProductionRecipes()
+{
+    const glm::vec2 currentWindowSize = ImGui::GetContentRegionAvail();
+    const glm::vec2 utilityPlace = currentWindowSize - 50.0f;
+    ImGui::SetCursorPosX(((currentWindowSize - utilityPlace) * 0.5f).x);
+    ImGui::BeginChild(ImGui::GetID("Production Recipes"), utilityPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
+    GameplayRulesManager::Instance().FProductionRecipesManager.DrawInEditor();
 
     ImGui::EndChild();
 }
