@@ -20,6 +20,7 @@
 #include "ECSGameplay_Specific/PeonFeedingTimeModule.h"
 #include "ECSGameplay_Specific/PeonSpawnModule.h"
 #include "ECSGameplay_Specific/RawResourceProductionModule.h"
+#include "ECSGameplay_Specific/RecipeProductionModule.h"
 #include "ECSGameplay_Specific/ResourceHarvesterModule.h"
 #include "ECSGameplay_Specific/ResourceStorageModule.h"
 #include "ECSGameplay_Specific/StorageSlotModule.h"
@@ -61,6 +62,7 @@ using BuildingControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::ApparenceModule,
       ECSEngine::ResourceStorageModule,
       ECSEngine::RawResourceProductionModule,
+      ECSEngine::RecipeProductionModule,
       ECSEngine::HousingPlaceModule,
       ECSEngine::BuildingGridOccupancyModule,
       ECSEngine::WorkPlaceModule,
