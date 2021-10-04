@@ -3,20 +3,18 @@
 #include "ProductionRecipe.h"
 
 #include "Application/PropertyDrawer.h"
+#include "ECSGameplaySpecificPropertyDrawers.h"
 
 namespace ECSEngine
 {
 void ProductionRecipe::DrawInEditor()
 {
-    if (ImGui::CollapsingHeader(FName.c_str()))
-    {
-        EDITOR_PROPERTY_STRING("Name", FName, false, "");
+    EDITOR_PROPERTY_STRING("Name", FName, false, "");
 
-        EDITOR_PROPERTY_WITH_LIMITS("Craft duration", FCraftDuration, 0.f, 1000.f);
+    EDITOR_PROPERTY_WITH_LIMITS("Craft duration", FCraftDuration, 0.f, 1000.f);
 
-        DrawComponentsInEditor("Inputs", FInputComponents);
-        DrawComponentsInEditor("Outputs", FOutputComponents);
-    }
+    DrawComponentsInEditor("Inputs", FInputComponents);
+    DrawComponentsInEditor("Outputs", FOutputComponents);
 }
 
 void ProductionRecipe::DrawComponentsInEditor(const std::string& parName, std::vector<RecipeComponent>& parVector)
@@ -50,8 +48,8 @@ void ProductionRecipe::DrawComponentsInEditor(const std::string& parName, std::v
             }
             ImGui::SameLine();
 
-            PropertyDrawer<RecipeComponent> drawer(fmt::format("Item_{}", i), &parVector[i]);
-            drawer.ShowProperty();
+            EDITOR_PROPERTY_RECIPE_COMPONENT(fmt::format("Item_{}", i), parVector[i]);
+
             ImGui::PopID();
         }
         ImGui::Unindent();
