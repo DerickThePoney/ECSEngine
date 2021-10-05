@@ -55,8 +55,10 @@ public:
     float ProductionTimeRemaining() const { return FProductionTimeRemaining; }
     void SetProductionTimeRemaining(float parTime) { FProductionTimeRemaining = parTime; }
 
+	const ProductionRecipe* GetProductionRecipe() const;
+
 private:
-    RecipeProductionState::Type FState;
+    RecipeProductionState::Type FState = RecipeProductionState::IDLE;
     float FProductionTimeRemaining = 0.f;
 };
 

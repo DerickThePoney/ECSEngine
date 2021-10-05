@@ -50,4 +50,11 @@ RecipeProductionModule::~RecipeProductionModule()
 {
 }
 
+const ProductionRecipe* RecipeProductionModule::GetProductionRecipe() const
+{
+    const RecipeProductionModuleTemplate* temp = Template<RecipeProductionModuleTemplate>();
+    AssertRelease(temp != nullptr);
+    return temp->GetProductionRecipe();
+}
+
 } // namespace ECSEngine
