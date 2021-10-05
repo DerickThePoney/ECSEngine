@@ -7,7 +7,7 @@
 #include "ECSGameplay_Specific/PeonFeedingTimeSystem.h"
 #include "ECSGameplay_Specific/PeonSpawnSystem.h"
 #include "ECSGameplay_Specific/PeonsHarvestingSystem.h"
-#include "ECSGameplay_Specific/RawResourceProductionSystem.h"
+#include "ECSGameplay_Specific/ResourceProductionSystem.h"
 #include "ECSGameplay_Specific/ResourceStatisticsUpdateSystem.h"
 #include "ECSGameplay_Specific/StorageSlotSystem.h"
 #include "ECSGameplay_Specific/UserInterfaceSystem.h"
@@ -46,7 +46,7 @@ private:
     ColonyBuildingSystem FColonyBuildingSystem;
     ColonyPeonsTaskAssignmentSystem FColonyManagementSystem;
     PeonsHaverstingSystem FPeonHarvestingSytem;
-    RawResourceProductionSystem FRawResourceProductionSystem;
+    ResourceProductionSystem FRawResourceProductionSystem;
     PeonSpawnSystem FPeonSpawnSystem;
     PeonFeedingTimeSystem FPeonLifeSpanSystem;
     ResourceStatisticsUpdateSystem FResourceStatsUpdateSystem;

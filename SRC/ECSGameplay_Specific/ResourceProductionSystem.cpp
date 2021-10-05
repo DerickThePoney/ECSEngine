@@ -1,62 +1,33 @@
 ﻿#include "stdafx.h"
 
-#include "RawResourceProductionSystem.h"
+#include "ResourceProductionSystem.h"
 
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
-#include "RawResourceProductionModule.h"
 #include "RecipeProductionModule.h"
 #include "ResourceStorageModule.h"
 
 namespace ECSEngine
 {
 
-RawResourceProductionSystem::RawResourceProductionSystem()
+ResourceProductionSystem::ResourceProductionSystem()
     : ModuleSystem()
 {
-    RegisterDepency<RawResourceProductionModule>(Worlds::BUILDINGS);
     RegisterDepency<RecipeProductionModule>(Worlds::BUILDINGS);
     RegisterDepency<ResourceStorageModule>(Worlds::BUILDINGS);
 }
 
-RawResourceProductionSystem::~RawResourceProductionSystem()
+ResourceProductionSystem::~ResourceProductionSystem()
 {
 }
 
-void RawResourceProductionSystem::VirtualUpdate()
+void ResourceProductionSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<RawResourceProductionModule> resourceProductionAccessor(Worlds::BUILDINGS);
     ModuleAccessor<ResourceStorageModule> resourceStorageAccesor(Worlds::BUILDINGS);
-
-    foreachitem(producer, resourceProductionAccessor)
-    {
-        ResourceStorageModule* producerStorage = resourceStorageAccesor[producer.UnitId()];
-        AssertRelease(producerStorage != nullptr);
-
-        const u32 remainingStorageSpace = producerStorage->GetRemainingStorageSpace();
-        u32 producedResources = 0;
-        const float dt = TimeManager::GameplayDeltaTime();
-        MemoryView<RawResourceProductionModule::ProducedRawResourceTiming> resourceTimings = producer.ProducedResourcesTimings();
-        foreachitem(resource, resourceTimings)
-        {
-            if (producedResources >= remainingStorageSpace)
-            {
-                producer.ResetTimingForResource(resource.first);
-                break;
-            }
-            resource.second -= dt;
-            if (resource.second <= 0.f)
-            {
-                const u32 addedResource = producerStorage->AddResource(resource.first, 1);
-                producedResources += addedResource;
-                producer.ResetTimingForResource(resource.first);
-            }
-        }
-    }
-
     ModuleAccessor<RecipeProductionModule> recipeProductionAccessor(Worlds::BUILDINGS);
+
     foreachitem(producer, recipeProductionAccessor)
     {
         const ProductionRecipe* recipe = producer.GetProductionRecipe();
