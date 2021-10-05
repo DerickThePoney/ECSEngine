@@ -10,6 +10,7 @@
 #include "ECSGameplay_Common/PositionModule.h"
 #include "LinkToStorageModule.h"
 #include "RawResourceProductionModule.h"
+#include "RecipeProductionModule.h"
 #include "ResourceStorageModule.h"
 #include "StorageSlotModule.h"
 
@@ -22,7 +23,7 @@ StorageSlotSystem::StorageSlotSystem()
     RegisterDepency<ResourceStorageModule>(Worlds::BUILDINGS);
     RegisterDepency<LinkToStorageModule>(Worlds::BUILDINGS);
     RegisterDepency<PositionModule>(Worlds::BUILDINGS);
-    RegisterDepency<RawResourceProductionModule>(Worlds::BUILDINGS);
+    RegisterDepency<RecipeProductionModule>(Worlds::BUILDINGS);
 }
 
 void StorageSlotSystem::VirtualUpdate()
@@ -33,21 +34,21 @@ void StorageSlotSystem::VirtualUpdate()
     ModuleAccessor<ResourceStorageModule> resourceStorageAccessor(Worlds::BUILDINGS);
     ModuleAccessor<LinkToStorageModule> linkToStorageAccessor(Worlds::BUILDINGS);
     ModuleAccessor<PositionModule> positionAccessor(Worlds::BUILDINGS);
-    ModuleAccessor<RawResourceProductionModule> rawProdAccessor(Worlds::BUILDINGS);
+    ModuleAccessor<RecipeProductionModule> recipeProdAccessor(Worlds::BUILDINGS);
 
-    auto functor = [this, &storageSlotAccessor, &positionAccessor, &linkToStorageAccessor, &rawProdAccessor](const BuildingNeedsStorageMessage& parMessage) {
-        this->ProcessMessages(parMessage, storageSlotAccessor, positionAccessor, linkToStorageAccessor, rawProdAccessor);
+    auto functor = [this, &storageSlotAccessor, &positionAccessor, &linkToStorageAccessor, &recipeProdAccessor](const BuildingNeedsStorageMessage& parMessage) {
+        this->ProcessMessages(parMessage, storageSlotAccessor, positionAccessor, linkToStorageAccessor, recipeProdAccessor);
     };
     GenericMessageManager::Instance().ProcessMessages<GenericMessageId::BUILDING_NEEDS_STORAGE, BuildingNeedsStorageMessage>(functor);
 
-    TransfertResourcesFromRawProducersToStorage(resourceStorageAccessor, storageSlotAccessor, linkToStorageAccessor, rawProdAccessor);
+    TransfertResourcesFromRawProducersToStorage(resourceStorageAccessor, storageSlotAccessor, linkToStorageAccessor, recipeProdAccessor);
 }
 
 void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMessage,
       ModuleAccessor<StorageSlotModule>& parStorageSlotAccessor,
       ModuleAccessor<PositionModule>& parPositionModuleAccessor,
       ModuleAccessor<LinkToStorageModule>& parLinkToStorageAccessor,
-      ModuleAccessor<RawResourceProductionModule>& parRawProductionAccessor)
+      ModuleAccessor<RecipeProductionModule>& parRecipeProductionAccessor)
 {
     LinkToStorageModule* linkToStorageForEntity = parLinkToStorageAccessor[parMessage.FUnitId];
     AssertRelease(linkToStorageForEntity != nullptr);
@@ -56,11 +57,16 @@ void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMe
 
     std::vector<GameResource::Type> resourcesToReserve;
 
-    const RawResourceProductionModule* rawProdModuleForEntity = parRawProductionAccessor[parMessage.FUnitId];
-    if (rawProdModuleForEntity)
+    const RecipeProductionModule* recipeProdModuleForEntity = parRecipeProductionAccessor[parMessage.FUnitId];
+    if (recipeProdModuleForEntity != nullptr)
     {
-        auto producedRes = rawProdModuleForEntity->ProducedResourcesTimings();
-        foreachitemconst(res, producedRes) { resourcesToReserve.push_back(res.first); }
+        const ProductionRecipe* recipe = recipeProdModuleForEntity->GetProductionRecipe();
+        AlwaysCheckedAssert(recipe != nullptr);
+        if (recipe != nullptr)
+        {
+            MemoryView<const RecipeComponent> outputResources = recipe->OutputComponents();
+            foreachitemconst(res, outputResources) { resourcesToReserve.push_back(res.first); }
+        }
     }
 
     AlwaysCheckedAssert(!resourcesToReserve.empty());
@@ -95,14 +101,19 @@ void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMe
 void StorageSlotSystem::TransfertResourcesFromRawProducersToStorage(ModuleAccessor<ResourceStorageModule>& parResourceStorageAccessor,
       ModuleAccessor<StorageSlotModule>& parStorageSlotAccessor,
       ModuleAccessor<LinkToStorageModule>& parLinkToStorageAccessor,
-      ModuleAccessor<RawResourceProductionModule>& parRawProductionAccessor)
+      ModuleAccessor<RecipeProductionModule>& parRecipeProductionAccessor)
 {
-    foreachitemconst(rawProducer, parRawProductionAccessor)
+    foreachitemconst(recipeProducer, parRecipeProductionAccessor)
     {
-        auto producedRes = rawProducer.ProducedResourcesTimings();
-        ResourceStorageModule* resStorage = parResourceStorageAccessor[rawProducer.UnitId()];
+        const ProductionRecipe* recipe = recipeProducer.GetProductionRecipe();
+        AlwaysCheckedAssert(recipe != nullptr);
+        if (recipe == nullptr)
+            continue;
+
+        MemoryView<const RecipeComponent> producedRes = recipe->OutputComponents();
+        ResourceStorageModule* resStorage = parResourceStorageAccessor[recipeProducer.UnitId()];
         AssertRelease(resStorage != nullptr);
-        const LinkToStorageModule* linkToStorage = parLinkToStorageAccessor[rawProducer.UnitId()];
+        const LinkToStorageModule* linkToStorage = parLinkToStorageAccessor[recipeProducer.UnitId()];
         AssertRelease(linkToStorage != nullptr);
 
         const EntityId storage = linkToStorage->StorageId();
@@ -117,11 +128,11 @@ void StorageSlotSystem::TransfertResourcesFromRawProducersToStorage(ModuleAccess
             const u32 resQ = resStorage->GetResourceQuantity(res.first);
             if (resQ > 0)
             {
-                const u32 maxFreeSpaceInStorage = storageSlotModule->GetFreeSpaceInSlot(rawProducer.UnitId(), res.first);
+                const u32 maxFreeSpaceInStorage = storageSlotModule->GetFreeSpaceInSlot(recipeProducer.UnitId(), res.first);
                 if (maxFreeSpaceInStorage > 0)
                 {
                     const u32 resRemoved = resStorage->RemoveResource(res.first, glm::min(resQ, maxFreeSpaceInStorage));
-                    storageSlotModule->AddResourceInSlot(rawProducer.UnitId(), res.first, resRemoved);
+                    storageSlotModule->AddResourceInSlot(recipeProducer.UnitId(), res.first, resRemoved);
                 }
             }
         }
