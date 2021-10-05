@@ -38,13 +38,13 @@ void ResourceManager::VirtualUpdate()
             {
                 ResourceToStoragePair pair;
                 pair.first = slot.Quantity;
-                pair.second.insert(slot.FReservedForBuilding);
+                pair.second.insert(storageSlotModule.UnitId());
                 FResources.insert_or_assign(slot.Resource, pair);
             }
             else
             {
                 itFind->second.first += slot.Quantity;
-                itFind->second.second.insert(slot.FReservedForBuilding);
+                itFind->second.second.insert(storageSlotModule.UnitId());
             }
         }
     }
@@ -76,6 +76,18 @@ const ResourceToStoragePair* ResourceManager::GetStoragesForResourceIFP(GameReso
         return &itFind->second;
     else
         return nullptr;
+}
+
+void ResourceManager::ConsumeFromStorage(GameResource::Type parResource, u32 parQuantity, StorageSlotModule* parStorageSlotModule)
+{
+    auto itFind = FResources.find(parResource);
+    AssertRelease(itFind != FResources.end());
+    AssertRelease(itFind->second.first >= parQuantity);
+    AssertRelease(itFind->second.second.find(parStorageSlotModule->UnitId()) != itFind->second.second.end());
+
+    const u32 resourceRemoved = parStorageSlotModule->RemoveResourceInSlot(parResource, parQuantity);
+    if (parStorageSlotModule->GetNbResources(parResource) == 0)
+        itFind->second.second.erase(parStorageSlotModule->UnitId());
 }
 
 } // namespace ECSEngine

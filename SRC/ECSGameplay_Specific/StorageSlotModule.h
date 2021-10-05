@@ -62,9 +62,10 @@ public:
 
     bool ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<const GameResource::Type> parRessources);
 
+    u32 GetNbResources(const GameResource::Type parResource) const;
     u32 GetFreeSpaceInSlot(const EntityId& parUnitId, const GameResource::Type parResource) const;
     u32 AddResourceInSlot(const EntityId& parUnitId, const GameResource::Type parResource, const u32 parQuantity);
-    u32 RemoveResourceInSlot(const EntityId& parUnitId, const GameResource::Type parResource, const u32 parQuantity);
+    u32 RemoveResourceInSlot(const GameResource::Type parResource, const u32 parQuantity);
 
     MemoryView<const StorageSlot> StorageSlots() const { return MemoryView(FSlots.data(), FSlots.size()); }
 

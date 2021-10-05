@@ -26,7 +26,12 @@ public:
 protected:
     void VirtualUpdate() override;
 
-    void TransfertResourcesFromRawProducersToStorage(ModuleAccessor<ResourceStorageModule>& parResourceStorageAccessor,
+    void TransfertResourcesFromProducersToStorage(ModuleAccessor<ResourceStorageModule>& parResourceStorageAccessor,
+          ModuleAccessor<StorageSlotModule>& parStorageSlotAccessor,
+          ModuleAccessor<LinkToStorageModule>& parLinkToStorageAccessor,
+          ModuleAccessor<RecipeProductionModule>& parRecipeProductionAccessor);
+
+    void TransfertResourcesFromStoragesToProducers(ModuleAccessor<ResourceStorageModule>& parResourceStorageAccessor,
           ModuleAccessor<StorageSlotModule>& parStorageSlotAccessor,
           ModuleAccessor<LinkToStorageModule>& parLinkToStorageAccessor,
           ModuleAccessor<RecipeProductionModule>& parRecipeProductionAccessor);
