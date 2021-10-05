@@ -99,6 +99,18 @@ bool StorageSlotModule::ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<co
     return true;
 }
 
+u32 StorageSlotModule::GetNbResources(const GameResource::Type parResource) const
+{
+    u32 res = 0;
+    foreachitem(slot, FSlots)
+    {
+        if (slot.Resource != parResource)
+            continue;
+        res += slot.Quantity;
+    }
+    return res;
+}
+
 u32 StorageSlotModule::GetFreeSpaceInSlot(const EntityId& parUnitId, const GameResource::Type parResource) const
 {
     foreachitemconst(slot, FSlots)
@@ -131,21 +143,24 @@ u32 StorageSlotModule::AddResourceInSlot(const EntityId& parUnitId, const GameRe
     return 0;
 }
 
-u32 StorageSlotModule::RemoveResourceInSlot(const EntityId& parUnitId, const GameResource::Type parResource, const u32 parQuantity)
+u32 StorageSlotModule::RemoveResourceInSlot(const GameResource::Type parResource, const u32 parQuantity)
 {
+    u32 toRemove = parQuantity;
+    u32 currentlyRemoved = 0;
     foreachitem(slot, FSlots)
     {
-        if (slot.FReservedForBuilding != parUnitId)
-            continue;
         if (slot.Resource != parResource)
             continue;
-        AlwaysCheckedAssert(slot.Quantity >= parQuantity);
-        slot.Quantity -= parQuantity;
-        return parQuantity;
+        const u32 resourceToRemove = glm::min(slot.Quantity, toRemove);
+        slot.Quantity -= resourceToRemove;
+        currentlyRemoved += resourceToRemove;
+        toRemove -= resourceToRemove;
+        if (toRemove == 0)
+            return parQuantity;
     }
 
     AssertNotReached();
-    return 0;
+    return currentlyRemoved;
 }
 
 void StorageSlotModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)

@@ -10,6 +10,7 @@
 #include "ECSGameplay_Common/PositionModule.h"
 #include "LinkToStorageModule.h"
 #include "RecipeProductionModule.h"
+#include "ResourceManager.h"
 #include "ResourceStorageModule.h"
 #include "StorageSlotModule.h"
 
@@ -40,7 +41,9 @@ void StorageSlotSystem::VirtualUpdate()
     };
     GenericMessageManager::Instance().ProcessMessages<GenericMessageId::BUILDING_NEEDS_STORAGE, BuildingNeedsStorageMessage>(functor);
 
-    TransfertResourcesFromRawProducersToStorage(resourceStorageAccessor, storageSlotAccessor, linkToStorageAccessor, recipeProdAccessor);
+    TransfertResourcesFromProducersToStorage(resourceStorageAccessor, storageSlotAccessor, linkToStorageAccessor, recipeProdAccessor);
+
+    TransfertResourcesFromStoragesToProducers(resourceStorageAccessor, storageSlotAccessor, linkToStorageAccessor, recipeProdAccessor);
 }
 
 void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMessage,
@@ -97,7 +100,7 @@ void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMe
     GenericMessageManager::Instance().PushMessage<GenericMessageId::BUILDING_NEEDS_STORAGE>(newMessage);
 }
 
-void StorageSlotSystem::TransfertResourcesFromRawProducersToStorage(ModuleAccessor<ResourceStorageModule>& parResourceStorageAccessor,
+void StorageSlotSystem::TransfertResourcesFromProducersToStorage(ModuleAccessor<ResourceStorageModule>& parResourceStorageAccessor,
       ModuleAccessor<StorageSlotModule>& parStorageSlotAccessor,
       ModuleAccessor<LinkToStorageModule>& parLinkToStorageAccessor,
       ModuleAccessor<RecipeProductionModule>& parRecipeProductionAccessor)
@@ -134,6 +137,60 @@ void StorageSlotSystem::TransfertResourcesFromRawProducersToStorage(ModuleAccess
                     storageSlotModule->AddResourceInSlot(recipeProducer.UnitId(), res.first, resRemoved);
                 }
             }
+        }
+    }
+}
+
+void StorageSlotSystem::TransfertResourcesFromStoragesToProducers(ModuleAccessor<ResourceStorageModule>& parResourceStorageAccessor,
+      ModuleAccessor<StorageSlotModule>& parStorageSlotAccessor,
+      ModuleAccessor<LinkToStorageModule>& parLinkToStorageAccessor,
+      ModuleAccessor<RecipeProductionModule>& parRecipeProductionAccessor)
+{
+    foreachitemconst(recipeProducer, parRecipeProductionAccessor)
+    {
+        // TODO Check fill up
+        if (recipeProducer.State() == RecipeProductionState::PRODUCING)
+            continue;
+        const ProductionRecipe* recipe = recipeProducer.GetProductionRecipe();
+        AlwaysCheckedAssert(recipe != nullptr);
+        if (recipe == nullptr)
+            continue;
+
+        MemoryView<const RecipeComponent> inputResources = recipe->InputComponents();
+        ResourceStorageModule* resStorage = parResourceStorageAccessor[recipeProducer.UnitId()];
+        AssertRelease(resStorage != nullptr);
+
+        u32 wantedResourceQty = 0;
+        bool canGetEveryThing = true;
+        foreachitemconst(inputResource, inputResources)
+        {
+            wantedResourceQty += inputResource.second;
+            if (ResourceManager::Instance().GetResourceQuantity(inputResource.first) < inputResource.second)
+            {
+                canGetEveryThing = false;
+                break;
+            }
+        }
+
+        if (resStorage->GetRemainingStorageSpace() < wantedResourceQty || !canGetEveryThing)
+            continue;
+
+        foreachitemconst(inputResource, inputResources)
+        {
+            u32 resourcesToGet = inputResource.second;
+            while (resourcesToGet > 0)
+            {
+                const auto storages = ResourceManager::Instance().GetStoragesForResourceIFP(inputResource.first);
+                AssertRelease(!storages->second.empty());
+                const EntityId& storage = *storages->second.begin();
+                StorageSlotModule* slotModule = parStorageSlotAccessor[storage];
+                AssertRelease(slotModule != nullptr);
+                const u32 quantityInSlots = slotModule->GetNbResources(inputResource.first);
+                const u32 qtyToGet = glm::min(quantityInSlots, inputResource.second);
+                ResourceManager::Instance().ConsumeFromStorage(inputResource.first, qtyToGet, slotModule);
+                resourcesToGet -= qtyToGet;
+            }
+            resStorage->AddResource(inputResource.first, inputResource.second);
         }
     }
 }

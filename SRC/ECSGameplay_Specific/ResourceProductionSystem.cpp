@@ -49,7 +49,7 @@ void ResourceProductionSystem::VirtualUpdate()
             bool hasNecessaryResources = true;
             foreachitemconst(inputComponent, inputComponents)
             {
-                if (producerStorage->GetResourceQuantity(inputComponent.first) < inputComponent.first)
+                if (producerStorage->GetResourceQuantity(inputComponent.first) < inputComponent.second)
                 {
                     hasNecessaryResources = false;
                     break;
