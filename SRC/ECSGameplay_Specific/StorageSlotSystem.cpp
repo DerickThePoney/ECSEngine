@@ -9,7 +9,6 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSGameplay_Common/PositionModule.h"
 #include "LinkToStorageModule.h"
-#include "RawResourceProductionModule.h"
 #include "RecipeProductionModule.h"
 #include "ResourceStorageModule.h"
 #include "StorageSlotModule.h"
