@@ -61,8 +61,7 @@ void ResourceProductionSystem::VirtualUpdate()
 
             // check output space
             const u32 availableSpace = producerStorage->GetRemainingStorageSpace();
-            u32 wantedSpace = 0;
-            foreachitemconst(outputComponent, outputComponents) { wantedSpace += outputComponent.second; }
+            const u32 wantedSpace = recipe->TotalQuantityOfOutputResourcesNecessary();
             if (wantedSpace > availableSpace)
                 continue;
 

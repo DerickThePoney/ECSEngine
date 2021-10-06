@@ -148,9 +148,6 @@ void StorageSlotSystem::TransfertResourcesFromStoragesToProducers(ModuleAccessor
 {
     foreachitemconst(recipeProducer, parRecipeProductionAccessor)
     {
-        // TODO Check fill up
-        if (recipeProducer.State() == RecipeProductionState::PRODUCING)
-            continue;
         const ProductionRecipe* recipe = recipeProducer.GetProductionRecipe();
         AlwaysCheckedAssert(recipe != nullptr);
         if (recipe == nullptr)
@@ -172,7 +169,9 @@ void StorageSlotSystem::TransfertResourcesFromStoragesToProducers(ModuleAccessor
             }
         }
 
-        if (resStorage->GetRemainingStorageSpace() < wantedResourceQty || !canGetEveryThing)
+        const u32 outputResourceQty = recipe->TotalQuantityOfOutputResourcesNecessary();
+
+        if (resStorage->GetRemainingStorageSpace() < (wantedResourceQty + outputResourceQty) || !canGetEveryThing)
             continue;
 
         foreachitemconst(inputResource, inputResources)
@@ -186,7 +185,8 @@ void StorageSlotSystem::TransfertResourcesFromStoragesToProducers(ModuleAccessor
                 StorageSlotModule* slotModule = parStorageSlotAccessor[storage];
                 AssertRelease(slotModule != nullptr);
                 const u32 quantityInSlots = slotModule->GetNbResources(inputResource.first);
-                const u32 qtyToGet = glm::min(quantityInSlots, inputResource.second);
+                const u32 qtyToGet = glm::min(quantityInSlots, resourcesToGet);
+
                 ResourceManager::Instance().ConsumeFromStorage(inputResource.first, qtyToGet, slotModule);
                 resourcesToGet -= qtyToGet;
             }
