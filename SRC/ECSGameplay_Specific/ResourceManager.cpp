@@ -86,6 +86,8 @@ void ResourceManager::ConsumeFromStorage(GameResource::Type parResource, u32 par
     AssertRelease(itFind->second.second.find(parStorageSlotModule->UnitId()) != itFind->second.second.end());
 
     const u32 resourceRemoved = parStorageSlotModule->RemoveResourceInSlot(parResource, parQuantity);
+    AssertRelease(resourceRemoved <= itFind->second.first);
+    itFind->second.first -= resourceRemoved;
     if (parStorageSlotModule->GetNbResources(parResource) == 0)
         itFind->second.second.erase(parStorageSlotModule->UnitId());
 }
