@@ -23,6 +23,8 @@ public:
     {
         if (FMessagesQueues.size() <= Id)
             return;
+        if (FMessagesQueues[Id].empty())
+            return;
 
         std::vector<std::unique_ptr<GenericMessage>> messages;
         {
