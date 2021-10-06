@@ -7,6 +7,26 @@
 
 namespace ECSEngine
 {
+u32 ProductionRecipe::TotalQuantityOfInputResourcesNecessary() const
+{
+	u32 res = 0;
+	foreachitemconst(inputResource, FInputComponents)
+	{
+		res += inputResource.second;
+	}
+	return res;
+}
+
+u32 ProductionRecipe::TotalQuantityOfOutputResourcesNecessary() const
+{
+	u32 res = 0;
+	foreachitemconst(outputResource, FOutputComponents)
+	{
+		res += outputResource.second;
+	}
+	return res;
+}
+
 void ProductionRecipe::DrawInEditor()
 {
     EDITOR_PROPERTY_STRING("Name", FName, false, "");
