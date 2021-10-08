@@ -9,6 +9,7 @@ namespace Rendering
 {
 class Carrier;
 class VisualModel;
+class GFXSelectable;
 
 class GFXRepresentation;
 class GFXRepresentationDescriptor
@@ -50,6 +51,8 @@ struct GFXRepresentationInitialiser
 
     std::string FRepresentationDescriptor;
 
+    std::pair<bool, bool> FIsSelectable;
+
     bool HasCarier = false;
     bool HasVisuals = false;
 };
@@ -71,6 +74,7 @@ public:
     const Carrier* GetCarrier() const { return FCarrier.get(); }
     const VisualModel* GetVisualModel() const { return FVisualModel.get(); }
     const SkelettonPose* GetPose() const { return FSkelettonPose; }
+    const GFXSelectable* GetSelectable() const { return FSelectable.get(); }
 
     u32 Id() const { return FId; }
 
@@ -81,8 +85,9 @@ private:
 private:
     std::unique_ptr<Carrier> FCarrier = nullptr;
     std::unique_ptr<VisualModel> FVisualModel = nullptr;
-
     SkelettonPose* FSkelettonPose = nullptr;
+
+    std::unique_ptr<GFXSelectable> FSelectable = nullptr;
 
     std::vector<std::unique_ptr<AbstractGFXOperator>> FGFXOperators;
 

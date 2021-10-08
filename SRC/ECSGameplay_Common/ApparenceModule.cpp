@@ -54,6 +54,8 @@ void ApparenceModuleTemplate::VirtualDrawEditor()
         }
         ImGui::EndCombo();
     }
+
+    EDITOR_PROPERTY_BOOL("Is selectable", FIsSelectable);
 }
 
 ApparenceModule::ApparenceModule()
@@ -92,6 +94,7 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
     AssertRelease(!Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName().empty());
     init.FRepresentationDescriptor = Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName();
     init.HasVisuals = true;
+    init.FIsSelectable = { true, true };
 
     FProxy->Initialise(init);
 }

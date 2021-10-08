@@ -22,11 +22,13 @@ public:
     virtual Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
     const std::string& GFXRepresentationDescriptorName() const { return FGFXRepresentationDescriptorName; }
+    bool IsSelectable() const { return FIsSelectable; }
 
     template<class Archive>
     void serialize(Archive& ar)
     {
         PROPERTYFIELD(GFXRepresentationDescriptorName, "");
+        PROPERTYFIELD(IsSelectable, true);
     }
 
 protected:
@@ -34,6 +36,8 @@ protected:
 
 private:
     std::string FGFXRepresentationDescriptorName;
+
+    bool FIsSelectable = true;
 };
 
 class ApparenceModule final : public Module
