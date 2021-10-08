@@ -6,6 +6,7 @@
 #include "Carrier.h"
 #include "GFXKeyHelper.h"
 #include "GFXRepresentationDescriptorManager.h"
+#include "GFXSelectable.h"
 #include "SkelettonManager.h"
 #include "VisualModel.h"
 
@@ -79,6 +80,13 @@ void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
         FSkelettonPose = SkelettonManager::Instance().CreateSkelettonPose_ReturnPose(FId, FVisualModel->GetMeshHandle());
     }
 
+    if (parInit.FIsSelectable.first)
+    {
+        FSelectable.reset(new GFXSelectable());
+        AssertRelease(FSelectable != nullptr);
+        FSelectable->Init(parInit.FIsSelectable.second);
+    }
+
     const MemoryView<const std::unique_ptr<AbstractGFXOperatorDescriptor>> operators = descriptor->OperatorDescriptors();
     FGFXOperators.reserve(operators.size());
     forrange(i, 0, operators.size()) { FGFXOperators.push_back(std::unique_ptr<AbstractGFXOperator>(operators[i]->CreateOperator())); }
@@ -137,6 +145,12 @@ void GFXRepresentation::ProcessMessages()
     {
         auto visible = currentMessages.GetValueIFP<bool>(GFXKeyHelper::Instance().Visible);
         FVisualModel->SetVisible(visible.first);
+    }
+
+    if (FSelectable != nullptr && currentMessages.HasMessage(GFXKeyHelper::Instance().Selectable))
+    {
+        auto selectable = currentMessages.GetValueIFP<bool>(GFXKeyHelper::Instance().Selectable);
+        FSelectable->SetSelectable(selectable.first);
     }
 }
 
