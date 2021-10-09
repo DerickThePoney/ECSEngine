@@ -2,6 +2,7 @@
 
 #include "GFXRepresentationManager.h"
 
+#include "GFXSelectable.h"
 #include "SkelettonManager.h"
 
 namespace ECSEngine
@@ -38,8 +39,25 @@ void GFXRepresentationManager::OnGameplayFrameEnded()
     // swap the queues here? transfer queue from proxy to representations?
 }
 
+std::pair<bool, bool> GFXRepresentationManager::IsGFXSelectedOrHighlighted(const u32 parId) const
+{
+    std::scoped_lock<std::mutex> lock(FMutex);
+    AssertRelease(parId != -1);
+    auto itFind = FGFXRepresentations.find(parId);
+    AssertRelease(itFind != FGFXRepresentations.end());
+    AssertRelease(itFind->second != nullptr);
+
+    const GFXRepresentation* rep = itFind->second.get();
+
+    const bool selected = rep->GetSelectable() != nullptr && rep->GetSelectable()->IsSelected();
+    const bool highlithed = rep->GetSelectable() != nullptr && rep->GetSelectable()->IsHighlighted();
+
+    return { selected, highlithed };
+}
+
 u32 GFXRepresentationManager::CreateGFXRepresentation(const GFXRepresentationInitialiser& parInit)
 {
+    std::scoped_lock<std::mutex> lock(FMutex);
     const u32 newId = FGFXIdGenerator.GetNextId();
     GFXRepresentation* newRep = new GFXRepresentation(newId);
     newRep->Initialise(parInit);
@@ -49,6 +67,7 @@ u32 GFXRepresentationManager::CreateGFXRepresentation(const GFXRepresentationIni
 
 void GFXRepresentationManager::DeleteGFXRepresentation(const u32 parId)
 {
+    std::scoped_lock<std::mutex> lock(FMutex);
     AssertRelease(parId != -1);
     auto itFind = FGFXRepresentations.find(parId);
     AssertRelease(itFind != FGFXRepresentations.end());

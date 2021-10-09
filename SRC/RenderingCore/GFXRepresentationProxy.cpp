@@ -22,6 +22,12 @@ void GFXRepresentationProxy::Initialise(const GFXRepresentationInitialiser& parI
     AssertRelease(FId != -1);
 }
 
+std::pair<bool, bool> GFXRepresentationProxy::IsGFXSelectedOrHighlighted() const
+{
+    AssertRelease(FId != -1);
+    return GFXRepresentationManager::Instance().IsGFXSelectedOrHighlighted(FId);
+}
+
 void GFXRepresentationProxy::Cleanup()
 {
     AssertRelease(FId != -1);
