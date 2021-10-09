@@ -16,6 +16,7 @@ public:
 
     u32 CreateGFXRepresentation(const GFXRepresentationInitialiser& parInit);
     void DeleteGFXRepresentation(const u32 parId);
+    std::pair<bool, bool> IsGFXSelectedOrHighlighted(const u32 parId) const;
 
     template<typename T>
     void PushMessage(const u32& parId, u32 parKey, const T& parData, const float parTime)
@@ -35,7 +36,7 @@ private:
     std::map<u32, std::unique_ptr<GFXRepresentation>> FGFXRepresentations;
 
     std::atomic_bool FGameplayFrameEnded = false;
-    std::mutex FMutex;
+    mutable std::mutex FMutex;
 };
 } // namespace Rendering
 } // namespace ECSEngine

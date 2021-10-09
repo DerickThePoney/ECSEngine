@@ -1,0 +1,37 @@
+#include "stdafx.h"
+
+#include "SelectionManager.h"
+
+#include "ApparenceModule.h"
+#include "ECSCore/EntityId.h"
+#include "ECSCore/ModuleAccessor.h"
+#include "RenderingCore/GFXRepresentationProxy.h"
+
+namespace ECSEngine
+{
+SelectionManager::SelectionManager()
+    : ModuleSystem()
+    , Singleton()
+{
+    RegisterDepency<ApparenceModule>(Worlds::BUILDINGS);
+}
+
+void SelectionManager::VirtualUpdate()
+{
+    ModuleSystem::VirtualUpdate();
+
+    ModuleAccessor<ApparenceModule> apparenceAccessor(Worlds::BUILDINGS);
+
+    FSelectedUnits.clear();
+    FHighlightedUnits.clear();
+    foreachitemconst(apparence, apparenceAccessor)
+    {
+        const Rendering::GFXRepresentationProxy* proxy = apparence.Proxy();
+        auto selection = proxy->IsGFXSelectedOrHighlighted();
+        if (selection.first)
+            FSelectedUnits.insert(apparence.UnitId());
+        if (selection.second)
+            FHighlightedUnits.insert(apparence.UnitId());
+    }
+}
+} // namespace ECSEngine

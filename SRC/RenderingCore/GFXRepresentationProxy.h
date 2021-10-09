@@ -18,8 +18,10 @@ public:
     void Initialise(const GFXRepresentationInitialiser& parInitialise);
     void Cleanup();
 
+    std::pair<bool, bool> IsGFXSelectedOrHighlighted() const;
+
     template<typename T>
-    void PushMessage(u32 parKey, const T& parData, const float parTime)
+    void PushMessage(u32 parKey, const T& parData, const float parTime) const
     {
         AssertRelease(FId != -1);
         GFXRepresentationManager::Instance().PushMessage(FId, parKey, parData, parTime);
