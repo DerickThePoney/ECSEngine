@@ -10,6 +10,7 @@ class MaterialInstanceHandle;
 struct CircleFeedbackParameters;
 struct CircularGridChunkFeedbackParameters;
 class SkelettonPose;
+class TextureHandle;
 
 //----------------------------------------------------------------
 //          IDrawCommand
@@ -92,6 +93,12 @@ public:
           const glm::mat4 parTransform = glm::identity<glm::mat4>());
 
     void BlitWithMaterial(const MaterialInstanceHandle& parMaterialInstanceHandle);
+
+    void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parHandle, const u32 parSlot);
+    void SetFreeFormSamplerUniform(const std::string& parUniformName, const u32& parHandle, const u32 parSlot);
+    void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue);
+    void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue);
+    void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue);
 
     void Submit();
 
