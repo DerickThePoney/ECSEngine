@@ -86,8 +86,6 @@ SetViewTranformCommand::~SetViewTranformCommand()
 
 void SetViewTranformCommand::SubmitCommand() const
 {
-    glm::mat4 inv = glm::inverse(FViewTransform);
-    glm::mat4 inv2 = glm::inverse(FProjection);
     bgfx::setViewTransform(FViewId, &FViewTransform[0][0], &FProjection[0][0]);
 }
 
@@ -1275,6 +1273,175 @@ void BlitWithMaterialCommand::SubmitCommand() const
 }
 
 //----------------------------------------------------------------
+//          SetSamplerUniformCommand
+//----------------------------------------------------------------
+
+class SetSamplerUniformCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(SetSamplerUniformCommand);
+
+public:
+    SetSamplerUniformCommand(const u16 parViewId, const std::string& parUniformName, const TextureHandle& parHandle, const u32 parSlot);
+    virtual ~SetSamplerUniformCommand() = default;
+
+    virtual void SubmitCommand() const override;
+
+private:
+    std::string FUniformName;
+    TextureHandle FHandle;
+    u32 FSlot;
+};
+
+IMPLEMENT_POOL_ALLOCATED(SetSamplerUniformCommand);
+
+SetSamplerUniformCommand::SetSamplerUniformCommand(const u16 parViewId, const std::string& parUniformName, const TextureHandle& parHandle, const u32 parSlot)
+    : IDrawCommand(parViewId)
+    , FUniformName(parUniformName)
+    , FHandle(parHandle)
+    , FSlot(parSlot)
+{
+}
+
+void SetSamplerUniformCommand::SubmitCommand() const
+{
+    MaterialManager::SetSamplerUniform(FUniformName, FHandle, FSlot);
+}
+
+//----------------------------------------------------------------
+//          SetFreeFormSamplerUniformCommand
+//----------------------------------------------------------------
+
+class SetFreeFormSamplerUniformCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(SetFreeFormSamplerUniformCommand);
+
+public:
+    SetFreeFormSamplerUniformCommand(const u16 parViewId, const std::string& parUniformName, const u32& parHandle, const u32 parSlot);
+    virtual ~SetFreeFormSamplerUniformCommand() = default;
+
+    virtual void SubmitCommand() const override;
+
+private:
+    std::string FUniformName;
+    u32 FHandle;
+    u32 FSlot;
+};
+
+IMPLEMENT_POOL_ALLOCATED(SetFreeFormSamplerUniformCommand);
+
+SetFreeFormSamplerUniformCommand::SetFreeFormSamplerUniformCommand(const u16 parViewId, const std::string& parUniformName, const u32& parHandle, const u32 parSlot)
+    : IDrawCommand(parViewId)
+    , FUniformName(parUniformName)
+    , FHandle(parHandle)
+    , FSlot(parSlot)
+{
+}
+
+void SetFreeFormSamplerUniformCommand::SubmitCommand() const
+{
+    MaterialManager::SetFreeFormSamplerUniform(FUniformName, FHandle, FSlot);
+}
+
+//----------------------------------------------------------------
+//          SetVec4UniformCommand
+//----------------------------------------------------------------
+
+class SetVec4UniformCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(SetVec4UniformCommand);
+
+public:
+    SetVec4UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::vec4& parUniformValue);
+    virtual ~SetVec4UniformCommand() = default;
+
+    virtual void SubmitCommand() const override;
+
+private:
+    std::string FUniformName;
+    glm::vec4 FData;
+};
+
+IMPLEMENT_POOL_ALLOCATED(SetVec4UniformCommand);
+
+SetVec4UniformCommand::SetVec4UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::vec4& parUniformValue)
+    : IDrawCommand(parViewId)
+    , FUniformName(parUniformName)
+    , FData(parUniformValue)
+{
+}
+
+void SetVec4UniformCommand::SubmitCommand() const
+{
+    MaterialManager::SetVec4Uniform(FUniformName, FData);
+}
+
+//----------------------------------------------------------------
+//          SetMat3UniformCommand
+//----------------------------------------------------------------
+
+class SetMat3UniformCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(SetMat3UniformCommand);
+
+public:
+    SetMat3UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::mat3& parUniformValue);
+    virtual ~SetMat3UniformCommand() = default;
+
+    virtual void SubmitCommand() const override;
+
+private:
+    std::string FUniformName;
+    glm::mat3 FData;
+};
+
+IMPLEMENT_POOL_ALLOCATED(SetMat3UniformCommand);
+
+SetMat3UniformCommand::SetMat3UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::mat3& parUniformValue)
+    : IDrawCommand(parViewId)
+    , FUniformName(parUniformName)
+    , FData(parUniformValue)
+{
+}
+
+void SetMat3UniformCommand::SubmitCommand() const
+{
+    MaterialManager::SetMat3Uniform(FUniformName, FData);
+}
+
+//----------------------------------------------------------------
+//          SetMat4UniformCommand
+//----------------------------------------------------------------
+
+class SetMat4UniformCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(SetMat4UniformCommand);
+
+public:
+    SetMat4UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::mat4& parUniformValue);
+    virtual ~SetMat4UniformCommand() = default;
+
+    virtual void SubmitCommand() const override;
+
+private:
+    std::string FUniformName;
+    glm::mat4 FData;
+};
+
+IMPLEMENT_POOL_ALLOCATED(SetMat4UniformCommand);
+
+SetMat4UniformCommand::SetMat4UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::mat4& parUniformValue)
+    : IDrawCommand(parViewId)
+    , FUniformName(parUniformName)
+    , FData(parUniformValue)
+{
+}
+
+void SetMat4UniformCommand::SubmitCommand() const
+{
+    MaterialManager::SetMat4Uniform(FUniformName, FData);
+}
+
+//----------------------------------------------------------------
 //          DrawCommandBuffer
 //----------------------------------------------------------------
 IMPLEMENT_POOL_ALLOCATED(DrawCommandBuffer);
@@ -1406,6 +1573,31 @@ void DrawCommandBuffer::DrawCircularChunk(const CircularGridChunkFeedbackParamet
 void DrawCommandBuffer::BlitWithMaterial(const MaterialInstanceHandle& parMaterialInstanceHandle)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new BlitWithMaterialCommand(FViewId, parMaterialInstanceHandle)));
+}
+
+void DrawCommandBuffer::SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parHandle, const u32 parSlot)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetSamplerUniformCommand(FViewId, parUniformName, parHandle, parSlot)));
+}
+
+void DrawCommandBuffer::SetFreeFormSamplerUniform(const std::string& parUniformName, const u32& parHandle, const u32 parSlot)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetFreeFormSamplerUniformCommand(FViewId, parUniformName, parHandle, parSlot)));
+}
+
+void DrawCommandBuffer::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetVec4UniformCommand(FViewId, parUniformName, parUniformValue)));
+}
+
+void DrawCommandBuffer::SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetMat3UniformCommand(FViewId, parUniformName, parUniformValue)));
+}
+
+void DrawCommandBuffer::SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetMat4UniformCommand(FViewId, parUniformName, parUniformValue)));
 }
 
 void DrawCommandBuffer::Submit()
