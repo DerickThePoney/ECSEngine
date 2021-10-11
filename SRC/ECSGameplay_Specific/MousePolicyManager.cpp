@@ -14,8 +14,6 @@ void MousePolicyManager::Initialise()
     FOrderedMousePolicies.push_back(std::unique_ptr<IMousePolicy>(new PlaceBuildingMousePolicy()));
     FPolicyToIndex[FOrderedMousePolicies.back()->MousePolicyType()] = (u32)FOrderedMousePolicies.size() - 1u;
     PlaceBuildingMousePolicy* placeBuildingPolicy = GetMousePolicy<PlaceBuildingMousePolicy>(FOrderedMousePolicies.back()->MousePolicyType());
-    placeBuildingPolicy->SetupMousePolicy("BuildingTest");
-    placeBuildingPolicy->Activate();
 
     // Default mouse policy
     FOrderedMousePolicies.push_back(std::unique_ptr<IMousePolicy>(new DefaultMousePolicy()));
