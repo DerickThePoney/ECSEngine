@@ -54,6 +54,9 @@ void GameRenderer::Initialise()
     SetViewFramebuffers(size);
 
     UIRendering::Initialise();
+
+    FPickingAndOutlineRendering.reset(new EntityPickingAndOutlineRenderer());
+    FPickingAndOutlineRendering->Initialise();
 }
 
 void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
@@ -71,6 +74,8 @@ void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
 
 void GameRenderer::Shutdown()
 {
+    FPickingAndOutlineRendering->Cleanup();
+
     UIRendering::Shutdown();
 
     FGeometryCommandBuffer->clear();
@@ -120,9 +125,10 @@ void GameRenderer::Render()
     glm::mat4 proj = c->GetProjectionMatrix(aspectRatio);
 
     {
-        SCOPED_PROFILE(GameRenderer_Render_GeometryPass);
-        // Geometry pass
+        SCOPED_PROFILE(GameRenderer_Render_GeometryPassAndSelection);
+        // Geometry pass and selection
         FGeometryCommandBuffer->SetViewTranform(view, proj);
+        FPickingAndOutlineRendering->BeginSelectionPass(FGameplayCameraId);
 
         foreachitemconst(gfxRep, GFXRepresentationManager::Instance())
         {
@@ -144,9 +150,12 @@ void GameRenderer::Render()
                 {
                     FGeometryCommandBuffer->DrawMesh(visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
                 }
+
+                FPickingAndOutlineRendering->PushGFXForSelectionPass(gfxRep.second.get());
             }
         }
 
+        FPickingAndOutlineRendering->EndSelectionPass();
         FGeometryCommandBuffer->Submit();
     }
 

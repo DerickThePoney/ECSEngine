@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Common/Singleton.h"
+#include "EntityPickingAndOutlineRenderer.h"
 #include "UIRenderer.h"
 
 namespace ECSEngine
@@ -34,6 +35,9 @@ private:
     DrawCommandBuffer* FGeometryCommandBuffer = nullptr;
     DrawCommandBuffer* FFeedbackCommandBuffer = nullptr;
     DrawCommandBuffer* FCombineCommandBuffer = nullptr;
+
+    // renderers
+    std::unique_ptr<EntityPickingAndOutlineRenderer> FPickingAndOutlineRendering;
 };
 } // namespace Rendering
 } // namespace ECSEngine
