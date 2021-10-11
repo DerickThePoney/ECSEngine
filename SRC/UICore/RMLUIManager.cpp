@@ -104,7 +104,7 @@ void RmlUiManager::Shutdown()
     FSystemInterface = nullptr;
 }
 
-void RmlUiManager::ProcessInput() const
+void RmlUiManager::ProcessInput()
 {
     // TODO Check if used
 
@@ -128,25 +128,29 @@ void RmlUiManager::ProcessInput() const
     Input::SetInputsAlreadyUsed(keys, mouse);
 }
 
-bool RmlUiManager::ProcessMouse(u32 parKeyMods) const
+bool RmlUiManager::ProcessMouse(u32 parKeyMods)
 {
     bool res = true;
+
+    // mouse position
     if (glm::length2(Input::GetMousePositionDelta()) > 0.f)
     {
-        bool thisRes = SetMousePositionHasChanged(Input::GetMousePosition(), parKeyMods);
-        res = res && thisRes;
+        FMouseInput = SetMousePositionHasChanged(Input::GetMousePosition(), parKeyMods);
     }
+    res = res && FMouseInput;
 
+    // mouse buttons
     bool thisRes = SetMouseButtons(parKeyMods);
     res = res && thisRes;
 
+    // mouse wheel
     const glm::vec2 delta = Input::GetMouseScrollDelta();
     if (glm::length2(delta) > 0.f)
     {
-        bool mw = FContext->ProcessMouseWheel(-delta.y, parKeyMods);
+        bool mw = !FContext->ProcessMouseWheel(-delta.y, parKeyMods);
         res = res && mw;
     }
-    return !res;
+    return res;
 }
 
 bool RmlUiManager::SetMousePositionHasChanged(glm::vec2 parPos, u32 parKeyMods) const

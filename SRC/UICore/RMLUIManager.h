@@ -35,8 +35,8 @@ public:
     void RemoveDataModel(const std::string& parModelName) const;
 
 private:
-    void ProcessInput() const;
-    bool ProcessMouse(u32 parKeyMods) const;
+    void ProcessInput();
+    bool ProcessMouse(u32 parKeyMods);
     bool SetMousePositionHasChanged(glm::vec2 parPos, u32 parKeyMods) const;
     bool SetMouseButtons(u32 parKeyMods) const;
     bool SetKeyboardButtons(u32 parKeyMods) const;
@@ -48,6 +48,9 @@ private:
     RmlSystemInterface* FSystemInterface = nullptr;
     Rendering::RmlRenderer* FRenderInterface = nullptr;
     RmlFileInterface* FFileInterface = nullptr;
+
+    bool FMouseInput = false;
+    bool FKeyboardInput = false;
 };
 } // namespace UI
 } // namespace ECSEngine
