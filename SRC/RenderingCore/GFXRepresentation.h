@@ -75,6 +75,7 @@ public:
     const VisualModel* GetVisualModel() const { return FVisualModel.get(); }
     const SkelettonPose* GetPose() const { return FSkelettonPose; }
     const GFXSelectable* GetSelectable() const { return FSelectable.get(); }
+    GFXSelectable* GetSelectable() { return FSelectable.get(); }
 
     u32 Id() const { return FId; }
 

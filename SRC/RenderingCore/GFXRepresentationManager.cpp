@@ -76,5 +76,16 @@ void GFXRepresentationManager::DeleteGFXRepresentation(const u32 parId)
     FGFXIdGenerator.ReleaseId(parId);
 }
 
+GFXRepresentation* GFXRepresentationManager::GetGFX(const u32 parId) const
+{
+    if (parId == -1)
+        return nullptr;
+    auto itFind = FGFXRepresentations.find(parId);
+    if (itFind == FGFXRepresentations.end())
+        return nullptr;
+
+    return itFind->second.get();
+}
+
 } // namespace Rendering
 } // namespace ECSEngine

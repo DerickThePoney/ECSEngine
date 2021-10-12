@@ -55,8 +55,8 @@ void GameRenderer::Initialise()
 
     UIRendering::Initialise();
 
-    FPickingAndOutlineRendering.reset(new EntityPickingAndOutlineRenderer());
-    FPickingAndOutlineRendering->Initialise();
+    FPickingRenderer.reset(new GFXPickingRenderer());
+    FPickingRenderer->Initialise();
 }
 
 void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
@@ -74,7 +74,7 @@ void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
 
 void GameRenderer::Shutdown()
 {
-    FPickingAndOutlineRendering->Cleanup();
+    FPickingRenderer->Cleanup();
 
     UIRendering::Shutdown();
 
@@ -128,7 +128,7 @@ void GameRenderer::Render()
         SCOPED_PROFILE(GameRenderer_Render_GeometryPassAndSelection);
         // Geometry pass and selection
         FGeometryCommandBuffer->SetViewTranform(view, proj);
-        FPickingAndOutlineRendering->BeginSelectionPass(FGameplayCameraId);
+        FPickingRenderer->BeginSelectionPass(FGameplayCameraId);
 
         foreachitemconst(gfxRep, GFXRepresentationManager::Instance())
         {
@@ -151,11 +151,11 @@ void GameRenderer::Render()
                     FGeometryCommandBuffer->DrawMesh(visuals->GetMeshHandle(), visuals->GetMaterialInstanceHandle(), carrier->LocalToWorld());
                 }
 
-                FPickingAndOutlineRendering->PushGFXForSelectionPass(gfxRep.second.get());
+                FPickingRenderer->PushGFXForSelectionPass(gfxRep.second.get());
             }
         }
 
-        FPickingAndOutlineRendering->EndSelectionPass();
+        FPickingRenderer->EndSelectionPass();
         FGeometryCommandBuffer->Submit();
     }
 
