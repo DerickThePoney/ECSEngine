@@ -9,7 +9,7 @@ class GFXRepresentation;
 class DrawCommandBuffer;
 class FramebufferInstance;
 constexpr u32 PickTextureSize = 8;
-class EntityPickingAndOutlineRenderer
+class GFXPickingRenderer
 {
 public:
     void Initialise();
@@ -39,8 +39,13 @@ private:
     u8 FSelectionData[PickTextureSize * PickTextureSize * 4];
 
     float FSelectionFoV = 1.f;
-    u32 FSelectedEntity = -1;
-    u32 FSelectedEntityHits = 0;
+    u32 FHighlightedGFXId = -1;
+    u32 FPreviousFrameHighlightedGFXId = -1;
+
+    u32 FSelectedGFXId = -1;
+    u32 FPreviousFrameSelectedGFXId = -1;
+
+    u32 FHighlithedGFXIdHits = 0;
 
     bool FReadingData = false;
     bool FReadingAvailable = false;

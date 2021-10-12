@@ -30,6 +30,7 @@ public:
 
     std::map<u32, std::unique_ptr<GFXRepresentation>>::const_iterator begin() const { return FGFXRepresentations.begin(); }
     std::map<u32, std::unique_ptr<GFXRepresentation>>::const_iterator end() const { return FGFXRepresentations.end(); }
+    GFXRepresentation* GetGFX(const u32 parId) const;
 
 private:
     IdGenerator FGFXIdGenerator;

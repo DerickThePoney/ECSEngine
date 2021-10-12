@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "EntityPickingAndOutlineRenderer.h"
+#include "GFXPickingRenderer.h"
 
 #include "Common/CameraHelpers.h"
 #include "Common/CameraManager.h"
@@ -13,6 +13,7 @@
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/Framebuffer.h"
 #include "RenderingCore/GFXRepresentation.h"
+#include "RenderingCore/GFXRepresentationManager.h"
 #include "RenderingCore/GFXSelectable.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
@@ -26,7 +27,7 @@ namespace Rendering
 {
 
 bgfx::TextureHandle FPickingBlitTexture;
-void EntityPickingAndOutlineRenderer::Initialise()
+void GFXPickingRenderer::Initialise()
 {
     bgfx::setViewName(Rendering::RenderPassId::SELECTION_PASS, "Picking pass");
     bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
@@ -49,7 +50,7 @@ void EntityPickingAndOutlineRenderer::Initialise()
     AssertRelease(FDrawIdMaterial.IsValid());
 }
 
-void EntityPickingAndOutlineRenderer::Cleanup()
+void GFXPickingRenderer::Cleanup()
 {
     Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FDrawCommandBuffer);
 
@@ -58,7 +59,7 @@ void EntityPickingAndOutlineRenderer::Cleanup()
     bgfx::destroy(FPickingBlitTexture);
 }
 
-void EntityPickingAndOutlineRenderer::BeginSelectionPass(const u32 parCamera)
+void GFXPickingRenderer::BeginSelectionPass(const u32 parCamera)
 {
     AssertRelease(FDrawCommandBuffer != nullptr);
 
@@ -80,7 +81,7 @@ void EntityPickingAndOutlineRenderer::BeginSelectionPass(const u32 parCamera)
     FDrawCommandBuffer->SetViewTranform(pickView, pickProj);
 }
 
-void EntityPickingAndOutlineRenderer::PushGFXForSelectionPass(const GFXRepresentation* parGFX)
+void GFXPickingRenderer::PushGFXForSelectionPass(const GFXRepresentation* parGFX)
 {
     const GFXSelectable* selectable = parGFX->GetSelectable();
     if (selectable == nullptr)
@@ -103,7 +104,7 @@ void EntityPickingAndOutlineRenderer::PushGFXForSelectionPass(const GFXRepresent
     FDrawCommandBuffer->DrawMesh(visualModel->GetMeshHandle(), FDrawIdMaterial, carrier->LocalToWorld());
 }
 
-void EntityPickingAndOutlineRenderer::EndSelectionPass()
+void GFXPickingRenderer::EndSelectionPass()
 {
     FDrawCommandBuffer->Submit();
 
@@ -111,7 +112,7 @@ void EntityPickingAndOutlineRenderer::EndSelectionPass()
     bgfx::blit(Rendering::RenderPassId::SELECTION_BLIT_PASS, FPickingBlitTexture, 0, 0, FPickFramebuffer->GetTextureHandle(0));
     u32 availableAtFrame = bgfx::readTexture(FPickingBlitTexture, FSelectionData);
     if (!FReadingAvailable)
-        Rendering::BGFXRenderingBackend::Instance().AddRequestOnSpecificFrame(availableAtFrame, DELEGATE(&EntityPickingAndOutlineRenderer::SetDataIsAvailable, *this));
+        Rendering::BGFXRenderingBackend::Instance().AddRequestOnSpecificFrame(availableAtFrame, DELEGATE(&GFXPickingRenderer::SetDataIsAvailable, *this));
 
     if (FReadingAvailable)
     {
@@ -128,27 +129,69 @@ void EntityPickingAndOutlineRenderer::EndSelectionPass()
             }
         }
 
-        FSelectedEntityHits = 0;
-        FSelectedEntity = -1;
+        FHighlithedGFXIdHits = 0;
+        FPreviousFrameHighlightedGFXId = FHighlightedGFXId;
+        FHighlightedGFXId = -1;
         foreachitemconst(it, mapIndexToNbHits)
         {
-            if (it.second > FSelectedEntityHits)
+            if (it.second > FHighlithedGFXIdHits)
             {
-                FSelectedEntityHits = it.second;
-                FSelectedEntity = it.first;
+                FHighlithedGFXIdHits = it.second;
+                FHighlightedGFXId = it.first;
             }
         }
 
         ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(debugSelection, false, "Debug selection", "Selection");
-        if (debugSelection && FSelectedEntity != -1)
-            std::cout << FSelectedEntity << "\t" << FSelectedEntityHits << "\n";
+        if (debugSelection && FHighlightedGFXId != -1)
+            std::cout << FHighlightedGFXId << "\t" << FHighlithedGFXIdHits << "\n";
+
+        FPreviousFrameSelectedGFXId = FSelectedGFXId;
+
+        if (FHighlightedGFXId != -1 && Input::GetMouseButtonState(MouseButtons::MOUSE_BUTTON_1) && Input::GetMouseButtonHasChanged(MouseButtons::MOUSE_BUTTON_1))
+        {
+            FSelectedGFXId = FHighlightedGFXId;
+        }
+        else if (FSelectedGFXId != -1 && Input::GetMouseButtonState(MouseButtons::MOUSE_BUTTON_2) && Input::GetMouseButtonHasChanged(MouseButtons::MOUSE_BUTTON_2))
+        {
+            FSelectedGFXId = -1;
+        }
+
+        if (FPreviousFrameHighlightedGFXId != FHighlightedGFXId)
+        {
+            GFXRepresentation* rep = GFXRepresentationManager::Instance().GetGFX(FPreviousFrameHighlightedGFXId);
+            if (rep != nullptr)
+            {
+                rep->GetSelectable()->SetHighlighted(false);
+            }
+
+            rep = GFXRepresentationManager::Instance().GetGFX(FHighlightedGFXId);
+            if (rep != nullptr)
+            {
+                rep->GetSelectable()->SetHighlighted(true);
+            }
+        }
+
+        if (FPreviousFrameSelectedGFXId != FSelectedGFXId)
+        {
+            GFXRepresentation* rep = GFXRepresentationManager::Instance().GetGFX(FPreviousFrameSelectedGFXId);
+            if (rep != nullptr)
+            {
+                rep->GetSelectable()->SetSelected(false);
+            }
+
+            rep = GFXRepresentationManager::Instance().GetGFX(FSelectedGFXId);
+            if (rep != nullptr)
+            {
+                rep->GetSelectable()->SetSelected(true);
+            }
+        }
     }
 }
 
 // Outline rendering: frame size / 4 - First pass, drawing - second pass horizontal filter - third pass vertical filter (use stencil?) - then upcale to frame resolution via
 // multiple blitting - blit onto the final frame in the combine pass
 
-void EntityPickingAndOutlineRenderer::SetDataIsAvailable()
+void GFXPickingRenderer::SetDataIsAvailable()
 {
     FReadingAvailable = true;
 }
