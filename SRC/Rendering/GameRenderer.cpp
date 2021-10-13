@@ -13,6 +13,7 @@
 #include "RenderingCore/FeedbackParameters.h"
 #include "RenderingCore/Framebuffer.h"
 #include "RenderingCore/GFXRepresentationManager.h"
+#include "RenderingCore/GFXSelectable.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshCuller.h"
@@ -57,6 +58,9 @@ void GameRenderer::Initialise()
 
     FPickingRenderer.reset(new GFXPickingRenderer());
     FPickingRenderer->Initialise();
+
+    FOutlineRenderer.reset(new OutlineRenderer());
+    FOutlineRenderer->Initialise();
 }
 
 void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
@@ -74,6 +78,7 @@ void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
 
 void GameRenderer::Shutdown()
 {
+    FOutlineRenderer->Cleanup();
     FPickingRenderer->Cleanup();
 
     UIRendering::Shutdown();
@@ -130,6 +135,9 @@ void GameRenderer::Render()
         FGeometryCommandBuffer->SetViewTranform(view, proj);
         FPickingRenderer->BeginSelectionPass(FGameplayCameraId);
 
+        std::vector<const GFXRepresentation*> selectedRepresentations;
+        std::vector<const GFXRepresentation*> highlightedRepresentations;
+
         foreachitemconst(gfxRep, GFXRepresentationManager::Instance())
         {
             const Carrier* carrier = gfxRep.second->GetCarrier();
@@ -152,11 +160,31 @@ void GameRenderer::Render()
                 }
 
                 FPickingRenderer->PushGFXForSelectionPass(gfxRep.second.get());
+
+                const GFXSelectable* selectable = gfxRep.second->GetSelectable();
+                if (selectable != nullptr)
+                {
+                    if (selectable->IsSelected())
+                    {
+                        selectedRepresentations.push_back(gfxRep.second.get());
+                    }
+
+                    if (selectable->IsHighlighted())
+                    {
+                        highlightedRepresentations.push_back(gfxRep.second.get());
+                    }
+                }
             }
         }
 
         FPickingRenderer->EndSelectionPass();
         FGeometryCommandBuffer->Submit();
+
+        if (!selectedRepresentations.empty() || !highlightedRepresentations.empty())
+        {
+            FOutlineRenderer->RenderOutline(
+                  MemoryView(selectedRepresentations.data(), selectedRepresentations.size()), MemoryView(highlightedRepresentations.data(), highlightedRepresentations.size()));
+        }
     }
 
     // feedback pass

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Common/Singleton.h"
 #include "GFXPickingRenderer.h"
+#include "OutlineRenderer.h"
 #include "UIRenderer.h"
 
 namespace ECSEngine
@@ -38,6 +39,7 @@ private:
 
     // renderers
     std::unique_ptr<GFXPickingRenderer> FPickingRenderer;
+    std::unique_ptr<OutlineRenderer> FOutlineRenderer;
 };
 } // namespace Rendering
 } // namespace ECSEngine
