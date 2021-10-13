@@ -18,16 +18,8 @@ public:
     void BeginSelectionPass(const u32 parCamera);
     void PushGFXForSelectionPass(const GFXRepresentation* parGFX);
     void EndSelectionPass();
-    void UpdateAndRender();
 
     void SetDataIsAvailable();
-
-private:
-    // push entity for selection pass
-
-    // submit selection pass stuffs
-
-    // render outline IFN
 
 private:
     // selectionpass rendering
