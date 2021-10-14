@@ -180,11 +180,8 @@ void GameRenderer::Render()
         FPickingRenderer->EndSelectionPass();
         FGeometryCommandBuffer->Submit();
 
-        if (!selectedRepresentations.empty() || !highlightedRepresentations.empty())
-        {
-            FOutlineRenderer->RenderOutline(
-                  MemoryView(selectedRepresentations.data(), selectedRepresentations.size()), MemoryView(highlightedRepresentations.data(), highlightedRepresentations.size()));
-        }
+        FOutlineRenderer->RenderOutline(
+              MemoryView(selectedRepresentations.data(), selectedRepresentations.size()), MemoryView(highlightedRepresentations.data(), highlightedRepresentations.size()));
     }
 
     // feedback pass
@@ -207,6 +204,7 @@ void GameRenderer::Render()
         SCOPED_PROFILE(GameRenderer_Render_CombinePass);
         MaterialInstanceHandle combineMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\combinepass.material");
         MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_GeometryTexture", FGeometryFramebuffer->GetTextureHandle(0).idx, 0);
+        MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_FeedbackTexture", FOutlineRenderer->GetTextureHandle(), 1);
 
         FCombineCommandBuffer->BlitWithMaterial(combineMaterial);
         FCombineCommandBuffer->Submit();

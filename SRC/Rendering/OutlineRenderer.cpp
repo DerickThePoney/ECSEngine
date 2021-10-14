@@ -21,21 +21,22 @@ namespace Rendering
 void OutlineRenderer::Initialise()
 {
     FDrawBuffer = BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::OUTLINE_INIT);
+    FSolidDrawBuffer = BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::OUTLINE_SOLID);
 
     bgfx::setViewName(RenderPassId::OUTLINE_INIT, "Outline init");
-    bgfx::setViewClear(RenderPassId::OUTLINE_INIT, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
-    bgfx::setViewName(RenderPassId::OUTLINE_HORIZONTAL, "Outline Horizontal");
-    bgfx::setViewClear(RenderPassId::OUTLINE_HORIZONTAL, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+    bgfx::setViewClear(RenderPassId::OUTLINE_INIT, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+    bgfx::setViewName(RenderPassId::OUTLINE_SOLID, "Outline solid");
+    bgfx::setViewClear(RenderPassId::OUTLINE_SOLID, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+    /*bgfx::setViewName(RenderPassId::OUTLINE_HORIZONTAL, "Outline Horizontal");
+    bgfx::setViewClear(RenderPassId::OUTLINE_HORIZONTAL, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
     bgfx::setViewName(RenderPassId::OUTLINE_VERTICAL, "Outline Vertical");
-    bgfx::setViewClear(RenderPassId::OUTLINE_VERTICAL, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
+    bgfx::setViewClear(RenderPassId::OUTLINE_VERTICAL, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);*/
 
     const glm::vec2 windowSize = GLFWDisplayWindowHandler::Instance().GetSize();
     // initial framebuffer
     FInitialFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, windowSize);
     FInitialFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
           0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
-    /*FInitialFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::D16,
-          0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);*/
     FInitialFramebuffer->InitFramebuffer();
 
     FIntermediaryFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, windowSize);
@@ -46,6 +47,9 @@ void OutlineRenderer::Initialise()
     FDrawIdMaterial = MaterialManager::CreateMaterialInstanceIFN("materials\\circlebuildingpicking.material");
     AssertRelease(FDrawIdMaterial.IsValid());
 
+    FSolidFilter = MaterialManager::CreateMaterialInstanceIFN("materials\\outlinesolid.material");
+    AssertRelease(FSolidFilter.IsValid());
+
     FGameplayCameraId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
     AssertRelease(FGameplayCameraId != -1);
 }
@@ -53,6 +57,7 @@ void OutlineRenderer::Initialise()
 void OutlineRenderer::Cleanup()
 {
     BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FDrawBuffer);
+    BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FSolidDrawBuffer);
 
     FInitialFramebuffer->Destroy();
     delete FInitialFramebuffer;
@@ -75,10 +80,19 @@ void OutlineRenderer::RenderOutline(MemoryView<const GFXRepresentation*> parSele
 
     bgfx::setViewFrameBuffer(RenderPassId::OUTLINE_INIT, FInitialFramebuffer->GetHandle());
     bgfx::setViewRect(RenderPassId::OUTLINE_INIT, 0, 0, windowSize.x, windowSize.y);
+    bgfx::setViewFrameBuffer(RenderPassId::OUTLINE_SOLID, FIntermediaryFramebuffer->GetHandle());
+    bgfx::setViewRect(RenderPassId::OUTLINE_SOLID, 0, 0, windowSize.x, windowSize.y);
     bgfx::setViewFrameBuffer(RenderPassId::OUTLINE_HORIZONTAL, FIntermediaryFramebuffer->GetHandle());
     bgfx::setViewRect(RenderPassId::OUTLINE_HORIZONTAL, 0, 0, windowSize.x, windowSize.y);
     bgfx::setViewFrameBuffer(RenderPassId::OUTLINE_VERTICAL, FInitialFramebuffer->GetHandle());
     bgfx::setViewRect(RenderPassId::OUTLINE_VERTICAL, 0, 0, windowSize.x, windowSize.y);
+
+    if (parSelectedRepresentations.empty() && parHighlightedRepresentations.empty())
+    {
+        // hackos pour forcer le clear ?
+        bgfx::touch(RenderPassId::OUTLINE_SOLID);
+        return;
+    }
 
     FDrawBuffer->clear();
 
@@ -88,6 +102,14 @@ void OutlineRenderer::RenderOutline(MemoryView<const GFXRepresentation*> parSele
     foreachitemconst(rep, parHighlightedRepresentations) { AddGFXForOutline(rep, false); }
 
     FDrawBuffer->Submit();
+
+    // horizontal pass
+    MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_InitialTexture", FInitialFramebuffer->GetTextureHandle(0).idx, 0);
+
+    FSolidDrawBuffer->clear();
+    FSolidDrawBuffer->BlitWithMaterial(FSolidFilter);
+
+    FSolidDrawBuffer->Submit();
 }
 
 void OutlineRenderer::AddGFXForOutline(const GFXRepresentation* parRepresentation, bool parSelected)
@@ -103,6 +125,11 @@ void OutlineRenderer::AddGFXForOutline(const GFXRepresentation* parRepresentatio
     const glm::vec4 color = ColorUtils::ConvertToFVEC4(colorU32);
     FDrawBuffer->SetVec4Uniform("u_PickingId", color);
     FDrawBuffer->DrawMesh(visualModel->GetMeshHandle(), FDrawIdMaterial, carrier->LocalToWorld());
+}
+
+u16 OutlineRenderer::GetTextureHandle() const
+{
+    return FIntermediaryFramebuffer->GetTextureHandle(0).idx;
 }
 
 } // namespace Rendering
