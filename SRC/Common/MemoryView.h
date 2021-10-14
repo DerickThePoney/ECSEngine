@@ -134,6 +134,8 @@ public:
 
     u32 size() const { return FSize; }
 
+    bool empty() const { return FSize == 0; }
+
     const T& operator[](const u32 parIndex) const
     {
         AssertRelease(parIndex < FSize);
