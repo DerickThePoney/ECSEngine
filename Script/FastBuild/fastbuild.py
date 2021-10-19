@@ -40,7 +40,8 @@ def GetVSStuff():
     vc_sdk_value = ''
     for d in sdks:
         splited = d.split('.')
-        if sdk < int(splited[2]):
+        print(splited)
+        if len(splited) > 3 and sdk < int(splited[2]):
             vc_sdk_value = d
 
     if vc_sdk_value == '':
