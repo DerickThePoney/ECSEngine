@@ -451,7 +451,7 @@ Print( "Disabling Incremental Link")
 //------------------------------------------------------------------------------
 
 //.WindowsSDKVersion10  = '10.0.10240.0' ; Visual 2015 final
-.WindowsSDKVersion10  = '10.0.18362.0' ; Visual 2019 final
+.WindowsSDKVersion10  = '10.0.19041.0' ; Visual 2019 final
 
 .WindowsNetSDKBasePath = 'C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8'
 .WindowsSDKBasePath10 = 'C:\Program Files (x86)\Windows Kits\10'
