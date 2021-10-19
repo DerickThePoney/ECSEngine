@@ -17,6 +17,7 @@ fbuildtemplate = """
 .VSPATH = '%(vspath)s'
 .VCTOOLVERSION = '%(vc_tools_version)s'
 .VCREDISTVERSION = '%(vc_redist_version)s'
+.WindowsSDKVersion10 = '%(vc_sdk_value)s'
 .PCHName = 'stdafx'
 .SolutionName = 'ECSEngine'
 .SolutionOutput = 'build'
@@ -32,6 +33,19 @@ def GetVSStuff():
     vswhere_params = [vswhere, '-products', '*', '-version', '[16.7,18.0)', '-property', 'installationPath', '-latest', '-format', 'value']
     vswhere_popen = subprocess.Popen(vswhere_params, stdout = subprocess.PIPE)
     (vs2017_path, vswhere_stderr) = vswhere_popen.communicate(None)
+
+    windowsSDKBasePath10 = "C:\\Program Files (x86)\\Windows Kits\\10\\Include"
+    sdks = os.listdir(windowsSDKBasePath10)
+    sdk = 0
+    vc_sdk_value = ''
+    for d in sdks:
+        splited = d.split('.')
+        if sdk < int(splited[2]):
+            vc_sdk_value = d
+
+    if vc_sdk_value == '':
+        return False, vs2017_path, vc_tools_version, vc_redist_version, vc_sdk_value
+
 
     if vs2017_path is None or len(vs2017_path) == 0:
         print("Impossible de récuperer le chemin d'installation de VS avec vswhere: " + str(vswhere_stderr))
@@ -56,12 +70,12 @@ def GetVSStuff():
             print("Impossible de récuperer VCRedistVersion: " + str(cat_vs_version_stderr))
         else:
             print("VCRedistVersion : " + vc_redist_version)
-            return True, vs2017_path, vc_tools_version, vc_redist_version
+            return True, vs2017_path, vc_tools_version, vc_redist_version, vc_sdk_value
 
-    return False, vs2017_path, vc_tools_version, vc_redist_version
+    return False, vs2017_path, vc_tools_version, vc_redist_version, vc_sdk_value
 
 def main():
-    success, vs_path, vc_tools_version, vc_redist_version = GetVSStuff()
+    success, vs_path, vc_tools_version, vc_redist_version, vc_sdk_value = GetVSStuff()
 
     if not success:
         print('error')
@@ -70,7 +84,8 @@ def main():
     buffer = fbuildtemplate % {
         'vspath': vs_path,
         'vc_tools_version': vc_tools_version,
-        'vc_redist_version': vc_redist_version
+        'vc_redist_version': vc_redist_version,
+        'vc_sdk_value': vc_sdk_value
     }
 
     solution_config_filename = 'fbuild.bff'
