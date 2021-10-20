@@ -46,16 +46,18 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
     while (currentFileStart < parMeshFiles.size() && currentThread < maxCpus)
     {
         const u32 thisEnd = glm::min(currentFileStart + numberOfFilesPerThreads, (u32)parMeshFiles.size());
-        threads.push_back(std::move(std::thread([&parMeshFiles, currentFileStart, thisEnd] {
-            std::cout << "Cooking mesh thread start" << std::endl;
-            LOG_COOKING("Cooking mesh thread start");
-            forrange(i, currentFileStart, thisEnd)
-            {
-                LOG_COOKING("Cooking mesh " + parMeshFiles[i]);
-                MeshCooking::CookMesh(parMeshFiles[i]);
-            }
-            LOG_COOKING("Cooking mesh thread end");
-        })));
+        threads.push_back(std::move(std::thread(
+              [&parMeshFiles, currentFileStart, thisEnd]
+              {
+                  std::cout << "Cooking mesh thread start" << std::endl;
+                  LOG_COOKING("Cooking mesh thread start");
+                  forrange(i, currentFileStart, thisEnd)
+                  {
+                      LOG_COOKING("Cooking mesh " + parMeshFiles[i]);
+                      MeshCooking::CookMesh(parMeshFiles[i]);
+                  }
+                  LOG_COOKING("Cooking mesh thread end");
+              })));
         currentFileStart += numberOfFilesPerThreads;
         currentThread++;
     }

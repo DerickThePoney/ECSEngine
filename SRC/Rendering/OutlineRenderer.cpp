@@ -35,7 +35,7 @@ void OutlineRenderer::Initialise()
     const glm::vec2 windowSize = GLFWDisplayWindowHandler::Instance().GetSize();
     // initial framebuffer
     FInitialFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, windowSize);
-    FInitialFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
+    FInitialFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::A8,
           0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
     FInitialFramebuffer->InitFramebuffer();
 
@@ -98,8 +98,8 @@ void OutlineRenderer::RenderOutline(MemoryView<const GFXRepresentation*> parSele
 
     FDrawBuffer->SetViewTranform(view, proj);
 
-    foreachitemconst(rep, parSelectedRepresentations) { AddGFXForOutline(rep, true); }
-    foreachitemconst(rep, parHighlightedRepresentations) { AddGFXForOutline(rep, false); }
+    foreachitemconst(rep, parSelectedRepresentations) { AddGFXForOutline(rep, false, true); }
+    foreachitemconst(rep, parHighlightedRepresentations) { AddGFXForOutline(rep, true, false); }
 
     FDrawBuffer->Submit();
 
@@ -112,7 +112,7 @@ void OutlineRenderer::RenderOutline(MemoryView<const GFXRepresentation*> parSele
     FSolidDrawBuffer->Submit();
 }
 
-void OutlineRenderer::AddGFXForOutline(const GFXRepresentation* parRepresentation, bool parSelected)
+void OutlineRenderer::AddGFXForOutline(const GFXRepresentation* parRepresentation, bool parHighlighted, bool parSelected)
 {
     const Carrier* carrier = parRepresentation->GetCarrier();
     const VisualModel* visualModel = parRepresentation->GetVisualModel();

@@ -20,7 +20,7 @@ public:
     u16 GetTextureHandle() const;
 
 private:
-    void AddGFXForOutline(const GFXRepresentation* parRepresentation, bool parSelected);
+    void AddGFXForOutline(const GFXRepresentation* parRepresentation, bool parHighlighted, bool parSelected);
 
 private:
     DrawCommandBuffer* FDrawBuffer = nullptr;
