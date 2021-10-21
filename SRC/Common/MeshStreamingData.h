@@ -199,7 +199,7 @@ struct MeshLayoutDescription
 namespace MagicStuff
 {
 constexpr u32 MajorVersion = 0;
-constexpr u32 MinorVersion = 3;
+constexpr u32 MinorVersion = 4;
 } // namespace MagicStuff
 
 struct MeshFileHeader
