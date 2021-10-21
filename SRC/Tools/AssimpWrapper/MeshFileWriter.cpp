@@ -69,6 +69,13 @@ void WriteMeshHierarchy(const aiScene* parScene,
     BlendIndices nodeIdx;
     nodeIdx.Indices[0] = (u8)outCurrentNodeIdx;
     const aiMatrix4x4 transform = parParentTransform * parNode->mTransformation;
+
+    // Extract the rotation matrix...
+    aiQuaternion q;
+    aiVector3D s, p;
+    transform.Decompose(s, q, p);
+    const aiMatrix3x3 transformNoTranslation = q.GetMatrix();
+
     forrange(i, 0, parNode->mNumMeshes)
     {
         const aiMesh* mesh = parScene->mMeshes[parNode->mMeshes[i]];
@@ -102,7 +109,7 @@ void WriteMeshHierarchy(const aiScene* parScene,
 
             if (parFileHeader.layout.HasNormals)
             {
-                const aiVector3D normal = transform * mesh->mNormals[l];
+                const aiVector3D normal = transformNoTranslation * mesh->mNormals[l];
                 parOutputStream.write((c8*)&normal.x, 4);
                 parOutputStream.write((c8*)&normal.y, 4);
                 parOutputStream.write((c8*)&normal.z, 4);
@@ -110,7 +117,7 @@ void WriteMeshHierarchy(const aiScene* parScene,
 
             if (parFileHeader.layout.HasTangents)
             {
-                const aiVector3D tangent = transform * mesh->mTangents[l];
+                const aiVector3D tangent = transformNoTranslation * mesh->mTangents[l];
                 parOutputStream.write((c8*)&tangent.x, 4);
                 parOutputStream.write((c8*)&tangent.y, 4);
                 parOutputStream.write((c8*)&tangent.z, 4);
@@ -118,7 +125,7 @@ void WriteMeshHierarchy(const aiScene* parScene,
 
             if (parFileHeader.layout.HasBinormals)
             {
-                const aiVector3D binormal = transform * mesh->mBitangents[l];
+                const aiVector3D binormal = transformNoTranslation * mesh->mBitangents[l];
                 parOutputStream.write((c8*)&binormal.x, 4);
                 parOutputStream.write((c8*)&binormal.y, 4);
                 parOutputStream.write((c8*)&binormal.z, 4);
