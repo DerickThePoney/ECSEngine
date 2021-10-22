@@ -13,10 +13,40 @@
 #include "teeny-sha1.c"
 
 #include <codecvt>
+#include <fstream>
 #include <locale>
 
 namespace ECSEngine
 {
+namespace ResourceCheck
+{
+bool HasFileChanged(const std::string& parFile)
+{
+    Resource resourceSha1(parFile + ".sha1");
+    c8 hexdigest[41];
+    Resource resource(parFile);
+    std::shared_ptr<ResourceHandle> resourceHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&resource);
+    AssertRelease(resourceHandle != nullptr);
+
+    i32 resSha1 = sha1digest(nullptr, &hexdigest[0], reinterpret_cast<const u8*>(resourceHandle->Buffer()), resourceHandle->Size());
+    AssertRelease(resSha1 == 0);
+
+    if (GlobalResourceCache::Instance().FCache->FileExists(&resourceSha1))
+    {
+        std::shared_ptr<ResourceHandle> resourceHandleSha1 = GlobalResourceCache::Instance().FCache->GetResourceHandle(&resourceSha1);
+        AssertRelease(resourceHandleSha1 != nullptr);
+
+        i32 res = memcmp(&hexdigest[0], resourceHandleSha1->Buffer(), 41);
+        if (res == 0)
+            return false;
+    }
+
+    std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + parFile + ".sha1", std::ofstream::binary);
+    AssertRelease(ofstr.good());
+    ofstr.write(&hexdigest[0], 41);
+    return true;
+}
+} // namespace ResourceCheck
 
 namespace MeshCooking
 {
@@ -29,9 +59,6 @@ void CookMesh(const std::string& parMeshFile)
     std::shared_ptr<ResourceHandle> meshResourceHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&meshResource);
     AssertRelease(meshResourceHandle != nullptr);
     AssimpLoading::GenerateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + parMeshFile, meshResourceHandle->Buffer(), meshResourceHandle->Size());
-
-    c8 hexdigest[41];
-    i32 res = sha1digest(nullptr, &hexdigest[0], reinterpret_cast<const u8*>(meshResourceHandle->Buffer()), meshResourceHandle->Size());
 }
 } // namespace MeshCooking
 
@@ -52,13 +79,12 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
         const u32 thisEnd = glm::min(currentFileStart + numberOfFilesPerThreads, (u32)parMeshFiles.size());
         threads.push_back(std::move(std::thread([&parMeshFiles, currentFileStart, thisEnd] {
             std::cout << "Cooking mesh thread start" << std::endl;
-            LOG_COOKING("Cooking mesh thread start");
             forrange(i, currentFileStart, thisEnd)
             {
-                LOG_COOKING("Cooking mesh " + parMeshFiles[i]);
+                if (!ResourceCheck::HasFileChanged(parMeshFiles[i]))
+                    continue;
                 MeshCooking::CookMesh(parMeshFiles[i]);
             }
-            LOG_COOKING("Cooking mesh thread end");
         })));
         currentFileStart += numberOfFilesPerThreads;
         currentThread++;
@@ -82,7 +108,8 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
     foreachitemconst(meshFile, parMeshFiles)
     {
         LOG_COOKING("Cooking mesh " + meshFile);
-
+        if (!ResourceCheck::HasFileChanged(meshFile))
+            continue;
         MeshCooking::CookMesh(meshFile);
     }
 #endif
@@ -154,6 +181,8 @@ void CookTextureBank(const std::string& parTextureBankFile)
     processes.reserve(textureBank.Descriptors().size());
     foreachitemconst(textureDesc, textureBank.Descriptors())
     {
+        if (!ResourceCheck::HasFileChanged(textureDesc.second.TextureFile()))
+            continue;
         processes.push_back(PROCESS_INFORMATION());
         CookTexture(textureDesc.first, textureDesc.second.TextureFile(), processes.back());
     }
@@ -290,6 +319,8 @@ void CompileShaders(const std::vector<std::string>& parShadersFiles)
     processes.reserve(parShadersFiles.size());
     foreachitemconst(file, parShadersFiles)
     {
+        if (!ResourceCheck::HasFileChanged(file))
+            continue;
         auto pos = file.find_last_of('\\');
         std::string fileNoPath = "";
         if (pos != file.npos)
