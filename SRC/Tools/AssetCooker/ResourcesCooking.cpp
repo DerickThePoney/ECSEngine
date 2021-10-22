@@ -77,15 +77,17 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
     while (currentFileStart < parMeshFiles.size() && currentThread < maxCpus)
     {
         const u32 thisEnd = glm::min(currentFileStart + numberOfFilesPerThreads, (u32)parMeshFiles.size());
-        threads.push_back(std::move(std::thread([&parMeshFiles, currentFileStart, thisEnd] {
-            std::cout << "Cooking mesh thread start" << std::endl;
-            forrange(i, currentFileStart, thisEnd)
-            {
-                if (!ResourceCheck::HasFileChanged(parMeshFiles[i]))
-                    continue;
-                MeshCooking::CookMesh(parMeshFiles[i]);
-            }
-        })));
+        threads.push_back(std::move(std::thread(
+              [&parMeshFiles, currentFileStart, thisEnd]
+              {
+                  std::cout << "Cooking mesh thread start" << std::endl;
+                  forrange(i, currentFileStart, thisEnd)
+                  {
+                      if (!ResourceCheck::HasFileChanged(parMeshFiles[i]))
+                          continue;
+                      MeshCooking::CookMesh(parMeshFiles[i]);
+                  }
+              })));
         currentFileStart += numberOfFilesPerThreads;
         currentThread++;
     }
@@ -228,6 +230,8 @@ void CookFreeFormTextures(const std::string& parFreeFormTextures)
     {
         std::string file, name;
         istr >> file >> name;
+        if (!ResourceCheck::HasFileChanged(file))
+            continue;
         processes.emplace_back();
         TextureCooking::CookTexture(name, file, processes.back());
     }
