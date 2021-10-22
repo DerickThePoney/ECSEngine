@@ -228,7 +228,7 @@ void CookFreeFormTextures(const std::string& parFreeFormTextures)
     {
         std::string file, name;
         istr >> file >> name;
-        processes.push_back(PROCESS_INFORMATION());
+        processes.emplace_back();
         TextureCooking::CookTexture(name, file, processes.back());
     }
 
@@ -340,7 +340,7 @@ void CompileShaders(const std::vector<std::string>& parShadersFiles)
         if (type == -1)
             continue;
 
-        processes.push_back(PROCESS_INFORMATION());
+        processes.emplace_back();
         ShaderCompiling::CompileShader(file, type, processes.back());
     }
 
