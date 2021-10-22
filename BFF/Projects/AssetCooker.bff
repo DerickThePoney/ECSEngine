@@ -3,6 +3,7 @@
     .ProjectName = 'AssetCooker'
     .ProjectPath = 'SRC/Tools'
     .AdditionnalIncludePaths = {"SRC", "SRC/Tools" }
+    #include "External/teeny-sha1.bff"
 
     .SolutionFolder = 'Tools'
 
