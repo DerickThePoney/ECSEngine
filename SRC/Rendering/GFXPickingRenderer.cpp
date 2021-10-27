@@ -30,6 +30,7 @@ bgfx::TextureHandle FPickingBlitTexture;
 void GFXPickingRenderer::Initialise()
 {
     bgfx::setViewName(Rendering::RenderPassId::SELECTION_PASS, "Picking pass");
+    bgfx::setViewName(Rendering::RenderPassId::SELECTION_BLIT_PASS, "Picking blit pass");
     bgfx::setViewClear(Rendering::RenderPassId::SELECTION_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 
     FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_PASS);

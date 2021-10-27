@@ -29,6 +29,10 @@ void GameRenderer::Initialise()
 {
     auto size = GLFWDisplayWindowHandler::Instance().GetSize();
 
+    bgfx::setViewName(RenderPassId::GEOMETRY_PASS, "Geometry pass");
+    bgfx::setViewName(RenderPassId::FEEDBACK_PASS, "Feedback pass");
+    bgfx::setViewName(RenderPassId::COMBINE_PASS, "Combine pass");
+
     FGameplayCameraId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
     AssertRelease(FGameplayCameraId != -1);
 
