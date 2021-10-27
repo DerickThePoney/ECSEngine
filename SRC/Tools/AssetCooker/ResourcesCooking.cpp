@@ -65,39 +65,42 @@ void CookMesh(const std::string& parMeshFile)
 void CookMeshes(const std::vector<std::string>& parMeshFiles)
 {
 #if 1
+    std::vector<std::string> meshToRecompute;
+    meshToRecompute.reserve(parMeshFiles.size());
+    foreachitemconst(mesh, parMeshFiles)
+    {
+        if (!ResourceCheck::HasFileChanged(mesh))
+            continue;
+        meshToRecompute.push_back(mesh);
+    }
 
     std::vector<std::thread> threads;
     const u32 maxCpus = std::thread::hardware_concurrency() - 1;
     threads.reserve(maxCpus);
 
-    const u32 numberOfFilesPerThreads = glm::max((u32)parMeshFiles.size() / maxCpus, 10u);
+    const u32 numberOfFilesPerThreads = glm::max((u32)meshToRecompute.size() / maxCpus, 10u);
 
     u32 currentFileStart = 0;
     u32 currentThread = 0;
-    while (currentFileStart < parMeshFiles.size() && currentThread < maxCpus)
+    while (currentFileStart < meshToRecompute.size() && currentThread < maxCpus)
     {
-        const u32 thisEnd = glm::min(currentFileStart + numberOfFilesPerThreads, (u32)parMeshFiles.size());
+        const u32 thisEnd = glm::min(currentFileStart + numberOfFilesPerThreads, (u32)meshToRecompute.size());
         threads.push_back(std::move(std::thread(
-              [&parMeshFiles, currentFileStart, thisEnd]
+              [&meshToRecompute, currentFileStart, thisEnd]
               {
                   std::cout << "Cooking mesh thread start" << std::endl;
-                  forrange(i, currentFileStart, thisEnd)
-                  {
-                      if (!ResourceCheck::HasFileChanged(parMeshFiles[i]))
-                          continue;
-                      MeshCooking::CookMesh(parMeshFiles[i]);
-                  }
+                  forrange(i, currentFileStart, thisEnd) { MeshCooking::CookMesh(meshToRecompute[i]); }
               })));
         currentFileStart += numberOfFilesPerThreads;
         currentThread++;
     }
 
-    if (currentFileStart < parMeshFiles.size())
+    if (currentFileStart < meshToRecompute.size())
     {
-        forrange(i, currentFileStart, parMeshFiles.size())
+        forrange(i, currentFileStart, meshToRecompute.size())
         {
-            LOG_COOKING("Cooking mesh " + parMeshFiles[i]);
-            MeshCooking::CookMesh(parMeshFiles[i]);
+            LOG_COOKING("Cooking mesh " + meshToRecompute[i]);
+            MeshCooking::CookMesh(meshToRecompute[i]);
         }
     }
 
