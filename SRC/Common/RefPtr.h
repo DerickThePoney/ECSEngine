@@ -90,7 +90,11 @@ public:
     }
 
     T* operator->() { return get(); }
-    T& operator*() { return *get(); }
+    T& operator*()
+    {
+        AssertRelease(FPtr != nullptr);
+        return *get();
+    }
 
 private:
     T* FPtr;
