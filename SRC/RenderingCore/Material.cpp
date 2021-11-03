@@ -16,7 +16,6 @@ IMPLEMENT_POOL_ALLOCATED(ProgramDescriptor);
 ProgramDescriptor::ProgramDescriptor()
     : RefCountedObject()
 {
-    FUniformsAndTypes.push_back({ "color", bgfx::UniformType::Vec4 });
 }
 
 ProgramDescriptor::~ProgramDescriptor()
@@ -25,6 +24,33 @@ ProgramDescriptor::~ProgramDescriptor()
 
 #ifdef PERFORM_SECURITY_CHECKS
 bool ProgramDescriptor::UsesUniformOfType(const std::string& parName, bgfx::UniformType::Enum parType) const
+{
+    foreachitemconst(uniform, FUniformsAndTypes)
+    {
+        if (parName == uniform.first)
+        {
+            return parType == uniform.second;
+        }
+    }
+    return false;
+}
+#endif
+
+//----------------------------------------------------------------
+//          ProgramDescriptorV2
+//----------------------------------------------------------------
+IMPLEMENT_POOL_ALLOCATED(ProgramDescriptorV2);
+ProgramDescriptorV2::ProgramDescriptorV2()
+    : RefCountedObject()
+{
+}
+
+ProgramDescriptorV2::~ProgramDescriptorV2()
+{
+}
+
+#ifdef PERFORM_SECURITY_CHECKS
+bool ProgramDescriptorV2::UsesUniformOfType(const std::string& parName, bgfx::UniformType::Enum parType) const
 {
     foreachitemconst(uniform, FUniformsAndTypes)
     {
@@ -68,6 +94,19 @@ MaterialDescriptor::MaterialDescriptor()
 }
 
 MaterialDescriptor::~MaterialDescriptor()
+{
+}
+
+//----------------------------------------------------------------
+//          MaterialDescriptorV2
+//----------------------------------------------------------------
+IMPLEMENT_POOL_ALLOCATED(MaterialDescriptorV2);
+MaterialDescriptorV2::MaterialDescriptorV2()
+    : RefCountedObject()
+{
+}
+
+MaterialDescriptorV2::~MaterialDescriptorV2()
 {
 }
 
