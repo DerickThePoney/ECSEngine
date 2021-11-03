@@ -52,6 +52,54 @@ private:
 };
 
 //----------------------------------------------------------------
+//          ProgramDescriptorV2
+//----------------------------------------------------------------
+
+class ProgramDescriptorV2 final : public RefCountedObject
+{
+    DECLARE_POOL_ALLOCATED(ProgramDescriptorV2);
+
+public:
+    ProgramDescriptorV2();
+    ~ProgramDescriptorV2();
+
+    // IDEA: Give the exact Shaders to be used
+
+    const std::string& GetShadersBasePath() const { return FShadersBasePath; }
+    const std::string& GetShadersBaseName() const { return FShadersBaseName; }
+    const std::vector<std::pair<std::string, bgfx::UniformType::Enum>>& GetUniformsAndTypes() const { return FUniformsAndTypes; }
+
+    MeshLayoutDescription LayoutDescription() const { return FLayoutDescription; }
+
+    void DrawEditor();
+
+#ifdef PERFORM_SECURITY_CHECKS
+    bool UsesUniformOfType(const std::string& parName, bgfx::UniformType::Enum parType) const;
+#endif
+
+    SERIALIZE()
+    {
+        PROPERTYFIELD(ShadersBasePath, "");
+        PROPERTYFIELD(ShadersBaseName, "");
+        PROPERTYFIELD(UniformsAndTypes, {});
+
+        PROPERTYFIELD(LayoutDescription, {});
+
+        PROPERTYFIELD(IsInstanced, false);
+    }
+
+private:
+    std::string FShadersBasePath;
+    std::string FShadersBaseName;
+    std::vector<std::pair<std::string, bgfx::UniformType::Enum>> FUniformsAndTypes; //+ More type semantic ? genre bin 0 == xxx?
+
+    // Inputs description
+    MeshLayoutDescription FLayoutDescription;
+
+    bool FIsInstanced = false;
+};
+
+//----------------------------------------------------------------
 //          Program
 //----------------------------------------------------------------
 
@@ -81,6 +129,33 @@ class MaterialDescriptor final : public RefCountedObject
 public:
     MaterialDescriptor();
     ~MaterialDescriptor();
+
+    const std::string& GetProgramDescriptorName() const { return FProgramDescriptorFilename; }
+    const std::vector<MaterialTextureInputDescriptor>& GetTexturesInput() const { return FTexturesInputDescriptors; }
+
+    SERIALIZE() { ar(PROPERTY(ProgramDescriptorFilename), PROPERTY(TexturesInputDescriptors)); }
+
+private:
+    std::string FProgramDescriptorFilename;
+
+    // Input type description?
+    std::vector<MaterialTextureInputDescriptor> FTexturesInputDescriptors;
+};
+
+//----------------------------------------------------------------
+//          MaterialDescriptorV2
+//----------------------------------------------------------------
+class MaterialDescriptorV2 final : public RefCountedObject
+{
+    DECLARE_POOL_ALLOCATED(MaterialDescriptorV2);
+
+public:
+    MaterialDescriptorV2();
+    ~MaterialDescriptorV2();
+
+    // IDEA: Have the material descriptor load several programs for =/= possible render passes
+
+    void DrawEditor();
 
     const std::string& GetProgramDescriptorName() const { return FProgramDescriptorFilename; }
     const std::vector<MaterialTextureInputDescriptor>& GetTexturesInput() const { return FTexturesInputDescriptors; }
