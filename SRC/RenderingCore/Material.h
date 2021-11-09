@@ -3,6 +3,7 @@
 #include "Common/RefCountedObject.h"
 #include "Common/RenderingHandles.h"
 #include "MaterialInput.h"
+#include "ShaderType.h"
 namespace ECSEngine
 {
 namespace Rendering
@@ -60,27 +61,30 @@ class ProgramDescriptorV2 final : public RefCountedObject
     DECLARE_POOL_ALLOCATED(ProgramDescriptorV2);
 
 public:
+    using ShaderSubstitution = std::pair<ShaderType::Type, std::string>;
+    using ShaderSubstitutionList = std::vector<ShaderSubstitution>;
+    using RenderPassToShaderMap = std::unordered_map<u16, ShaderSubstitutionList>;
+
+public:
     ProgramDescriptorV2();
     ~ProgramDescriptorV2();
 
     // IDEA: Give the exact Shaders to be used
-
-    const std::string& GetShadersBasePath() const { return FShadersBasePath; }
-    const std::string& GetShadersBaseName() const { return FShadersBaseName; }
+    const RenderPassToShaderMap& RenderPassToShaders() const { return FRenderPassToShaderMap; }
     const std::vector<std::pair<std::string, bgfx::UniformType::Enum>>& GetUniformsAndTypes() const { return FUniformsAndTypes; }
 
     MeshLayoutDescription LayoutDescription() const { return FLayoutDescription; }
 
     void DrawEditor();
 
-#ifdef PERFORM_SECURITY_CHECKS
+#ifdef ENABLE_SECURITY_CHECKS
     bool UsesUniformOfType(const std::string& parName, bgfx::UniformType::Enum parType) const;
 #endif
 
     SERIALIZE()
     {
-        PROPERTYFIELD(ShadersBasePath, "");
-        PROPERTYFIELD(ShadersBaseName, "");
+        PROPERTYFIELD(RenderPassToShaderMap, RenderPassToShaderMap());
+        PROPERTYFIELD(DefaultView, 0);
         PROPERTYFIELD(UniformsAndTypes, {});
 
         PROPERTYFIELD(LayoutDescription, {});
@@ -89,8 +93,9 @@ public:
     }
 
 private:
-    std::string FShadersBasePath;
-    std::string FShadersBaseName;
+    RenderPassToShaderMap FRenderPassToShaderMap;
+    u16 FDefaultView;
+
     std::vector<std::pair<std::string, bgfx::UniformType::Enum>> FUniformsAndTypes; //+ More type semantic ? genre bin 0 == xxx?
 
     // Inputs description
