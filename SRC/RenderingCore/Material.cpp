@@ -49,6 +49,10 @@ ProgramDescriptorV2::~ProgramDescriptorV2()
 {
 }
 
+void ProgramDescriptorV2::DrawEditor()
+{
+}
+
 #ifdef PERFORM_SECURITY_CHECKS
 bool ProgramDescriptorV2::UsesUniformOfType(const std::string& parName, bgfx::UniformType::Enum parType) const
 {
