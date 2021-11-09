@@ -4,7 +4,6 @@ namespace ECSEngine
 {
 namespace Rendering
 {
-#ifndef ABSOLUTELY_NOT_ASSERT
 namespace ShaderType
 {
 enum Type
@@ -14,6 +13,5 @@ enum Type
     LENGTH
 };
 }
-#endif //  ABSOLUTELY_NOT_ASSERT
 } // namespace Rendering
 } // namespace ECSEngine
