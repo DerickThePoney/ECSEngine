@@ -28,6 +28,7 @@ enum Type : u16
     IMGUI_PASSES_END = IMGUI_DEBUG_PASS
 };
 const char* GetName(Type parPass);
+Type ChooseInList(RenderPassId::Type parPreviouslyChosen);
 } // namespace RenderPassId
 
 class RenderPassDescriptor

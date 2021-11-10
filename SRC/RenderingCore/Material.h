@@ -3,7 +3,9 @@
 #include "Common/RefCountedObject.h"
 #include "Common/RenderingHandles.h"
 #include "MaterialInput.h"
+#include "RenderPass.h"
 #include "ShaderType.h"
+
 namespace ECSEngine
 {
 namespace Rendering
@@ -63,7 +65,7 @@ class ProgramDescriptorV2 final : public RefCountedObject
 public:
     using ShaderSubstitution = std::pair<ShaderType::Type, std::string>;
     using ShaderSubstitutionList = std::vector<ShaderSubstitution>;
-    using RenderPassToShaderMap = std::unordered_map<u16, ShaderSubstitutionList>;
+    using RenderPassToShaderMap = std::unordered_map<RenderPassId::Type, ShaderSubstitutionList>;
 
 public:
     ProgramDescriptorV2();
@@ -84,7 +86,7 @@ public:
     SERIALIZE()
     {
         PROPERTYFIELD(RenderPassToShaderMap, RenderPassToShaderMap());
-        PROPERTYFIELD(DefaultView, 0);
+        PROPERTYFIELD(DefaultView, RenderPassId::GEOMETRY_PASS);
         PROPERTYFIELD(UniformsAndTypes, {});
 
         PROPERTYFIELD(LayoutDescription, {});
@@ -94,7 +96,7 @@ public:
 
 private:
     RenderPassToShaderMap FRenderPassToShaderMap;
-    u16 FDefaultView;
+    RenderPassId::Type FDefaultView;
 
     std::vector<std::pair<std::string, bgfx::UniformType::Enum>> FUniformsAndTypes; //+ More type semantic ? genre bin 0 == xxx?
 
