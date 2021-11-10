@@ -51,6 +51,15 @@ ProgramDescriptorV2::~ProgramDescriptorV2()
 
 void ProgramDescriptorV2::DrawEditor()
 {
+    if (ImGui::CollapsingHeader("Substitutions"))
+    {
+        static RenderPassId::Type selectedType = FDefaultView;
+
+        if (ImGui::Button("Add substitution"))
+        {
+            auto it = FRenderPassToShaderMap.find(FDefaultView);
+        }
+    }
 }
 
 #ifdef PERFORM_SECURITY_CHECKS
