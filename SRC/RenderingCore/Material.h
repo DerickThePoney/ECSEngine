@@ -63,8 +63,8 @@ class ProgramDescriptorV2 final : public RefCountedObject
     DECLARE_POOL_ALLOCATED(ProgramDescriptorV2);
 
 public:
-    using ShaderSubstitution = std::pair<ShaderType::Type, std::string>;
-    using ShaderSubstitutionList = std::vector<ShaderSubstitution>;
+    using ShaderSubstitution =  std::string;
+    using ShaderSubstitutionList = std::array<ShaderSubstitution, ShaderType::LENGTH>;
     using RenderPassToShaderMap = std::unordered_map<RenderPassId::Type, ShaderSubstitutionList>;
 
 public:

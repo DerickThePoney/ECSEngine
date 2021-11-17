@@ -2,9 +2,11 @@
 
 #include "Material.h"
 
+#include "Application/PropertyDrawer.h"
 #include "BGFXRenderingUtils.h"
 #include "MaterialManager.h"
 #include "TexturesManager.h"
+
 namespace ECSEngine
 {
 namespace Rendering
@@ -51,13 +53,70 @@ ProgramDescriptorV2::~ProgramDescriptorV2()
 
 void ProgramDescriptorV2::DrawEditor()
 {
+    FDefaultView = RenderPassId::ChooseInList(FDefaultView);
     if (ImGui::CollapsingHeader("Substitutions"))
     {
-        static RenderPassId::Type selectedType = FDefaultView;
+        static RenderPassId::Type selectedType = FDefaultView;        
 
+        RenderPassId::Type chosenPass = RenderPassId::ChooseInList(selectedType);
+        ImGui::SameLine();
         if (ImGui::Button("Add substitution"))
         {
-            auto it = FRenderPassToShaderMap.find(FDefaultView);
+            auto it = FRenderPassToShaderMap.find(chosenPass);
+            if (it == FRenderPassToShaderMap.end())
+                FRenderPassToShaderMap.insert_or_assign(chosenPass, ShaderSubstitutionList());
+        }
+
+        u32 idx = 0;
+        foreachitem(substitution, FRenderPassToShaderMap)
+        {
+            ImGui::Indent();
+            ImGui::PushID(idx);
+            RenderPassId::Type modifyChosenPass = RenderPassId::ChooseInList(substitution.first);
+
+            ImGui::SameLine();
+            const bool deleteSubstitution = ImGui::Button("Delete substitution");
+
+            if (modifyChosenPass != substitution.first)
+            {
+                auto itFind = FRenderPassToShaderMap.find(modifyChosenPass);
+                if (itFind == FRenderPassToShaderMap.end())
+                {
+                    ShaderSubstitutionList shaderList = substitution.second;
+                    FRenderPassToShaderMap.erase(itFind);
+                    FRenderPassToShaderMap.insert_or_assign(modifyChosenPass, shaderList);
+                    ImGui::PopID();
+                    break;
+                }
+            }
+
+            if (deleteSubstitution)
+            {
+                auto itFind = FRenderPassToShaderMap.find(substitution.first);
+                AssertRelease(itFind != FRenderPassToShaderMap.end());
+                FRenderPassToShaderMap.erase(itFind);
+                ImGui::PopID();
+                break;                
+            }
+
+            // Vertex Shader
+            std::string vertexShader = substitution.second[0];
+            EDITOR_PROPERTY_STRING(ShaderType::GetName(ShaderType::VERTEX_SHADER), vertexShader, true, "*.sc");
+            if (ImGui::Button("Clear vertex shader"))
+                vertexShader.clear();
+
+            // Fragment Shader
+            std::string fragmentShader = substitution.second[1];
+            EDITOR_PROPERTY_STRING(ShaderType::GetName(ShaderType::FRAGMENT_SHADER), fragmentShader, true, "*.sc");
+            if (ImGui::Button("Clear fragment shader"))
+                fragmentShader.clear();
+
+            substitution.second[0] = vertexShader;
+            substitution.second[1] = fragmentShader;
+
+            idx++;
+            ImGui::PopID();
+            ImGui::Unindent();
         }
     }
 }
