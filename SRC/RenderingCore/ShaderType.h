@@ -12,6 +12,8 @@ enum Type
     FRAGMENT_SHADER,
     LENGTH
 };
-}
+const char* GetName(Type parPass);
+Type ChooseInList(Type parPreviouslyChosen);
+} // namespace ShaderType
 } // namespace Rendering
 } // namespace ECSEngine
