@@ -11,6 +11,7 @@ struct WindowsToShow
     bool showActionManager = true;
     bool showEntityTemplateEditor = false;
     bool showGFXRepresentationsEditor = false;
+    bool showProgramsEditor = false;
     bool showLogger = false;
     bool showImGuiDemo = false;
     bool showInputDebug = false;

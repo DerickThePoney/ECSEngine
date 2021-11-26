@@ -22,6 +22,7 @@
 #include "RenderingCore/TexturesManager.h"
 #include "ResourceCacheDebug.h"
 #include "SceneManagerEditor.h"
+#include "ProgramsEditor.h"
 
 namespace ECSEngine
 {
@@ -89,6 +90,7 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
         if (ImGui::BeginMenu("Rendering"))
         {
             ImGui::MenuItem("GFX representations", NULL, &options.showGFXRepresentationsEditor);
+            ImGui::MenuItem("Programs editor", NULL, &options.showProgramsEditor);
             ImGui::EndMenu();
         }
         ImGui::EndMenu();
@@ -324,6 +326,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showGFXRepresentationsEditor)
         DrawGFXRepresentationsEditor(&parOutWindowsToShow.showGFXRepresentationsEditor, menuBarHeight.y);
+
+    if (parOutWindowsToShow.showProgramsEditor)
+        DrawProgramsEditor(parOutWindowsToShow.showProgramsEditor, menuBarHeight.y);
 
     if (parOutWindowsToShow.showLogger)
         DrawLogger(Logger::GetLoggedMessages(), true, &parOutWindowsToShow.showLogger);
