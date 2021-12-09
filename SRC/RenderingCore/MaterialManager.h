@@ -8,6 +8,7 @@ namespace ECSEngine
 namespace Rendering
 {
 class MaterialInstance;
+class ProgramDescriptorV2;
 namespace MaterialManager
 {
 void Initialise();
@@ -21,6 +22,8 @@ void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUnifo
 void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue);
 void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue);
 void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber);
+
+std::vector<ProgramDescriptorV2*>& GetProgramsForEditor();
 } // namespace MaterialManager
 
 } // namespace Rendering

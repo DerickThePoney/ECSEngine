@@ -22,7 +22,7 @@
 #include "RenderingCore/TexturesManager.h"
 #include "ResourceCacheDebug.h"
 #include "SceneManagerEditor.h"
-#include "ProgramsEditor.h"
+#include "RenderingCore/ProgramsEditor.h"
 
 namespace ECSEngine
 {
@@ -328,7 +328,7 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
         DrawGFXRepresentationsEditor(&parOutWindowsToShow.showGFXRepresentationsEditor, menuBarHeight.y);
 
     if (parOutWindowsToShow.showProgramsEditor)
-        DrawProgramsEditor(parOutWindowsToShow.showProgramsEditor, menuBarHeight.y);
+        Rendering::ImGUITools::DrawProgramsEditor(parOutWindowsToShow.showProgramsEditor, menuBarHeight.y);
 
     if (parOutWindowsToShow.showLogger)
         DrawLogger(Logger::GetLoggedMessages(), true, &parOutWindowsToShow.showLogger);

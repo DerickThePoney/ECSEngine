@@ -8,6 +8,7 @@
 #include "RenderPass.h"
 #include "RenderingState.h"
 #include "VertexBuffer.h"
+#include "MaterialDescriptors.h"
 
 namespace ECSEngine
 {

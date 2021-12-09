@@ -40,21 +40,23 @@ const char* RenderPassId::GetName(Type parPass)
 Type ChooseInList(Type parPreviouslyChosen)
 {
     Type res = parPreviouslyChosen;
-    if (ImGui::BeginCombo("Render pass", GetName(parPreviouslyChosen)))
+    if (ImGui::BeginCombo("##Render pass", GetName(parPreviouslyChosen)))
     {
         forrange(i, 0, (u32)END_OF_GAME_PASSES)
         {
             ImGui::PushID(i);
             Type current = (Type)i;
             bool isSelected = (current == parPreviouslyChosen);
-            if (ImGui::Selectable(GetName(current)), isSelected)
+            if (ImGui::Selectable(GetName(current), isSelected))
                 res = current;
 
             if (isSelected)
                 ImGui::SetItemDefaultFocus();
             ImGui::PopID();
         }
+        ImGui::EndCombo();
     }
+
     return res;
 }
 } // namespace RenderPassId
