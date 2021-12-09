@@ -15,6 +15,7 @@
 #include "RenderingCore/TexturesManager.h"
 #include "RenderingCore/VertexLayout.h"
 #include "bx/bx.h"
+#include "RenderingCore/MaterialDescriptors.h"
 
 namespace ECSEngine
 {

@@ -10,6 +10,7 @@
 #include "Material.h"
 #include "Texture.h"
 #include "TexturesManager.h"
+#include "MaterialDescriptors.h"
 
 namespace ECSEngine
 {
@@ -38,12 +39,16 @@ public:
     void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue) const;
     void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber) const;
 
+    std::vector<ProgramDescriptorV2*>& GetProgramsForEditor();
+
 private:
     std::unordered_map<std::string, u32> FFileToMaterialDescriptor;
     std::vector<MaterialDescriptor*> FMaterialDescriptors;
 
     std::unordered_map<std::string, u32> FFileToProgramDescriptor;
     std::vector<ProgramDescriptor*> FProgramDescriptors;
+    std::vector<ProgramDescriptorV2*> FProgramDescriptorsV2;
+
     std::vector<Program*> FPrograms;
 
     std::unordered_map<std::string, std::pair<bgfx::UniformHandle, bgfx::UniformType::Enum>> FUniformMap;
@@ -63,6 +68,23 @@ MaterialManagerSingleton::~MaterialManagerSingleton()
 
 void MaterialManagerSingleton::Initialise()
 {
+    LOG_RENDERING("Initialising programs v2");
+    std::vector<std::string> programsList;
+    GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.programv2", programsList);
+    foreachitemconst(program, programsList)
+    {
+        LOG_RENDERING(fmt::format("Loading program V2 {}...", program));
+        Resource res(program);
+        std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
+
+        ResourceBuffer buff = handle->GetResourceBuffer();
+        std::istream istr(&buff, std::istream::binary);
+        cereal::JSONInputArchive input(istr);
+        ProgramDescriptorV2* programDesc = new ProgramDescriptorV2();
+        input(*programDesc);
+        FProgramDescriptorsV2.push_back(programDesc);
+    }
+
     LOG_RENDERING("Initialising materials");
 
     std::vector<std::string> materialsList;
@@ -276,6 +298,11 @@ void MaterialManagerSingleton::SetMat4Uniforms(const std::string& parUniformName
     bgfx::setUniform(handle, parUniformValue, parNumber);
 }
 
+std::vector<ProgramDescriptorV2*>& MaterialManagerSingleton::GetProgramsForEditor()
+{
+    return FProgramDescriptorsV2;
+}
+
 namespace MaterialManager
 {
 
@@ -347,6 +374,12 @@ void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUnif
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     MaterialManagerSingleton::Instance().SetMat4Uniforms(parUniformName, parUniformValue, parNumber);
+}
+
+std::vector<ProgramDescriptorV2*>& GetProgramsForEditor()
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    return MaterialManagerSingleton::Instance().GetProgramsForEditor();
 }
 
 } // namespace MaterialManager
