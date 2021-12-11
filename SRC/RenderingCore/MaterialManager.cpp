@@ -39,7 +39,7 @@ public:
     void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue) const;
     void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber) const;
 
-    std::vector<ProgramDescriptorV2*>& GetProgramsForEditor();
+    std::vector<MultiPassProgramDescriptor*>& GetProgramsForEditor();
 
 private:
     std::unordered_map<std::string, u32> FFileToMaterialDescriptor;
@@ -47,7 +47,7 @@ private:
 
     std::unordered_map<std::string, u32> FFileToProgramDescriptor;
     std::vector<ProgramDescriptor*> FProgramDescriptors;
-    std::vector<ProgramDescriptorV2*> FProgramDescriptorsV2;
+    std::vector<MultiPassProgramDescriptor*> FProgramDescriptorsV2;
 
     std::vector<Program*> FPrograms;
 
@@ -73,16 +73,18 @@ void MaterialManagerSingleton::Initialise()
     GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.programv2", programsList);
     foreachitemconst(program, programsList)
     {
-        LOG_RENDERING(fmt::format("Loading program V2 {}...", program));
+        LOG_RENDERING(fmt::format("Loading multipass programs {}...", program));
         Resource res(program);
         std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
 
         ResourceBuffer buff = handle->GetResourceBuffer();
         std::istream istr(&buff, std::istream::binary);
         cereal::JSONInputArchive input(istr);
-        ProgramDescriptorV2* programDesc = new ProgramDescriptorV2();
+        MultiPassProgramDescriptor* programDesc = new MultiPassProgramDescriptor();
         input(*programDesc);
         FProgramDescriptorsV2.push_back(programDesc);
+
+        MultiPassProgram p(programDesc);
     }
 
     LOG_RENDERING("Initialising materials");
@@ -298,7 +300,7 @@ void MaterialManagerSingleton::SetMat4Uniforms(const std::string& parUniformName
     bgfx::setUniform(handle, parUniformValue, parNumber);
 }
 
-std::vector<ProgramDescriptorV2*>& MaterialManagerSingleton::GetProgramsForEditor()
+std::vector<MultiPassProgramDescriptor*>& MaterialManagerSingleton::GetProgramsForEditor()
 {
     return FProgramDescriptorsV2;
 }
@@ -376,7 +378,7 @@ void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUnif
     MaterialManagerSingleton::Instance().SetMat4Uniforms(parUniformName, parUniformValue, parNumber);
 }
 
-std::vector<ProgramDescriptorV2*>& GetProgramsForEditor()
+std::vector<MultiPassProgramDescriptor*>& GetProgramsForEditor()
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     return MaterialManagerSingleton::Instance().GetProgramsForEditor();

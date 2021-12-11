@@ -38,13 +38,13 @@ bool ProgramDescriptor::UsesUniformOfType(const std::string& parName, bgfx::Unif
 //----------------------------------------------------------------
 //          ProgramDescriptorV2
 //----------------------------------------------------------------
-IMPLEMENT_POOL_ALLOCATED(ProgramDescriptorV2);
-ProgramDescriptorV2::ProgramDescriptorV2()
+IMPLEMENT_POOL_ALLOCATED(MultiPassProgramDescriptor);
+MultiPassProgramDescriptor::MultiPassProgramDescriptor()
     : RefCountedObject()
 {
 }
 
-ProgramDescriptorV2::~ProgramDescriptorV2()
+MultiPassProgramDescriptor::~MultiPassProgramDescriptor()
 {
 }
 
@@ -99,7 +99,7 @@ bgfx::UniformType::Enum ChooseUniformType(const bgfx::UniformType::Enum parCurre
 }
 }
 
-void ProgramDescriptorV2::DrawEditor()
+void MultiPassProgramDescriptor::DrawEditor()
 {    
     static char buffer[2048];
     ImGui::Text(FFilename.c_str());
@@ -240,7 +240,7 @@ void ProgramDescriptorV2::DrawEditor()
 }
 
 #ifdef PERFORM_SECURITY_CHECKS
-bool ProgramDescriptorV2::UsesUniformOfType(const std::string& parName, bgfx::UniformType::Enum parType) const
+bool MultiPassProgramDescriptor::UsesUniformOfType(const std::string& parName, bgfx::UniformType::Enum parType) const
 {
     foreachitemconst(uniform, FUniformsAndTypes)
     {
@@ -269,13 +269,13 @@ MaterialDescriptor::~MaterialDescriptor()
 //----------------------------------------------------------------
 //          MaterialDescriptorV2
 //----------------------------------------------------------------
-IMPLEMENT_POOL_ALLOCATED(MaterialDescriptorV2);
-MaterialDescriptorV2::MaterialDescriptorV2()
+IMPLEMENT_POOL_ALLOCATED(MutiPassMaterialDescriptor);
+MutiPassMaterialDescriptor::MutiPassMaterialDescriptor()
     : RefCountedObject()
 {
 }
 
-MaterialDescriptorV2::~MaterialDescriptorV2()
+MutiPassMaterialDescriptor::~MutiPassMaterialDescriptor()
 {
 }
 } // namespace Rendering

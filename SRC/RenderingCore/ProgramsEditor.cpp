@@ -20,7 +20,7 @@ namespace
 {
 void SavePrograms()
 {
-    std::vector<ProgramDescriptorV2*>& programs = Rendering::MaterialManager::GetProgramsForEditor();
+    std::vector<MultiPassProgramDescriptor*>& programs = Rendering::MaterialManager::GetProgramsForEditor();
     foreachitemconst(program, programs)
     {
         std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + program->Filename());
@@ -64,14 +64,14 @@ void DrawProgramsEditor(bool& parIsOpen, float parMenuBarHeight)
     // - Just list programs it's easier
     // - pour chaque category, lister les programs dedans
     // - pour chaque program, editer le programs
-    // donc en gros deux child window, avec une treeview d'un coté, une view de l'autre.
+    // donc en gros deux child window, avec une treeview d'un cote, une view de l'autre.
 
     // PROBLEM, NEED TO SEPARATE THE DESCRIPTORS FROM THE INSTANTIATION....
-    std::vector<ProgramDescriptorV2*>& programs = Rendering::MaterialManager::GetProgramsForEditor();
+    std::vector<MultiPassProgramDescriptor*>& programs = Rendering::MaterialManager::GetProgramsForEditor();
 
     if (ImGui::Button("Add Program"))
     {
-        programs.push_back(new ProgramDescriptorV2());
+        programs.push_back(new MultiPassProgramDescriptor());
     }
 
     u32 toDelete = -1;
