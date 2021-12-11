@@ -122,6 +122,22 @@ bgfx::ShaderHandle loadShader(const std::string& parFilename OnlyWithAssertions(
     return bgfx::createShader(mem);
 }
 
+bgfx::ProgramHandle LoadProgram(const std::pair<std::string, std::string>& parShaders)
+{
+    std::string vertexShader = parShaders.first;
+    auto pos = vertexShader.find_last_of('.');
+    vertexShader = vertexShader.substr(0, pos) + ".bin";
+
+    std::string fragmentShader = parShaders.second;
+     pos = fragmentShader.find_last_of('.');
+    fragmentShader = fragmentShader.substr(0, pos) + ".bin";
+
+    bgfx::ShaderHandle vsh = loadShader(vertexShader OnlyWithAssertions(COMMA ShaderType::VERTEX_SHADER));
+    bgfx::ShaderHandle fsh = loadShader(fragmentShader OnlyWithAssertions(COMMA ShaderType::FRAGMENT_SHADER));
+
+    return bgfx::createProgram(vsh, fsh, true);
+}
+
 bgfx::ProgramHandle LoadProgram(const std::string& parBasePath, const std::string& parFolderName, const std::string& parBaseProgramName)
 {
     bgfx::ShaderHandle vsh = loadShader(parBasePath + parFolderName + "\\vs_" + parBaseProgramName + ".bin" OnlyWithAssertions(COMMA ShaderType::VERTEX_SHADER));
