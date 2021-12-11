@@ -12,7 +12,8 @@ namespace Rendering
 {
 class ProgramDescriptor;
 class MaterialDescriptor;
-//----------------------------------------------------------------
+class MultiPassProgramDescriptor;
+      //----------------------------------------------------------------
 //          Program
 //----------------------------------------------------------------
 
@@ -32,6 +33,30 @@ private:
     bgfx::ProgramHandle FHandle;
 };
 
+
+//----------------------------------------------------------------
+//          MultipassProgram
+//----------------------------------------------------------------
+
+class MultiPassProgram : public RefCountedObject
+{
+public:
+    MultiPassProgram(const MultiPassProgramDescriptor* const parDescriptor);
+    ~MultiPassProgram();
+
+    const MultiPassProgramDescriptor* Descriptor() const { return FDescriptor; }
+    const bgfx::ProgramHandle& ProgramHandle(const RenderPassId::Type parRenderPass) const;
+
+    bool HasSubstitution(const RenderPassId::Type parRenderPass) const;
+    bool IsValid() const;
+
+private:
+    void InitialisePrograms();
+
+private:
+    const MultiPassProgramDescriptor* const FDescriptor;
+    std::unordered_map<RenderPassId::Type, bgfx::ProgramHandle> FHandles;
+};
 
 //----------------------------------------------------------------
 //          MaterialInstance

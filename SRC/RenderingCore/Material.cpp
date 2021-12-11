@@ -35,6 +35,62 @@ bool Program::IsValid() const
 }
 
 //----------------------------------------------------------------
+//          MultipassProgram
+//----------------------------------------------------------------
+MultiPassProgram::MultiPassProgram(const MultiPassProgramDescriptor* const parDescriptor)
+    : RefCountedObject()
+    , FDescriptor(parDescriptor)
+{
+    AssertRelease(parDescriptor != nullptr);
+    InitialisePrograms();
+    AssertRelease(IsValid());
+}
+
+MultiPassProgram::~MultiPassProgram()
+{
+    foreachitem(programs, FHandles) { bgfx::destroy(programs.second); }
+}
+
+const bgfx::ProgramHandle& MultiPassProgram::ProgramHandle(const RenderPassId::Type parRenderPass) const
+{
+    auto prog = FHandles.find(parRenderPass);
+    AssertRelease(prog != FHandles.end());
+    AssertRelease(bgfx::isValid(prog->second));
+    return prog->second;
+}
+
+bool MultiPassProgram::HasSubstitution(const RenderPassId::Type parRenderPass) const
+{
+    return FHandles.find(parRenderPass) != FHandles.end();
+}
+
+bool MultiPassProgram::IsValid() const
+{
+    foreachitemconst(programs, FHandles)
+    {
+        if (!bgfx::isValid(programs.second))
+            return false;
+    }
+    return true;
+}
+
+void MultiPassProgram::InitialisePrograms()
+{
+    auto substitutions = FDescriptor->RenderPassToShaders();
+    auto defaultSubs = substitutions.find(FDescriptor->DefaultSubstitution());
+    AssertRelease(defaultSubs != substitutions.end());
+    foreachitemconst(subs, substitutions)
+    {
+        const std::string& vertexShader = (subs.second[0].empty()) ? defaultSubs->second[0] : subs.second[0];
+        const std::string& fragmentShader = (subs.second[1].empty()) ? defaultSubs->second[1] : subs.second[1];
+        AssertRelease(!vertexShader.empty());
+        AssertRelease(!fragmentShader.empty());
+        bgfx::ProgramHandle prog = LoadProgram({ vertexShader, fragmentShader });
+        FHandles.insert_or_assign(subs.first, prog);
+    }
+}
+
+//----------------------------------------------------------------
 //          MaterialInstanceDescriptor
 //----------------------------------------------------------------
 IMPLEMENT_POOL_ALLOCATED(MaterialInstance);
