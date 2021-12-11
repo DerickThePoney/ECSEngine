@@ -16,6 +16,7 @@ namespace Rendering
 bool CompileShaders(const std::string& parFilename, const ShaderType::Type parShaderType);
 #endif
 bgfx::ShaderHandle loadShader(const std::string& parFilename OnlyWithAssertions(COMMA const ShaderType::Type parShaderType));
+bgfx::ProgramHandle LoadProgram(const std::pair<std::string, std::string>& parShaders);
 bgfx::ProgramHandle LoadProgram(const std::string& parBasePath, const std::string& parBaseProgramName);
 bgfx::ProgramHandle LoadProgram(const std::string& parBasePath, const std::string& parFolderName, const std::string& parBaseProgramName);
 } // namespace Rendering
