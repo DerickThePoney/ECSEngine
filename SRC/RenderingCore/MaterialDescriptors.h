@@ -55,12 +55,12 @@ private:
 };
 
 //----------------------------------------------------------------
-//          ProgramDescriptorV2
+//          MultiPassProgramDescriptor
 //----------------------------------------------------------------
 
-class ProgramDescriptorV2 final : public RefCountedObject
+class MultiPassProgramDescriptor final : public RefCountedObject
 {
-    DECLARE_POOL_ALLOCATED(ProgramDescriptorV2);
+    DECLARE_POOL_ALLOCATED(MultiPassProgramDescriptor);
 
 public:
     using ShaderSubstitution = std::string;
@@ -68,13 +68,14 @@ public:
     using RenderPassToShaderMap = std::unordered_map<RenderPassId::Type, ShaderSubstitutionList>;
 
 public:
-    ProgramDescriptorV2();
-    ~ProgramDescriptorV2();
+    MultiPassProgramDescriptor();
+    ~MultiPassProgramDescriptor();
 
     const std::string& Filename() const { return FFilename; }
     void OverrideFilename(const std::string& parName) { FFilename = parName; }
 
     // IDEA: Give the exact Shaders to be used
+    const RenderPassId::Type DefaultSubstitution() const { return FDefaultView; }
     const RenderPassToShaderMap& RenderPassToShaders() const { return FRenderPassToShaderMap; }
     const std::vector<std::pair<std::string, bgfx::UniformType::Enum>>& GetUniformsAndTypes() const { return FUniformsAndTypes; }
 
@@ -99,7 +100,7 @@ public:
     }
 
 private:
-    std::string FFilename;
+    std::string FFilename = "UNKNOWN";
     RenderPassToShaderMap FRenderPassToShaderMap;
     RenderPassId::Type FDefaultView;
 
@@ -135,27 +136,27 @@ private:
 };
 
 //----------------------------------------------------------------
-//          MaterialDescriptorV2
+//          MutiPassMaterialDescriptor
 //----------------------------------------------------------------
-class MaterialDescriptorV2 final : public RefCountedObject
+class MutiPassMaterialDescriptor final : public RefCountedObject
 {
-    DECLARE_POOL_ALLOCATED(MaterialDescriptorV2);
+    DECLARE_POOL_ALLOCATED(MutiPassMaterialDescriptor);
 
 public:
-    MaterialDescriptorV2();
-    ~MaterialDescriptorV2();
+    MutiPassMaterialDescriptor();
+    ~MutiPassMaterialDescriptor();
 
     // IDEA: Have the material descriptor load several programs for =/= possible render passes
 
     void DrawEditor();
 
-    const std::string& GetProgramDescriptorName() const { return FProgramDescriptorFilename; }
+    const std::string& MultipassProgramDescriptorFilename() const { return FMultipassProgramDescriptorFilename; }
     const std::vector<MaterialTextureInputDescriptor>& GetTexturesInput() const { return FTexturesInputDescriptors; }
 
-    SERIALIZE() { ar(PROPERTY(ProgramDescriptorFilename), PROPERTY(TexturesInputDescriptors)); }
+    SERIALIZE() { ar(PROPERTY(MultipassProgramDescriptorFilename), PROPERTY(TexturesInputDescriptors)); }
 
 private:
-    std::string FProgramDescriptorFilename;
+    std::string FMultipassProgramDescriptorFilename;
 
     // Input type description?
     std::vector<MaterialTextureInputDescriptor> FTexturesInputDescriptors;
