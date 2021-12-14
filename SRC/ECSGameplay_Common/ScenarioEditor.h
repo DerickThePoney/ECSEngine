@@ -12,6 +12,7 @@ struct WindowsToShow
     bool showEntityTemplateEditor = false;
     bool showGFXRepresentationsEditor = false;
     bool showProgramsEditor = false;
+    bool showMaterialsEditor = false;
     bool showLogger = false;
     bool showImGuiDemo = false;
     bool showInputDebug = false;

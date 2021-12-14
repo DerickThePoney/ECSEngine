@@ -40,16 +40,21 @@ public:
     void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber) const;
 
     std::vector<MultiPassProgramDescriptor*>& GetProgramsForEditor();
+    std::vector<MultiPassMaterialDescriptor*>& GetMaterialsForEditor();
 
 private:
     std::unordered_map<std::string, u32> FFileToMaterialDescriptor;
+    std::unordered_map<std::string, u32> FFileToMultiPassMaterialDescriptor;
     std::vector<MaterialDescriptor*> FMaterialDescriptors;
+    std::vector<MultiPassMaterialDescriptor*> FMultiPassMaterialDescriptors;
 
     std::unordered_map<std::string, u32> FFileToProgramDescriptor;
+    std::unordered_map<std::string, u32> FFileToMultiPassProgramDescriptor;
     std::vector<ProgramDescriptor*> FProgramDescriptors;
-    std::vector<MultiPassProgramDescriptor*> FProgramDescriptorsV2;
+    std::vector<MultiPassProgramDescriptor*> FMultiPassProgramDescriptors;
 
     std::vector<Program*> FPrograms;
+    std::vector<MultiPassProgram*> FMultiPassPrograms;
 
     std::unordered_map<std::string, std::pair<bgfx::UniformHandle, bgfx::UniformType::Enum>> FUniformMap;
 
@@ -82,9 +87,11 @@ void MaterialManagerSingleton::Initialise()
         cereal::JSONInputArchive input(istr);
         MultiPassProgramDescriptor* programDesc = new MultiPassProgramDescriptor();
         input(*programDesc);
-        FProgramDescriptorsV2.push_back(programDesc);
+        FMultiPassProgramDescriptors.push_back(programDesc);
 
-        MultiPassProgram p(programDesc);
+        FMultiPassPrograms.push_back(new MultiPassProgram(programDesc));
+
+        FFileToMultiPassProgramDescriptor[program] = FFileToMultiPassProgramDescriptor.size();
     }
 
     LOG_RENDERING("Initialising materials");
@@ -109,6 +116,28 @@ void MaterialManagerSingleton::Initialise()
 
         LOG_RENDERING(fmt::format("Loading Material {}...    SUCCESS", material));
     }
+
+    std::vector<std::string> materialsV2List;
+    GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.materialV2", materialsV2List);
+    foreachitemconst(material, materialsV2List)
+    {
+        LOG_RENDERING(fmt::format("Loading Multi Pass Material {}...", material));
+        Resource res(material);
+        std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
+
+        ResourceBuffer buff = handle->GetResourceBuffer();
+        std::istream istr(&buff, std::istream::binary);
+        cereal::JSONInputArchive input(istr);
+        MultiPassMaterialDescriptor* descriptor = new MultiPassMaterialDescriptor();
+        input(NAMEDPROPERTY("Material", *descriptor));
+
+        const u32 id = (u32)FMultiPassMaterialDescriptors.size();
+        FMultiPassMaterialDescriptors.push_back(descriptor);
+        FFileToMultiPassMaterialDescriptor[material] = id;
+
+        LOG_RENDERING(fmt::format("Loading Multi Pass Material {}...    SUCCESS", material));
+    }
+
 
     foreachitemconst(material, FMaterialDescriptors)
     {
@@ -179,6 +208,11 @@ void MaterialManagerSingleton::Shutdown()
     foreachitem(materialInstance, FMaterialInstances) { delete materialInstance.second; }
     FMaterialInstances.clear();
 
+    foreachitem(program, FMultiPassPrograms) { delete program; }
+    foreachitem(program, FMultiPassProgramDescriptors) { delete program; }
+    FMultiPassPrograms.clear();
+    FMultiPassProgramDescriptors.clear();
+
     foreachitem(program, FPrograms) { delete program; }
     foreachitem(program, FProgramDescriptors) { delete program; }
     FPrograms.clear();
@@ -186,8 +220,11 @@ void MaterialManagerSingleton::Shutdown()
     FFileToProgramDescriptor.clear();
 
     foreachitem(material, FMaterialDescriptors) { delete material; }
+    foreachitem(material, FMultiPassMaterialDescriptors) { delete material; }
     FMaterialDescriptors.clear();
+    FMultiPassMaterialDescriptors.clear();
     FFileToMaterialDescriptor.clear();
+    FFileToMultiPassMaterialDescriptor.clear();
 }
 
 const MaterialInstanceHandle MaterialManagerSingleton::CreateMaterialInstanceIFN(const std::string& parMaterialFilename)
@@ -302,7 +339,12 @@ void MaterialManagerSingleton::SetMat4Uniforms(const std::string& parUniformName
 
 std::vector<MultiPassProgramDescriptor*>& MaterialManagerSingleton::GetProgramsForEditor()
 {
-    return FProgramDescriptorsV2;
+    return FMultiPassProgramDescriptors;
+}
+
+std::vector<MultiPassMaterialDescriptor*>& MaterialManagerSingleton::GetMaterialsForEditor()
+{
+    return FMultiPassMaterialDescriptors;
 }
 
 namespace MaterialManager
@@ -382,6 +424,12 @@ std::vector<MultiPassProgramDescriptor*>& GetProgramsForEditor()
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     return MaterialManagerSingleton::Instance().GetProgramsForEditor();
+}
+
+std::vector<MultiPassMaterialDescriptor*>& GetMaterialsForEditor()
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    return MaterialManagerSingleton::Instance().GetMaterialsForEditor();
 }
 
 } // namespace MaterialManager

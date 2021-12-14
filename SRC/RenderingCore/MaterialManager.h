@@ -9,6 +9,7 @@ namespace Rendering
 {
 class MaterialInstance;
 class MultiPassProgramDescriptor;
+class MultiPassMaterialDescriptor;
 namespace MaterialManager
 {
 void Initialise();
@@ -24,6 +25,7 @@ void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUnifo
 void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber);
 
 std::vector<MultiPassProgramDescriptor*>& GetProgramsForEditor();
+std::vector<MultiPassMaterialDescriptor*>& GetMaterialsForEditor();
 } // namespace MaterialManager
 
 } // namespace Rendering

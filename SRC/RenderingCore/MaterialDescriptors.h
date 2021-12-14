@@ -138,24 +138,24 @@ private:
 //----------------------------------------------------------------
 //          MutiPassMaterialDescriptor
 //----------------------------------------------------------------
-class MutiPassMaterialDescriptor final : public RefCountedObject
+class MultiPassMaterialDescriptor final : public RefCountedObject
 {
-    DECLARE_POOL_ALLOCATED(MutiPassMaterialDescriptor);
+    DECLARE_POOL_ALLOCATED(MultiPassMaterialDescriptor);
 
 public:
-    MutiPassMaterialDescriptor();
-    ~MutiPassMaterialDescriptor();
-
-    // IDEA: Have the material descriptor load several programs for =/= possible render passes
+    MultiPassMaterialDescriptor();
+    ~MultiPassMaterialDescriptor();
 
     void DrawEditor();
 
+    const std::string& Filename() const { return FFilename; }
     const std::string& MultipassProgramDescriptorFilename() const { return FMultipassProgramDescriptorFilename; }
     const std::vector<MaterialTextureInputDescriptor>& GetTexturesInput() const { return FTexturesInputDescriptors; }
 
     SERIALIZE() { ar(PROPERTY(MultipassProgramDescriptorFilename), PROPERTY(TexturesInputDescriptors)); }
 
 private:
+    std::string FFilename = "UNKNOWN";
     std::string FMultipassProgramDescriptorFilename;
 
     // Input type description?
