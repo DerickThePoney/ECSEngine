@@ -54,6 +54,38 @@ Type ChooseInList(Type parPreviouslyChosen)
                 ImGui::SetItemDefaultFocus();
             ImGui::PopID();
         }
+        ImGui::Separator();
+        {
+            bool isSelected = (EDITOR_PASS == parPreviouslyChosen);
+            if (ImGui::Selectable(GetName(EDITOR_PASS), isSelected))
+                res = EDITOR_PASS;
+
+            if (isSelected)
+                ImGui::SetItemDefaultFocus();
+
+            isSelected = (IMGUI_EDITOR_PASS == parPreviouslyChosen);
+            if (ImGui::Selectable(GetName(IMGUI_EDITOR_PASS), isSelected))
+                res = IMGUI_EDITOR_PASS;
+
+            if (isSelected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::Separator();
+        {
+            bool isSelected = (DEBUG_PASS == parPreviouslyChosen);
+            if (ImGui::Selectable(GetName(DEBUG_PASS), isSelected))
+                res = DEBUG_PASS;
+
+            if (isSelected)
+                ImGui::SetItemDefaultFocus();
+
+            isSelected = (IMGUI_DEBUG_PASS == parPreviouslyChosen);
+            if (ImGui::Selectable(GetName(IMGUI_DEBUG_PASS), isSelected))
+                res = IMGUI_DEBUG_PASS;
+
+            if (isSelected)
+                ImGui::SetItemDefaultFocus();
+        }
         ImGui::EndCombo();
     }
 

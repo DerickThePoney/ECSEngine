@@ -267,17 +267,45 @@ MaterialDescriptor::~MaterialDescriptor()
 }
 
 //----------------------------------------------------------------
-//          MaterialDescriptorV2
+//          MutiPassMaterialDescriptor
 //----------------------------------------------------------------
-IMPLEMENT_POOL_ALLOCATED(MutiPassMaterialDescriptor);
-MutiPassMaterialDescriptor::MutiPassMaterialDescriptor()
+IMPLEMENT_POOL_ALLOCATED(MultiPassMaterialDescriptor);
+MultiPassMaterialDescriptor::MultiPassMaterialDescriptor()
     : RefCountedObject()
 {
 }
 
-MutiPassMaterialDescriptor::~MutiPassMaterialDescriptor()
+MultiPassMaterialDescriptor::~MultiPassMaterialDescriptor()
 {
 }
+
+void MultiPassMaterialDescriptor::DrawEditor()
+{
+    static char buffer[2048];
+    ImGui::Text(FFilename.c_str());
+    ImGui::SameLine();
+    if (ImGui::Button("ChangeName"))
+    {
+        ImGui::OpenPopup("Change material filename window");
+        strcpy(buffer, FFilename.c_str());
+    }
+
+    bool dummy = true;
+    if (ImGui::BeginPopupModal("Change material filename window", &dummy))
+    {
+        ImGui::InputText("Filename", buffer, 2048);
+        if (ImGui::Button("Ok"))
+        {
+            FFilename = std::string(buffer);
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    EDITOR_PROPERTY_STRING("Multi Pass Program File", FMultipassProgramDescriptorFilename, true, "*.programv2");
+}
+
 } // namespace Rendering
 }
 

@@ -162,5 +162,77 @@ void MaterialInstance::SetFreeFormSamplerUniform(const std::string& parUniformNa
     MaterialManager::SetFreeFormSamplerUniform(parUniformName, parHandle, parSlot);
 }
 
+//----------------------------------------------------------------
+//          MultiPassMaterialInstance
+//----------------------------------------------------------------
+IMPLEMENT_POOL_ALLOCATED(MultiPassMaterialInstance);
+
+MultiPassMaterialInstance::MultiPassMaterialInstance(const MultiPassProgram* const parProgram, const MultiPassMaterialDescriptor* const parMaterialDescriptor)
+    : RefCountedObject()
+    , FProgram(parProgram)
+    , FMaterialDescriptor(parMaterialDescriptor)
+{
+    AssertRelease(FProgram != nullptr);
+    AssertRelease(FProgram->IsValid());
+    AssertRelease(FMaterialDescriptor != nullptr);
+
+    const std::vector<MaterialTextureInputDescriptor>& texturesInputDesc = FMaterialDescriptor->GetTexturesInput();
+    foreachitemconst(desc, texturesInputDesc)
+    {
+        const TextureHandle handle = TextureManager::Instance().GetTextureHandle(desc.GetTexture());
+        AssertRelease(handle.IsValid());
+        FTextureInput.push_back(MaterialTextureInput(handle, desc.GetTextureSlotName(), desc.GetSlot()));
+    }
+}
+
+MultiPassMaterialInstance::~MultiPassMaterialInstance()
+{
+}
+
+void MultiPassMaterialInstance::SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parHandle, const u32 parSlot)
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Sampler));
+#endif
+    MaterialManager::SetSamplerUniform(parUniformName, parHandle, parSlot);
+}
+
+void MultiPassMaterialInstance::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue)
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Vec4));
+#endif
+    MaterialManager::SetVec4Uniform(parUniformName, parUniformValue);
+}
+
+void MultiPassMaterialInstance::SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue)
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Mat3));
+#endif
+    MaterialManager::SetMat3Uniform(parUniformName, parUniformValue);
+}
+
+void MultiPassMaterialInstance::SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue)
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Mat4));
+#endif
+    MaterialManager::SetMat4Uniform(parUniformName, parUniformValue);
+}
+
+void MultiPassMaterialInstance::SetTextures() const
+{
+    foreachitemconst(textureInput, FTextureInput) { textureInput.SetTexture(); }
+}
+
+void MultiPassMaterialInstance::SetFreeFormSamplerUniform(const std::string& parUniformName, const u32& parHandle, const u32 parSlot) const
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Sampler));
+#endif
+    MaterialManager::SetFreeFormSamplerUniform(parUniformName, parHandle, parSlot);
+}
+
 } // namespace Rendering
 } // namespace ECSEngine
