@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "MaterialDescriptors.h"
+
 #include "Application/PropertyDrawer.h"
 #include "RenderingPropertyDrawers.h"
 
@@ -97,10 +98,10 @@ bgfx::UniformType::Enum ChooseUniformType(const bgfx::UniformType::Enum parCurre
 
     return res;
 }
-}
+} // namespace ProgramEditor
 
 void MultiPassProgramDescriptor::DrawEditor()
-{    
+{
     static char buffer[2048];
     ImGui::Text(FFilename.c_str());
     ImGui::SameLine();
@@ -122,7 +123,6 @@ void MultiPassProgramDescriptor::DrawEditor()
 
         ImGui::EndPopup();
     }
-    
 
     FDefaultView = RenderPassId::ChooseInList(FDefaultView);
     if (ImGui::CollapsingHeader("Substitutions"))
@@ -194,29 +194,28 @@ void MultiPassProgramDescriptor::DrawEditor()
         ImGui::PopID();
     }
 
-    if (ImGui::CollapsingHeader("Uniforms")) 
-    { 
+    if (ImGui::CollapsingHeader("Uniforms"))
+    {
         ImGui::Indent();
         ImGui::PushID("UniformToAdd");
-        
-        
+
         static std::string name = "";
         EDITOR_PROPERTY_STRING("Uniform Name", name, false, "");
-        
+
         static bgfx::UniformType::Enum type = bgfx::UniformType::Vec4;
         type = ProgramEditor::ChooseUniformType(type);
-        
+
         if (ImGui::Button("Add Uniform"))
         {
             FUniformsAndTypes.emplace_back(name, type);
-        }        
+        }
 
         ImGui::PopID();
 
         u32 idx = 0;
-        auto  idxToErase = FUniformsAndTypes.end();
-        for(auto it = FUniformsAndTypes.begin(); it != FUniformsAndTypes.end(); ++it)
-        { 
+        auto idxToErase = FUniformsAndTypes.end();
+        for (auto it = FUniformsAndTypes.begin(); it != FUniformsAndTypes.end(); ++it)
+        {
             ImGui::PushID(idx);
             if (ImGui::Button("X"))
             {
@@ -304,8 +303,31 @@ void MultiPassMaterialDescriptor::DrawEditor()
     }
 
     EDITOR_PROPERTY_STRING("Multi Pass Program File", FMultipassProgramDescriptorFilename, true, "*.programv2");
+
+    // TODO activate only program actually has textures
+    if (ImGui::CollapsingHeader("Textures"))
+    {
+        if (ImGui::Button("Add texture input"))
+        {
+            FTexturesInputDescriptors.emplace_back();
+        }
+
+        u32 toDelete = -1;
+        forrange(i, 0, FTexturesInputDescriptors.size())
+        {
+            ImGui::PushID(i);
+            if (ImGui::Button("Delete"))
+            {
+                toDelete = i;
+            }
+            FTexturesInputDescriptors[i].DrawEditor();
+            ImGui::Separator();
+            ImGui::PopID();
+        }
+        if (toDelete != -1)
+            FTexturesInputDescriptors.erase(FTexturesInputDescriptors.begin() + toDelete);
+    }
 }
 
 } // namespace Rendering
-}
-
+} // namespace ECSEngine

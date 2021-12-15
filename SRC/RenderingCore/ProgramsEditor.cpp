@@ -5,8 +5,8 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
 #include "GLFWDisplayWindowHandler.h"
-#include "MaterialManager.h"
 #include "MaterialDescriptors.h"
+#include "MaterialManager.h"
 
 namespace ECSEngine
 {
@@ -18,7 +18,7 @@ namespace ImGUITools
 
 namespace
 {
-void SavePrograms()
+void SaveMaterials()
 {
     std::vector<MultiPassProgramDescriptor*>& programs = Rendering::MaterialManager::GetProgramsForEditor();
     foreachitemconst(program, programs)
@@ -26,7 +26,7 @@ void SavePrograms()
         std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + program->Filename());
         AssertRelease(ofstr.good());
         cereal::JSONOutputArchive ar(ofstr);
-        ar ( *program);
+        ar(*program);
     }
 }
 
@@ -38,7 +38,7 @@ void DrawMenuBar()
         {
             if (ImGui::MenuItem("Save"))
             {
-                SavePrograms();
+                SaveMaterials();
             }
             ImGui::EndMenu();
         }
@@ -83,14 +83,17 @@ void DrawProgramsEditor(bool& parIsOpen, float parMenuBarHeight)
             toDelete = i;
         }
         ImGui::SameLine();
-        
+
         if (ImGui::CollapsingHeader(programs[i]->Filename().c_str()))
         {
             programs[i]->DrawEditor();
         }
-        
+
         ImGui::PopID();
     }
+
+    if (toDelete != -1)
+        programs.erase(programs.begin() + toDelete);
 
     ImGui::End();
 }

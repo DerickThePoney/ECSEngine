@@ -16,6 +16,8 @@ public:
 
     SERIALIZE() { ar(PROPERTY(Texture), PROPERTY(TextureSamplerName), PROPERTY(TextureSlot)); }
 
+    void DrawEditor();
+
 private:
     TextureName FTexture;
     std::string FTextureSamplerName;

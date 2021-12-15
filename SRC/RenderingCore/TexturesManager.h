@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Common/MemoryView.h"
 #include "Common/RenderingHandles.h"
 #include "Common/Singleton.h"
 #include "TextureBank.h"
@@ -24,6 +25,8 @@ public:
     const u32 CreateFreeFormTexture(const u8* parData, u32 parWidth, u32 parHeight);
     void ReleaseFreeFormTexture(const u32 parId);
     const Texture* GetFreeFormTexture(const u32 parId) const;
+
+    const MemoryView<const std::unique_ptr<TextureBank>> GetTextureBanks() const { return MemoryView(FTextureBanks.data(), FTextureBanks.size()); }
 
 private:
     std::vector<std::unique_ptr<TextureBank>> FTextureBanks;
