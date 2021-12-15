@@ -1,11 +1,12 @@
 #include "stdafx.h"
 
 #include "MaterialEditor.h"
+
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFile.h"
 #include "GLFWDisplayWindowHandler.h"
-#include "MaterialManager.h"
 #include "MaterialDescriptors.h"
+#include "MaterialManager.h"
 
 namespace ECSEngine
 {
@@ -15,15 +16,15 @@ namespace ImGUITools
 {
 namespace
 {
-void SavePrograms()
+void SaveMaterials()
 {
-    std::vector<MultiPassProgramDescriptor*>& programs = Rendering::MaterialManager::GetProgramsForEditor();
-    foreachitemconst(program, programs)
+    std::vector<MultiPassProgramDescriptor*>& materials = Rendering::MaterialManager::GetProgramsForEditor();
+    foreachitemconst(material, materials)
     {
-        std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + program->Filename());
+        std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + material->Filename());
         AssertRelease(ofstr.good());
         cereal::JSONOutputArchive ar(ofstr);
-        ar(*program);
+        ar(*material);
     }
 }
 
@@ -35,7 +36,7 @@ void DrawMenuBar()
         {
             if (ImGui::MenuItem("Save"))
             {
-                SavePrograms();
+                SaveMaterials();
             }
             ImGui::EndMenu();
         }
@@ -57,13 +58,6 @@ void DrawMaterialsEditor(bool& parIsOpen, float parMenuBarHeight)
     ImGui::Begin("Materials editor", &parIsOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
     DrawMenuBar();
 
-    // TODO :
-    // - Just list programs it's easier
-    // - pour chaque category, lister les programs dedans
-    // - pour chaque program, editer le programs
-    // donc en gros deux child window, avec une treeview d'un cote, une view de l'autre.
-
-    // PROBLEM, NEED TO SEPARATE THE DESCRIPTORS FROM THE INSTANTIATION....
     std::vector<MultiPassMaterialDescriptor*>& materials = Rendering::MaterialManager::GetMaterialsForEditor();
 
     if (ImGui::Button("Add Material"))
@@ -89,9 +83,11 @@ void DrawMaterialsEditor(bool& parIsOpen, float parMenuBarHeight)
         ImGui::PopID();
     }
 
+    if (toDelete != -1)
+        materials.erase(materials.begin() + toDelete);
+
     ImGui::End();
 }
-}
+} // namespace ImGUITools
 } // namespace Rendering
-}
-
+} // namespace ECSEngine
