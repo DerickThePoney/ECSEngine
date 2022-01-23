@@ -152,7 +152,11 @@ public:
     const std::string& MultipassProgramDescriptorFilename() const { return FMultipassProgramDescriptorFilename; }
     const std::vector<MaterialTextureInputDescriptor>& GetTexturesInput() const { return FTexturesInputDescriptors; }
 
-    SERIALIZE() { ar(PROPERTY(MultipassProgramDescriptorFilename), PROPERTY(TexturesInputDescriptors)); }
+    SERIALIZE()
+    {
+        PROPERTYFIELD(Filename, "UNKNOWN");
+        ar(PROPERTY(MultipassProgramDescriptorFilename), PROPERTY(TexturesInputDescriptors));
+    }
 
 private:
     std::string FFilename = "UNKNOWN";

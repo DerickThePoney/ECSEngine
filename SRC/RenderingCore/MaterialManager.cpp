@@ -118,7 +118,7 @@ void MaterialManagerSingleton::Initialise()
     }
 
     std::vector<std::string> materialsV2List;
-    GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.materialV2", materialsV2List);
+    GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.materialv2", materialsV2List);
     foreachitemconst(material, materialsV2List)
     {
         LOG_RENDERING(fmt::format("Loading Multi Pass Material {}...", material));
@@ -129,7 +129,7 @@ void MaterialManagerSingleton::Initialise()
         std::istream istr(&buff, std::istream::binary);
         cereal::JSONInputArchive input(istr);
         MultiPassMaterialDescriptor* descriptor = new MultiPassMaterialDescriptor();
-        input(NAMEDPROPERTY("Material", *descriptor));
+        input(*descriptor);
 
         const u32 id = (u32)FMultiPassMaterialDescriptors.size();
         FMultiPassMaterialDescriptors.push_back(descriptor);

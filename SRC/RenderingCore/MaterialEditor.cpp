@@ -18,7 +18,7 @@ namespace
 {
 void SaveMaterials()
 {
-    std::vector<MultiPassProgramDescriptor*>& materials = Rendering::MaterialManager::GetProgramsForEditor();
+    std::vector<MultiPassMaterialDescriptor*>& materials = Rendering::MaterialManager::GetMaterialsForEditor();
     foreachitemconst(material, materials)
     {
         std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + material->Filename());
