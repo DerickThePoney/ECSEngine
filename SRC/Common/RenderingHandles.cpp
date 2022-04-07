@@ -27,6 +27,16 @@ bool MaterialInstanceHandle::IsValid() const
     return FMaterialInstanceId != HandlesId::InvalidMaterialInstanceHandle;
 }
 
+MultiPassMaterialInstanceHandle::MultiPassMaterialInstanceHandle(u32 parMaterialId /*= HandlesId::InvalideMaterialHandle*/)
+    : FMaterialInstanceId(parMaterialId)
+{
+}
+
+bool MultiPassMaterialInstanceHandle::IsValid() const
+{
+    return FMaterialInstanceId != HandlesId::InvalidMaterialInstanceHandle;
+}
+
 TextureHandle::TextureHandle(u32 parBankId /*= HandlesId::InvalidTextureBankId*/, u32 parTextureHandle /*= HandlesId::InvalidTextureHandle*/)
     : FBankId(parBankId)
     , FTextureHandleId(parTextureHandle)

@@ -86,7 +86,9 @@ void DrawProgramsEditor(bool& parIsOpen, float parMenuBarHeight)
 
         if (ImGui::CollapsingHeader(programs[i]->Filename().c_str()))
         {
+            ImGui::Indent();
             programs[i]->DrawEditor();
+            ImGui::Unindent();
         }
 
         ImGui::PopID();

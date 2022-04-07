@@ -226,6 +226,7 @@ void MultiPassProgramDescriptor::DrawEditor()
             ImGui::SameLine();
             it->second = ProgramEditor::ChooseUniformType(it->second);
             ImGui::PopID();
+            idx++;
         }
         if (idxToErase != FUniformsAndTypes.end())
             FUniformsAndTypes.erase(idxToErase);

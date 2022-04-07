@@ -27,6 +27,7 @@ public:
     void Shutdown();
 
     const MaterialInstanceHandle CreateMaterialInstanceIFN(const std::string& parMaterialFilename);
+    const MultiPassMaterialInstanceHandle CreateMultiPassMaterialInstanceIFN(const std::string& parMaterialFilename);
 
     const bgfx::UniformHandle& GetUniform(const std::string& parName, bgfx::UniformType::Enum parType) const;
     const MaterialInstance* GetMaterialInstance(const MaterialInstanceHandle& parHandle) const;
@@ -60,6 +61,9 @@ private:
 
     std::unordered_map<std::string, std::list<MaterialInstanceHandle>> FMaterialDescriptorToMaterialInstance;
     std::unordered_map<MaterialInstanceHandle, MaterialInstance*> FMaterialInstances;
+
+    std::unordered_map<std::string, std::list<MultiPassMaterialInstanceHandle>> FMultiPassMaterialDescriptorsToMultiPassMaterialInstances;
+    std::unordered_map<MultiPassMaterialInstanceHandle, MultiPassMaterialInstance*> FMultiPassMaterialInstances;
 };
 
 MaterialManagerSingleton::MaterialManagerSingleton()
@@ -258,6 +262,37 @@ const MaterialInstanceHandle MaterialManagerSingleton::CreateMaterialInstanceIFN
     return handle;
 }
 
+const MultiPassMaterialInstanceHandle MaterialManagerSingleton::CreateMultiPassMaterialInstanceIFN(const std::string& parMaterialFilename)
+{
+    // TODO CHECK IF MULTIPLE INSTANCE HANDLES ARE NEEDED IE --> SAME DESCRIPTOR, SAME PROGRAM, NO INSTANCING? OR JUST DO THE CHECK LATER ON, INSTANCES SEEM CHEAP?
+    auto itFind = FMultiPassMaterialDescriptorsToMultiPassMaterialInstances.find(parMaterialFilename);
+    if (itFind != FMultiPassMaterialDescriptorsToMultiPassMaterialInstances.end())
+    {
+        return *(itFind->second.begin());
+    }
+
+    AssertRelease(FFileToMultiPassMaterialDescriptor.find(parMaterialFilename) != FFileToMultiPassMaterialDescriptor.end());
+    const u32 materialId = FFileToMultiPassMaterialDescriptor.at(parMaterialFilename);
+    AssertRelease(materialId < (u32)FMultiPassMaterialDescriptors.size());
+    const MultiPassMaterialDescriptor* const materialDescriptor = FMultiPassMaterialDescriptors[materialId];
+    AssertRelease(materialDescriptor != nullptr);
+
+    const std::string& programName = materialDescriptor->MultipassProgramDescriptorFilename();
+    AssertRelease(FFileToMultiPassProgramDescriptor.find(programName) != FFileToMultiPassProgramDescriptor.end());
+    const u32 programId = FFileToMultiPassProgramDescriptor.at(programName);
+    AssertRelease(programId < (u32)FPrograms.size());
+    const MultiPassProgram* const program = FMultiPassPrograms[programId];
+    AssertRelease(program != nullptr && program->IsValid());
+
+    MultiPassMaterialInstance* instance = new MultiPassMaterialInstance(program, materialDescriptor);
+    MultiPassMaterialInstanceHandle handle((u32)FMaterialInstances.size());
+    FMultiPassMaterialInstances[handle] = instance;
+
+    FMultiPassMaterialDescriptorsToMultiPassMaterialInstances[parMaterialFilename].push_back(handle);
+
+    return handle;
+}
+
 const MaterialInstance* MaterialManagerSingleton::GetMaterialInstance(const MaterialInstanceHandle& parHandle) const
 {
     AssertRelease(FMaterialInstances.find(parHandle) != FMaterialInstances.end());
@@ -370,6 +405,12 @@ const MaterialInstanceHandle CreateMaterialInstanceIFN(const std::string& parMat
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     return MaterialManagerSingleton::Instance().CreateMaterialInstanceIFN(parMaterialFilename);
+}
+
+const MultiPassMaterialInstanceHandle CreateMultiPassMaterialInstanceIFN(const std::string& parMaterialFilename)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    return MaterialManagerSingleton::Instance().CreateMultiPassMaterialInstanceIFN(parMaterialFilename);
 }
 
 const MaterialInstance* GetMaterialInstance(const MaterialInstanceHandle& parHandle)
