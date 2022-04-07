@@ -44,6 +44,23 @@ private:
     u32 FMaterialInstanceId;
 };
 
+class MultiPassMaterialInstanceHandle
+{
+public:
+    MultiPassMaterialInstanceHandle(u32 parMaterialId = HandlesId::InvalidMaterialInstanceHandle);
+
+    const u32 GetMaterialId() const { return FMaterialInstanceId; }
+    bool IsValid() const;
+
+    bool operator<(const MultiPassMaterialInstanceHandle& parOther) const { return FMaterialInstanceId < parOther.FMaterialInstanceId; }
+
+    operator u32() const { return FMaterialInstanceId; }
+
+private:
+    u32 FMaterialInstanceId;
+};
+
+
 class TextureName
 {
 public:
@@ -97,6 +114,16 @@ template<>
 struct hash<ECSEngine::Rendering::MaterialInstanceHandle>
 {
     std::size_t operator()(const ECSEngine::Rendering::MaterialInstanceHandle& parHandle) const noexcept
+    {
+        static hash<u32> hash;
+        return hash((u32)parHandle);
+    }
+};
+
+template<>
+struct hash<ECSEngine::Rendering::MultiPassMaterialInstanceHandle>
+{
+    std::size_t operator()(const ECSEngine::Rendering::MultiPassMaterialInstanceHandle& parHandle) const noexcept
     {
         static hash<u32> hash;
         return hash((u32)parHandle);
