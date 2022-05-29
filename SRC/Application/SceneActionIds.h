@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "standalone/brigand.hpp"
 namespace ECSEngine
 {
 enum class ESceneActionId
