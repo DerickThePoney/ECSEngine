@@ -3,6 +3,8 @@
 #include "DataPackDataStructures.h"
 #include "DataPackFile.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 namespace DataPack

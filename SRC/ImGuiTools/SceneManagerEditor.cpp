@@ -5,6 +5,8 @@
 #include "Application/PropertyDrawer.h"
 #include "Application/SceneManager.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 namespace ImGUITools

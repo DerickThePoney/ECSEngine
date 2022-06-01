@@ -6,6 +6,8 @@
 #include "Common/ResourceCache.h"
 #include "ECSCore/EntityTemplateManager.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 namespace ImGUITools

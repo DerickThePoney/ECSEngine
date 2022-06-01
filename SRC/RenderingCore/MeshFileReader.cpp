@@ -12,6 +12,8 @@
 #include "SkelettonManager.h"
 #include "VertexLayout.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 namespace Rendering

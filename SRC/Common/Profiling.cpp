@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 
+#ifdef ENABLE_PROFILING
 #include "Profiling.h"
+#endif
 
 namespace ECSEngine
 {
