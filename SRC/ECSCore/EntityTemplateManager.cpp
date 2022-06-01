@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 
 #include "EntityTemplateManager.h"
+#include "ModuleTemplate.h"
 
 namespace ECSEngine
 {

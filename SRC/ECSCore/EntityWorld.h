@@ -17,7 +17,7 @@ class EntityId;
 class EntityWorld
 {
 public:
-    EntityWorld(const Worlds::Type parWorldId);
+    EntityWorld(const EEntityWorlds parWorldId);
     EntityWorld(EntityWorld&& other) noexcept = delete;
     void operator=(EntityWorld&& other) noexcept = delete;
     ~EntityWorld();
@@ -32,13 +32,13 @@ public:
     void DestroyEntity(const EntityId& parId);
     void DestroyAllRemainingEntities();
 
-    const u32 WorldID() const { return FWorldID; }
+    const u32 WorldID() const { return (u32)FWorldID; }
 
     const EntityTemplate* GetTemplateForEntity(const EntityId& parId);
 
 private:
     u32 FSize;
-    u32 FWorldID;
+    EEntityWorlds FWorldID;
 
     EntityIDGenerator FEntityIdGenerator;
     std::vector<Entity> FEntities;

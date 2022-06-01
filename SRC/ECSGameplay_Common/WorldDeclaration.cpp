@@ -30,6 +30,7 @@
 #include "PositionModule.h"
 
 #include <standalone/brigand.hpp>
+#include "WorldIds.h"
 
 namespace ECSEngine
 {
@@ -84,39 +85,39 @@ struct f
 void CreateWorlds()
 {
     {
-        EntityWorld* world = new EntityWorld(Worlds::STANDARD);
+        EntityWorld* world = new EntityWorld(EEntityWorlds::STANDARD);
         auto r = brigand::for_each<StandardControllers>(f{ world });
-        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::STANDARD, world);
+        WorldManager::Instance().AddEntityWorldStealOwnership(EEntityWorlds::STANDARD, world);
     }
 
     {
-        EntityWorld* world = new EntityWorld(Worlds::COLONY);
+        EntityWorld* world = new EntityWorld(EEntityWorlds::COLONY);
         auto r = brigand::for_each<ColonyControllers>(f{ world });
-        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::COLONY, world);
+        WorldManager::Instance().AddEntityWorldStealOwnership(EEntityWorlds::COLONY, world);
     }
 
     {
-        EntityWorld* world = new EntityWorld(Worlds::CAMERA);
+        EntityWorld* world = new EntityWorld(EEntityWorlds::CAMERA);
         auto r = brigand::for_each<CameraControllers>(f{ world });
-        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::CAMERA, world);
+        WorldManager::Instance().AddEntityWorldStealOwnership(EEntityWorlds::CAMERA, world);
     }
 
     {
-        EntityWorld* world = new EntityWorld(Worlds::RESOURCE_PROD);
+        EntityWorld* world = new EntityWorld(EEntityWorlds::RESOURCE_PROD);
         auto r = brigand::for_each<ResourceProducerControllers>(f{ world });
-        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::RESOURCE_PROD, world);
+        WorldManager::Instance().AddEntityWorldStealOwnership(EEntityWorlds::RESOURCE_PROD, world);
     }
 
     {
-        EntityWorld* world = new EntityWorld(Worlds::PEONS);
+        EntityWorld* world = new EntityWorld(EEntityWorlds::PEONS);
         auto r = brigand::for_each<PeonsControllers>(f{ world });
-        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::PEONS, world);
+        WorldManager::Instance().AddEntityWorldStealOwnership(EEntityWorlds::PEONS, world);
     }
 
     {
-        EntityWorld* world = new EntityWorld(Worlds::BUILDINGS);
+        EntityWorld* world = new EntityWorld(EEntityWorlds::BUILDINGS);
         auto r = brigand::for_each<BuildingControllers>(f{ world });
-        WorldManager::Instance().AddEntityWorldStealOwnership(Worlds::BUILDINGS, world);
+        WorldManager::Instance().AddEntityWorldStealOwnership(EEntityWorlds::BUILDINGS, world);
     }
 }
 

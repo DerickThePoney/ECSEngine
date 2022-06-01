@@ -3,6 +3,7 @@
 #include "Application/PropertyDrawer.h"
 #include "EntityTemplate.h"
 #include "EntityTemplateManager.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -10,7 +11,7 @@ template<>
 class PropertyDrawer<const EntityTemplate*>
 {
 public:
-    PropertyDrawer(const std::string& parPropertyName, const EntityTemplate** parProperty, std::string* parNameProperty, Worlds::Type parFilter = Worlds::LENGTH)
+    PropertyDrawer(const std::string& parPropertyName, const EntityTemplate** parProperty, std::string* parNameProperty, EEntityWorlds parFilter = EEntityWorlds::LENGTH)
         : FName(parPropertyName)
         , FProperty(parProperty)
         , FNameProperty(parNameProperty)
@@ -42,7 +43,7 @@ public:
             {
                 const EntityTemplate* temp = EntityTemplateManager::Instance().GetEntityTemplate((u32)i);
 
-                if (FFilter != Worlds::LENGTH && temp->GetWorldId() != FFilter)
+                if (FFilter != EEntityWorlds::LENGTH && temp->GetWorldId() != FFilter)
                     continue;
 
                 bool is_selected = (selected == (u32)i);
@@ -67,7 +68,7 @@ private:
     std::string FName;
     const EntityTemplate** FProperty = nullptr;
     std::string* FNameProperty = nullptr;
-    Worlds::Type FFilter = Worlds::LENGTH;
+    EEntityWorlds FFilter = EEntityWorlds::LENGTH;
 };
 
 #define EDITOR_PROPERTY_ENTITY_TEMPLATE(NAME, PROPERTY, NAME_PROPERTY)                                                                                                             \

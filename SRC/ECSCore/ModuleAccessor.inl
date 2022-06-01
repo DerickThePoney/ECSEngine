@@ -7,7 +7,7 @@ namespace ECSEngine
 {
 
 template<typename T>
-ModuleAccessor<T>::ModuleAccessor(const Worlds::Type parWorld /*= Worlds::STANDARD*/)
+ModuleAccessor<T>::ModuleAccessor(const EEntityWorlds parWorld /*= Worlds::STANDARD*/)
 {
     AssertRelease(WorldManager::HasInstance());
     EntityWorld* world = WorldManager::Instance().GetWorldIFP(parWorld);
@@ -71,7 +71,7 @@ ECSEngine::ManualLockModuleAccessor<T>::ManualLockModuleAccessor(EntityWorld* wo
 }
 
 template<typename T>
-ECSEngine::ManualLockModuleAccessor<T>::ManualLockModuleAccessor(const Worlds::Type parWorld /*= Worlds::STANDARD*/)
+ECSEngine::ManualLockModuleAccessor<T>::ManualLockModuleAccessor(const EEntityWorlds parWorld /*= Worlds::STANDARD*/)
 {
     AssertRelease(WorldManager::HasInstance());
     EntityWorld* world = WorldManager::Instance().GetWorldIFP(parWorld);

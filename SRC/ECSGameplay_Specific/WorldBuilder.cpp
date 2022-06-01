@@ -11,6 +11,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/WorldIds.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -57,14 +58,14 @@ void WorldBuilder::CreateWorld() const
     // Create colony
     const EntityTemplate* colonyTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FColonyTemplateName);
     AssertRelease(colonyTemplate != nullptr);
-    AssertRelease(colonyTemplate->GetWorldId() == Worlds::COLONY);
+    AssertRelease(colonyTemplate->GetWorldId() == EEntityWorlds::COLONY);
     ModuleParameters::ParameterContainer colonyContainer;
     colonyContainer.Set<ModuleParameters::Position>(glm::vec3(0.f));
     const EntityId colonyId = EntityFactory::CreateEntity(colonyTemplate, colonyContainer);
 
     const EntityTemplate* firePlaceTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FFirePlaceTemplateName);
     AssertRelease(firePlaceTemplate != nullptr);
-    AssertRelease(firePlaceTemplate->GetWorldId() == Worlds::STANDARD);
+    AssertRelease(firePlaceTemplate->GetWorldId() == EEntityWorlds::STANDARD);
     ModuleParameters::ParameterContainer firePlaceContainer;
     firePlaceContainer.Set<ModuleParameters::Position>(glm::vec3(0.f));
     const EntityId firePlaceId = EntityFactory::CreateEntity(firePlaceTemplate, firePlaceContainer);
@@ -80,7 +81,7 @@ void WorldBuilder::CreateWorld() const
 
     const EntityTemplate* peonTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FPeonTemplateName);
     AssertRelease(peonTemplate != nullptr);
-    AssertRelease(peonTemplate->GetWorldId() == Worlds::PEONS);
+    AssertRelease(peonTemplate->GetWorldId() == EEntityWorlds::PEONS);
     std::vector<EntityId> createdPeons;
     createdPeons.reserve(FGenerationParameters.FStartingPeonsNumber);
     ModuleParameters::ParameterContainer peonsParamContainer;
@@ -89,7 +90,7 @@ void WorldBuilder::CreateWorld() const
           FGenerationParameters.FSpawnRadius, FGenerationParameters.FSpawnRadius, FGenerationParameters.FStartingPeonsNumber, peonTemplate, createdPeons, peonsParamContainer);
 
     {
-        ManualLockModuleAccessor<ColonyPeonsManagementModule> colonyPeonsManagementModuleAccessor(Worlds::COLONY);
+        ManualLockModuleAccessor<ColonyPeonsManagementModule> colonyPeonsManagementModuleAccessor(EEntityWorlds::COLONY);
         colonyPeonsManagementModuleAccessor.LockIFN();
         ColonyPeonsManagementModule* colonyPeonsModule = colonyPeonsManagementModuleAccessor[colonyId];
         AssertRelease(colonyPeonsModule != nullptr);

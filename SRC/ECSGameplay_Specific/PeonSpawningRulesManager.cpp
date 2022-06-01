@@ -34,7 +34,7 @@ void PeonSpawningCostRule::DrawEditingHeader()
 void PeonSpawningCostRule::DrawEditor()
 {
     const EntityTemplate* et = PeonTemplate();
-    EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED("##Template", et, FPeonTemplateName, Worlds::PEONS);
+    EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED("##Template", et, FPeonTemplateName, EEntityWorlds::PEONS);
     ImGui::NextColumn();
     ImGui::BeginChild(ImGui::GetID(this), ImVec2(ImGui::GetContentRegionAvailWidth(), 100.f));
     ImGui::Columns(3);

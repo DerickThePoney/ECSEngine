@@ -1,21 +1,15 @@
 ﻿#pragma once
 #include "EntityModuleKey.h"
-#include "ModuleTemplate.h"
 #include "WorldIds.h"
 
 namespace ECSEngine
 {
+class ModuleTemplate;
 class EntityTemplate
 {
 public:
-    EntityTemplate()
-        : FWorld(Worlds::STANDARD)
-        , FName("Default")
-#ifdef PERFORM_SECURITY_CHECKS
-        , FHasBeenInit(false)
-#endif
-    {
-    }
+    EntityTemplate();
+
 
     EntityTemplate(const EntityTemplate& other) = delete;
     EntityTemplate& operator=(const EntityTemplate& other) = delete;
@@ -30,11 +24,7 @@ public:
     const bool HasModule(const u32 parModuleId) const { return FKey.HasModule(parModuleId); }
 
     template<typename Module>
-    void SetHasModule()
-    {
-        FKey.SetHasModule<Module>();
-        AddModule(ModuleTraits<Module>::GetModuleId());
-    }
+    void SetHasModule();
 
     const void SetHasModule(const u32 parModuleId)
     {
@@ -46,22 +36,13 @@ public:
 
     void AddModule(const u32 parId);
 
-    const Worlds::Type& GetWorldId() const { return FWorld; }
-    void SetWorldId_IKnowWhatImDoing(Worlds::Type parWorld) { FWorld = parWorld; }
+    const EEntityWorlds& GetWorldId() const { return FWorld; }
+    void SetWorldId_IKnowWhatImDoing(EEntityWorlds parWorld) { FWorld = parWorld; }
 
     template<typename Module>
-    const ModuleTemplate* GetModuleTemplate() const
-    {
-        return GetModuleTemplate(ModuleTraits<Module>::GetModuleId());
-    }
+    const ModuleTemplate* GetModuleTemplate() const;
 
-    const ModuleTemplate* GetModuleTemplate(const u32 parId) const
-    {
-        auto it = FModuleTemplates.find(parId);
-        if (it == FModuleTemplates.end())
-            return nullptr;
-        return it->second.get();
-    }
+    const ModuleTemplate* GetModuleTemplate(const u32 parId) const;
 
     const std::string& GetName() const { return FName; }
 
@@ -80,17 +61,7 @@ public:
     {
         ar(PROPERTY(Name), PROPERTY(World), PROPERTY(Key), NAMEDPROPERTY("ModuleTemplatesList", FModuleTemplates));
 
-        EntityModuleKey key;
-        std::map<u32, std::unique_ptr<ModuleTemplate>> moduleTemplates;
-        foreachitem(modTemplate, FModuleTemplates)
-        {
-            const u32 moduleId = modTemplate.second->GetModuleId();
-            key.SetHasModule(moduleId);
-            moduleTemplates.insert_or_assign(moduleId, std::move(modTemplate.second));
-        }
-
-        FKey = key;
-        FModuleTemplates = std::move(moduleTemplates);
+        UpdateKey();
     }
 
     void DrawEditor();
@@ -104,8 +75,10 @@ private:
 
     const void RemoveModule(const u32 parModuleId) { return FKey.RemoveModule(parModuleId); }
 
+    void UpdateKey();
+
 private:
-    Worlds::Type FWorld;
+    EEntityWorlds FWorld;
     EntityModuleKey FKey;
     std::map<u32, std::unique_ptr<ModuleTemplate>> FModuleTemplates;
 
@@ -114,4 +87,5 @@ private:
     bool FHasBeenInit;
 #endif
 };
+
 } // namespace ECSEngine

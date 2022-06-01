@@ -4,24 +4,24 @@
 
 namespace ECSEngine
 {
-namespace Worlds
-{
 
-const char* GetName(const Type parWorld)
+namespace EEntityWorldsHelpers
+{
+const char* GetName(const EEntityWorlds parWorld)
 {
     switch (parWorld)
     {
-    case STANDARD:
+    case EEntityWorlds::STANDARD:
         return "STANDARD";
-    case COLONY:
+    case EEntityWorlds::COLONY:
         return "COLONY";
-    case CAMERA:
+    case EEntityWorlds::CAMERA:
         return "CAMERA";
-    case RESOURCE_PROD:
+    case EEntityWorlds::RESOURCE_PROD:
         return "RESOURCE_PROD";
-    case PEONS:
+    case EEntityWorlds::PEONS:
         return "PEONS";
-    case BUILDINGS:
+    case EEntityWorlds::BUILDINGS:
         return "BUILDINGS";
     default:
         AssertNotReached();
@@ -29,6 +29,5 @@ const char* GetName(const Type parWorld)
         break;
     }
 }
-
-} // namespace Worlds
+} // namespace EEntityWorldsHelpers
 } // namespace ECSEngine

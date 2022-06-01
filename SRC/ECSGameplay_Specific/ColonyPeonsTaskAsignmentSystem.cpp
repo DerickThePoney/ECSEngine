@@ -13,6 +13,7 @@
 #include "ResourceStorageModule.h"
 
 #include <random>
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -52,16 +53,16 @@ EntityId GetTargetForPeon(const PositionModule& parPeonPositionModule,
 ColonyPeonsTaskAssignmentSystem::ColonyPeonsTaskAssignmentSystem()
 {
     // Colony
-    RegisterDepency<ColonyPeonsManagementModule>(Worlds::COLONY);
-    RegisterDepency<ColonyTraitsModule>(Worlds::COLONY);
+    RegisterDepency<ColonyPeonsManagementModule>(EEntityWorlds::COLONY);
+    RegisterDepency<ColonyTraitsModule>(EEntityWorlds::COLONY);
 
     // resource producers
-    RegisterDepency<PositionModule>(Worlds::RESOURCE_PROD);
-    RegisterDepency<ResourceStorageModule>(Worlds::RESOURCE_PROD);
+    RegisterDepency<PositionModule>(EEntityWorlds::RESOURCE_PROD);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::RESOURCE_PROD);
 
     // peons
-    RegisterDepency<PositionModule>(Worlds::PEONS);
-    RegisterDepency<ResourceHarvesterModule>(Worlds::PEONS);
+    RegisterDepency<PositionModule>(EEntityWorlds::PEONS);
+    RegisterDepency<ResourceHarvesterModule>(EEntityWorlds::PEONS);
 }
 
 ColonyPeonsTaskAssignmentSystem::~ColonyPeonsTaskAssignmentSystem()
@@ -72,14 +73,14 @@ void ColonyPeonsTaskAssignmentSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<ColonyPeonsManagementModule> colonyPeonsModuleAccessor(Worlds::COLONY);
-    ModuleAccessor<ColonyTraitsModule> colonyTraitsAccessor(Worlds::COLONY);
+    ModuleAccessor<ColonyPeonsManagementModule> colonyPeonsModuleAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<ColonyTraitsModule> colonyTraitsAccessor(EEntityWorlds::COLONY);
 
-    ModuleAccessor<PositionModule> resourcesPositionModuleAccessor(Worlds::RESOURCE_PROD);
-    ModuleAccessor<PositionModule> peonsPositionModuleAccessor(Worlds::PEONS);
+    ModuleAccessor<PositionModule> resourcesPositionModuleAccessor(EEntityWorlds::RESOURCE_PROD);
+    ModuleAccessor<PositionModule> peonsPositionModuleAccessor(EEntityWorlds::PEONS);
 
-    ModuleAccessor<ResourceStorageModule> producerResourceStorageAccessor(Worlds::RESOURCE_PROD);
-    ModuleAccessor<ResourceHarvesterModule> peonHarvesterAccessor(Worlds::PEONS);
+    ModuleAccessor<ResourceStorageModule> producerResourceStorageAccessor(EEntityWorlds::RESOURCE_PROD);
+    ModuleAccessor<ResourceHarvesterModule> peonHarvesterAccessor(EEntityWorlds::PEONS);
 
     foreachitem(colonyPeonsModule, colonyPeonsModuleAccessor)
     {

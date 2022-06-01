@@ -6,6 +6,7 @@
 #include "Application/PropertyDrawer.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleUtils.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::HousingPlaceModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::HousingPlaceModuleTemplate);
@@ -47,7 +48,7 @@ u32 HousingPlaceModule::RemainingFreeSpace() const
 
 void HousingPlaceModule::AddNewResident(const EntityId& parUnitId)
 {
-    AlwaysCheckedAssert(parUnitId.GetWorldId() == Worlds::PEONS);
+    AlwaysCheckedAssert(parUnitId.GetWorldId() == (u32)EEntityWorlds::PEONS);
 
     const u32 remainingSpace = RemainingFreeSpace();
     AlwaysCheckedAssert(remainingSpace > 0);

@@ -5,6 +5,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "HousingPlaceModule.h"
 #include "LinkToHousingPlaceModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -12,15 +13,15 @@ namespace ECSEngine
 HousingSystem::HousingSystem()
     : ModuleSystem()
 {
-    RegisterDepency<LinkToHousingPlaceModule>(Worlds::PEONS);
-    RegisterDepency<HousingPlaceModule>(Worlds::BUILDINGS);
+    RegisterDepency<LinkToHousingPlaceModule>(EEntityWorlds::PEONS);
+    RegisterDepency<HousingPlaceModule>(EEntityWorlds::BUILDINGS);
 }
 
 void HousingSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<HousingPlaceModule> housingPlaceController(Worlds::BUILDINGS);
+    ModuleAccessor<HousingPlaceModule> housingPlaceController(EEntityWorlds::BUILDINGS);
 
     // 1- loop though the places to look for free spots
     foreachitemconst(housingPlace, housingPlaceController)
@@ -50,7 +51,7 @@ void HousingSystem::VirtualUpdate()
         return;
 
     // 2- Loop through the peons to check for the ones that don't have any house
-    ModuleAccessor<LinkToHousingPlaceModule> linkToHousingPlaceController(Worlds::PEONS);
+    ModuleAccessor<LinkToHousingPlaceModule> linkToHousingPlaceController(EEntityWorlds::PEONS);
     FHomelessPeons.clear();
     foreachitemconst(linkToHouse, linkToHousingPlaceController)
     {

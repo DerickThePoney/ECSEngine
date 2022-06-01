@@ -7,14 +7,16 @@
 #include "EntityTemplate.h"
 #include "Module.h"
 #include "ModuleController.h"
+#include "ECSGameplay_Common/WorldIds.h"
+#include "ModuleTemplate.h"
 
 namespace ECSEngine
 {
-EntityWorld::EntityWorld(const Worlds::Type parWorldId)
+EntityWorld::EntityWorld(const EEntityWorlds parWorldId)
     : FSize((u32)EModuleId::Length)
     , FWorldID(parWorldId)
 {
-    AssertRelease(FWorldID < Worlds::LENGTH);
+    AssertRelease(FWorldID < EEntityWorlds::LENGTH);
     AssertRelease(FSize != 0);
 
     FEntityIdGenerator.SetWorldId(FWorldID);
@@ -71,7 +73,7 @@ EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(const EntityTemplat
 void EntityWorld::DestroyEntity(const EntityId& parId)
 {
     AssertRelease(parId.Valid());
-    AssertRelease(parId.GetWorldId() == FWorldID);
+    AssertRelease(parId.GetWorld() == FWorldID);
     AssertRelease(FAllocatedEntities.find(parId.GetSequentialId()) != FAllocatedEntities.end());
     FEntityIdGenerator.ReleaseEntityId(parId);
 

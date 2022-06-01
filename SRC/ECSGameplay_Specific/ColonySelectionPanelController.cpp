@@ -25,7 +25,7 @@ void ColonySelectionPanelController::VirtualUpdate()
 {
     UIControllerWithModuleAccessors::VirtualUpdate();
 
-    const EntityId colonyId = EntityId(Worlds::COLONY, 0);
+    const EntityId colonyId = EntityId((u32)EEntityWorlds::COLONY, 0);
 
     const ColonyModule* colonyModule = GetModule<ColonyModule>(colonyId);
     if (colonyModule == nullptr)

@@ -12,7 +12,7 @@ template<typename T>
 class ModuleAccessor
 {
 public:
-    ModuleAccessor(const Worlds::Type parWorld = Worlds::STANDARD);
+    ModuleAccessor(const EEntityWorlds parWorld = 0);
     ModuleAccessor(EntityWorld* world);
 
     T* operator[](const EntityId& parId);
@@ -75,7 +75,7 @@ template<typename T>
 class ManualLockModuleAccessor
 {
 public:
-    ManualLockModuleAccessor(const Worlds::Type parWorld = Worlds::STANDARD);
+    ManualLockModuleAccessor(const EEntityWorlds parWorld = 0);
     ManualLockModuleAccessor(EntityWorld* world);
 
     ~ManualLockModuleAccessor();

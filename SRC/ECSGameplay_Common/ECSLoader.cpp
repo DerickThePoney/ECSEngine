@@ -9,6 +9,7 @@
 #include "Common/ResourceHandle.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/EntityTemplate.h"
+#include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/WorldManager.h"

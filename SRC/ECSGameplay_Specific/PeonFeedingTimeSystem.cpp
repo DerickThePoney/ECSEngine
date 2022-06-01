@@ -12,6 +12,7 @@
 #include "GameplayConstants.h"
 #include "PeonFeedingTimeModule.h"
 #include "ResourceStorageModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -19,11 +20,11 @@ namespace ECSEngine
 PeonFeedingTimeSystem::PeonFeedingTimeSystem()
     : ModuleSystem()
 {
-    RegisterDepency<ColonyPeonsManagementModule>(Worlds::COLONY);
-    RegisterDepency<PeonFeedingTimeModule>(Worlds::COLONY);
-    RegisterDepency<ResourceStorageModule>(Worlds::COLONY);
-    RegisterDepency<PositionModule>(Worlds::PEONS);
-    RegisterDepency<PositionModule>(Worlds::COLONY);
+    RegisterDepency<ColonyPeonsManagementModule>(EEntityWorlds::COLONY);
+    RegisterDepency<PeonFeedingTimeModule>(EEntityWorlds::COLONY);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::COLONY);
+    RegisterDepency<PositionModule>(EEntityWorlds::PEONS);
+    RegisterDepency<PositionModule>(EEntityWorlds::COLONY);
 }
 
 PeonFeedingTimeSystem::~PeonFeedingTimeSystem()
@@ -34,11 +35,11 @@ void PeonFeedingTimeSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<PeonFeedingTimeModule> lifeSpanAccessor(Worlds::COLONY);
-    ModuleAccessor<ColonyPeonsManagementModule> colonyManagerAccessor(Worlds::COLONY);
-    ModuleAccessor<ResourceStorageModule> colonyStorageAccessor(Worlds::COLONY);
-    ModuleAccessor<PositionModule> colonyPositionAccessor(Worlds::COLONY);
-    ModuleAccessor<PositionModule> peonPositionAccessor(Worlds::PEONS);
+    ModuleAccessor<PeonFeedingTimeModule> lifeSpanAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<ColonyPeonsManagementModule> colonyManagerAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<ResourceStorageModule> colonyStorageAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<PositionModule> colonyPositionAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<PositionModule> peonPositionAccessor(EEntityWorlds::PEONS);
 
     // Idées:
     //    - Chaque span, on nourrit les peons. X points de nourriture par peons.

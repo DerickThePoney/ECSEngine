@@ -26,7 +26,7 @@ public:
     explicit EntityId(u32 parWorldId = 0xFF, u32 parId = 0xFFFFFF);
 
     const u8 GetWorldId() const { return FId.GetWorldId(); }
-    const Worlds::Type GetWorld() const { return (Worlds::Type)GetWorldId(); }
+    const EEntityWorlds GetWorld() const { return (EEntityWorlds)GetWorldId(); }
     const u32 GetSequentialId() const { return FId.GetSequentialId(); }
     const u32 GetRawId() const { return FId.GetRawId(); }
     bool Valid() const { return FId.GetWorldId() != 0xFF && FId.GetSequentialId() != 0xFFFFFF; }

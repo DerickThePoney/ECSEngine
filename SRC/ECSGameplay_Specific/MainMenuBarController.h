@@ -2,7 +2,7 @@
 #include "ColonyModule.h"
 #include "ColonyPeonsManagementModule.h"
 #include "ECSCore/UIController.h"
-#include "ECSCore/WorldIds.h"
+#include "ECSGameplay_Common/WorldIds.h"
 #include "EnergyProducerModule.h"
 #include "HousingPlaceModule.h"
 #include "PeonFeedingTimeModule.h"
@@ -16,13 +16,13 @@ namespace ECSEngine
 namespace UI
 {
 
-class MainMenuBarController : public UIControllerWithModuleAccessors<MC<ColonyModule, Worlds::COLONY>,
-                                    MC<ResourceStorageModule, Worlds::COLONY>,
-                                    MC<PeonSpawnModule, Worlds::COLONY>,
-                                    MC<ColonyPeonsManagementModule, Worlds::COLONY>,
-                                    MC<PeonFeedingTimeModule, Worlds::COLONY>,
-                                    MC<HousingPlaceModule, Worlds::BUILDINGS>,
-                                    MC<EnergyProducerModule, Worlds::BUILDINGS>>
+class MainMenuBarController : public UIControllerWithModuleAccessors<MC<ColonyModule, EEntityWorlds::COLONY>,
+                                    MC<ResourceStorageModule, EEntityWorlds::COLONY>,
+                                    MC<PeonSpawnModule, EEntityWorlds::COLONY>,
+                                    MC<ColonyPeonsManagementModule, EEntityWorlds::COLONY>,
+                                    MC<PeonFeedingTimeModule, EEntityWorlds::COLONY>,
+                                    MC<HousingPlaceModule, EEntityWorlds::BUILDINGS>,
+                                    MC<EnergyProducerModule, EEntityWorlds::BUILDINGS>>
 {
 public:
     MainMenuBarController();

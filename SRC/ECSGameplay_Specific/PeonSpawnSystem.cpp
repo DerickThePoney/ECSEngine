@@ -10,6 +10,7 @@
 #include "GameplayRulesManager.h"
 #include "PeonSpawnModule.h"
 #include "ResourceStorageModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -17,10 +18,10 @@ namespace ECSEngine
 PeonSpawnSystem::PeonSpawnSystem()
     : ModuleSystem()
 {
-    RegisterDepency<PeonSpawnModule>(Worlds::COLONY);
-    RegisterDepency<ColonyPeonsManagementModule>(Worlds::COLONY);
-    RegisterDepency<ResourceStorageModule>(Worlds::COLONY);
-    RegisterDepency<PositionModule>(Worlds::COLONY);
+    RegisterDepency<PeonSpawnModule>(EEntityWorlds::COLONY);
+    RegisterDepency<ColonyPeonsManagementModule>(EEntityWorlds::COLONY);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::COLONY);
+    RegisterDepency<PositionModule>(EEntityWorlds::COLONY);
 }
 
 PeonSpawnSystem::~PeonSpawnSystem()
@@ -31,10 +32,10 @@ void PeonSpawnSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<PeonSpawnModule> colonySpawnModuleAccessor(Worlds::COLONY);
-    ModuleAccessor<ColonyPeonsManagementModule> colonyPeonsAccessor(Worlds::COLONY);
-    ModuleAccessor<ResourceStorageModule> colonyResourceStorageAccessor(Worlds::COLONY);
-    ModuleAccessor<PositionModule> colonyPositionAccessor(Worlds::COLONY);
+    ModuleAccessor<PeonSpawnModule> colonySpawnModuleAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<ColonyPeonsManagementModule> colonyPeonsAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<ResourceStorageModule> colonyResourceStorageAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<PositionModule> colonyPositionAccessor(EEntityWorlds::COLONY);
 
     foreachitem(spawnModule, colonySpawnModuleAccessor)
     {

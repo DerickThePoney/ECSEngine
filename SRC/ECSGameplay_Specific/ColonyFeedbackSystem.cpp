@@ -12,22 +12,23 @@
 #include "GameplayConstants.h"
 #include "GameplayFeedbackDrawer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
 
 ColonyFeedbackSystem::ColonyFeedbackSystem()
 {
-    RegisterDepency<PositionModule>(Worlds::COLONY);
-    RegisterDepency<ColonyTraitsModule>(Worlds::COLONY);
+    RegisterDepency<PositionModule>(EEntityWorlds::COLONY);
+    RegisterDepency<ColonyTraitsModule>(EEntityWorlds::COLONY);
 }
 
 void ColonyFeedbackSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<ColonyTraitsModule> colonyTraitsAccessor(Worlds::COLONY);
-    ModuleAccessor<PositionModule> colonyPositionAccessor(Worlds::COLONY);
+    ModuleAccessor<ColonyTraitsModule> colonyTraitsAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<PositionModule> colonyPositionAccessor(EEntityWorlds::COLONY);
 
     foreachitemconst(traits, colonyTraitsAccessor)
     {

@@ -13,28 +13,29 @@
 #include "ResourceManager.h"
 #include "ResourceStorageModule.h"
 #include "StorageSlotModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
 StorageSlotSystem::StorageSlotSystem()
     : ModuleSystem()
 {
-    RegisterDepency<StorageSlotModule>(Worlds::BUILDINGS);
-    RegisterDepency<ResourceStorageModule>(Worlds::BUILDINGS);
-    RegisterDepency<LinkToStorageModule>(Worlds::BUILDINGS);
-    RegisterDepency<PositionModule>(Worlds::BUILDINGS);
-    RegisterDepency<RecipeProductionModule>(Worlds::BUILDINGS);
+    RegisterDepency<StorageSlotModule>(EEntityWorlds::BUILDINGS);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::BUILDINGS);
+    RegisterDepency<LinkToStorageModule>(EEntityWorlds::BUILDINGS);
+    RegisterDepency<PositionModule>(EEntityWorlds::BUILDINGS);
+    RegisterDepency<RecipeProductionModule>(EEntityWorlds::BUILDINGS);
 }
 
 void StorageSlotSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<StorageSlotModule> storageSlotAccessor(Worlds::BUILDINGS);
-    ModuleAccessor<ResourceStorageModule> resourceStorageAccessor(Worlds::BUILDINGS);
-    ModuleAccessor<LinkToStorageModule> linkToStorageAccessor(Worlds::BUILDINGS);
-    ModuleAccessor<PositionModule> positionAccessor(Worlds::BUILDINGS);
-    ModuleAccessor<RecipeProductionModule> recipeProdAccessor(Worlds::BUILDINGS);
+    ModuleAccessor<StorageSlotModule> storageSlotAccessor(EEntityWorlds::BUILDINGS);
+    ModuleAccessor<ResourceStorageModule> resourceStorageAccessor(EEntityWorlds::BUILDINGS);
+    ModuleAccessor<LinkToStorageModule> linkToStorageAccessor(EEntityWorlds::BUILDINGS);
+    ModuleAccessor<PositionModule> positionAccessor(EEntityWorlds::BUILDINGS);
+    ModuleAccessor<RecipeProductionModule> recipeProdAccessor(EEntityWorlds::BUILDINGS);
 
     auto functor = [this, &storageSlotAccessor, &positionAccessor, &linkToStorageAccessor, &recipeProdAccessor](const BuildingNeedsStorageMessage& parMessage) {
         this->ProcessMessages(parMessage, storageSlotAccessor, positionAccessor, linkToStorageAccessor, recipeProdAccessor);
