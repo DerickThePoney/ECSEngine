@@ -5,6 +5,7 @@
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ResourceStorageModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -25,18 +26,18 @@ void UpdateStorageStats(ModuleAccessor<ResourceStorageModule>& parAccessor)
 ResourceStatisticsUpdateSystem::ResourceStatisticsUpdateSystem()
     : ModuleSystem()
 {
-    RegisterDepency<ResourceStorageModule>(Worlds::COLONY);
-    RegisterDepency<ResourceStorageModule>(Worlds::RESOURCE_PROD);
-    RegisterDepency<ResourceStorageModule>(Worlds::PEONS);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::COLONY);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::RESOURCE_PROD);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::PEONS);
 }
 
 void ResourceStatisticsUpdateSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<ResourceStorageModule> colonyStorageAccessor(Worlds::COLONY);
-    ModuleAccessor<ResourceStorageModule> peonsStorageAccessor(Worlds::PEONS);
-    ModuleAccessor<ResourceStorageModule> producerStorageAccessor(Worlds::RESOURCE_PROD);
+    ModuleAccessor<ResourceStorageModule> colonyStorageAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<ResourceStorageModule> peonsStorageAccessor(EEntityWorlds::PEONS);
+    ModuleAccessor<ResourceStorageModule> producerStorageAccessor(EEntityWorlds::RESOURCE_PROD);
 
     UpdateStorageStats(colonyStorageAccessor);
     UpdateStorageStats(producerStorageAccessor);

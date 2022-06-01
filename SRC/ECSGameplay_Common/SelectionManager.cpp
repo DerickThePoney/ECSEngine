@@ -6,6 +6,7 @@
 #include "ECSCore/EntityId.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "RenderingCore/GFXRepresentationProxy.h"
+#include "WorldIds.h"
 
 namespace ECSEngine
 {
@@ -13,14 +14,14 @@ SelectionManager::SelectionManager()
     : ModuleSystem()
     , Singleton()
 {
-    RegisterDepency<ApparenceModule>(Worlds::BUILDINGS);
+    RegisterDepency<ApparenceModule>(EEntityWorlds::BUILDINGS);
 }
 
 void SelectionManager::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<ApparenceModule> apparenceAccessor(Worlds::BUILDINGS);
+    ModuleAccessor<ApparenceModule> apparenceAccessor(EEntityWorlds::BUILDINGS);
 
     FSelectedUnits.clear();
     FHighlightedUnits.clear();

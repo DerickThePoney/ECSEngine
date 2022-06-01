@@ -4,6 +4,7 @@
 
 #include "ECSCore/ModuleAccessor.h"
 #include "StorageSlotModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -11,7 +12,7 @@ ResourceManager::ResourceManager()
     : Singleton()
     , ModuleSystem()
 {
-    RegisterDepency<StorageSlotModule>(Worlds::BUILDINGS);
+    RegisterDepency<StorageSlotModule>(EEntityWorlds::BUILDINGS);
 }
 
 ResourceManager::~ResourceManager()
@@ -22,7 +23,7 @@ void ResourceManager::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<StorageSlotModule> storageSlotAccessor(Worlds::BUILDINGS);
+    ModuleAccessor<StorageSlotModule> storageSlotAccessor(EEntityWorlds::BUILDINGS);
 
     FResources.clear();
     foreachitemconst(storageSlotModule, storageSlotAccessor)

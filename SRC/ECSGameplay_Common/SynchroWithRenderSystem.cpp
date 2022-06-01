@@ -9,30 +9,31 @@
 #include "ECSGameplay_Common/PositionModule.h"
 #include "RenderingCore/GFXKeyHelper.h"
 #include "RenderingCore/GFXRepresentationProxy.h"
+#include "WorldIds.h"
 
 namespace ECSEngine
 {
 SynchroWithRenderSystem::SynchroWithRenderSystem()
     : parent_type()
 {
-    RegisterDepency<ApparenceModule>(Worlds::STANDARD);
-    RegisterDepency<PositionModule>(Worlds::STANDARD);
-    RegisterDepency<OrientationModule>(Worlds::STANDARD);
+    RegisterDepency<ApparenceModule>(EEntityWorlds::STANDARD);
+    RegisterDepency<PositionModule>(EEntityWorlds::STANDARD);
+    RegisterDepency<OrientationModule>(EEntityWorlds::STANDARD);
 
-    RegisterDepency<ApparenceModule>(Worlds::RESOURCE_PROD);
-    RegisterDepency<PositionModule>(Worlds::RESOURCE_PROD);
-    RegisterDepency<OrientationModule>(Worlds::RESOURCE_PROD);
+    RegisterDepency<ApparenceModule>(EEntityWorlds::RESOURCE_PROD);
+    RegisterDepency<PositionModule>(EEntityWorlds::RESOURCE_PROD);
+    RegisterDepency<OrientationModule>(EEntityWorlds::RESOURCE_PROD);
 
-    RegisterDepency<ApparenceModule>(Worlds::PEONS);
-    RegisterDepency<PositionModule>(Worlds::PEONS);
-    RegisterDepency<OrientationModule>(Worlds::PEONS);
+    RegisterDepency<ApparenceModule>(EEntityWorlds::PEONS);
+    RegisterDepency<PositionModule>(EEntityWorlds::PEONS);
+    RegisterDepency<OrientationModule>(EEntityWorlds::PEONS);
 }
 
 SynchroWithRenderSystem::~SynchroWithRenderSystem()
 {
 }
 
-template<Worlds::Type world>
+template<EEntityWorlds world>
 void UpdateObjectsForRendering()
 {
     ModuleAccessor<ApparenceModule> apparenceController(world);
@@ -59,9 +60,9 @@ void SynchroWithRenderSystem::VirtualUpdate()
 {
     parent_type::VirtualUpdate();
 
-    UpdateObjectsForRendering<Worlds::STANDARD>();
-    UpdateObjectsForRendering<Worlds::RESOURCE_PROD>();
-    UpdateObjectsForRendering<Worlds::PEONS>();
+    UpdateObjectsForRendering<EEntityWorlds::STANDARD>();
+    UpdateObjectsForRendering<EEntityWorlds::RESOURCE_PROD>();
+    UpdateObjectsForRendering<EEntityWorlds::PEONS>();
 }
 
 } // namespace ECSEngine

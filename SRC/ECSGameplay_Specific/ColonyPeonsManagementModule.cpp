@@ -6,6 +6,7 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::ColonyPeonsManagementModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::ColonyPeonsManagementModuleTemplate)
@@ -35,7 +36,7 @@ void ColonyPeonsManagementModule::VirtualInit(const EntityId& parUnitId, const M
 
 void ColonyPeonsManagementModule::SetPeonOccupied(const EntityId& parPeon)
 {
-    AssertRelease(parPeon.GetWorldId() == Worlds::PEONS);
+    AssertRelease(parPeon.GetWorld() == EEntityWorlds::PEONS);
     auto it = std::find(FIdlePeons.begin(), FIdlePeons.end(), parPeon);
     AssertRelease(it != FIdlePeons.end());
     FIdlePeons.erase(it);
@@ -49,7 +50,7 @@ void ColonyPeonsManagementModule::SetPeonOccupied(const EntityId& parPeon)
 
 void ColonyPeonsManagementModule::SetPeonIdleIFN(const EntityId& parPeon)
 {
-    AssertRelease(parPeon.GetWorldId() == Worlds::PEONS);
+    AssertRelease(parPeon.GetWorld() == EEntityWorlds::PEONS);
     auto it = std::find(FIdlePeons.begin(), FIdlePeons.end(), parPeon);
     if (it != FIdlePeons.end())
         return;
@@ -62,7 +63,7 @@ void ColonyPeonsManagementModule::SetPeonIdleIFN(const EntityId& parPeon)
 
 void ColonyPeonsManagementModule::AddNewPeon(const EntityId& parPeon)
 {
-    AssertRelease(parPeon.GetWorldId() == Worlds::PEONS);
+    AssertRelease(parPeon.GetWorld() == EEntityWorlds::PEONS);
 #ifdef PERFORM_SECURITY_CHECKS
     {
         auto it = std::find(FIdlePeons.begin(), FIdlePeons.end(), parPeon);
@@ -79,7 +80,7 @@ void ColonyPeonsManagementModule::AddNewPeon(const EntityId& parPeon)
 
 void ColonyPeonsManagementModule::RemovePeon(const EntityId& parPeon)
 {
-    AssertRelease(parPeon.GetWorldId() == Worlds::PEONS);
+    AssertRelease(parPeon.GetWorld() == EEntityWorlds::PEONS);
 
     {
         auto it = std::find(FIdlePeons.begin(), FIdlePeons.end(), parPeon);

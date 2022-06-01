@@ -6,6 +6,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "RecipeProductionModule.h"
 #include "ResourceStorageModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -13,8 +14,8 @@ namespace ECSEngine
 ResourceProductionSystem::ResourceProductionSystem()
     : ModuleSystem()
 {
-    RegisterDepency<RecipeProductionModule>(Worlds::BUILDINGS);
-    RegisterDepency<ResourceStorageModule>(Worlds::BUILDINGS);
+    RegisterDepency<RecipeProductionModule>(EEntityWorlds::BUILDINGS);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::BUILDINGS);
 }
 
 ResourceProductionSystem::~ResourceProductionSystem()
@@ -25,8 +26,8 @@ void ResourceProductionSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<ResourceStorageModule> resourceStorageAccesor(Worlds::BUILDINGS);
-    ModuleAccessor<RecipeProductionModule> recipeProductionAccessor(Worlds::BUILDINGS);
+    ModuleAccessor<ResourceStorageModule> resourceStorageAccesor(EEntityWorlds::BUILDINGS);
+    ModuleAccessor<RecipeProductionModule> recipeProductionAccessor(EEntityWorlds::BUILDINGS);
 
     foreachitem(producer, recipeProductionAccessor)
     {

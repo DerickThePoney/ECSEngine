@@ -16,6 +16,7 @@
 #include "RenderingCore/GFXKeyHelper.h"
 #include "RenderingCore/GFXRepresentationProxy.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -34,7 +35,7 @@ void PlaceBuildingMousePolicy::SetupMousePolicy(const std::string& parBuildingTe
 {
     FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(parBuildingTemplateName);
     AssertRelease(FTemplate != nullptr);
-    AssertRelease(FTemplate->GetWorldId() == Worlds::BUILDINGS);
+    AssertRelease(FTemplate->GetWorldId() == EEntityWorlds::BUILDINGS);
 }
 
 void PlaceBuildingMousePolicy::VirtualActivate()

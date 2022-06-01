@@ -8,12 +8,12 @@ namespace ECSEngine
 {
 namespace UI
 {
-template<typename T, Worlds::Type _World>
+template<typename T, EEntityWorlds _World>
 struct MC
 {
     using ModuleType = std::decay_t<T>;
 
-    constexpr static Worlds::Type World = _World;
+    constexpr static EEntityWorlds World = _World;
     using Accessor = ManualLockModuleAccessor<ModuleType>;
 
     static Accessor Construct() { return Accessor(_World); }

@@ -12,6 +12,7 @@
 #include "ECSGameplay_Common/PositionModule.h"
 #include "ResourceHarvesterModule.h"
 #include "ResourceStorageModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -59,20 +60,20 @@ PeonsHaverstingSystem::PeonsHaverstingSystem()
     : ModuleSystem()
 {
     // Colony
-    RegisterDepency<ColonyPeonsManagementModule>(Worlds::COLONY);
-    RegisterDepency<PositionModule>(Worlds::COLONY);
-    RegisterDepency<ResourceStorageModule>(Worlds::COLONY);
+    RegisterDepency<ColonyPeonsManagementModule>(EEntityWorlds::COLONY);
+    RegisterDepency<PositionModule>(EEntityWorlds::COLONY);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::COLONY);
 
     // resource producers
-    RegisterDepency<PositionModule>(Worlds::RESOURCE_PROD);
-    RegisterDepency<ResourceStorageModule>(Worlds::RESOURCE_PROD);
+    RegisterDepency<PositionModule>(EEntityWorlds::RESOURCE_PROD);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::RESOURCE_PROD);
 
     // peons
-    RegisterDepency<PositionModule>(Worlds::PEONS);
-    RegisterDepency<ResourceHarvesterModule>(Worlds::PEONS);
-    RegisterDepency<ResourceStorageModule>(Worlds::PEONS);
-    RegisterDepency<MovementModule>(Worlds::PEONS);
-    RegisterDepency<LinkToOwnerModule>(Worlds::PEONS);
+    RegisterDepency<PositionModule>(EEntityWorlds::PEONS);
+    RegisterDepency<ResourceHarvesterModule>(EEntityWorlds::PEONS);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::PEONS);
+    RegisterDepency<MovementModule>(EEntityWorlds::PEONS);
+    RegisterDepency<LinkToOwnerModule>(EEntityWorlds::PEONS);
 }
 
 PeonsHaverstingSystem::~PeonsHaverstingSystem()
@@ -92,7 +93,7 @@ void PeonsHaverstingSystem::Debug()
 
     if (ImGui::CollapsingHeader("Colonies"))
     {
-        ModuleAccessor<ResourceStorageModule> colonyStorageAccessor(Worlds::COLONY);
+        ModuleAccessor<ResourceStorageModule> colonyStorageAccessor(EEntityWorlds::COLONY);
 
         foreachitemconst(storage, colonyStorageAccessor)
         {
@@ -117,7 +118,7 @@ void PeonsHaverstingSystem::Debug()
 
     if (ImGui::CollapsingHeader("Peons"))
     {
-        ModuleAccessor<ResourceStorageModule> peonsStorageAccessor(Worlds::PEONS);
+        ModuleAccessor<ResourceStorageModule> peonsStorageAccessor(EEntityWorlds::PEONS);
 
         foreachitemconst(storage, peonsStorageAccessor)
         {
@@ -142,7 +143,7 @@ void PeonsHaverstingSystem::Debug()
 
     if (ImGui::CollapsingHeader("Producers"))
     {
-        ModuleAccessor<ResourceStorageModule> producerStorageAccessor(Worlds::RESOURCE_PROD);
+        ModuleAccessor<ResourceStorageModule> producerStorageAccessor(EEntityWorlds::RESOURCE_PROD);
 
         foreachitemconst(storage, producerStorageAccessor)
         {
@@ -173,21 +174,21 @@ void PeonsHaverstingSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<ColonyPeonsManagementModule> colonyPeonsModuleAccessor(Worlds::COLONY);
+    ModuleAccessor<ColonyPeonsManagementModule> colonyPeonsModuleAccessor(EEntityWorlds::COLONY);
 
-    ModuleAccessor<ResourceHarvesterModule> peonHarvesterAccessor(Worlds::PEONS);
+    ModuleAccessor<ResourceHarvesterModule> peonHarvesterAccessor(EEntityWorlds::PEONS);
 
-    ModuleAccessor<PositionModule> peonPositionAccessor(Worlds::PEONS);
-    ModuleAccessor<PositionModule> producerPositionAccessor(Worlds::RESOURCE_PROD);
-    ModuleAccessor<PositionModule> colonyPositionAccessor(Worlds::COLONY);
+    ModuleAccessor<PositionModule> peonPositionAccessor(EEntityWorlds::PEONS);
+    ModuleAccessor<PositionModule> producerPositionAccessor(EEntityWorlds::RESOURCE_PROD);
+    ModuleAccessor<PositionModule> colonyPositionAccessor(EEntityWorlds::COLONY);
 
-    ModuleAccessor<LinkToOwnerModule> peonOwnerAccessor(Worlds::PEONS);
+    ModuleAccessor<LinkToOwnerModule> peonOwnerAccessor(EEntityWorlds::PEONS);
 
-    ModuleAccessor<ResourceStorageModule> colonyStorageAccessor(Worlds::COLONY);
-    ModuleAccessor<ResourceStorageModule> producerStorageAccessor(Worlds::RESOURCE_PROD);
-    ModuleAccessor<ResourceStorageModule> peonsStorageAccessor(Worlds::PEONS);
+    ModuleAccessor<ResourceStorageModule> colonyStorageAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<ResourceStorageModule> producerStorageAccessor(EEntityWorlds::RESOURCE_PROD);
+    ModuleAccessor<ResourceStorageModule> peonsStorageAccessor(EEntityWorlds::PEONS);
 
-    ModuleAccessor<MovementModule> peonsMovementAccessor(Worlds::PEONS);
+    ModuleAccessor<MovementModule> peonsMovementAccessor(EEntityWorlds::PEONS);
 
     foreachitem(harvester, peonHarvesterAccessor)
     {

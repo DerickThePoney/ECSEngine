@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Common/IdGenerator.h"
+#include "WorldIds.h"
 
 namespace ECSEngine
 {
@@ -23,10 +24,10 @@ public:
     EntityId GetNextEntityId();
     void ReleaseEntityId(const EntityId& parId);
 
-    void SetWorldId(const u32 parWorldId) { FAssociatedWorldID = parWorldId; }
-    const u32 GetWorldId() const { return FAssociatedWorldID; }
+    void SetWorldId(const EEntityWorlds parWorldId) { FAssociatedWorldID = parWorldId; }
+    const EEntityWorlds GetWorldId() const { return FAssociatedWorldID; }
 
 private:
-    u32 FAssociatedWorldID;
+    EEntityWorlds FAssociatedWorldID;
 };
 } // namespace ECSEngine

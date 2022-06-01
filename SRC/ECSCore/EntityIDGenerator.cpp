@@ -3,13 +3,14 @@
 #include "EntityIDGenerator.h"
 
 #include "EntityId.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
 
 EntityIDGenerator::EntityIDGenerator(u32 parWorldID)
     : IdGenerator()
-    , FAssociatedWorldID(parWorldID)
+    , FAssociatedWorldID(EEntityWorlds::LENGTH)
 {
 }
 
@@ -17,13 +18,13 @@ EntityIDGenerator::EntityIDGenerator(EntityIDGenerator&& other)
 {
     FAssociatedWorldID = other.FAssociatedWorldID;
 
-    other.FAssociatedWorldID = -1;
+    other.FAssociatedWorldID = EEntityWorlds::LENGTH;
 }
 
 void EntityIDGenerator::operator=(EntityIDGenerator&& other) noexcept
 {
     FAssociatedWorldID = other.FAssociatedWorldID;
-    other.FAssociatedWorldID = -1;
+    other.FAssociatedWorldID = EEntityWorlds::LENGTH;
 }
 
 EntityIDGenerator::~EntityIDGenerator()
@@ -32,8 +33,8 @@ EntityIDGenerator::~EntityIDGenerator()
 
 EntityId EntityIDGenerator::GetNextEntityId()
 {
-    AssertRelease(FAssociatedWorldID != -1);
-    EntityId nextId = EntityId(FAssociatedWorldID, GetNextId());
+    AssertRelease(FAssociatedWorldID != EEntityWorlds::LENGTH);
+    EntityId nextId = EntityId((u32)FAssociatedWorldID, GetNextId());
     AssertRelease(nextId.Valid());
     AssertRelease(nextId.GetWorld() == FAssociatedWorldID);
     return nextId;
@@ -41,8 +42,8 @@ EntityId EntityIDGenerator::GetNextEntityId()
 
 void EntityIDGenerator::ReleaseEntityId(const EntityId& parId)
 {
-    AssertRelease(FAssociatedWorldID != -1);
-    AlwaysCheckedAssert(parId.GetWorldId() == FAssociatedWorldID);
+    AssertRelease(FAssociatedWorldID != EEntityWorlds::LENGTH);
+    AlwaysCheckedAssert(parId.GetWorld() == FAssociatedWorldID);
     ReleaseId(parId.GetSequentialId());
 }
 

@@ -14,12 +14,12 @@ public:
     void Init();
     void Shutdown();
 
-    void AddEntityWorldStealOwnership(Worlds::Type parType, EntityWorld* parWorld);
+    void AddEntityWorldStealOwnership(EEntityWorlds parType, EntityWorld* parWorld);
     void ProcessDestroyEntities();
     void DestroyAllRemainingEntities();
 
-    EntityWorld& GetWorld(Worlds::Type parWorld);
-    EntityWorld* GetWorldIFP(Worlds::Type parWorld);
+    EntityWorld& GetWorld(EEntityWorlds parWorld);
+    EntityWorld* GetWorldIFP(EEntityWorlds parWorld);
 
     void MarkAsDead(const EntityId& parId);
 

@@ -50,7 +50,7 @@ void BuildingCostDescriptor::DrawEditorHeader()
 void BuildingCostDescriptor::DrawEditor()
 {
     const EntityTemplate* et = BuildingTemplate();
-    EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED("##Template", et, FBuildingTemplateName, Worlds::BUILDINGS);
+    EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED("##Template", et, FBuildingTemplateName, EEntityWorlds::BUILDINGS);
     EDITOR_PROPERTY_BUILDING_CATEGORY("##Category", FBuildingType);
     ImGui::NextColumn();
     ImGui::BeginChild(ImGui::GetID(this), ImVec2(ImGui::GetContentRegionAvailWidth(), 100.f));

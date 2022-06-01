@@ -5,6 +5,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "LinkToWorkPlaceModule.h"
 #include "WorkPlaceModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -12,15 +13,15 @@ namespace ECSEngine
 WorkSystem::WorkSystem()
     : ModuleSystem()
 {
-    RegisterDepency<LinkToWorkPlaceModule>(Worlds::PEONS);
-    RegisterDepency<WorkPlaceModule>(Worlds::BUILDINGS);
+    RegisterDepency<LinkToWorkPlaceModule>(EEntityWorlds::PEONS);
+    RegisterDepency<WorkPlaceModule>(EEntityWorlds::BUILDINGS);
 }
 
 void WorkSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<WorkPlaceModule> workPlaceController(Worlds::BUILDINGS);
+    ModuleAccessor<WorkPlaceModule> workPlaceController(EEntityWorlds::BUILDINGS);
 
     // 1- loop though the places to look for free spots
     foreachitemconst(workPlace, workPlaceController)
@@ -50,7 +51,7 @@ void WorkSystem::VirtualUpdate()
         return;
 
     // 2- Loop through the peons to check for the ones that don't have any house
-    ModuleAccessor<LinkToWorkPlaceModule> linkToWorkPlaceController(Worlds::PEONS);
+    ModuleAccessor<LinkToWorkPlaceModule> linkToWorkPlaceController(EEntityWorlds::PEONS);
     FJobLessPeons.clear();
     foreachitemconst(linkToJob, linkToWorkPlaceController)
     {

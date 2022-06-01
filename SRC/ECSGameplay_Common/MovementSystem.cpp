@@ -13,6 +13,7 @@
 #include "RenderingCore/DrawCommands.h"
 
 #include <glm/gtx/vec_swizzle.hpp>
+#include "WorldIds.h"
 
 namespace ECSEngine
 {
@@ -60,8 +61,8 @@ void FollowPath(MovementModule& parMovementModule, PositionModule& parPositionMo
 MovementSystem::MovementSystem()
     : parent_type()
 {
-    RegisterDepency<PositionModule>(Worlds::PEONS);
-    RegisterDepency<MovementModule>(Worlds::PEONS);
+    RegisterDepency<PositionModule>(EEntityWorlds::PEONS);
+    RegisterDepency<MovementModule>(EEntityWorlds::PEONS);
 }
 
 MovementSystem::~MovementSystem()
@@ -76,8 +77,8 @@ void MovementSystem::VirtualInit()
 void MovementSystem::VirtualUpdate()
 {
     parent_type::VirtualUpdate();
-    ModuleAccessor<MovementModule> movementModuleAccessor(Worlds::PEONS);
-    ModuleAccessor<PositionModule> positionModuleAccessor(Worlds::PEONS);
+    ModuleAccessor<MovementModule> movementModuleAccessor(EEntityWorlds::PEONS);
+    ModuleAccessor<PositionModule> positionModuleAccessor(EEntityWorlds::PEONS);
 
     Pathfinding::ComputeRequests();
     std::vector<PathfindingResult> results;
@@ -126,8 +127,8 @@ void MovementSystem::VisualDebug(Rendering::DrawCommandBuffer& parBuffer, const 
 
     LockControllers();
 
-    ModuleAccessor<MovementModule> movementModuleAccessor(Worlds::PEONS);
-    ModuleAccessor<PositionModule> positionModuleAccessor(Worlds::PEONS);
+    ModuleAccessor<MovementModule> movementModuleAccessor(EEntityWorlds::PEONS);
+    ModuleAccessor<PositionModule> positionModuleAccessor(EEntityWorlds::PEONS);
 
     foreachitem(movementModule, movementModuleAccessor)
     {

@@ -3,9 +3,22 @@
 #include "EntityTemplate.h"
 
 #include "EntityTemplateManager.h"
+#include "ECSGameplay_Common/WorldIds.h"
+
+#include "ModuleTemplate.h"
+#include "ModuleId.h"
 
 namespace ECSEngine
 {
+
+ EntityTemplate::EntityTemplate()
+    : FWorld(EEntityWorlds::STANDARD)
+    , FName("Default")
+#ifdef PERFORM_SECURITY_CHECKS
+    , FHasBeenInit(false)
+#endif
+{
+}
 
 EntityTemplate::~EntityTemplate()
 {
@@ -50,6 +63,14 @@ void EntityTemplate::AddModule(const u32 parId)
     }
 }
 
+const ModuleTemplate* EntityTemplate::GetModuleTemplate(const u32 parId) const
+{
+    auto it = FModuleTemplates.find(parId);
+    if (it == FModuleTemplates.end())
+        return nullptr;
+    return it->second.get();
+}
+
 void EntityTemplate::DrawEditor()
 {
     ImGui::TextColored(glm::vec4(0.8f, 0.8f, 0.8f, 1.0f), "Entity template name:");
@@ -60,12 +81,12 @@ void EntityTemplate::DrawEditor()
     ImGui::InputText("", text, 256);
     FName = std::string(text);
 
-    if (ImGui::BeginCombo("Entity world", Worlds::GetName(FWorld)))
+    if (ImGui::BeginCombo("Entity world", EEntityWorldsHelpers::GetName(FWorld)))
     {
-        for (u32 i = Worlds::STANDARD; i < Worlds::LENGTH; ++i)
+        for (u32 i = (u32)EEntityWorlds::STANDARD; i < (u32)EEntityWorlds::LENGTH; ++i)
         {
-            if (ImGui::Selectable(Worlds::GetName((Worlds::Type)i), i == FWorld))
-                FWorld = (Worlds::Type)i;
+            if (ImGui::Selectable(EEntityWorldsHelpers::GetName((EEntityWorlds)i), i == (u32)FWorld))
+                FWorld = (EEntityWorlds)i;
         }
         ImGui::EndCombo();
     }
@@ -85,5 +106,42 @@ void EntityTemplate::DrawEditor()
         RemoveModule(id);
     }
 }
+
+void EntityTemplate::UpdateKey()
+{
+    EntityModuleKey key;
+    std::map<u32, std::unique_ptr<ModuleTemplate>> moduleTemplates;
+    foreachitem(modTemplate, FModuleTemplates)
+    {
+        const u32 moduleId = modTemplate.second->GetModuleId();
+        key.SetHasModule(moduleId);
+        moduleTemplates.insert_or_assign(moduleId, std::move(modTemplate.second));
+    }
+
+    FKey = key;
+    FModuleTemplates = std::move(moduleTemplates);
+}
+
+
+template<typename Module>
+const ModuleTemplate* EntityTemplate::GetModuleTemplate() const
+{
+    return GetModuleTemplate(ModuleTraits<Module>::GetModuleId());
+}
+
+#define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE) template const ModuleTemplate* EntityTemplate::GetModuleTemplate<NAME>() const;
+#include "ModuleList.inl"
+#undef DECLARE_MODULE_AND_TEMPLATE
+
+template<typename Module>
+void EntityTemplate::SetHasModule()
+{
+    FKey.SetHasModule<Module>();
+    AddModule(ModuleTraits<Module>::GetModuleId());
+}
+
+#define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE) template void EntityTemplate::SetHasModule<NAME>();
+#include "ModuleList.inl"
+#undef DECLARE_MODULE_AND_TEMPLATE
 
 } // namespace ECSEngine

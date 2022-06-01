@@ -9,15 +9,16 @@
 #include "ECSCore/ModuleParameters.h"
 #include "ECSGameplay_Common/PositionModule.h"
 #include "ResourceStorageModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
 
 void SpawnPeonOrder::Execute()
 {
-    ModuleAccessor<ColonyPeonsManagementModule> colonyPeonsAccessor(Worlds::COLONY);
-    ModuleAccessor<ResourceStorageModule> colonyResourceStorageAccessor(Worlds::COLONY);
-    ModuleAccessor<PositionModule> colonyPositionAccessor(Worlds::COLONY);
+    ModuleAccessor<ColonyPeonsManagementModule> colonyPeonsAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<ResourceStorageModule> colonyResourceStorageAccessor(EEntityWorlds::COLONY);
+    ModuleAccessor<PositionModule> colonyPositionAccessor(EEntityWorlds::COLONY);
 
     ColonyPeonsManagementModule* colonyPeons = colonyPeonsAccessor[FColonyId];
     AssertRelease(colonyPeons != nullptr);

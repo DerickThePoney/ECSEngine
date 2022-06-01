@@ -38,7 +38,7 @@ protected:
 
 protected:
     template<class T>
-    void RegisterDepency(const Worlds::Type parEntityWorld);
+    void RegisterDepency(const EEntityWorlds parEntityWorld);
 
 protected:
     void LockControllers();
@@ -55,7 +55,7 @@ protected:
 };
 
 template<class T>
-void ModuleSystem::RegisterDepency(const Worlds::Type parEntityWorld)
+void ModuleSystem::RegisterDepency(const EEntityWorlds parEntityWorld)
 {
     AssertRelease(WorldManager::HasInstance());
     EntityWorld* world = WorldManager::Instance().GetWorldIFP(parEntityWorld);

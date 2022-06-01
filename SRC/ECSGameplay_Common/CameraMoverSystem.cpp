@@ -10,15 +10,16 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
+#include "WorldIds.h"
 
 namespace ECSEngine
 {
 
 CameraMoverSystem::CameraMoverSystem()
 {
-    RegisterDepency<CameraMoverModule>(Worlds::CAMERA);
-    RegisterDepency<PositionModule>(Worlds::CAMERA);
-    RegisterDepency<OrientationModule>(Worlds::CAMERA);
+    RegisterDepency<CameraMoverModule>(EEntityWorlds::CAMERA);
+    RegisterDepency<PositionModule>(EEntityWorlds::CAMERA);
+    RegisterDepency<OrientationModule>(EEntityWorlds::CAMERA);
 
     FRight.FKeyboardKey = InputKeyNames::INPUT_KEY_A;
     FRight.FInputType = EInputType::REPEATED;
@@ -40,9 +41,9 @@ void CameraMoverSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<CameraMoverModule> cameraMoverAccessor(Worlds::CAMERA);
-    ModuleAccessor<PositionModule> positionAccessor(Worlds::CAMERA);
-    ModuleAccessor<OrientationModule> orientationAccessor(Worlds::CAMERA);
+    ModuleAccessor<CameraMoverModule> cameraMoverAccessor(EEntityWorlds::CAMERA);
+    ModuleAccessor<PositionModule> positionAccessor(EEntityWorlds::CAMERA);
+    ModuleAccessor<OrientationModule> orientationAccessor(EEntityWorlds::CAMERA);
     AssertRelease(cameraMoverAccessor.size() <= 1); // Pour l'instant on en prend qu'un !!
 
     const float deltaTime = TimeManager::FrameDeltaTime();

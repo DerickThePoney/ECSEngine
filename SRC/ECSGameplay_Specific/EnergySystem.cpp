@@ -5,6 +5,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "EnergyConsumerModule.h"
 #include "EnergyProducerModule.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -13,8 +14,8 @@ EnergySystem::EnergySystem()
     : ModuleSystem()
     , Singleton<EnergySystem>()
 {
-    RegisterDepency<EnergyProducerModule>(Worlds::BUILDINGS);
-    RegisterDepency<EnergyConsumerModule>(Worlds::BUILDINGS);
+    RegisterDepency<EnergyProducerModule>(EEntityWorlds::BUILDINGS);
+    RegisterDepency<EnergyConsumerModule>(EEntityWorlds::BUILDINGS);
 }
 
 float EnergySystem::ConsumedToProducedEnergyRatio() const
@@ -42,13 +43,13 @@ void EnergySystem::VirtualUpdate()
     ModuleSystem::VirtualUpdate();
 
     {
-        ModuleAccessor<EnergyProducerModule> accessor(Worlds::BUILDINGS);
+        ModuleAccessor<EnergyProducerModule> accessor(EEntityWorlds::BUILDINGS);
         FProducedEnergy = 0;
         foreachitemconst(energyModule, accessor) { FProducedEnergy += energyModule.ProducedEnergy(); }
     }
 
     {
-        ModuleAccessor<EnergyConsumerModule> accessor(Worlds::BUILDINGS);
+        ModuleAccessor<EnergyConsumerModule> accessor(EEntityWorlds::BUILDINGS);
         FConsumedEnergy = 0;
         foreachitemconst(energyModule, accessor) { FConsumedEnergy += energyModule.ConsumedEnergy(); }
     }

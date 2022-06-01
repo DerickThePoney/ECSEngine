@@ -7,6 +7,7 @@
 #include "EnergySystem.h"
 #include "UICore/RMLUIManager.h"
 #include "UICore/RML_includes.h"
+#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -49,7 +50,7 @@ void MainMenuBarController::VirtualUpdate()
     if (!HandleVisibility())
         return;
 
-    const EntityId colonyId = EntityId(Worlds::COLONY, 0);
+    const EntityId colonyId = EntityId((u32)EEntityWorlds::COLONY, 0);
 
     const ColonyModule* colonyModule = GetModule<ColonyModule>(colonyId);
     if (colonyModule == nullptr)
