@@ -1,4 +1,4 @@
-﻿#include "WorldManager.h"
+﻿//#include "WorldManager.h"
 
 namespace ECSEngine
 {

@@ -2,7 +2,6 @@
 
 #include "PeonSpawnModule.h"
 
-#include "Application/PropertyDrawer.h"
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleUtils.h"

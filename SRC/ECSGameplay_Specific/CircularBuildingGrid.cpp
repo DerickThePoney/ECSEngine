@@ -7,6 +7,7 @@
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "GameplayConstants.h"
 #include "GameplayFeedbackDrawer.h"
+#include "Common/Polygon.h"
 
 namespace ECSEngine
 {

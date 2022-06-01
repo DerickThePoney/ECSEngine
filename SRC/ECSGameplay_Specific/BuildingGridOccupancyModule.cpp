@@ -7,6 +7,8 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleUtils.h"
 #include "ECSGameplay_Common/NavMeshPathfindingManager.h"
+#include "Common/Polygon.h"
+#include "ECSCore/ModuleParameters.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::BuildingGridOccupancyModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::BuildingGridOccupancyModuleTemplate);
