@@ -26,6 +26,7 @@
 #include "RenderingCore/MaterialEditor.h"
 
 #include <fstream>
+#include "Application/SceneItemsIds.h"
 
 namespace ECSEngine
 {

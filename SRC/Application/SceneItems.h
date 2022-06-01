@@ -1,18 +1,14 @@
 ﻿#pragma once
 #include "Common/PoolAllocator.h"
-#include "Common/RefCountedObject.h"
-#include "SceneItemsIds.h"
+//
 
 // TODO
 // - POOL Allocation
 // - Factories
 namespace ECSEngine
 {
-#define DECLARE_SCENE_ITEM(TYPE)                                                                                                                                                   \
-public:                                                                                                                                                                            \
-    u32 GetSceneItemTypeId() const override { return SceneItemTraits<TYPE>::GetSceneItemTypeId(); }
 
-class BaseSceneItem : public RefCountedObject
+class BaseSceneItem
 {
     DECLARE_POOL_ALLOCATED(BaseSceneItem);
 
@@ -22,7 +18,7 @@ public:
 
     virtual ~BaseSceneItem() {}
 
-    virtual u32 GetSceneItemTypeId() const { return SceneItemTraits<BaseSceneItem>::GetSceneItemTypeId(); }
+    virtual u32 GetSceneItemTypeId() const;
 
     void DrawEditor();
 

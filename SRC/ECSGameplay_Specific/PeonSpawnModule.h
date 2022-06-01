@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
-#include "GameResources.h"
 #include "GameplayActions.h"
 
 namespace ECSEngine

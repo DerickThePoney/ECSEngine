@@ -1,5 +1,4 @@
 #pragma once
-#include "Application/PropertyDrawer.h"
 #include "Common/MemoryView.h"
 #include "GameResources.h"
 

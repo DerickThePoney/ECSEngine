@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "CircularPathfindingGraph.h"
-#include "Common/Polygon.h"
 #include "Common/Singleton.h"
 
 namespace ECSEngine
 {
+class Polygon2D;
 class CircularGridAccessor
 {
 public:

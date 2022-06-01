@@ -3,6 +3,7 @@
 #include "SceneItems.h"
 
 #include "PropertyDrawer.h"
+#include "SceneItemsIds.h"
 
 namespace ECSEngine
 {
@@ -34,6 +35,11 @@ BaseSceneItem::BaseSceneItem(const std::string& parName, const u32 parId)
     , FVirtualDrawEditorHasBeenCalled(false)
 #endif
 {
+}
+
+u32 BaseSceneItem::GetSceneItemTypeId() const
+{
+    return SceneItemTraits<BaseSceneItem>::GetSceneItemTypeId();
 }
 
 void BaseSceneItem::DrawEditor()
