@@ -11,6 +11,8 @@
 #include "ECSGameplay_Specific/GameplaySpecificLoader.h"
 #include "RenderingCore/RenderingLoader.h"
 
+#include <fstream>
+
 int main(int argc, char** argv)
 {
     ECSEngine::ReadMainCommandLine(argc, argv);

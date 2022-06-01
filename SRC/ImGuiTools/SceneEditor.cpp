@@ -25,6 +25,8 @@
 #include "RenderingCore/ProgramsEditor.h"
 #include "RenderingCore/MaterialEditor.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 namespace ImGUITools

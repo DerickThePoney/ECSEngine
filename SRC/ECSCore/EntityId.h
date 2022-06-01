@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Common/RefCountedObject.h"
 #include "WorldIds.h"
 namespace ECSEngine
 {

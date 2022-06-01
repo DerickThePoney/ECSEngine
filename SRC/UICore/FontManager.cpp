@@ -9,6 +9,8 @@
 #include "Common/Singleton.h"
 #include "Font.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 namespace UI

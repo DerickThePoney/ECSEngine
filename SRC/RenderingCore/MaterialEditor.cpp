@@ -8,6 +8,8 @@
 #include "MaterialDescriptors.h"
 #include "MaterialManager.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 namespace Rendering

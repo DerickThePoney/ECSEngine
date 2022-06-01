@@ -6,6 +6,8 @@
 #include "ECSGameplay_Specific/GameplayRulesManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 namespace ImGUITools

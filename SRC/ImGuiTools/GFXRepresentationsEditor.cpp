@@ -7,6 +7,8 @@
 #include "RenderingCore/GFXRepresentationDescriptorManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 namespace ImGUITools

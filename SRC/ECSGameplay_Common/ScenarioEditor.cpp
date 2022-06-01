@@ -15,6 +15,8 @@
 #include "RenderingCore/RenderPass.h"
 #include "UICore/RmlUiManager.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 
