@@ -21,11 +21,11 @@ def BuildBGFX(config, MSBUILD, tools, samples):
 
     print('BUILDING BGFX')
     sys.stdout.flush()
-    result = subprocess.run('cd External/BGFX/bgfx/ && ..\\bx\\tools\\bin\\windows\\genie.exe {2}--with-windows=10.0 vs2019 && {0} -m .build/projects/vs2019/bgfx.sln /verbosity:minimal /p:Configuration={1} /p:Platform=x64'.format(MSBUILD, configBGFX, addoptions), shell=True)
+    result = subprocess.run('cd External/BGFX/bgfx/ && ..\\bx\\tools\\bin\\windows\\genie.exe {2}--with-windows=10.0 vs2022 && {0} -m .build/projects/vs2022/bgfx.sln /verbosity:minimal /p:Configuration={1} /p:Platform=x64'.format(MSBUILD, configBGFX, addoptions), shell=True)
 
     if tools and result.returncode == 0 and config != 'Debug':
-        copyfile('External/BGFX/bgfx/.build/win64_vs2019/bin/texturecRelease.exe', 'External/BGFX/ToolBinaries/texturecRelease.exe')
-        copyfile('External/BGFX/bgfx/.build/win64_vs2019/bin/shadercRelease.exe', 'External/BGFX/ToolBinaries/shadercRelease.exe')
+        copyfile('External/BGFX/bgfx/.build/win64_vs2022/bin/texturecRelease.exe', 'External/BGFX/ToolBinaries/texturecRelease.exe')
+        copyfile('External/BGFX/bgfx/.build/win64_vs2022/bin/shadercRelease.exe', 'External/BGFX/ToolBinaries/shadercRelease.exe')
 
     return result.returncode
 
@@ -105,7 +105,7 @@ def main():
 
     args = parser.parse_args()
 
-    MSBUILD = '\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\"'
+    MSBUILD = '\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe\"'
     if args.msbuild:
         MSBUILD = args.msbuild
 

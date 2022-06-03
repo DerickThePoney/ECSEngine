@@ -583,12 +583,14 @@ Compiler( 'Compiler-MSVC2019-x64' )
         + ' /errorreport:none'
         + ' /utf-8'
         + ' /std:c++17'
+        + ' /Zc:__cplusplus'
         + ' /permissive-'
         + .CompilerOptionsHacks
     .PCHOptions = ''
         + ' /errorreport:none'
         + ' /utf-8'
         + ' /std:c++17'
+        + ' /Zc:__cplusplus'
         + ' /permissive-'
         + .CompilerOptionsHacks
     .CompilerFamily     = 'Visual'
