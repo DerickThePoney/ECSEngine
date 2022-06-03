@@ -29,8 +29,11 @@
 #include "OrientationModule.h"
 #include "PositionModule.h"
 
-#include <standalone/brigand.hpp>
+#include "brigand/sequences/list.hpp"
+#include "brigand/algorithms/for_each.hpp"
+
 #include "WorldIds.h"
+
 
 namespace ECSEngine
 {

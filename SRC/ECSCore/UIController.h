@@ -2,7 +2,12 @@
 #include "ModuleAccessor.h"
 #include "WorldIds.h"
 
-#include <brigand/brigand.hpp>
+#include "brigand/adapted/tuple.hpp"
+#include "brigand/sequences/list.hpp"
+#include "brigand/sequences/map.hpp"
+#include "brigand/sequences/has_key.hpp"
+
+
 
 namespace ECSEngine
 {
