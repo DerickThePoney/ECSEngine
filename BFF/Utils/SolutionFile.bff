@@ -5,7 +5,8 @@
         .SolutionOutput = '$SolutionOutput$/$SolutionName$.sln'
         .SolutionConfigs = .SolutionConfigs
 
-        .SolutionVisualStudioVersion = '16.8.30717.126'
+        .SolutionVisualStudioVersion = .VSINSTALLVERSION
+        Print("Using visual version $VSINSTALLVERSION$")
 
         .SolutionProjects = {}
         ForEach( .Project in .ProjectList)
