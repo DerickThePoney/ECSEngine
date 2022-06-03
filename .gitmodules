@@ -1,15 +1,15 @@
 [submodule "External/BGFX/bx"]
 	path = External/BGFX/bx
-	url = git://github.com/bkaradzic/bx.git
+	url = https://github.com/bkaradzic/bx.git
 [submodule "External/BGFX/bimg"]
 	path = External/BGFX/bimg
-	url = git://github.com/bkaradzic/bimg.git
+	url = https://github.com/bkaradzic/bimg.git
 [submodule "External/BGFX/bgfx"]
 	path = External/BGFX/bgfx
-	url = git://github.com/bkaradzic/bgfx.git
+	url = https://github.com/bkaradzic/bgfx.git
 [submodule "External/IMGUI/imgui"]
 	path = External/IMGUI/imgui
-	url = git://github.com/ocornut/imgui.git
+	url = https://github.com/ocornut/imgui.git
 [submodule "External/brigand/brigand"]
 	path = External/brigand/brigand
 	url = https://github.com/edouarda/brigand.git
