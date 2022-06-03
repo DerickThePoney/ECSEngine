@@ -19,7 +19,6 @@ DECLARE_MODULE_PARAMETER(EulerAngles, glm::vec3)
 DECLARE_MODULE_PARAMETER(Mesh, Rendering::MeshHandle)
 DECLARE_MODULE_PARAMETER(OwnerId, EntityId)
 DECLARE_MODULE_PARAMETER(GridAccessor, CircularGridAccessor)
-// DECLARE_MODULE_PARAMETER(Material, bgfx::ProgramHandle)
 
 #ifdef DECLARING_PARAMETERS
 }
