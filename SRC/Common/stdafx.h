@@ -17,11 +17,10 @@
 #include <chrono>
 // clang-format on
 
-#include <fmt/format.h>
-
 #include "Macros.h"
-
 #include "Profiling.h"
+
+#include <fmt/format.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_ALIGNED_GENTYPES
@@ -36,21 +35,20 @@
 #if defined(_DEBUG) && GLM_PRINT_EXTENSIONS
 #define GLM_FORCE_MESSAGES
 #endif
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-
-#include <cereal/archives/json.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/array.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/map.hpp>
-#include <cereal/types/unordered_map.hpp>
-#include <cereal/types/set.hpp>
-#include <cereal/types/utility.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/queue.hpp>
 #include <cereal/access.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/types/array.hpp>
+#include <cereal/types/map.hpp>
 #include <cereal/types/polymorphic.hpp>
+#include <cereal/types/queue.hpp>
+#include <cereal/types/set.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/utility.hpp>
+#include <cereal/types/vector.hpp>
+#include <glm/ext.hpp>
+#include <glm/glm.hpp>
 
 #define PROPERTY(P) cereal::make_nvp(#P, F##P)
 #define NAMEDPROPERTY(N, P) cereal::make_nvp(N, P)
@@ -85,12 +83,9 @@
     template<class Archive>                                                                                                                                                        \
     void save(Archive& ar) const
 
+#include "Assertions.h"
+#include "Delegate.h"
 #include "GLMSerialization.h"
-
 #include "Types.h"
 
 #include <xmmintrin.h>
-
-#include "Assertions.h"
-
-#include "Delegate.h"
