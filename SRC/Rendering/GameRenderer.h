@@ -2,7 +2,6 @@
 #include "Common/Singleton.h"
 #include "GFXPickingRenderer.h"
 #include "OutlineRenderer.h"
-#include "UIRenderer.h"
 
 namespace ECSEngine
 {

@@ -3,6 +3,7 @@
 #include "SceneEditor.h"
 
 #include "Application/PropertyDrawer.h"
+#include "Application/SceneItemsIds.h"
 #include "Application/SceneScenario.h"
 #include "Common/Logger.h"
 #include "Common/RenderingHandles.h"
@@ -11,7 +12,6 @@
 #include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "ECSGameplay_Common/ScenarioEditor.h"
 #include "EntityTemplatesEditor.h"
-#include "FontsConfigurator.h"
 #include "GFXRepresentationsEditor.h"
 #include "GameRulesEditor.h"
 #include "InputDebug.h"
@@ -19,14 +19,13 @@
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
+#include "RenderingCore/MaterialEditor.h"
+#include "RenderingCore/ProgramsEditor.h"
 #include "RenderingCore/TexturesManager.h"
 #include "ResourceCacheDebug.h"
 #include "SceneManagerEditor.h"
-#include "RenderingCore/ProgramsEditor.h"
-#include "RenderingCore/MaterialEditor.h"
 
 #include <fstream>
-#include "Application/SceneItemsIds.h"
 
 namespace ECSEngine
 {
@@ -82,7 +81,6 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
         if (ImGui::BeginMenu("UI"))
         {
             ImGui::MenuItem("UI Style Editor", NULL, &options.showUIStyleEditor);
-            ImGui::MenuItem("Fonts editor", NULL, &options.showFontsManagerEditor);
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Gameplay"))
@@ -361,9 +359,6 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showScenesManagerEditor)
         DrawScenesManagerEditor(&parOutWindowsToShow.showScenesManagerEditor);
-
-    if (parOutWindowsToShow.showFontsManagerEditor)
-        DrawFontsConfigurator(&parOutWindowsToShow.showFontsManagerEditor, menuBarHeight.y);
 }
 
 void DrawPlayScenarioWindow(bool& parOutPlayScenario)
