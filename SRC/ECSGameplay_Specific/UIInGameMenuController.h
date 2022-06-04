@@ -1,20 +1,22 @@
 ﻿#pragma once
-#include "BuildMenuController.h"
-#include "ColonySelectionPanelController.h"
+
 #include "ECSCore/UIController.h"
-#include "ECSGameplay_Common/UIWindowsPositionning.h"
-#include "MainMenuBarController.h"
-#include "ResourcePanelController.h"
 
 namespace ECSEngine
 {
 namespace UI
 {
 
+class ColonySelectionPanelController;
+class BuildMenuController;
+class MainMenuBarController;
+class ResourcePanelController;
+
 class UIInGameMenuController : public UIController
 {
 public:
     UIInGameMenuController();
+    ~UIInGameMenuController();
 
 protected:
     void VirtualInit() override;
@@ -22,10 +24,10 @@ protected:
     void VirtualDestroy() override;
 
 private:
-    ColonySelectionPanelController FColonySelectionPanel;
-    BuildMenuController FBuildMenuController;
-    MainMenuBarController FMainMenuBarController;
-    ResourcePanelController FResourcesPanel;
+    std::unique_ptr<ColonySelectionPanelController> FColonySelectionPanel;
+    std::unique_ptr<BuildMenuController> FBuildMenuController;
+    std::unique_ptr<MainMenuBarController> FMainMenuBarController;
+    std::unique_ptr<ResourcePanelController> FResourcesPanel;
 };
 
 } // namespace UI
