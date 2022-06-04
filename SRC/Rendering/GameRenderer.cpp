@@ -58,8 +58,6 @@ void GameRenderer::Initialise()
 
     SetViewFramebuffers(size);
 
-    UIRendering::Initialise();
-
     FPickingRenderer.reset(new GFXPickingRenderer());
     FPickingRenderer->Initialise();
 
@@ -84,8 +82,6 @@ void GameRenderer::Shutdown()
 {
     FOutlineRenderer->Cleanup();
     FPickingRenderer->Cleanup();
-
-    UIRendering::Shutdown();
 
     FGeometryCommandBuffer->clear();
     FFeedbackCommandBuffer->clear();
@@ -210,12 +206,6 @@ void GameRenderer::Render()
 
         GameplayFeedbackDrawer::Instance().DrawFeedback(FFeedbackCommandBuffer);
         FFeedbackCommandBuffer->Submit();
-    }
-
-    {
-        // UI pass
-        SCOPED_PROFILE(GameRenderer_Render_UIPass);
-        UIRendering::RenderScene();
     }
 
     // combine pass
