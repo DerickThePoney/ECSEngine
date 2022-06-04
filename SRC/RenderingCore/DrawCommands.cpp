@@ -874,6 +874,8 @@ void DrawMeshCommand::SubmitCommand() const
         program = multipassProgram->ProgramHandle((Rendering::RenderPassId::Type)FViewId);
     }
 
+    AssertRelease(bgfx::isValid(program));
+
     if (FSkelettonPose != nullptr)
     {
         Rendering::MaterialManager::SetMat4Uniforms("u_skinningMatrices", FSkelettonPose->SkinningMatrices(), FSkelettonPose->BonesNumber());
