@@ -97,6 +97,8 @@ void MaterialManagerSingleton::Initialise()
         FMultiPassPrograms.push_back(new MultiPassProgram(programDesc));
 
         FFileToMultiPassProgramDescriptor[program] = FFileToMultiPassProgramDescriptor.size();
+
+        LOG_RENDERING(fmt::format("Loading Multi Pass Program {}...    SUCCESS", program));
     }
 
     LOG_RENDERING("Initialising materials");
@@ -285,7 +287,7 @@ const MultiPassMaterialInstanceHandle MaterialManagerSingleton::CreateMultiPassM
     AssertRelease(program != nullptr && program->IsValid());
 
     MultiPassMaterialInstance* instance = new MultiPassMaterialInstance(program, materialDescriptor);
-    MultiPassMaterialInstanceHandle handle((u32)FMaterialInstances.size());
+    MultiPassMaterialInstanceHandle handle((u32)FMultiPassMaterialInstances.size());
     FMultiPassMaterialInstances[handle] = instance;
 
     FMultiPassMaterialDescriptorsToMultiPassMaterialInstances[parMaterialFilename].push_back(handle);
