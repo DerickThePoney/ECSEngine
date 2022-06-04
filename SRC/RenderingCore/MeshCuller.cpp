@@ -3,7 +3,6 @@
 #include "MeshCuller.h"
 
 #include "Common/IntersectionRoutines.h"
-#include "ECSGameplay_Common/ApparenceModule.h"
 #include "Mesh.h"
 #include "MeshManager.h"
 
