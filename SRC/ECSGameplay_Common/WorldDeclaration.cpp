@@ -5,6 +5,7 @@
 #include "ApparenceModule.h"
 #include "CameraMoverModule.h"
 #include "ECSCore/EntityWorld.h"
+#include "ECSCore/ModuleId.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSCore/WorldManager.h"

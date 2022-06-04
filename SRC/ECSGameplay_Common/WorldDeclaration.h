@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "ECSCore/ModuleId.h"
 namespace ECSEngine
 {
 
