@@ -806,6 +806,7 @@ public:
     DrawMeshCommand(const u16 parViewId,
           const MeshHandle& parMeshHandle,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const MultiPassMaterialInstanceHandle& parMultiPassMaterialInstanceHandle,
           const SkelettonPose* parSkelettonPose = nullptr,
           const glm::mat4& parTransform = glm::identity<glm::mat4>());
     virtual ~DrawMeshCommand();
@@ -817,22 +818,25 @@ private:
     const SkelettonPose* FSkelettonPose = nullptr;
     MeshHandle FMeshHandle;
     MaterialInstanceHandle FMaterialInstanceHandle;
+    MultiPassMaterialInstanceHandle FMultiPassMaterialInstanceHandle;
 };
 
 IMPLEMENT_POOL_ALLOCATED(DrawMeshCommand);
 DrawMeshCommand::DrawMeshCommand(const u16 parViewId,
       const MeshHandle& parMeshHandle,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const MultiPassMaterialInstanceHandle& parMultiPassMaterialInstanceHandle,
       const SkelettonPose* parSkelettonPose /*= nullptr*/,
       const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
     : IDrawCommand(parViewId)
     , FMeshHandle(parMeshHandle)
     , FMaterialInstanceHandle(parMaterialInstanceHandle)
+    , FMultiPassMaterialInstanceHandle(parMultiPassMaterialInstanceHandle)
     , FTransform(parTransform)
     , FSkelettonPose(parSkelettonPose)
 {
     AssertRelease(FMeshHandle.IsValid());
-    AssertRelease(FMaterialInstanceHandle.IsValid());
+    AssertRelease(FMaterialInstanceHandle.IsValid() || FMultiPassMaterialInstanceHandle.IsValid());
 }
 
 DrawMeshCommand::~DrawMeshCommand()
@@ -849,10 +853,26 @@ void DrawMeshCommand::SubmitCommand() const
 
     bgfx::setTransform(&FTransform[0][0]);
 
-    const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
-    AssertRelease(instance != nullptr);
+    bgfx::ProgramHandle program;
+    if (FMaterialInstanceHandle.IsValid())
+    {
+        const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
+        AssertRelease(instance != nullptr);
 
-    instance->SetTextures();
+        instance->SetTextures();
+        program = instance->GetProgram()->ProgramHandle();
+    }
+    else
+    {
+        const Rendering::MultiPassMaterialInstance* instance = Rendering::MaterialManager::GetMultiPassMaterialInstance(FMultiPassMaterialInstanceHandle);
+        AssertRelease(instance != nullptr);
+
+        instance->SetTextures();
+        const Rendering::MultiPassProgram* multipassProgram = instance->GetProgram();
+        AssertRelease(multipassProgram != nullptr && multipassProgram->HasSubstitution((Rendering::RenderPassId::Type)FViewId));
+
+        program = multipassProgram->ProgramHandle((Rendering::RenderPassId::Type)FViewId);
+    }
 
     if (FSkelettonPose != nullptr)
     {
@@ -862,7 +882,7 @@ void DrawMeshCommand::SubmitCommand() const
     RenderingState state;
     state.ApplyState();
 
-    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+    bgfx::submit(FViewId, program);
 }
 
 //----------------------------------------------------------------
@@ -1490,7 +1510,8 @@ void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
       const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawMeshCommand(FViewId, parMeshHandle, parMaterialInstanceHandle, nullptr, parTransform)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
+          new DrawMeshCommand(FViewId, parMeshHandle, parMaterialInstanceHandle, Rendering::MultiPassMaterialInstanceHandle(), nullptr, parTransform)));
 }
 
 void DrawCommandBuffer::DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
@@ -1498,7 +1519,25 @@ void DrawCommandBuffer::DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
       const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawMeshCommand(FViewId, parMeshHandle, parMaterialInstanceHandle, parSkelettonPose, parTransform)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
+          new DrawMeshCommand(FViewId, parMeshHandle, parMaterialInstanceHandle, Rendering::MultiPassMaterialInstanceHandle(), parSkelettonPose, parTransform)));
+}
+
+void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
+      const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+{
+    FCommandVector.push_back(
+          std::unique_ptr<IDrawCommand>(new DrawMeshCommand(FViewId, parMeshHandle, Rendering::MaterialInstanceHandle(), parMaterialInstanceHandle, nullptr, parTransform)));
+}
+
+void DrawCommandBuffer::DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
+      const MeshHandle& parMeshHandle,
+      const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle,
+      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
+          new DrawMeshCommand(FViewId, parMeshHandle, Rendering::MaterialInstanceHandle(), parMaterialInstanceHandle, parSkelettonPose, parTransform)));
 }
 
 void DrawCommandBuffer::DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor /*= 0xFFFFFFFF*/)

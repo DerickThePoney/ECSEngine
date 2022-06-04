@@ -11,13 +11,22 @@ namespace Rendering
 {
 IMPLEMENT_POOL_ALLOCATED(VisualModel);
 
-void VisualModel::Init(const std::string& parMaterialFile, const std::string& parMeshFile)
+void VisualModel::Init(const std::string& parMaterialFile, bool parIsMutipass, const std::string& parMeshFile)
 {
     FMeshHandle = Rendering::MeshManager::Instance().CreateMesh(parMeshFile);
-    FMaterialHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(parMaterialFile);
+
+    if (parIsMutipass)
+        FMultiPassMaterialHandle = Rendering::MaterialManager::CreateMultiPassMaterialInstanceIFN(parMaterialFile);
+    else
+        FMaterialHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(parMaterialFile);
 
     AssertRelease(FMeshHandle.IsValid());
-    AssertRelease(FMaterialHandle.IsValid());
+    AssertRelease(FMaterialHandle.IsValid() || FMultiPassMaterialHandle.IsValid());
+}
+
+bool VisualModel::HasMultipassMaterial() const
+{
+    return FMultiPassMaterialHandle.IsValid();
 }
 
 } // namespace Rendering

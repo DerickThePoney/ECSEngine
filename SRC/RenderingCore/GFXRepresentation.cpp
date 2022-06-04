@@ -20,7 +20,8 @@ void GFXRepresentationDescriptor::DrawInEditor()
 {
     EDITOR_PROPERTY_STRING("GFXRepresentation name", FName, false, "");
     EDITOR_PROPERTY_STRING("Mesh file name", FMeshFile, true, "*.fbx.gen");
-    EDITOR_PROPERTY_STRING("Material file name", FMaterialName, true, "*.material");
+    EDITOR_PROPERTY_STRING("Material file name", FMaterialName, true, "*.material*");
+    EDITOR_PROPERTY_BOOL("Is multipass material", FIsMultpassMaterial);
 
     auto operatorsList = GFXOperatorDescriptorFactory::GetOperatorsList();
     static int selected = -1;
@@ -75,7 +76,7 @@ void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
     {
         FVisualModel.reset(new VisualModel());
         AssertRelease(FVisualModel != nullptr);
-        FVisualModel->Init(descriptor->MaterialName(), descriptor->MeshFile());
+        FVisualModel->Init(descriptor->MaterialName(), descriptor->IsMultiPassMaterial(), descriptor->MeshFile());
 
         FSkelettonPose = SkelettonManager::Instance().CreateSkelettonPose_ReturnPose(FId, FVisualModel->GetMeshHandle());
     }
