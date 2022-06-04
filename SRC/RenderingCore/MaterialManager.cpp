@@ -8,9 +8,9 @@
 #include "Common/ResourceFile.h"
 #include "Common/ResourceHandle.h"
 #include "Material.h"
+#include "MaterialDescriptors.h"
 #include "Texture.h"
 #include "TexturesManager.h"
-#include "MaterialDescriptors.h"
 
 namespace ECSEngine
 {
@@ -31,6 +31,7 @@ public:
 
     const bgfx::UniformHandle& GetUniform(const std::string& parName, bgfx::UniformType::Enum parType) const;
     const MaterialInstance* GetMaterialInstance(const MaterialInstanceHandle& parHandle) const;
+    const MultiPassMaterialInstance* GetMultiPassMaterialInstance(const MultiPassMaterialInstanceHandle& parHandle) const;
 
     void SetSamplerUniform(const std::string& parUniformName, const u16& parTextureHandle, const u32 parSlot) const;
     void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parTextureHandle, const u32 parSlot) const;
@@ -141,7 +142,6 @@ void MaterialManagerSingleton::Initialise()
 
         LOG_RENDERING(fmt::format("Loading Multi Pass Material {}...    SUCCESS", material));
     }
-
 
     foreachitemconst(material, FMaterialDescriptors)
     {
@@ -299,6 +299,12 @@ const MaterialInstance* MaterialManagerSingleton::GetMaterialInstance(const Mate
     return FMaterialInstances.at(parHandle);
 }
 
+const MultiPassMaterialInstance* MaterialManagerSingleton::GetMultiPassMaterialInstance(const MultiPassMaterialInstanceHandle& parHandle) const
+{
+    AssertRelease(FMultiPassMaterialInstances.find(parHandle) != FMultiPassMaterialInstances.end());
+    return FMultiPassMaterialInstances.at(parHandle);
+}
+
 const bgfx::UniformHandle& MaterialManagerSingleton::GetUniform(const std::string& parName, bgfx::UniformType::Enum parType) const
 {
     auto itFind = FUniformMap.find(parName);
@@ -417,6 +423,12 @@ const MaterialInstance* GetMaterialInstance(const MaterialInstanceHandle& parHan
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     return MaterialManagerSingleton::Instance().GetMaterialInstance(parHandle);
+}
+
+const MultiPassMaterialInstance* GetMultiPassMaterialInstance(const MultiPassMaterialInstanceHandle& parHandle)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    return MaterialManagerSingleton::Instance().GetMultiPassMaterialInstance(parHandle);
 }
 
 void SetSamplerUniform_IKNOWWHATIMDOING(const std::string& parUniformName, const u16& parTextureHandle, const u32 parSlot)

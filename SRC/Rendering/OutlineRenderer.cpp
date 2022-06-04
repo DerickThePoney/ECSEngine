@@ -124,7 +124,11 @@ void OutlineRenderer::AddGFXForOutline(const GFXRepresentation* parRepresentatio
     const u32 colorU32 = parSelected ? 0xFFFFFFFF : 0xFFFF0000;
     const glm::vec4 color = ColorUtils::ConvertToFVEC4(colorU32);
     FDrawBuffer->SetVec4Uniform("u_PickingId", color);
-    FDrawBuffer->DrawMesh(visualModel->GetMeshHandle(), FDrawIdMaterial, carrier->LocalToWorld());
+
+    if (visualModel->HasMultipassMaterial())
+        FDrawBuffer->DrawMesh(visualModel->GetMeshHandle(), visualModel->GetMultiPassMaterialInstanceHandle(), carrier->LocalToWorld());
+    else
+        FDrawBuffer->DrawMesh(visualModel->GetMeshHandle(), FDrawIdMaterial, carrier->LocalToWorld());
 }
 
 u16 OutlineRenderer::GetTextureHandle() const

@@ -102,7 +102,10 @@ void GFXPickingRenderer::PushGFXForSelectionPass(const GFXRepresentation* parGFX
     const u32 id = 0xFF000000 | (gfxId & 0x00FFFFFF);
     const glm::vec4 color = ColorUtils::ConvertToFVEC4(id);
     FDrawCommandBuffer->SetVec4Uniform("u_PickingId", color);
-    FDrawCommandBuffer->DrawMesh(visualModel->GetMeshHandle(), FDrawIdMaterial, carrier->LocalToWorld());
+    if (visualModel->HasMultipassMaterial())
+        FDrawCommandBuffer->DrawMesh(visualModel->GetMeshHandle(), visualModel->GetMultiPassMaterialInstanceHandle(), carrier->LocalToWorld());
+    else
+        FDrawCommandBuffer->DrawMesh(visualModel->GetMeshHandle(), FDrawIdMaterial, carrier->LocalToWorld());
 }
 
 void GFXPickingRenderer::EndSelectionPass()

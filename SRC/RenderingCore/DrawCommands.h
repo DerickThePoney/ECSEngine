@@ -7,6 +7,7 @@ namespace Rendering
 {
 class MeshHandle;
 class MaterialInstanceHandle;
+class MultiPassMaterialInstanceHandle;
 struct CircleFeedbackParameters;
 struct CircularGridChunkFeedbackParameters;
 class SkelettonPose;
@@ -62,6 +63,11 @@ public:
     void DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
           const MeshHandle& parMeshHandle,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const glm::mat4& parTransform = glm::identity<glm::mat4>());
+    void DrawMesh(const MeshHandle& parMeshHandle, const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle, const glm::mat4& parTransform = glm::identity<glm::mat4>());
+    void DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
+          const MeshHandle& parMeshHandle,
+          const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle,
           const glm::mat4& parTransform = glm::identity<glm::mat4>());
     void DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor = 0xFFFFFFFF);
     void DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor = 0xFFFFFFFF);
