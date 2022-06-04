@@ -1,7 +1,8 @@
 ﻿#include "stdafx.h"
 
 #include "WorldManager.h"
-#include "ECSGameplay_Common/WorldIds.h"
+
+#include "WorldIds.h"
 
 namespace ECSEngine
 {

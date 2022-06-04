@@ -4,9 +4,9 @@
 
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
 #include "RecipeProductionModule.h"
 #include "ResourceStorageModule.h"
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {

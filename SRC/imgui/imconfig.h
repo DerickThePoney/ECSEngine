@@ -21,7 +21,8 @@
 #define GLM_FORCE_PRECISION_HIGHP_FLOAT
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_INLINE
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 #include <glm/ext/vector_uint2.hpp>
 // clang-format on
 

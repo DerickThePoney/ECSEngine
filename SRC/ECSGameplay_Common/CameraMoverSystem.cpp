@@ -8,9 +8,9 @@
 #include "Common/Logger.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
-#include "WorldIds.h"
 
 namespace ECSEngine
 {

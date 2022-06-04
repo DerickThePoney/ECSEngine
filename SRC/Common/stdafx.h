@@ -11,9 +11,8 @@
 #include <map>
 #include <queue>
 #include <array>
-#include <thread>
+
 #include <atomic>
-#include <mutex>
 #include <malloc.h>
 #include <chrono>
 // clang-format on
@@ -39,10 +38,6 @@
 #endif
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <glm/ext/vector_uint2.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/vec_swizzle.hpp>
 
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/binary.hpp>

@@ -15,6 +15,7 @@
 #include <codecvt>
 #include <fstream>
 #include <locale>
+#include <thread>
 
 namespace ECSEngine
 {

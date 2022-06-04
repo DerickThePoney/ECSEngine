@@ -6,6 +6,7 @@
 #include "CameraMoverModule.h"
 #include "ECSCore/EntityWorld.h"
 #include "ECSCore/ModuleTemplate.h"
+#include "ECSCore/WorldIds.h"
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Specific/BuildingGridOccupancyModule.h"
 #include "ECSGameplay_Specific/ColonyModule.h"
@@ -28,12 +29,8 @@
 #include "MovementModule.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
-
-#include "brigand/sequences/list.hpp"
 #include "brigand/algorithms/for_each.hpp"
-
-#include "WorldIds.h"
-
+#include "brigand/sequences/list.hpp"
 
 namespace ECSEngine
 {

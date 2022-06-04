@@ -7,8 +7,8 @@
 #include "EntityTemplate.h"
 #include "Module.h"
 #include "ModuleController.h"
-#include "ECSGameplay_Common/WorldIds.h"
 #include "ModuleTemplate.h"
+#include "WorldIds.h"
 
 namespace ECSEngine
 {

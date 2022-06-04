@@ -12,11 +12,11 @@
 #include "Common/TimeManager.h"
 #include "ConstructBuildingMessage.h"
 #include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
 #include "RenderingCore/GFXKeyHelper.h"
 #include "RenderingCore/GFXRepresentationProxy.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {

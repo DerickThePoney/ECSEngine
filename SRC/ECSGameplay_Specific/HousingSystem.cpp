@@ -3,9 +3,9 @@
 #include "HousingSystem.h"
 
 #include "ECSCore/ModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
 #include "HousingPlaceModule.h"
 #include "LinkToHousingPlaceModule.h"
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
