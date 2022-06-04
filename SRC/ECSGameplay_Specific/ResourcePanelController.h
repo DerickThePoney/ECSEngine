@@ -2,7 +2,6 @@
 #include "ECSCore/UIController.h"
 #include "ECSGameplay_Common/UIWindowsPositionning.h"
 #include "GameResources.h"
-#include "RmlUi/Config/Config.h"
 #include "UICore/RML_fwd.h"
 #include "UICore/RmlDataModelWrapper.h"
 
