@@ -6,7 +6,7 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
-#include "ECSGameplay_Common/WorldIds.h"
+#include "ECSCore/WorldIds.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::ColonyPeonsManagementModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::ColonyPeonsManagementModuleTemplate)

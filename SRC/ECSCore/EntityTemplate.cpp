@@ -3,15 +3,14 @@
 #include "EntityTemplate.h"
 
 #include "EntityTemplateManager.h"
-#include "ECSGameplay_Common/WorldIds.h"
-
-#include "ModuleTemplate.h"
 #include "ModuleId.h"
+#include "ModuleTemplate.h"
+#include "WorldIds.h"
 
 namespace ECSEngine
 {
 
- EntityTemplate::EntityTemplate()
+EntityTemplate::EntityTemplate()
     : FWorld(EEntityWorlds::STANDARD)
     , FName("Default")
 #ifdef PERFORM_SECURITY_CHECKS
@@ -121,7 +120,6 @@ void EntityTemplate::UpdateKey()
     FKey = key;
     FModuleTemplates = std::move(moduleTemplates);
 }
-
 
 template<typename Module>
 const ModuleTemplate* EntityTemplate::GetModuleTemplate() const

@@ -5,8 +5,8 @@
 #include "ApparenceModule.h"
 #include "ECSCore/EntityId.h"
 #include "ECSCore/ModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
 #include "RenderingCore/GFXRepresentationProxy.h"
-#include "WorldIds.h"
 
 namespace ECSEngine
 {

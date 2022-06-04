@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "GenericMessage.h"
 #include "Singleton.h"
+#include <mutex>
 
 namespace ECSEngine
 {

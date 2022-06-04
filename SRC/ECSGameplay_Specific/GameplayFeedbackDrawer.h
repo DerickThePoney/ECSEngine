@@ -4,6 +4,7 @@
 #include "Common/RenderingHandles.h"
 #include "Common/Singleton.h"
 #include "RenderingCore/FeedbackParameters.h"
+#include <mutex>
 
 namespace ECSEngine
 {

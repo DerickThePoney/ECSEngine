@@ -7,13 +7,13 @@
 #include "Common/GenericMessageManager.h"
 #include "Common/MemoryView.h"
 #include "ECSCore/ModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/PositionModule.h"
 #include "LinkToStorageModule.h"
 #include "RecipeProductionModule.h"
 #include "ResourceManager.h"
 #include "ResourceStorageModule.h"
 #include "StorageSlotModule.h"
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
@@ -37,9 +37,8 @@ void StorageSlotSystem::VirtualUpdate()
     ModuleAccessor<PositionModule> positionAccessor(EEntityWorlds::BUILDINGS);
     ModuleAccessor<RecipeProductionModule> recipeProdAccessor(EEntityWorlds::BUILDINGS);
 
-    auto functor = [this, &storageSlotAccessor, &positionAccessor, &linkToStorageAccessor, &recipeProdAccessor](const BuildingNeedsStorageMessage& parMessage) {
-        this->ProcessMessages(parMessage, storageSlotAccessor, positionAccessor, linkToStorageAccessor, recipeProdAccessor);
-    };
+    auto functor = [this, &storageSlotAccessor, &positionAccessor, &linkToStorageAccessor, &recipeProdAccessor](const BuildingNeedsStorageMessage& parMessage)
+    { this->ProcessMessages(parMessage, storageSlotAccessor, positionAccessor, linkToStorageAccessor, recipeProdAccessor); };
     GenericMessageManager::Instance().ProcessMessages<GenericMessageId::BUILDING_NEEDS_STORAGE, BuildingNeedsStorageMessage>(functor);
 
     TransfertResourcesFromProducersToStorage(resourceStorageAccessor, storageSlotAccessor, linkToStorageAccessor, recipeProdAccessor);

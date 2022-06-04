@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "EntityModuleKey.h"
-#include "WorldIds.h"
+#include "WorldIds_fwd.h"
 
 namespace ECSEngine
 {
@@ -9,7 +9,6 @@ class EntityTemplate
 {
 public:
     EntityTemplate();
-
 
     EntityTemplate(const EntityTemplate& other) = delete;
     EntityTemplate& operator=(const EntityTemplate& other) = delete;

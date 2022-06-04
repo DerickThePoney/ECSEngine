@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "Application/PropertyDrawer.h"
+#include "ECSCore/WorldIds.h"
 #include "EntityTemplate.h"
 #include "EntityTemplateManager.h"
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {

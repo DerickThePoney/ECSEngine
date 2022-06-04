@@ -3,9 +3,9 @@
 #include "WorkSystem.h"
 
 #include "ECSCore/ModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
 #include "LinkToWorkPlaceModule.h"
 #include "WorkPlaceModule.h"
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {

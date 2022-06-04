@@ -3,9 +3,9 @@
 #include "EnergySystem.h"
 
 #include "ECSCore/ModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
 #include "EnergyConsumerModule.h"
 #include "EnergyProducerModule.h"
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {

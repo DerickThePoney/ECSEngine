@@ -6,7 +6,7 @@
 #include "Application/PropertyDrawer.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleUtils.h"
-#include "ECSGameplay_Common/WorldIds.h"
+#include "ECSCore/WorldIds.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::HousingPlaceModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::HousingPlaceModuleTemplate);

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "WorldIds.h"
+#include "WorldIds_fwd.h"
 namespace ECSEngine
 {
 #pragma pack(push, 1)

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Common/Singleton.h"
 #include "EntityWorld.h"
-#include "WorldIds.h"
+#include "WorldIds_fwd.h"
 namespace ECSEngine
 {
 class EntityWorld;

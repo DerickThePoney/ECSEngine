@@ -6,9 +6,9 @@
 #include "Common/ResourceCache.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleTemplate.h"
+#include "ECSCore/WorldIds.h"
 
 #include <fstream>
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {

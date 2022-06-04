@@ -1,13 +1,10 @@
 ﻿#pragma once
 #include "ModuleAccessor.h"
-#include "WorldIds.h"
-
+#include "WorldIds_fwd.h"
 #include "brigand/adapted/tuple.hpp"
+#include "brigand/sequences/has_key.hpp"
 #include "brigand/sequences/list.hpp"
 #include "brigand/sequences/map.hpp"
-#include "brigand/sequences/has_key.hpp"
-
-
 
 namespace ECSEngine
 {

@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Common/IdGenerator.h"
-#include "WorldIds.h"
+#include "WorldIds_fwd.h"
 
 namespace ECSEngine
 {

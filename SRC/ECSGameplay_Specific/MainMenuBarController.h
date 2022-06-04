@@ -2,7 +2,7 @@
 #include "ColonyModule.h"
 #include "ColonyPeonsManagementModule.h"
 #include "ECSCore/UIController.h"
-#include "ECSGameplay_Common/WorldIds.h"
+#include "ECSCore/WorldIds.h"
 #include "EnergyProducerModule.h"
 #include "HousingPlaceModule.h"
 #include "PeonFeedingTimeModule.h"

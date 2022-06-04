@@ -6,11 +6,11 @@
 #include "ECSCore/EntityFactory.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleParameters.h"
+#include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/PositionModule.h"
 #include "GameplayRulesManager.h"
 #include "PeonSpawnModule.h"
 #include "ResourceStorageModule.h"
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {

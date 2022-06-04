@@ -4,10 +4,10 @@
 
 #include "Common/Logger.h"
 #include "Common/TimeManager.h"
+#include "ECSCore/WorldIds.h"
 #include "EnergySystem.h"
 #include "UICore/RMLUIManager.h"
 #include "UICore/RML_includes.h"
-#include "ECSGameplay_Common/WorldIds.h"
 
 namespace ECSEngine
 {
