@@ -2,7 +2,6 @@
 
 namespace ECSEngine
 {
-class ApparenceModule;
 class Frustum;
 namespace Rendering
 {

@@ -1,9 +1,6 @@
 ﻿#include "stdafx.h"
 
-#include "MeshUtils.h"
-
-#include "Common/MeshStreamingData.h"
-#include "VertexLayout.h"
+#include "Mesh.h"
 
 namespace ECSEngine
 {
@@ -12,7 +9,7 @@ namespace Rendering
 namespace MeshHelpers
 {
 
-Mesh* CreateIMesh(const VertexLayoutHash& parLayoutHash)
+Mesh* CreateIMesh()
 {
     return new Mesh();
 }

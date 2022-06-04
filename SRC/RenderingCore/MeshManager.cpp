@@ -31,7 +31,7 @@ MeshManager::~MeshManager()
 const MeshHandle MeshManager::CreateMesh(const VertexDataStream& parVertexData, const void* parIndexData, const u32 parIndexDataSizeInBytes)
 {
     MeshHandle handle = GetNextHandle();
-    Mesh* mesh = MeshHelpers::CreateIMesh(parVertexData.GetHash());
+    Mesh* mesh = MeshHelpers::CreateIMesh();
 
     mesh->SetRawVertexData(parVertexData);
     mesh->SetRawIndexData(parIndexData, parIndexDataSizeInBytes);

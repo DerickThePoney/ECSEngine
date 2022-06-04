@@ -1,14 +1,14 @@
 ﻿#pragma once
-#include "Mesh.h"
+
 namespace ECSEngine
 {
 namespace Rendering
 {
-struct VertexLayoutHash;
+class Mesh;
 namespace MeshHelpers
 {
 
-Mesh* CreateIMesh(const VertexLayoutHash& parLayoutHash);
+Mesh* CreateIMesh();
 } // namespace MeshHelpers
 } // namespace Rendering
 } // namespace ECSEngine

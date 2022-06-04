@@ -177,7 +177,7 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
 
     parStream.read((c8*)indices.data(), 4u * fileHeader.NbIndices);
 
-    parMesh = MeshHelpers::CreateIMesh(hash);
+    parMesh = MeshHelpers::CreateIMesh();
 
     AssertRelease(parMesh != nullptr);
 
