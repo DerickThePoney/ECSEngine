@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "SceneActionManagement.h"
 // TODO
 // - POOL Allocation
 // - Type id comme les sceneitems et les modules

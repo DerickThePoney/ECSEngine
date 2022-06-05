@@ -4,16 +4,13 @@
 
 #include "Common/Camera.h"
 #include "Common/CameraManager.h"
-#include "Common/IntersectionRoutines.h"
 #include "Common/PolygonPartitionner.h"
-#include "Common/PolygonTriangulator.h"
-#include "Common/Ray.h"
 #include "Common/RenderingHandles.h"
-#include "Common/Segment.h"
 #include "PropertyDrawer.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
+#include "SceneActionManagement.h"
 #include "SceneScenario.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::SceneActionWithBaseSceneItem);

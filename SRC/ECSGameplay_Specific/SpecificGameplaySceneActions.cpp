@@ -2,12 +2,14 @@
 
 #include "SpecificGameplaySceneActions.h"
 
+#include "Application/SceneActionManagement.h"
 #include "CircularBuildingGrid.h"
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
 #include "GameplayConstants.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/FeedbackParameters.h"
+#include "RenderingCore/GFXRepresentation.h"
 #include "RenderingCore/GFXRepresentationDescriptorManager.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"

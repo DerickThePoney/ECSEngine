@@ -3,6 +3,7 @@
 #include "GameplaySceneActions.h"
 
 #include "ApparenceModule.h"
+#include "Application/SceneActionManagement.h"
 #include "Application/SceneItems.h"
 #include "Common/NavMeshPathSmoother.h"
 #include "Common/NavMeshPathSolver.h"
@@ -14,6 +15,7 @@
 #include "ECSCore/ModuleParameters.h"
 #include "NavMeshPathfindingManager.h"
 #include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/GFXRepresentation.h"
 #include "RenderingCore/GFXRepresentationDescriptorManager.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"

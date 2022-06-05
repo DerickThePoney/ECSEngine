@@ -10,6 +10,7 @@ class PositionModule;
 class LinkToStorageModule;
 class RecipeProductionModule;
 class ResourceStorageModule;
+class EntityId;
 
 struct BuildingNeedsStorageMessage;
 class StorageSlotSystem final : public ModuleSystem

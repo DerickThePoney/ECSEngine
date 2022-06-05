@@ -2,7 +2,7 @@
 
 #include "ColonyTraitsModule.h"
 
-#include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 #include "GameplayConstants.h"
 

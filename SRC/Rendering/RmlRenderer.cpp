@@ -6,6 +6,7 @@
 #include "Common/MeshStreamingData.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/Material.h"
+#include "RenderingCore/MaterialDescriptors.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/Mesh.h"
 #include "RenderingCore/MeshManager.h"
@@ -15,7 +16,6 @@
 #include "RenderingCore/TexturesManager.h"
 #include "RenderingCore/VertexLayout.h"
 #include "bx/bx.h"
-#include "RenderingCore/MaterialDescriptors.h"
 
 namespace ECSEngine
 {

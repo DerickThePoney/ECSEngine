@@ -3,6 +3,7 @@
 
 namespace ECSEngine
 {
+class EntityId;
 class HousingSystem : public ModuleSystem
 {
 public:

@@ -1,6 +1,5 @@
 ﻿#pragma once
-#include "EntityWorld.h"
-#include "WorldManager.h"
+#include "WorldIds_fwd.h"
 
 namespace ECSEngine
 {
@@ -17,24 +16,9 @@ public:
     void Destroy();
 
 protected:
-    virtual void VirtualInit()
-    {
-#ifdef PERFORM_SECURITY_CHECKS
-        FVirtualInitCalled = true;
-#endif
-    }
-    virtual void VirtualUpdate()
-    {
-#ifdef PERFORM_SECURITY_CHECKS
-        FVirtualUpdateCalled = true;
-#endif
-    }
-    virtual void VirtualDestroy()
-    {
-#ifdef PERFORM_SECURITY_CHECKS
-        FVirtualDestroyCalled = true;
-#endif
-    }
+    virtual void VirtualInit();
+    virtual void VirtualUpdate();
+    virtual void VirtualDestroy();
 
 protected:
     template<class T>
@@ -53,16 +37,4 @@ protected:
     bool FVirtualDestroyCalled;
 #endif
 };
-
-template<class T>
-void ModuleSystem::RegisterDepency(const EEntityWorlds parEntityWorld)
-{
-    AssertRelease(WorldManager::HasInstance());
-    EntityWorld* world = WorldManager::Instance().GetWorldIFP(parEntityWorld);
-    AssertRelease(world != nullptr);
-    IModuleController* controller = world->GetControllerIFP<T>();
-    AssertRelease(controller != nullptr);
-    FControllers.push_back(controller);
-}
-
 } // namespace ECSEngine

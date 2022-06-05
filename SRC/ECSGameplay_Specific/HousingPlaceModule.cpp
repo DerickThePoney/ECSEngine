@@ -4,7 +4,7 @@
 #include "HousingPlaceModule.h"
 
 #include "Application/PropertyDrawer.h"
-#include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 #include "ECSCore/WorldIds.h"
 

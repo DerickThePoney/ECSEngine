@@ -1,6 +1,9 @@
 ﻿#include "stdafx.h"
 
 #include "EntityTemplateManager.h"
+
+#include "EntityTemplate.h"
+#include "EntityTemplateManagerMethods.h"
 #include "ModuleTemplate.h"
 
 namespace ECSEngine
@@ -44,6 +47,11 @@ EntityTemplate* EntityTemplateManager::GetEntityTemplateForWriting(u32 parIndex)
 
 EntityTemplateManager::~EntityTemplateManager()
 {
+}
+
+void EntityTemplateManager::InitAfterLoad()
+{
+    foreachitemconst(et, FEntityTemplates) { et->Initialise(); }
 }
 
 namespace EntityTemplateManagerMethods
