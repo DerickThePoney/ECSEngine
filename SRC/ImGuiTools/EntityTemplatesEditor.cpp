@@ -4,7 +4,9 @@
 
 #include "../RenderingCore/GLFWDisplayWindowHandler.h"
 #include "Common/ResourceCache.h"
+#include "ECSCore/EntityTemplate.h"
 #include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/WorldIds.h"
 

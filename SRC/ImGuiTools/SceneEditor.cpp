@@ -3,6 +3,7 @@
 #include "SceneEditor.h"
 
 #include "Application/PropertyDrawer.h"
+#include "Application/SceneActionManagement.h"
 #include "Application/SceneItemsIds.h"
 #include "Application/SceneScenario.h"
 #include "Common/Logger.h"

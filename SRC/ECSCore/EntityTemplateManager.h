@@ -1,17 +1,9 @@
 ﻿#pragma once
 #include "Common/Singleton.h"
-#include "EntityTemplate.h"
 
 namespace ECSEngine
 {
-namespace EntityTemplateManagerMethods
-{
-bool RegisterTemplateFactory(const u32 parId, ModuleTemplate* (*parFactory)());
-ModuleTemplate* CreateModuleTemplate(const u32 parId);
-const std::map<u32, std::string>& GetModuleList();
-void Cleanup();
-} // namespace EntityTemplateManagerMethods
-
+class EntityTemplate;
 class EntityTemplateManager final : public Singleton<EntityTemplateManager>
 {
 public:
@@ -39,8 +31,11 @@ public:
     void load(Archive& ar)
     {
         ar(PROPERTY(EntityTemplates));
-        foreachitem(temp, FEntityTemplates) { temp->Initialise(); }
+        InitAfterLoad();
     }
+
+private:
+    void InitAfterLoad();
 
 private:
     std::vector<std::shared_ptr<EntityTemplate>> FEntityTemplates;

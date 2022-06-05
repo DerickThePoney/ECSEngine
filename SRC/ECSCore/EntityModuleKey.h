@@ -2,16 +2,12 @@
 #include "Common/BitSet.h"
 #include "MaxModuleNumber.h"
 
-
 namespace ECSEngine
 {
 struct EntityModuleKey
 {
 public:
-    EntityModuleKey()
-        : FKey(0)
-    {
-    }
+    EntityModuleKey();
 
     template<typename T>
     const bool HasModule() const;
@@ -38,7 +34,5 @@ public:
 private:
     BitSet<MaxModuleNumber> FKey;
 };
-
-
 
 } // namespace ECSEngine

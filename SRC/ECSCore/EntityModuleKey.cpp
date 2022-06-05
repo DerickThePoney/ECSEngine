@@ -6,6 +6,11 @@
 
 namespace ECSEngine
 {
+EntityModuleKey::EntityModuleKey()
+    : FKey(0)
+{
+}
+
 const bool EntityModuleKey::HasModule(const u32 parModuleId) const
 {
     AssertRelease(parModuleId < MaxModuleNumber);
@@ -28,7 +33,6 @@ const BitSet<MaxModuleNumber>& EntityModuleKey::GetKey() const
 {
     return FKey;
 }
-
 
 template<typename T>
 const bool EntityModuleKey::HasModule() const

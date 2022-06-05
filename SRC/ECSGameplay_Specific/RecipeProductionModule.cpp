@@ -3,7 +3,7 @@
 
 #include "RecipeProductionModule.h"
 
-#include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 #include "ECSGameplaySpecificPropertyDrawers.h"
 #include "GameplayRulesManager.h"

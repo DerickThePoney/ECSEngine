@@ -3,6 +3,7 @@
 
 namespace ECSEngine
 {
+class EntityId;
 class WorkSystem : public ModuleSystem
 {
 public:

@@ -11,6 +11,7 @@
 #include "Common/InputManager.h"
 #include "Common/TimeManager.h"
 #include "ConstructBuildingMessage.h"
+#include "ECSCore/EntityTemplate.h"
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/ApparenceModule.h"

@@ -6,6 +6,7 @@
 
 namespace ECSEngine
 {
+class StorageSlotModule;
 using ResourceToStoragePair = std::pair<u32, std::set<EntityId>>;
 class ResourceManager final : public ModuleSystem, public Singleton<ResourceManager>
 {

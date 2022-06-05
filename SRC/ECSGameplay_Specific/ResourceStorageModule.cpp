@@ -5,7 +5,7 @@
 #include "Application/PropertyDrawer.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/EntityId.h"
-#include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
 #include "ECSGameplaySpecificPropertyDrawers.h"

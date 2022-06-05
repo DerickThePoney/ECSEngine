@@ -4,6 +4,7 @@
 #include "Common/ResourceFile.h"
 #include "SceneItems.h"
 #include "SceneScenario.h"
+#include "imgui/imgui.h"
 
 namespace ECSEngine
 {

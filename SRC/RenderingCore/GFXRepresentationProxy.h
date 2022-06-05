@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "ECSCore/EntityId.h"
-#include "GFXRepresentation.h"
 #include "GFXRepresentationManager.h"
 
 namespace ECSEngine

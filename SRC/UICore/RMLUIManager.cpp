@@ -10,13 +10,13 @@
 #include "Common/ResourceCache.h"
 #include "Rendering/RmlRenderer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RmlFileInterface.h"
 #include "RmlSystemInterface.h"
 
 #include <RmlUi/Core.h>
 #if !defined(COMPILE_FINAL) and !defined(COMPILE_PROFILE)
 #include <RmlUi/Debugger.h>
 #endif
-#include "RmlFileInterface.h"
 
 namespace ECSEngine
 {

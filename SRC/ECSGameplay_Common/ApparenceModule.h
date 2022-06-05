@@ -1,9 +1,7 @@
 ﻿#pragma once
-#include "Common/Logger.h"
 #include "Common/RenderingHandles.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
-#include "RenderingCore/GFXRepresentationProxy.h"
 
 namespace ECSEngine
 {
@@ -39,6 +37,11 @@ private:
 
     bool FIsSelectable = true;
 };
+
+namespace Rendering
+{
+class GFXRepresentationProxy;
+}
 
 class ApparenceModule final : public Module
 {

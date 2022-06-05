@@ -4,7 +4,7 @@
 
 #include "Application/PropertyDrawer.h"
 #include "Common/CameraManager.h"
-#include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::CameraMoverModuleTemplate);

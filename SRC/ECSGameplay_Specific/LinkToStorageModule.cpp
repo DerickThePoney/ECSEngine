@@ -6,7 +6,7 @@
 #include "BuildingNeedsStorageMessgage.h"
 #include "Common/GenericMessageIdentifiers.h"
 #include "Common/GenericMessageManager.h"
-#include "ECSCore/EntityTemplateManager.h"
+#include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::LinkToStorageModuleTemplate);

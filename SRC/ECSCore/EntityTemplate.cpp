@@ -3,6 +3,7 @@
 #include "EntityTemplate.h"
 
 #include "EntityTemplateManager.h"
+#include "EntityTemplateManagerMethods.h"
 #include "ModuleId.h"
 #include "ModuleTemplate.h"
 #include "WorldIds.h"
