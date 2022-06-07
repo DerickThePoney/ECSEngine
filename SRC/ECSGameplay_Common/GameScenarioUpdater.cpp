@@ -2,20 +2,17 @@
 
 #include "GameScenarioUpdater.h"
 
-#include "Application/SceneScenario.h"
 #include "Common/CameraManager.h"
-#include "Common/Resource.h"
-#include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
-#include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Specific/CircularBuildingGrid.h"
 #include "ECSGameplay_Specific/EnergySystem.h"
 #include "ECSGameplay_Specific/MousePolicyManager.h"
 #include "ECSGameplay_Specific/ResourceManager.h"
 #include "ImGuiTools/ResourceCacheDebug.h"
 #include "NavMeshPathfindingManager.h"
+#include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GFXRepresentationManager.h"
@@ -179,6 +176,13 @@ void GameScenarioUpdater::DebugRender()
         {
             bool dummy = showDebugForCacheDebug;
             ImGUITools::DrawResourceCacheDebug(&dummy);
+        }
+
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showBGFXDebugs, false, "show debug", "Rendering");
+        if (showBGFXDebugs)
+        {
+            bool dummy = showBGFXDebugs;
+            Rendering::BGFXRenderingBackend::Instance().DrawStats(&dummy);
         }
 
         Pathfinding::Debug(*buffer, handle);

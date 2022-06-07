@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Application/SceneScenario.h"
 #include "EditorCamera.h"
 #include "IScenarioUpdater.h"
 
@@ -46,6 +45,7 @@ class SceneObjectsPickingRenderer;
 class EditorSceneRenderer;
 class EditorGridRenderer;
 class GameScenarioUpdater;
+class SceneScenario;
 
 namespace Rendering
 {

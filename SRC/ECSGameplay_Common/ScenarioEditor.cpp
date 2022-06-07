@@ -2,6 +2,7 @@
 
 #include "ScenarioEditor.h"
 
+#include "Application/SceneScenario.h"
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
@@ -10,10 +11,8 @@
 #include "Rendering/EditorGridRenderer.h"
 #include "Rendering/EditorSceneRenderer.h"
 #include "Rendering/SceneObjectsPickingRenderer.h"
-#include "RenderingCore/GFXOperator.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/RenderPass.h"
-#include "UICore/RmlUiManager.h"
 
 #include <fstream>
 
@@ -261,8 +260,6 @@ void ScenarioEditor::UpdateSceneEditorStatus()
             }
         }
     }
-
-    MemoryView<const char*> operators = Rendering::GFXOperatorDescriptorFactory::GetOperatorsList();
 }
 
 void ScenarioEditor::RenderForSceneEditing()
