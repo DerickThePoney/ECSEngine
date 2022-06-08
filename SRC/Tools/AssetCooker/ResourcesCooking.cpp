@@ -19,6 +19,7 @@
 #include <thread>
 
 #undef max
+#undef min
 
 namespace ECSEngine
 {

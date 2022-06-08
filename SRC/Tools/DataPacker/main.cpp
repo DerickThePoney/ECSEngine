@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "Application/BaseApplication.h"
 #include "Common/MainOptions.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFileDirectoryView.h"

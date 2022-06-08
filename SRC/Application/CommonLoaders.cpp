@@ -31,10 +31,8 @@ void LoadInitialiseSubLoaders::VirtualShutdown()
 {
     ILoader::VirtualShutdown();
 
-    for (size_t i = FSubLoaders.size(); i > 0; i--)
-    {
-        FSubLoaders[i - 1]->Shutdown();
-    }
+    reverseforeachitem(subLoader, FSubLoaders) { subLoader->Shutdown(); }
+    FSubLoaders.clear();
 }
 
 bool LoaderInitialiseCommonResources::VirtualInitialise()

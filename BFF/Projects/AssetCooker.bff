@@ -15,5 +15,5 @@
     #include "../Utils/MakeProjectStandard.bff"
     #undef USE_PRECOMPILED_HEADERS
 
-    ^'$ExeName$Projects' + 'Common' + 'fmt' + 'imgui' + 'Application' + 'ECSCore' + 'ECSGameplay_Common' + 'ECSGameplay_Specific' + 'RenderingCore' + 'Rendering' + 'ImguiTools' + 'UICore'
+    ^'$ExeName$Projects' + 'Common' + 'Tracy' + 'fmt' + 'imgui' + 'Application' + 'ECSCore' + 'ECSGameplay_Common' + 'ECSGameplay_Specific' + 'RenderingCore' + 'Rendering' + 'ImguiTools' + 'UICore'
 }
