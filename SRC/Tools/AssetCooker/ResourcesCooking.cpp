@@ -12,10 +12,13 @@
 #include "Tools/AssimpWrapper/AssimpMeshDataLoading.h"
 #include "teeny-sha1.c"
 
+#include <Windows.h>
 #include <codecvt>
 #include <fstream>
 #include <locale>
 #include <thread>
+
+#undef max
 
 namespace ECSEngine
 {
