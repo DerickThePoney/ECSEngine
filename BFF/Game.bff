@@ -22,7 +22,6 @@
 #include "Projects/External/glm.bff"
 #include "Projects/External/polypartition.bff"
 #include "Projects/External/fmt.bff"
-#include "Projects/External/Remotery.bff"
 #include "Projects/External/Tracy.bff"
 #include "Projects/External/freetype.bff"
 #include "Projects/External/RMLUI.bff"

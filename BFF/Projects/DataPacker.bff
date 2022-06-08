@@ -13,5 +13,5 @@
     #include "../Utils/MakeProjectStandard.bff"
     #undef USE_PRECOMPILED_HEADERS
 
-    ^'$ExeName$Projects' + 'Common' + 'Remotery' + 'fmt' + 'imgui' + 'DataPack' + 'ECSCore'
+    ^'$ExeName$Projects' + 'Common' + 'fmt' + 'imgui' + 'DataPack' + 'ECSCore'
 }
