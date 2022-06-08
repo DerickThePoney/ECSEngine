@@ -688,36 +688,36 @@ void DrawFrustumCommand::SubmitCommand() const
         // NearPlane
         const glm::vec4 nearPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_LEFT] +
                                                corners[FrustumCorner::NEAR_TOP_RIGHT]) /
-              4;
+              4.f;
         PushNormalVertices(nearPlanePoint, glm::xyz(planes[FrustumPlane::NEAR_PLANE]), FNormalsColor, stream);
 
         // Farplane
         const glm::vec4 farPlanePoint =
               (corners[FrustumCorner::FAR_BOTTOM_LEFT] + corners[FrustumCorner::FAR_BOTTOM_RIGHT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_RIGHT]) /
-              4;
+              4.f;
         PushNormalVertices(farPlanePoint, glm::xyz(planes[FrustumPlane::FAR_PLANE]), FNormalsColor, stream);
 
         // LEFTPlane
         const glm::vec4 leftPlanePoint =
               (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_BOTTOM_LEFT]) /
-              4;
+              4.f;
         PushNormalVertices(leftPlanePoint, glm::xyz(planes[FrustumPlane::LEFT_PLANE]), FNormalsColor, stream);
 
         // RightPlane
         const glm::vec4 rightPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_RIGHT] +
                                                 corners[FrustumCorner::FAR_TOP_RIGHT]) /
-              4;
+              4.f;
         PushNormalVertices(rightPlanePoint, glm::xyz(planes[FrustumPlane::RIGHT_PLANE]), FNormalsColor, stream);
 
         // TopPlane
         const glm::vec4 topPlanePoint =
-              (corners[FrustumCorner::NEAR_TOP_LEFT] + corners[FrustumCorner::NEAR_TOP_RIGHT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_RIGHT]) / 4;
+              (corners[FrustumCorner::NEAR_TOP_LEFT] + corners[FrustumCorner::NEAR_TOP_RIGHT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_RIGHT]) / 4.f;
         PushNormalVertices(topPlanePoint, glm::xyz(planes[FrustumPlane::TOP_PLANE]), FNormalsColor, stream);
 
         // BottomPlane
         const glm::vec4 bottomPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_LEFT] +
                                                  corners[FrustumCorner::FAR_BOTTOM_RIGHT]) /
-              4;
+              4.f;
         PushNormalVertices(bottomPlanePoint, glm::xyz(planes[FrustumPlane::BOTTOM_PLANE]), FNormalsColor, stream);
     }
 

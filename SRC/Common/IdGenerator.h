@@ -19,13 +19,11 @@ public:
     void ReleaseId(const u32 parIdToRelease);
 
     template<class Archive>
-    void serialize(Archive& ar)
-    {
-        ar(PROPERTY(NextIncrementalId), PROPERTY(ReusableIds));
-    }
+    void serialize(Archive& ar);
 
 private:
     u32 FNextIncrementalId;
     std::queue<u32> FReusableIds;
 };
+
 } // namespace ECSEngine

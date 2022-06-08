@@ -3,7 +3,11 @@
 #include "Assertions.h"
 
 #include "Logger.h"
+
+// clang-format off
+#include <Windows.h>
 #include "dbghelp.h"
+// clang-format on
 
 #include <boost/stacktrace.hpp>
 

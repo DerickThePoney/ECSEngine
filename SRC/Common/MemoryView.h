@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#undef max
+
 namespace ECSEngine
 {
 template<typename T>

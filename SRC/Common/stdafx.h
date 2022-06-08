@@ -5,50 +5,28 @@
 // clang-format off
 #include <set>
 #include <string>
-#include <Windows.h>
 #include <vector>
 #include <unordered_map>
 #include <map>
 #include <queue>
 #include <array>
-
 #include <atomic>
 #include <malloc.h>
 #include <chrono>
 // clang-format on
 
+#include "GLMIncludes.h"
 #include "Macros.h"
 #include "Profiling.h"
 
-#include <fmt/format.h>
-
-#define GLM_ENABLE_EXPERIMENTAL
-#define GLM_FORCE_ALIGNED_GENTYPES
-#define GLM_FORCE_INTRINSICS
-#define GLM_FORCE_PRECISION_HIGHP_FLOAT
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_INLINE
-#define GLM_FORCE_LEFT_HANDED
-
-#define GLM_PRINT_EXTENSIONS 0
-
-#if defined(_DEBUG) && GLM_PRINT_EXTENSIONS
-#define GLM_FORCE_MESSAGES
-#endif
-#include <cereal/access.hpp>
-#include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/polymorphic.hpp>
-#include <cereal/types/queue.hpp>
-#include <cereal/types/set.hpp>
 #include <cereal/types/string.hpp>
-#include <cereal/types/unordered_map.hpp>
 #include <cereal/types/utility.hpp>
 #include <cereal/types/vector.hpp>
-#include <glm/ext.hpp>
-#include <glm/glm.hpp>
+#include <fmt/format.h>
 
 #define PROPERTY(P) cereal::make_nvp(#P, F##P)
 #define NAMEDPROPERTY(N, P) cereal::make_nvp(N, P)
@@ -87,5 +65,3 @@
 #include "Delegate.h"
 #include "GLMSerialization.h"
 #include "Types.h"
-
-#include <xmmintrin.h>

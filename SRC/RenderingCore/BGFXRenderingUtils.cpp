@@ -6,6 +6,7 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 
+#include <Windows.h>
 #include <codecvt>
 #include <locale>
 
@@ -129,7 +130,7 @@ bgfx::ProgramHandle LoadProgram(const std::pair<std::string, std::string>& parSh
     vertexShader = vertexShader.substr(0, pos) + ".bin";
 
     std::string fragmentShader = parShaders.second;
-     pos = fragmentShader.find_last_of('.');
+    pos = fragmentShader.find_last_of('.');
     fragmentShader = fragmentShader.substr(0, pos) + ".bin";
 
     bgfx::ShaderHandle vsh = loadShader(vertexShader OnlyWithAssertions(COMMA ShaderType::VERTEX_SHADER));

@@ -2,6 +2,8 @@
 
 #include "IdGenerator.h"
 
+#include <cereal/types/queue.hpp>
+
 namespace ECSEngine
 {
 
@@ -42,5 +44,14 @@ void IdGenerator::operator=(IdGenerator&& other) noexcept
 IdGenerator::~IdGenerator()
 {
 }
+
+template<class Archive>
+void IdGenerator::serialize(Archive& ar)
+{
+    ar(PROPERTY(NextIncrementalId), PROPERTY(ReusableIds));
+}
+
+template void IdGenerator::serialize<cereal::JSONInputArchive>(cereal::JSONInputArchive&);
+template void IdGenerator::serialize<cereal::JSONOutputArchive>(cereal::JSONOutputArchive&);
 
 } // namespace ECSEngine

@@ -90,7 +90,7 @@ void NavMeshSolver::CreateNavMesh(const Polygon2D& parWorldExtents, const std::v
             verticesLoc[i].first = GetOrCreateVertex(verticesMap, polygon[i], verticesLoc[i].second);
             center += polygon[i];
         }
-        face->Center = center / polygon.size();
+        face->Center = center / (float)polygon.size();
 
         std::vector<NavMeshEdge*> edgesLoc;
         edgesLoc.resize((u32)polygon.size());
