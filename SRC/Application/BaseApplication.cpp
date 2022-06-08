@@ -51,6 +51,7 @@ void BaseApplicationLayer::RunMainLoop()
         FGameplayUpdater->DebugRender();
         FGameplayUpdater->Render();
         FGameplayUpdater->EndUpdate();
+        FRAME_END;
     }
 }
 

@@ -91,3 +91,6 @@
 [submodule "Assets"]
 	path = Assets
 	url = https://github.com/DerickThePoney/Assets.git
+[submodule "External/tracy"]
+	path = External/tracy
+	url = https://github.com/wolfpld/tracy.git

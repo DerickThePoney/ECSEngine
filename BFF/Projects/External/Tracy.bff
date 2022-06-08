@@ -1,0 +1,17 @@
+{
+    .ProjectName = 'Tracy'
+    .ProjectPath = 'External/tracy'
+    .ProjectFilesPath = .ProjectPath
+    .AdditionnalIncludePaths = { .ProjectPath}
+    .CompilerInputPattern = "TracyClient.cpp"
+    .AdditionalCompilerOptions = ''
+    ^ProjectIncludePath + .ProjectPath
+
+    .SolutionFolder = 'External'
+
+    .ExeName = .GameName
+
+    .BuildTarget = { '$ProjectName$' }
+
+    #include "../../Utils/MakeProject.bff"
+}

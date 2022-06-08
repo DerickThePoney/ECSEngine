@@ -24,6 +24,7 @@ ResourceProductionSystem::~ResourceProductionSystem()
 
 void ResourceProductionSystem::VirtualUpdate()
 {
+    SCOPED_PROFILE_SIMPLE;
     ModuleSystem::VirtualUpdate();
 
     ModuleAccessor<ResourceStorageModule> resourceStorageAccesor(EEntityWorlds::BUILDINGS);
