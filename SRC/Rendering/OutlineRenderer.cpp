@@ -37,6 +37,8 @@ void OutlineRenderer::Initialise()
     FInitialFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, windowSize);
     FInitialFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::A8,
           0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
+    FInitialFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::D16,
+          0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
     FInitialFramebuffer->InitFramebuffer();
 
     FIntermediaryFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, windowSize);
@@ -82,10 +84,10 @@ void OutlineRenderer::RenderOutline(MemoryView<const GFXRepresentation*> parSele
     bgfx::setViewRect(RenderPassId::OUTLINE_INIT, 0, 0, windowSize.x, windowSize.y);
     bgfx::setViewFrameBuffer(RenderPassId::OUTLINE_SOLID, FIntermediaryFramebuffer->GetHandle());
     bgfx::setViewRect(RenderPassId::OUTLINE_SOLID, 0, 0, windowSize.x, windowSize.y);
-    bgfx::setViewFrameBuffer(RenderPassId::OUTLINE_HORIZONTAL, FIntermediaryFramebuffer->GetHandle());
-    bgfx::setViewRect(RenderPassId::OUTLINE_HORIZONTAL, 0, 0, windowSize.x, windowSize.y);
-    bgfx::setViewFrameBuffer(RenderPassId::OUTLINE_VERTICAL, FInitialFramebuffer->GetHandle());
-    bgfx::setViewRect(RenderPassId::OUTLINE_VERTICAL, 0, 0, windowSize.x, windowSize.y);
+    // bgfx::setViewFrameBuffer(RenderPassId::OUTLINE_HORIZONTAL, FIntermediaryFramebuffer->GetHandle());
+    // bgfx::setViewRect(RenderPassId::OUTLINE_HORIZONTAL, 0, 0, windowSize.x, windowSize.y);
+    // bgfx::setViewFrameBuffer(RenderPassId::OUTLINE_VERTICAL, FInitialFramebuffer->GetHandle());
+    // bgfx::setViewRect(RenderPassId::OUTLINE_VERTICAL, 0, 0, windowSize.x, windowSize.y);
 
     if (parSelectedRepresentations.empty() && parHighlightedRepresentations.empty())
     {
@@ -98,15 +100,25 @@ void OutlineRenderer::RenderOutline(MemoryView<const GFXRepresentation*> parSele
 
     FDrawBuffer->SetViewTranform(view, proj);
 
-    foreachitemconst(rep, parSelectedRepresentations) { AddGFXForOutline(rep, false, true); }
-    foreachitemconst(rep, parHighlightedRepresentations) { AddGFXForOutline(rep, true, false); }
+    foreachitemconst(rep, parSelectedRepresentations)
+    {
+        bgfx::setState(0 | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_CULL_CW);
+        AddGFXForOutline(rep, false, true);
+    }
+    foreachitemconst(rep, parHighlightedRepresentations)
+    {
+        bgfx::setState(0 | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_CULL_CW);
+        AddGFXForOutline(rep, true, false);
+    }
 
     FDrawBuffer->Submit();
 
     // horizontal pass
-    MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_InitialTexture", FInitialFramebuffer->GetTextureHandle(0).idx, 0);
-
     FSolidDrawBuffer->clear();
+    MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_InitialTexture", FInitialFramebuffer->GetTextureHandle(0).idx, 0);
+    FSolidDrawBuffer->SetVec4Uniform("u_SelectionColor", ColorUtils::ConvertToFVEC4(0xFFFFFFFF));
+
+    bgfx::setState(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW | BGFX_STATE_BLEND_ALPHA);
     FSolidDrawBuffer->BlitWithMaterial(FSolidFilter);
 
     FSolidDrawBuffer->Submit();
@@ -121,7 +133,7 @@ void OutlineRenderer::AddGFXForOutline(const GFXRepresentation* parRepresentatio
     AssertRelease(carrier != nullptr);
     AssertRelease(visualModel != nullptr);
 
-    const u32 colorU32 = parSelected ? 0xFFFFFFFF : 0xFFFF0000;
+    const u32 colorU32 = parSelected ? 0xFF0000FF : 0x7F00007F;
     const glm::vec4 color = ColorUtils::ConvertToFVEC4(colorU32);
     FDrawBuffer->SetVec4Uniform("u_PickingId", color);
 
