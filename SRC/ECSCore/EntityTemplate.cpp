@@ -109,17 +109,7 @@ void EntityTemplate::DrawEditor()
 
 void EntityTemplate::UpdateKey()
 {
-    EntityModuleKey key;
-    std::map<u32, std::unique_ptr<ModuleTemplate>> moduleTemplates;
-    foreachitem(modTemplate, FModuleTemplates)
-    {
-        const u32 moduleId = modTemplate.second->GetModuleId();
-        key.SetHasModule(moduleId);
-        moduleTemplates.insert_or_assign(moduleId, std::move(modTemplate.second));
-    }
-
-    FKey = key;
-    FModuleTemplates = std::move(moduleTemplates);
+    foreachitem(modTemplate, FModuleTemplates) { FKey.SetHasModule(modTemplate.first); }
 }
 
 template<typename Module>
