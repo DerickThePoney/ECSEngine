@@ -7,6 +7,8 @@
 #include "Common/IFeedbackDrawer.h"
 #include "ECSGameplay_Specific/GameplayConstants.h"
 #include "ECSGameplay_Specific/GameplayFeedbackDrawer.h"
+#include "GFXPickingRenderer.h"
+#include "OutlineRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/Carrier.h"
 #include "RenderingCore/DrawCommands.h"
@@ -24,6 +26,15 @@ namespace ECSEngine
 {
 namespace Rendering
 {
+
+GameRenderer::GameRenderer()
+    : Singleton()
+{
+}
+
+GameRenderer::~GameRenderer()
+{
+}
 
 void GameRenderer::Initialise()
 {
@@ -210,6 +221,7 @@ void GameRenderer::Render()
 
     // combine pass
     {
+        // TODO Apply UI AFTER THIS!
         SCOPED_PROFILE(GameRenderer_Render_CombinePass);
         MaterialInstanceHandle combineMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\combinepass.material");
         MaterialManager::SetSamplerUniform_IKNOWWHATIMDOING("s_GeometryTexture", FGeometryFramebuffer->GetTextureHandle(0).idx, 0);

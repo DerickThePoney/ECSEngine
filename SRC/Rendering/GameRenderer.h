@@ -1,7 +1,5 @@
 ﻿#pragma once
 #include "Common/Singleton.h"
-#include "GFXPickingRenderer.h"
-#include "OutlineRenderer.h"
 
 namespace ECSEngine
 {
@@ -9,15 +7,14 @@ namespace Rendering
 {
 class FramebufferInstance;
 class DrawCommandBuffer;
+class GFXPickingRenderer;
+class OutlineRenderer;
 
 class GameRenderer : public Singleton<GameRenderer>
 {
 public:
-    GameRenderer()
-        : Singleton()
-    {
-    }
-    ~GameRenderer() { }
+    GameRenderer();
+    ~GameRenderer();
 
     void Initialise();
     void Shutdown();
