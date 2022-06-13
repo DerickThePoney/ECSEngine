@@ -13,6 +13,9 @@ public:
     const std::set<EntityId>& SelectedUnits() const { return FSelectedUnits; }
     const std::set<EntityId>& HighlightedUnits() const { return FHighlightedUnits; }
 
+    void Finalize();
+    static void Delete();
+
 protected:
     void VirtualUpdate() override;
 

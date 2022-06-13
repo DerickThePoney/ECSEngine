@@ -17,6 +17,16 @@ SelectionManager::SelectionManager()
     RegisterDepency<ApparenceModule>(EEntityWorlds::BUILDINGS);
 }
 
+void SelectionManager::Finalize()
+{
+    ModuleSystem::Destroy();
+}
+
+void SelectionManager::Delete()
+{
+    Singleton<SelectionManager>::Destroy();
+}
+
 void SelectionManager::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();

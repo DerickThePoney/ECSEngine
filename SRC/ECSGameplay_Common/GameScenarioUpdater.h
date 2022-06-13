@@ -9,6 +9,7 @@
 #include "ECSGameplay_Specific/PeonsHarvestingSystem.h"
 #include "ECSGameplay_Specific/ResourceProductionSystem.h"
 #include "ECSGameplay_Specific/ResourceStatisticsUpdateSystem.h"
+#include "ECSGameplay_Specific/StorageFeedbackDrawer.h"
 #include "ECSGameplay_Specific/StorageSlotSystem.h"
 #include "ECSGameplay_Specific/UserInterfaceSystem.h"
 #include "ECSGameplay_Specific/WorkSystem.h"
@@ -54,6 +55,7 @@ private:
     WorkSystem FWorkSystem;
 
     ColonyFeedbackSystem FColonyFeedbackSystem;
+    StorageFeedbackDrawer FStorageFeedback;
 
     UserInterfaceSystem FUserInterfaceSystem;
 

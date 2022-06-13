@@ -6,6 +6,7 @@
 #include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
+#include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Specific/CircularBuildingGrid.h"
 #include "ECSGameplay_Specific/EnergySystem.h"
 #include "ECSGameplay_Specific/MousePolicyManager.h"
@@ -21,6 +22,7 @@
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/RenderPass.h"
+#include "SelectionManager.h"
 #include "UICore/RMLUIManager.h"
 
 namespace ECSEngine
@@ -49,6 +51,9 @@ void GameScenarioUpdater::Initialise()
 
     MousePolicyManager::CreateIFP();
     MousePolicyManager::Instance().Initialise();
+
+    SelectionManager::CreateIFP();
+    SelectionManager::Instance().Init();
 
     AssertRelease(FScenario != nullptr);
     EnergySystem::CreateIFP();
@@ -102,7 +107,8 @@ void GameScenarioUpdater::Destroy()
     EnergySystem::Instance().Finalize();
     EnergySystem::Delete();
 
-    WorldManager::Instance().DestroyAllRemainingEntities();
+    SelectionManager::Instance().Finalize();
+    SelectionManager::Delete();
 
     MousePolicyManager::Instance().Shutdown();
     MousePolicyManager::Destroy();
@@ -127,6 +133,8 @@ void GameScenarioUpdater::GameplayUpdate()
 {
     {
         SCOPED_PROFILE(GameScenarioUpdater_GameplayUpdate);
+
+        SelectionManager::Instance().Update();
 
         AssertRelease(FScenario != nullptr);
         FScenario->Update();
@@ -223,8 +231,13 @@ void GameScenarioUpdater::DebugRender()
 void GameScenarioUpdater::Render()
 {
     {
-        SCOPED_PROFILE(GameScenarioUpdater_RenderingFrame);
+        SCOPED_PROFILE(GameScenarioUpdater_Feedback);
         FColonyFeedbackSystem.Update();
+        FStorageFeedback.DrawFeedback();
+    }
+
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_RenderingFrame);
 
         Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
 
