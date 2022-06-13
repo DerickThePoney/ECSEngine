@@ -38,7 +38,7 @@ public:
     BuildingGridOccupancyModule();
     ~BuildingGridOccupancyModule();
 
-    CircularGridAccessor& GridAccessor() { FGridAccessor; }
+    const CircularGridAccessor& GridAccessor() const { FGridAccessor; }
     void SetGridAccessor(const CircularGridAccessor& parAccessor) { FGridAccessor = parAccessor; }
 
 protected:
