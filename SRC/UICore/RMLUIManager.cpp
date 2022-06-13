@@ -267,5 +267,10 @@ void RmlUiManager::RemoveDataModel(const std::string& parModelName) const
     FContext->RemoveDataModel(parModelName);
 }
 
+u16 RmlUiManager::GetTexture() const
+{
+    return FRenderInterface->GetTexture();
+}
+
 } // namespace UI
 } // namespace ECSEngine

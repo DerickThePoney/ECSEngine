@@ -34,6 +34,8 @@ public:
     Rml::DataModelConstructor CreateDataModel(const std::string& parModelName) const;
     void RemoveDataModel(const std::string& parModelName) const;
 
+    u16 GetTexture() const;
+
 private:
     void ProcessInput();
     bool ProcessMouse(u32 parKeyMods);

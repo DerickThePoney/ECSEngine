@@ -4,6 +4,7 @@
 
 #include "Common/ColorUtils.h"
 #include "Common/MeshStreamingData.h"
+#include "RenderingCore/Framebuffer.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/Material.h"
 #include "RenderingCore/MaterialDescriptors.h"
@@ -17,12 +18,12 @@
 #include "RenderingCore/VertexLayout.h"
 #include "bx/bx.h"
 
+#include <RmlUi/Core.h>
+
 namespace ECSEngine
 {
 namespace Rendering
 {
-using namespace Rml;
-
 constexpr RenderPassId::Type renderPass = RenderPassId::GAME_UI_PASS;
 
 void RmlRenderer::FillVextexStream(VertexDataStream& parStream, Rml::Vertex* vertices, int num_vertices)
@@ -37,7 +38,7 @@ void RmlRenderer::FillVextexStream(VertexDataStream& parStream, Rml::Vertex* ver
     }
 }
 
-void RmlRenderer::RenderGeometry(Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture, const Vector2f& translation)
+void RmlRenderer::RenderGeometry(Rml::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture, const Rml::Vector2f& translation)
 {
     VertexLayoutHash hash(true, 1, 1, false, false, false, false);
     bgfx::VertexLayout layout = GetVertexLayout(hash);
@@ -82,7 +83,7 @@ void RmlRenderer::RenderGeometry(Vertex* vertices, int num_vertices, int* indice
     bgfx::submit(renderPass, instance->GetProgram()->ProgramHandle());
 }
 
-Rml::CompiledGeometryHandle RmlRenderer::CompileGeometry(Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture)
+Rml::CompiledGeometryHandle RmlRenderer::CompileGeometry(Rml::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rml::TextureHandle texture)
 {
     VertexLayoutHash hash(true, 1, 1, false, false, false, false);
     bgfx::VertexLayout layout = GetVertexLayout(hash);
@@ -97,7 +98,7 @@ Rml::CompiledGeometryHandle RmlRenderer::CompileGeometry(Vertex* vertices, int n
     return (Rml::CompiledGeometryHandle)handle.GetMeshId();
 }
 
-void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, const Vector2f& translation)
+void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, const Rml::Vector2f& translation)
 {
     glm::mat4 mat = glm::translate(glm::vec3(translation.x, translation.y, 0.f)) * FCurrentMatrix;
     bgfx::setTransform(&mat);
@@ -177,7 +178,7 @@ void RmlRenderer::SetScissorRegion(int x, int y, int width, int height)
     bgfx::setScissor(x, y, width, height);
 }
 
-bool RmlRenderer::LoadTexture(Rml::TextureHandle& texture_handle, Vector2i& texture_dimensions, const String& source)
+bool RmlRenderer::LoadTexture(Rml::TextureHandle& texture_handle, Rml::Vector2i& texture_dimensions, const Rml::String& source)
 {
     const u32 id = TextureManager::Instance().CreateFreeFormTexture(source);
     const Texture* texture = TextureManager::Instance().GetFreeFormTexture(id);
@@ -186,11 +187,11 @@ bool RmlRenderer::LoadTexture(Rml::TextureHandle& texture_handle, Vector2i& text
         return false;
 
     texture_handle = id + 1;
-    texture_dimensions = Vector2i(texture->Info().width, texture->Info().height);
+    texture_dimensions = Rml::Vector2i(texture->Info().width, texture->Info().height);
     return true;
 }
 
-bool RmlRenderer::GenerateTexture(Rml::TextureHandle& texture_handle, const byte* source, const Vector2i& source_dimensions)
+bool RmlRenderer::GenerateTexture(Rml::TextureHandle& texture_handle, const Rml::byte* source, const Rml::Vector2i& source_dimensions)
 {
     const u32 id = TextureManager::Instance().CreateFreeFormTexture(source, source_dimensions.x, source_dimensions.y);
     const Texture* texture = TextureManager::Instance().GetFreeFormTexture(id);
@@ -224,8 +225,19 @@ void RmlRenderer::SetTransform(const Rml::Matrix4f* transform)
     FCurrentMatrix = glm::mat4(row0_glm, row1_glm, row2_glm, row3_glm);
 }
 
+u16 RmlRenderer::GetTexture() const
+{
+    return FFramebuffer->GetTextureHandle(0).idx;
+}
+
 void RmlRenderer::Initialise()
 {
+    const glm::vec2 size = GLFWDisplayWindowHandler::Instance().GetSize();
+    FFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, size);
+    FFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
+          0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
+    FFramebuffer->InitFramebuffer();
+
     FRenderMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uivertexcolormaterial.material");
     FRenderMaterialWithTexture = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uivertexcolortexcoordmaterial.material");
 }
@@ -238,15 +250,22 @@ void RmlRenderer::Shutdown()
         TextureManager::Instance().ReleaseFreeFormTexture(handle.second);
     }
     FCompiledGeometry.clear();
+
+    FFramebuffer->Destroy();
+    delete FFramebuffer;
 }
 
 void RmlRenderer::OnPreUpdate()
 {
     SCOPED_PROFILE_CLASS(RmlRenderer, OnPreUpdate);
+
     bgfx::setViewName(renderPass, "GAME_UI_PASS");
     bgfx::setViewMode(renderPass, bgfx::ViewMode::Sequential);
 
     auto size = GLFWDisplayWindowHandler::Instance().GetSize();
+    FFramebuffer->ResizeIFN(size);
+    bgfx::setViewFrameBuffer(renderPass, FFramebuffer->GetHandle());
+
     FProjMat = glm::ortho(0.f, (float)size.x, (float)size.y, 0.f);
     auto id = glm::identity<glm::mat4>();
     bgfx::setViewTransform(renderPass, &id, &FProjMat);

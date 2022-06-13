@@ -21,6 +21,8 @@ public:
 
     void Render();
 
+    u16 GetFinalTexture() const;
+
 private:
     void SetViewFramebuffers(const glm::uvec2 parSize);
 
@@ -28,6 +30,7 @@ private:
     u32 FGameplayCameraId = -1;
 
     FramebufferInstance* FGeometryFramebuffer = nullptr;
+    FramebufferInstance* FCombineFramebuffer = nullptr;
 
     DrawCommandBuffer* FGeometryCommandBuffer = nullptr;
     DrawCommandBuffer* FFeedbackCommandBuffer = nullptr;

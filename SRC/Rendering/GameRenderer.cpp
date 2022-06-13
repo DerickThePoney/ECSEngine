@@ -42,7 +42,7 @@ void GameRenderer::Initialise()
 
     bgfx::setViewName(RenderPassId::GEOMETRY_PASS, "Geometry pass");
     bgfx::setViewName(RenderPassId::FEEDBACK_PASS, "Feedback pass");
-    bgfx::setViewName(RenderPassId::COMBINE_PASS, "Combine pass");
+    bgfx::setViewName(RenderPassId::GAME_RENDERER_COMBINE_PASS, "Combine pass");
 
     FGameplayCameraId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
     AssertRelease(FGameplayCameraId != -1);
@@ -64,8 +64,13 @@ void GameRenderer::Initialise()
     FFeedbackCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::FEEDBACK_PASS);
 
     // Combine pass
-    FCombineCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::COMBINE_PASS);
-    bgfx::setViewClear(RenderPassId::COMBINE_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+    FCombineFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, size);
+    FCombineFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
+          0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
+    FCombineFramebuffer->InitFramebuffer();
+
+    FCombineCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::GAME_RENDERER_COMBINE_PASS);
+    bgfx::setViewClear(RenderPassId::GAME_RENDERER_COMBINE_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 
     SetViewFramebuffers(size);
 
@@ -80,12 +85,11 @@ void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
 {
     bgfx::setViewFrameBuffer(RenderPassId::GEOMETRY_PASS, FGeometryFramebuffer->GetHandle());
     bgfx::setViewFrameBuffer(RenderPassId::FEEDBACK_PASS, FGeometryFramebuffer->GetHandle());
-    bgfx::setViewFrameBuffer(RenderPassId::GAME_UI_PASS, FGeometryFramebuffer->GetHandle());
+    bgfx::setViewFrameBuffer(RenderPassId::GAME_RENDERER_COMBINE_PASS, FCombineFramebuffer->GetHandle());
 
     bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, parSize.x, parSize.y);
     bgfx::setViewRect(RenderPassId::FEEDBACK_PASS, 0, 0, parSize.x, parSize.y);
-    bgfx::setViewRect(RenderPassId::GAME_UI_PASS, 0, 0, parSize.x, parSize.y);
-    bgfx::setViewRect(RenderPassId::COMBINE_PASS, 0, 0, parSize.x, parSize.y);
+    bgfx::setViewRect(RenderPassId::GAME_RENDERER_COMBINE_PASS, 0, 0, parSize.x, parSize.y);
     bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, parSize.x, parSize.y);
 }
 
@@ -102,8 +106,13 @@ void GameRenderer::Shutdown()
     Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FFeedbackCommandBuffer);
     Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(FCombineCommandBuffer);
 
+    FGeometryFramebuffer->Destroy();
     delete FGeometryFramebuffer;
     FGeometryFramebuffer = nullptr;
+
+    FCombineFramebuffer->Destroy();
+    delete FCombineFramebuffer;
+    FCombineFramebuffer = nullptr;
 }
 
 void GameRenderer::Render()
@@ -117,15 +126,16 @@ void GameRenderer::Render()
 
     // Resize framebuffers
     auto size = GLFWDisplayWindowHandler::Instance().GetSize();
-    const bool hasResized = FGeometryFramebuffer->ResizeIFN(size);
+    const bool hasResizedG = FGeometryFramebuffer->ResizeIFN(size);
+    const bool hasResizedC = FCombineFramebuffer->ResizeIFN(size);
 
-    if (hasResized)
+    if (hasResizedG || hasResizedC)
         SetViewFramebuffers(size);
 
     bgfx::setViewRect(RenderPassId::GEOMETRY_PASS, 0, 0, size.x, size.y);
     bgfx::setViewRect(RenderPassId::FEEDBACK_PASS, 0, 0, size.x, size.y);
     bgfx::setViewRect(RenderPassId::GAME_UI_PASS, 0, 0, size.x, size.y);
-    bgfx::setViewRect(RenderPassId::COMBINE_PASS, 0, 0, size.x, size.y);
+    bgfx::setViewRect(RenderPassId::GAME_RENDERER_COMBINE_PASS, 0, 0, size.x, size.y);
     bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, size.x, size.y);
 
     // Gameplay Camera fetch
@@ -230,6 +240,11 @@ void GameRenderer::Render()
         FCombineCommandBuffer->BlitWithMaterial(combineMaterial);
         FCombineCommandBuffer->Submit();
     }
+}
+
+u16 GameRenderer::GetFinalTexture() const
+{
+    return FCombineFramebuffer->GetTextureHandle(0).idx;
 }
 
 } // namespace Rendering

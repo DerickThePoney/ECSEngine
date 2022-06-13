@@ -77,7 +77,7 @@ void BGFXRenderingBackend::Resize(u32 width, u32 height)
     bgfx::setViewRect(RenderPassId::EDITOR_PASS, 0, 0, width, height);
     bgfx::setViewRect(RenderPassId::EDITOR_UI_PASS, 0, 0, width, height);
     bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, width, height);
-    bgfx::setViewRect(RenderPassId::COMBINE_PASS, 0, 0, width, height);
+    bgfx::setViewRect(RenderPassId::GAME_RENDERER_COMBINE_PASS, 0, 0, width, height);
 }
 
 bool BGFXRenderingBackend::IsInstancingEnabled()

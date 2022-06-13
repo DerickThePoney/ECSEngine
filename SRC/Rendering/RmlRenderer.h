@@ -1,14 +1,14 @@
 #pragma once
 
 #include "Common/RenderingHandles.h"
-
-#include <RmlUi/Core.h>
+#include "RmlUi/Core/RenderInterface.h"
 
 namespace ECSEngine
 {
 namespace Rendering
 {
 class VertexDataStream;
+class FramebufferInstance;
 class RmlRenderer final : public Rml::RenderInterface
 {
 public:
@@ -28,10 +28,13 @@ public:
     void ReleaseTexture(Rml::TextureHandle texture) override;
     void SetTransform(const Rml::Matrix4f* transform) override;
 
+    u16 GetTexture() const;
+
 private:
     void FillVextexStream(VertexDataStream& parStream, Rml::Vertex* vertices, int num_vertices);
 
 private:
+    FramebufferInstance* FFramebuffer;
     MaterialInstanceHandle FRenderMaterial;
     MaterialInstanceHandle FRenderMaterialWithTexture;
 

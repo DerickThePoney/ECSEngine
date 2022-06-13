@@ -10,7 +10,6 @@
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
-#include "UICore/RmlUiManager.h"
 
 namespace ECSEngine
 {
@@ -76,8 +75,6 @@ void ApplicationUpdater::UpdateGameplay()
 void ApplicationUpdater::UIUpdate()
 {
     FScene->UIUpdate();
-
-    UI::RmlUiManager::Instance().Update();
 }
 
 void ApplicationUpdater::DebugRender()
@@ -88,11 +85,6 @@ void ApplicationUpdater::DebugRender()
 void ApplicationUpdater::Render()
 {
     FScene->Render();
-
-    {
-        SCOPED_PROFILE(ApplicationUpdater_Render_RmlUiManager);
-        UI::RmlUiManager::Instance().Render();
-    }
 
     {
         SCOPED_PROFILE(ApplicationUpdater_Render_Imgui);

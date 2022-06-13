@@ -12,6 +12,7 @@
 #include "ECSGameplay_Specific/ResourceManager.h"
 #include "ImGuiTools/ResourceCacheDebug.h"
 #include "NavMeshPathfindingManager.h"
+#include "Rendering/FinalCombinePass.h"
 #include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
@@ -20,6 +21,7 @@
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/RenderPass.h"
+#include "UICore/RMLUIManager.h"
 
 namespace ECSEngine
 {
@@ -38,6 +40,12 @@ void GameScenarioUpdater::Initialise()
 {
     Rendering::GameRenderer::CreateIFP();
     Rendering::GameRenderer::Instance().Initialise();
+
+    UI::RmlUiManager::CreateIFP();
+    UI::RmlUiManager::Instance().Initialise();
+
+    Rendering::FinalCombinePass::CreateIFP();
+    Rendering::FinalCombinePass::Instance().Initialise();
 
     MousePolicyManager::CreateIFP();
     MousePolicyManager::Instance().Initialise();
@@ -99,6 +107,12 @@ void GameScenarioUpdater::Destroy()
     MousePolicyManager::Instance().Shutdown();
     MousePolicyManager::Destroy();
 
+    Rendering::FinalCombinePass::Instance().Shutdown();
+    Rendering::FinalCombinePass::Destroy();
+
+    UI::RmlUiManager::Instance().Shutdown();
+    UI::RmlUiManager::Destroy();
+
     Rendering::GameRenderer::Instance().Shutdown();
     Rendering::GameRenderer::Destroy();
 }
@@ -152,6 +166,11 @@ void GameScenarioUpdater::UIUpdate()
         SCOPED_PROFILE(GameScenarioUpdater_UIUpdate);
         Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
         FUserInterfaceSystem.Update();
+    }
+
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_RmlUIUpdate);
+        UI::RmlUiManager::Instance().Update();
     }
 }
 
@@ -212,6 +231,17 @@ void GameScenarioUpdater::Render()
         Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
 
         Rendering::GameRenderer::Instance().Render();
+    }
+
+    {
+        SCOPED_PROFILE(ApplicationUpdater_Render_RmlUiManager);
+        UI::RmlUiManager::Instance().Render();
+    }
+
+    {
+        SCOPED_PROFILE(ApplicationUpdater_Render_FinalCombinePass);
+        Rendering::FinalCombinePass::Instance().SetTextures(Rendering::GameRenderer::Instance().GetFinalTexture(), UI::RmlUiManager::Instance().GetTexture());
+        Rendering::FinalCombinePass::Instance().Render();
     }
 }
 
