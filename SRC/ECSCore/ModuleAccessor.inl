@@ -26,7 +26,7 @@ ModuleAccessor<T>::ModuleAccessor(EntityWorld* world)
 }
 
 template<typename T>
-const T* ECSEngine::ModuleAccessor<T>::operator[](const EntityId& parId) const
+const T* ModuleAccessor<T>::operator[](const EntityId& parId) const
 {
     AssertRelease(FController != nullptr);
     AlwaysCheckedAssert(FController->IsLocked());
@@ -34,7 +34,7 @@ const T* ECSEngine::ModuleAccessor<T>::operator[](const EntityId& parId) const
 }
 
 template<typename T>
-T* ECSEngine::ModuleAccessor<T>::operator[](const EntityId& parId)
+T* ModuleAccessor<T>::operator[](const EntityId& parId)
 {
     AssertRelease(FController != nullptr);
     AlwaysCheckedAssert(FController->IsLocked());
@@ -42,7 +42,7 @@ T* ECSEngine::ModuleAccessor<T>::operator[](const EntityId& parId)
 }
 
 template<typename T>
-void ECSEngine::ManualLockModuleAccessor<T>::LockIFN()
+void ManualLockModuleAccessor<T>::LockIFN()
 {
     if (FController->IsLocked())
         return;
@@ -50,7 +50,7 @@ void ECSEngine::ManualLockModuleAccessor<T>::LockIFN()
 }
 
 template<typename T>
-void ECSEngine::ManualLockModuleAccessor<T>::UnlockIFN()
+void ManualLockModuleAccessor<T>::UnlockIFN()
 {
     if (!FController->IsLocked())
         return;
@@ -58,20 +58,20 @@ void ECSEngine::ManualLockModuleAccessor<T>::UnlockIFN()
 }
 
 template<typename T>
-ECSEngine::ManualLockModuleAccessor<T>::~ManualLockModuleAccessor()
+ManualLockModuleAccessor<T>::~ManualLockModuleAccessor()
 {
     UnlockIFN();
 }
 
 template<typename T>
-ECSEngine::ManualLockModuleAccessor<T>::ManualLockModuleAccessor(EntityWorld* world)
+ManualLockModuleAccessor<T>::ManualLockModuleAccessor(EntityWorld* world)
 {
     FController = dynamic_cast<ModuleController<T>*>(world->GetControllerIFP<T>());
     AssertRelease(FController != nullptr);
 }
 
 template<typename T>
-ECSEngine::ManualLockModuleAccessor<T>::ManualLockModuleAccessor(const EEntityWorlds parWorld /*= Worlds::STANDARD*/)
+ManualLockModuleAccessor<T>::ManualLockModuleAccessor(const EEntityWorlds parWorld /*= Worlds::STANDARD*/)
 {
     AssertRelease(WorldManager::HasInstance());
     EntityWorld* world = WorldManager::Instance().GetWorldIFP(parWorld);
@@ -81,7 +81,7 @@ ECSEngine::ManualLockModuleAccessor<T>::ManualLockModuleAccessor(const EEntityWo
 }
 
 template<typename T>
-const T* ECSEngine::ManualLockModuleAccessor<T>::operator[](const EntityId& parId) const
+const T* ManualLockModuleAccessor<T>::operator[](const EntityId& parId) const
 {
     AssertRelease(FController != nullptr);
     AlwaysCheckedAssert(FController->IsLocked());
@@ -89,7 +89,7 @@ const T* ECSEngine::ManualLockModuleAccessor<T>::operator[](const EntityId& parI
 }
 
 template<typename T>
-T* ECSEngine::ManualLockModuleAccessor<T>::operator[](const EntityId& parId)
+T* ManualLockModuleAccessor<T>::operator[](const EntityId& parId)
 {
     AssertRelease(FController != nullptr);
     AlwaysCheckedAssert(FController->IsLocked());
