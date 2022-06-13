@@ -3,9 +3,16 @@
 #include "ColonySelectionPanelController.h"
 
 #include "ColonyModule.h"
+#include "ColonyPeonsManagementModule.h"
+#include "ECSCore/ScopedModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
 #include "GameplayRulesManager.h"
+#include "HousingPlaceModule.h"
+#include "PeonFeedingTimeModule.h"
+#include "PeonSpawnModule.h"
 #include "PeonSpawningRulesManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "ResourceStorageModule.h"
 #include "imgui/imgui_internal.h"
 
 namespace ECSEngine
@@ -13,7 +20,15 @@ namespace ECSEngine
 namespace UI
 {
 
+using AccessHelpers = ScopedModuleAccessor<MC<ColonyModule, EEntityWorlds::COLONY>,
+      MC<ResourceStorageModule, EEntityWorlds::COLONY>,
+      MC<PeonSpawnModule, EEntityWorlds::COLONY>,
+      MC<ColonyPeonsManagementModule, EEntityWorlds::COLONY>,
+      MC<PeonFeedingTimeModule, EEntityWorlds::COLONY>,
+      MC<HousingPlaceModule, EEntityWorlds::BUILDINGS>>;
+
 ColonySelectionPanelController::ColonySelectionPanelController()
+    : UIController()
 {
 }
 
@@ -23,21 +38,23 @@ ColonySelectionPanelController::~ColonySelectionPanelController()
 
 void ColonySelectionPanelController::VirtualUpdate()
 {
-    UIControllerWithModuleAccessors::VirtualUpdate();
+    UIController::VirtualUpdate();
+
+    AccessHelpers accessHelpers;
 
     const EntityId colonyId = EntityId((u32)EEntityWorlds::COLONY, 0);
 
-    const ColonyModule* colonyModule = GetModule<ColonyModule>(colonyId);
+    const ColonyModule* colonyModule = accessHelpers.GetModule<ColonyModule>(colonyId);
     if (colonyModule == nullptr)
         return;
 
-    const ResourceStorageModule* resourceStorage = GetModule<ResourceStorageModule>(colonyId);
+    const ResourceStorageModule* resourceStorage = accessHelpers.GetModule<ResourceStorageModule>(colonyId);
     AssertRelease(resourceStorage != nullptr);
 
-    const ColonyPeonsManagementModule* peonManagerModule = GetModule<ColonyPeonsManagementModule>(colonyId);
+    const ColonyPeonsManagementModule* peonManagerModule = accessHelpers.GetModule<ColonyPeonsManagementModule>(colonyId);
     AssertRelease(peonManagerModule != nullptr);
 
-    PeonSpawnModule* peonSpawnModule = GetModule<PeonSpawnModule>(colonyId);
+    PeonSpawnModule* peonSpawnModule = accessHelpers.GetModule<PeonSpawnModule>(colonyId);
     AssertRelease(peonSpawnModule != nullptr);
 
     const float size_x = 0.2f, size_y = 0.4f;
@@ -58,7 +75,7 @@ void ColonySelectionPanelController::VirtualUpdate()
 
         u32 totalPlace = 0;
         u32 freePlace = 0;
-        foreachitemconst(house, Accessor<HousingPlaceModule>())
+        foreachitemconst(house, accessHelpers.Accessor<HousingPlaceModule>())
         {
             totalPlace += house.MaxPlace();
             freePlace += house.RemainingFreeSpace();
@@ -81,7 +98,7 @@ void ColonySelectionPanelController::VirtualUpdate()
     // show colony resources
     if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        const PeonFeedingTimeModule* peonFeedingTimeModule = GetModule<PeonFeedingTimeModule>(colonyId);
+        const PeonFeedingTimeModule* peonFeedingTimeModule = accessHelpers.GetModule<PeonFeedingTimeModule>(colonyId);
         const float progress = peonFeedingTimeModule->RemainTimeBeforeNextFeedAsRatio();
         ImGui::PushID("feedingTimeProgress");
         ImGui::Text("Next feeding time: ");

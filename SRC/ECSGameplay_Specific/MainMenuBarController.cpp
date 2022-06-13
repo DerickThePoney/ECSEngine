@@ -2,10 +2,18 @@
 
 #include "MainMenuBarController.h"
 
+#include "ColonyModule.h"
+#include "ColonyPeonsManagementModule.h"
 #include "Common/Logger.h"
 #include "Common/TimeManager.h"
+#include "ECSCore/ScopedModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
+#include "EnergyProducerModule.h"
 #include "EnergySystem.h"
+#include "HousingPlaceModule.h"
+#include "PeonFeedingTimeModule.h"
+#include "PeonSpawnModule.h"
+#include "ResourceStorageModule.h"
 #include "UICore/RMLUIManager.h"
 #include "UICore/RML_includes.h"
 
@@ -13,6 +21,14 @@ namespace ECSEngine
 {
 namespace UI
 {
+
+using AccessHelpers = ScopedModuleAccessor<MC<ColonyModule, EEntityWorlds::COLONY>,
+      MC<ResourceStorageModule, EEntityWorlds::COLONY>,
+      MC<PeonSpawnModule, EEntityWorlds::COLONY>,
+      MC<ColonyPeonsManagementModule, EEntityWorlds::COLONY>,
+      MC<PeonFeedingTimeModule, EEntityWorlds::COLONY>,
+      MC<HousingPlaceModule, EEntityWorlds::BUILDINGS>,
+      MC<EnergyProducerModule, EEntityWorlds::BUILDINGS>>;
 
 void ClickedTestData(Rml::DataModelHandle model_handle, Rml::Event& ev, const Rml::VariantList& ag)
 {
@@ -29,7 +45,7 @@ MainMenuBarController::~MainMenuBarController()
 
 void MainMenuBarController::VirtualInit()
 {
-    UIControllerWithModuleAccessors::VirtualInit();
+    UIController::VirtualInit();
 
     Rml::DataModelConstructor ctr = RmlUiManager::Instance().CreateDataModel("colony-model");
     AssertRelease((bool)ctr);
@@ -46,26 +62,28 @@ void MainMenuBarController::VirtualInit()
 
 void MainMenuBarController::VirtualUpdate()
 {
-    UIControllerWithModuleAccessors::VirtualUpdate();
+    UIController::VirtualUpdate();
     if (!HandleVisibility())
         return;
 
+    AccessHelpers accessHelpers;
+
     const EntityId colonyId = EntityId((u32)EEntityWorlds::COLONY, 0);
 
-    const ColonyModule* colonyModule = GetModule<ColonyModule>(colonyId);
+    const ColonyModule* colonyModule = accessHelpers.GetModule<ColonyModule>(colonyId);
     if (colonyModule == nullptr)
         return;
 
-    const ResourceStorageModule* resourceStorage = GetModule<ResourceStorageModule>(colonyId);
+    const ResourceStorageModule* resourceStorage = accessHelpers.GetModule<ResourceStorageModule>(colonyId);
     AssertRelease(resourceStorage != nullptr);
 
-    const ColonyPeonsManagementModule* peonManagerModule = GetModule<ColonyPeonsManagementModule>(colonyId);
+    const ColonyPeonsManagementModule* peonManagerModule = accessHelpers.GetModule<ColonyPeonsManagementModule>(colonyId);
     AssertRelease(peonManagerModule != nullptr);
 
-    PeonSpawnModule* peonSpawnModule = GetModule<PeonSpawnModule>(colonyId);
+    PeonSpawnModule* peonSpawnModule = accessHelpers.GetModule<PeonSpawnModule>(colonyId);
     AssertRelease(peonSpawnModule != nullptr);
 
-    const PeonFeedingTimeModule* peonFeedingTimeModule = GetModule<PeonFeedingTimeModule>(colonyId);
+    const PeonFeedingTimeModule* peonFeedingTimeModule = accessHelpers.GetModule<PeonFeedingTimeModule>(colonyId);
 
     FModel.TotalPeons = peonManagerModule->PeonsInColony();
     FModel.IdlePeons = peonManagerModule->IdlePeons().size();
@@ -86,7 +104,7 @@ void MainMenuBarController::VirtualUpdate()
 
 void MainMenuBarController::VirtualDestroy()
 {
-    UIControllerWithModuleAccessors::VirtualDestroy();
+    UIController::VirtualDestroy();
     if (FDocument != nullptr)
     {
         RmlUiManager::Instance().UnloadDocument(FDocument);
