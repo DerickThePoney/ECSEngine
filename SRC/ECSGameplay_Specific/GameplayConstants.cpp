@@ -31,6 +31,13 @@ float GridChunkFeedbackThickness = 0.1f;
 u32 StartingGridChunkNumber = 2;
 glm::vec4 GridFeedbackColor = glm::vec4(0.f);
 } // namespace CircularBuildingGrid
+
+namespace Storage
+{
+glm::vec4 HighlightedColor = glm::vec4(1.f);
+glm::vec4 SelectedColor = glm::vec4(1.f);
+float CircleThickness = 0.1f;
+} // namespace Storage
 } // namespace GameplayConstants
 
 void GameplayConstantsLoader::PostSerialize()
@@ -52,6 +59,11 @@ void GameplayConstantsLoader::PostSerialize()
     GameplayConstants::CircularBuildingGrid::GridChunkFeedbackThickness = FGridChunkFeedbackThickness;
     GameplayConstants::CircularBuildingGrid::StartingGridChunkNumber = FStartingGridChunkNumber;
     GameplayConstants::CircularBuildingGrid::GridFeedbackColor = FGridFeedbackColor;
+
+    // Storage
+    GameplayConstants::Storage::HighlightedColor = FHighlightedColor;
+    GameplayConstants::Storage::SelectedColor = FSelectedColor;
+    GameplayConstants::Storage::CircleThickness = FCircleThickness;
 }
 
 void GameplayConstantsLoader::DrawEditor()
@@ -80,6 +92,13 @@ void GameplayConstantsLoader::DrawEditor()
         ImGui::Separator();
         EDITOR_PROPERTY_SIMPLE("Grid chunk feedback thickness", FGridChunkFeedbackThickness);
         EDITOR_PROPERTY_COLOR("Grid feedback color", FGridFeedbackColor);
+    }
+
+    if (ImGui::CollapsingHeader("Storage building parameters"))
+    {
+        EDITOR_PROPERTY_COLOR("Storage range feedback highlighted color", FHighlightedColor);
+        EDITOR_PROPERTY_COLOR("Storage range feedback selected color", FSelectedColor);
+        EDITOR_PROPERTY_SIMPLE("Storage range thickness", FCircleThickness);
     }
 
     PostSerialize();

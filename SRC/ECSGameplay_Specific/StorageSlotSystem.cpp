@@ -83,7 +83,7 @@ void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMe
         const PositionModule* positionModuleForStorage = parPositionModuleAccessor[storage.UnitId()];
         AssertRelease(positionModuleForStorage != nullptr);
         const float radiusSq = storage.RadiusOfEffect() * storage.RadiusOfEffect();
-        const float distanceSq = glm::length2(glm::xy(positionModuleForEntity->GetPosition3D() - positionModuleForStorage->GetPosition3D()));
+        const float distanceSq = glm::length2(glm::xz(positionModuleForEntity->GetPosition3D() - positionModuleForStorage->GetPosition3D()));
         if (distanceSq <= radiusSq)
         {
             const bool success = storage.ReserveSlotsIFP(parMessage.FUnitId, MemoryView<const GameResource::Type>(resourcesToReserve.data(), resourcesToReserve.size()));

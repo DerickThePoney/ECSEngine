@@ -25,6 +25,13 @@ extern float GridChunkFeedbackThickness;
 extern u32 StartingGridChunkNumber;
 extern glm::vec4 GridFeedbackColor;
 } // namespace CircularBuildingGrid
+
+namespace Storage
+{
+extern glm::vec4 HighlightedColor;
+extern glm::vec4 SelectedColor;
+extern float CircleThickness;
+} // namespace Storage
 } // namespace GameplayConstants
 
 // work it out as actual extern X Y;
@@ -48,6 +55,11 @@ public:
         PROPERTYFIELD(GridChunkFeedbackThickness, 0.1f);
         PROPERTYFIELD(StartingGridChunkNumber, 2);
         PROPERTYFIELD(GridFeedbackColor, glm::vec4(0.f));
+
+        // Storage
+        PROPERTYFIELD(HighlightedColor, glm::vec4(1.f));
+        PROPERTYFIELD(SelectedColor, glm::vec4(1.f));
+        PROPERTYFIELD(CircleThickness, 0.1f);
 
         PostSerialize();
     }
@@ -74,5 +86,10 @@ private:
     float FGridChunkFeedbackThickness = 0.1f;
     u32 FStartingGridChunkNumber = 2;
     glm::vec4 FGridFeedbackColor = glm::vec4(0.f);
+
+    // Storage
+    glm::vec4 FHighlightedColor = glm::vec4(1.f);
+    glm::vec4 FSelectedColor = glm::vec4(1.f);
+    float FCircleThickness = 0.1f;
 };
 } // namespace ECSEngine
