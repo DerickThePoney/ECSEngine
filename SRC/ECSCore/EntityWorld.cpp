@@ -117,7 +117,7 @@ void EntityWorld::DestroyAllRemainingEntities()
 #endif
 }
 
-const EntityTemplate* EntityWorld::GetTemplateForEntity(const EntityId& parId)
+const EntityTemplate* EntityWorld::GetTemplateForEntity(const EntityId& parId) const
 {
     AssertRelease(FAllocatedEntities.find(parId.GetSequentialId()) != FAllocatedEntities.end());
     return FEntities[parId.GetSequentialId()].GetTemplate();

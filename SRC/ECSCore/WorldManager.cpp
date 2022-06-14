@@ -2,6 +2,7 @@
 
 #include "WorldManager.h"
 
+#include "EntityWorld.h"
 #include "WorldIds.h"
 
 namespace ECSEngine
@@ -32,7 +33,17 @@ EntityWorld& WorldManager::GetWorld(EEntityWorlds parWorld)
     return *FWorlds[(u32)parWorld];
 }
 
+const EntityWorld& WorldManager::GetWorld(EEntityWorlds parWorld) const
+{
+    return *FWorlds[(u32)parWorld];
+}
+
 EntityWorld* WorldManager::GetWorldIFP(EEntityWorlds parWorld)
+{
+    return FWorlds[(u32)parWorld].get();
+}
+
+const EntityWorld* WorldManager::GetWorldIFP(EEntityWorlds parWorld) const
 {
     return FWorlds[(u32)parWorld].get();
 }
@@ -59,6 +70,13 @@ void WorldManager::MarkAsDead(const EntityId& parId)
     AssertRelease(world != nullptr);
 #endif
     FDeadEntities.insert(parId);
+}
+
+const EntityTemplate* WorldManager::GetTemplateForEntityId(const EntityId& parUnitId) const
+{
+    AssertRelease(parUnitId.Valid());
+    const EntityWorld& world = GetWorld(parUnitId.GetWorld());
+    return world.GetTemplateForEntity(parUnitId);
 }
 
 void WorldManager::ProcessDestroyEntities()

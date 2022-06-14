@@ -1,15 +1,17 @@
 ﻿#pragma once
 #include "Common/Singleton.h"
-#include "EntityWorld.h"
 #include "WorldIds_fwd.h"
+
 namespace ECSEngine
 {
 class EntityWorld;
+class EntityTemplate;
+class EntityId;
 class WorldManager final : public Singleton<WorldManager>
 {
 public:
     WorldManager();
-    virtual ~WorldManager();
+    ~WorldManager();
 
     void Init();
     void Shutdown();
@@ -19,9 +21,13 @@ public:
     void DestroyAllRemainingEntities();
 
     EntityWorld& GetWorld(EEntityWorlds parWorld);
+    const EntityWorld& GetWorld(EEntityWorlds parWorld) const;
     EntityWorld* GetWorldIFP(EEntityWorlds parWorld);
+    const EntityWorld* GetWorldIFP(EEntityWorlds parWorld) const;
 
     void MarkAsDead(const EntityId& parId);
+
+    const EntityTemplate* GetTemplateForEntityId(const EntityId& parUnitId) const;
 
 private:
     std::vector<std::unique_ptr<EntityWorld>> FWorlds;

@@ -3,6 +3,7 @@
 #include "EntityFactory.h"
 
 #include "EntityTemplate.h"
+#include "EntityWorld.h"
 #include "WorldManager.h"
 
 namespace ECSEngine

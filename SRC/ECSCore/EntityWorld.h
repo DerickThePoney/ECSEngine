@@ -34,7 +34,7 @@ public:
 
     const u32 WorldID() const { return (u32)FWorldID; }
 
-    const EntityTemplate* GetTemplateForEntity(const EntityId& parId);
+    const EntityTemplate* GetTemplateForEntity(const EntityId& parId) const;
 
 private:
     u32 FSize;
