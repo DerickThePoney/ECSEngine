@@ -22,9 +22,6 @@ void UIController::Init()
 
 void UIController::Update()
 {
-    if (!FShow)
-        return;
-
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualUpdateCalled = false;
 #endif
