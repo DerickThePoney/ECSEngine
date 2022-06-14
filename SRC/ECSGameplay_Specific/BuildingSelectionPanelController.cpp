@@ -6,6 +6,8 @@
 #include "ECSCore/ScopedModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/SelectionManager.h"
+#include "RecipeProductionModule.h"
+#include "ResourceStorageModule.h"
 #include "UICore/RMLUIManager.h"
 #include "UICore/RML_includes.h"
 #include "UICore/RmlDataModelWrapper.h"
@@ -15,7 +17,7 @@ namespace ECSEngine
 {
 namespace UI
 {
-using AccessHelpers = ScopedModuleAccessor<MC<StorageSlotModule, EEntityWorlds::BUILDINGS>, MC<RecipeProductionModule, EEntityWorlds::BUILDINGS>>;
+using AccessHelpers = ScopedModuleAccessor<MC<ResourceStorageModule, EEntityWorlds::BUILDINGS>, MC<RecipeProductionModule, EEntityWorlds::BUILDINGS>>;
 
 BuildingSelectionPanelController::BuildingSelectionPanelController()
 {
@@ -31,11 +33,11 @@ void BuildingSelectionPanelController::VirtualInit()
 
     Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("buildingResourcesModel");
 
-    /*if (auto handle = ctr2.RegisterStruct<UIResourceView>())
+    if (auto handle = ctr2.RegisterStruct<UIResourceView>())
     {
         handle.RegisterMember("name", &UIResourceView::ResourceName);
         handle.RegisterMember("quantity", &UIResourceView::Quantity);
-    }*/
+    }
 
     ctr2.RegisterArray<std::vector<UIResourceView>>();
 
@@ -59,6 +61,36 @@ void BuildingSelectionPanelController::VirtualUpdate()
     AssertRelease(buildingTemplate != nullptr);
 
     FDocument->GetElementById("title")->SetInnerRML(buildingTemplate->GetName());
+
+    if (FPreviousIdSelected != FCurrentIdSelected)
+    {
+        FResourceToIndex.clear();
+        FResourcesInCurrentBuilding.clear();
+    }
+
+    AccessHelpers accessHelpers;
+    const ResourceStorageModule* storageModule = accessHelpers.GetModule<ResourceStorageModule>(FCurrentIdSelected);
+
+    if (storageModule != nullptr)
+    {
+        auto storageSlots = storageModule->Resources();
+        foreachitemconst(slot, storageSlots)
+        {
+            auto itFind = FResourceToIndex.find(slot.first);
+            if (itFind == FResourceToIndex.end())
+            {
+                FResourceToIndex.insert_or_assign(slot.first, (u32)FResourcesInCurrentBuilding.size());
+                FResourcesInCurrentBuilding.emplace_back(UIResourceView{ slot.first, GameResource::GetName(slot.first), (int)slot.second });
+            }
+            else
+            {
+                AlwaysCheckedAssert(FResourcesInCurrentBuilding[itFind->second].Resource == slot.first);
+                FResourcesInCurrentBuilding[itFind->second].Quantity = (int)slot.second;
+            }
+        }
+    }
+
+    FDataModelWrapper->DirtyVariable("buildingResourcesModel");
 }
 
 void BuildingSelectionPanelController::VirtualDestroy()

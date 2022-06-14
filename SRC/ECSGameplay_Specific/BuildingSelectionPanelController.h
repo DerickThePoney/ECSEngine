@@ -1,6 +1,7 @@
 #pragma once
 #include "ECSCore/EntityId.h"
 #include "ECSCore/UIController.h"
+#include "GameResources.h"
 #include "UICore/RML_fwd.h"
 
 namespace ECSEngine
@@ -28,6 +29,7 @@ private:
     EntityId FPreviousIdSelected;
 
     std::vector<UIResourceView> FResourcesInCurrentBuilding;
+    std::map<GameResource::Type, u32> FResourceToIndex;
 
     std::unique_ptr<IDataModelWrapper> FDataModelWrapper;
     Rml::ElementDocument* FDocument = nullptr;

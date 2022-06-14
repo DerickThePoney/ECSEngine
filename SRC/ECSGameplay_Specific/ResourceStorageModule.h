@@ -87,6 +87,8 @@ public:
     ResourcesStatistics& Statistics() { return FResourceStatisticsManager; }
     const ResourcesStatistics& Statistics() const { return FResourceStatisticsManager; }
 
+    MemoryView<const std::pair<GameResource::Type, u32>> Resources() const { return MemoryView(FCarriedResources.data(), FCarriedResources.size()); }
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
