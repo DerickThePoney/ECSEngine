@@ -240,6 +240,8 @@ void RmlRenderer::Initialise()
 
     FRenderMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uivertexcolormaterial.material");
     FRenderMaterialWithTexture = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\uivertexcolortexcoordmaterial.material");
+
+    bgfx::setViewClear(renderPass, BGFX_CLEAR_COLOR, 0x00000000, 1.0f, 0);
 }
 
 void RmlRenderer::Shutdown()
