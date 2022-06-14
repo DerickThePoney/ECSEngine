@@ -2,17 +2,17 @@
 #include "ECSCore/UIController.h"
 #include "GameResources.h"
 #include "UICore/RML_fwd.h"
-#include "UICore/RmlDataModelWrapper.h"
 
 namespace ECSEngine
 {
 namespace UI
 {
-
+class IDataModelWrapper;
 class ResourcePanelController : public UIController
 {
 public:
     ResourcePanelController();
+    ~ResourcePanelController();
 
     void SetIsPlacingBuilding(const u32 parBuildingIndex);
 

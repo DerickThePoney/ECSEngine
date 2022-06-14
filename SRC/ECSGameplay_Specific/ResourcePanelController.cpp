@@ -5,6 +5,7 @@
 #include "ResourceManager.h"
 #include "UICore/RMLUIManager.h"
 #include "UICore/RML_includes.h"
+#include "UICore/RmlDataModelWrapper.h"
 
 namespace ECSEngine
 {
@@ -12,6 +13,10 @@ namespace UI
 {
 
 ResourcePanelController::ResourcePanelController()
+{
+}
+
+ResourcePanelController::~ResourcePanelController()
 {
 }
 
