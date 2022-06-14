@@ -26,13 +26,13 @@ void ResourcePanelController::VirtualInit()
 
     Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("resourcesModel");
 
-    if (auto handle = ctr2.RegisterStruct<ResourceView>())
+    if (auto handle = ctr2.RegisterStruct<UIResourceView>())
     {
-        handle.RegisterMember("name", &ResourceView::ResourceName);
-        handle.RegisterMember("quantity", &ResourceView::Quantity);
+        handle.RegisterMember("name", &UIResourceView::ResourceName);
+        handle.RegisterMember("quantity", &UIResourceView::Quantity);
     }
 
-    ctr2.RegisterArray<decltype(FResourceView)>();
+    ctr2.RegisterArray<std::vector<UIResourceView>>();
 
     ctr2.Bind("resources", &FResourceView);
 
@@ -64,7 +64,7 @@ void ResourcePanelController::VirtualUpdate()
         }
         else if (currentResourceQuantity > 0)
         {
-            ResourceView newView;
+            UIResourceView newView;
             newView.Resource = currentResource;
             newView.ResourceName = GameResource::GetName(currentResource);
             newView.Quantity = currentResourceQuantity;

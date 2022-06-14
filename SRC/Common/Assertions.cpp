@@ -6,7 +6,7 @@
 
 // clang-format off
 #include <Windows.h>
-#include "dbghelp.h"
+#include <dbghelp.h>
 // clang-format on
 
 #include <boost/stacktrace.hpp>

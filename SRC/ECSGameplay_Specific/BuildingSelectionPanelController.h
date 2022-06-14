@@ -1,7 +1,6 @@
 #pragma once
 #include "ECSCore/EntityId.h"
 #include "ECSCore/UIController.h"
-#include "GameResources.h"
 #include "UICore/RML_fwd.h"
 
 namespace ECSEngine
@@ -9,6 +8,7 @@ namespace ECSEngine
 namespace UI
 {
 class IDataModelWrapper;
+class UIResourceView;
 class BuildingSelectionPanelController : public UIController
 {
 public:
@@ -26,6 +26,8 @@ private:
 private:
     EntityId FCurrentIdSelected;
     EntityId FPreviousIdSelected;
+
+    std::vector<UIResourceView> FResourcesInCurrentBuilding;
 
     std::unique_ptr<IDataModelWrapper> FDataModelWrapper;
     Rml::ElementDocument* FDocument = nullptr;

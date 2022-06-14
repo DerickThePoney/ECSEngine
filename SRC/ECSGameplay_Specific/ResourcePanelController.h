@@ -1,7 +1,7 @@
 #pragma once
 #include "ECSCore/UIController.h"
-#include "GameResources.h"
 #include "UICore/RML_fwd.h"
+#include "UIResourceView.h"
 
 namespace ECSEngine
 {
@@ -27,15 +27,8 @@ private:
     void FillWindow();
 
 private:
-    struct ResourceView
-    {
-        GameResource::Type Resource = GameResource::LENGTH;
-        std::string ResourceName;
-        int Quantity = 0;
-    };
-
     std::map<GameResource::Type, u32> FResourceToIndex;
-    std::vector<ResourceView> FResourceView;
+    std::vector<UIResourceView> FResourceView;
 
     std::unique_ptr<IDataModelWrapper> FDataModelWrapper;
     Rml::ElementDocument* FDocument = nullptr;

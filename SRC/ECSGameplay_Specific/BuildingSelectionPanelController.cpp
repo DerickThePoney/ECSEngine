@@ -9,6 +9,7 @@
 #include "UICore/RMLUIManager.h"
 #include "UICore/RML_includes.h"
 #include "UICore/RmlDataModelWrapper.h"
+#include "UIResourceView.h"
 
 namespace ECSEngine
 {
@@ -30,15 +31,15 @@ void BuildingSelectionPanelController::VirtualInit()
 
     Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("buildingResourcesModel");
 
-    /*if (auto handle = ctr2.RegisterStruct<ResourceView>())
+    /*if (auto handle = ctr2.RegisterStruct<UIResourceView>())
     {
-        handle.RegisterMember("name", &ResourceView::ResourceName);
-        handle.RegisterMember("quantity", &ResourceView::Quantity);
-    }
+        handle.RegisterMember("name", &UIResourceView::ResourceName);
+        handle.RegisterMember("quantity", &UIResourceView::Quantity);
+    }*/
 
-    ctr2.RegisterArray<decltype(FResourceView)>();
+    ctr2.RegisterArray<std::vector<UIResourceView>>();
 
-    ctr2.Bind("resources", &FResourceView);*/
+    ctr2.Bind("buildingResourcesModel", &FResourcesInCurrentBuilding);
 
     FDataModelWrapper = RmlDataModelWrapperFactory::CreateDataModelWrapper(ctr2.GetModelHandle());
 
