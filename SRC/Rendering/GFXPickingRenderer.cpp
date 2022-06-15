@@ -151,6 +151,11 @@ void GFXPickingRenderer::EndSelectionPass()
 
         FPreviousFrameSelectedGFXId = FSelectedGFXId;
 
+        if (FSelectedGFXId != -1 && GFXRepresentationManager::Instance().GetGFX(FSelectedGFXId) == nullptr)
+        {
+            FSelectedGFXId = -1;
+        }
+
         if (FHighlightedGFXId != -1 && Input::GetMouseButtonState(MouseButtons::MOUSE_BUTTON_1) && Input::GetMouseButtonHasChanged(MouseButtons::MOUSE_BUTTON_1))
         {
             FSelectedGFXId = FHighlightedGFXId;
