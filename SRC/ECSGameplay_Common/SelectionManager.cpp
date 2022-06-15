@@ -15,16 +15,24 @@ SelectionManager::SelectionManager()
     , Singleton()
 {
     RegisterDepency<ApparenceModule>(EEntityWorlds::BUILDINGS);
+    WorldManager::Instance().RegisterListener(DELEGATE(&SelectionManager::OnUnitDeath, *this));
 }
 
 void SelectionManager::Finalize()
 {
     ModuleSystem::Destroy();
+    WorldManager::Instance().RemoveListener(DELEGATE(&SelectionManager::OnUnitDeath, *this));
 }
 
 void SelectionManager::Delete()
 {
     Singleton<SelectionManager>::Destroy();
+}
+
+void SelectionManager::OnUnitDeath(const EntityId parUnit)
+{
+    FHighlightedUnits.erase(parUnit);
+    FSelectedUnits.erase(parUnit);
 }
 
 void SelectionManager::VirtualUpdate()

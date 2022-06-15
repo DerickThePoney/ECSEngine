@@ -16,6 +16,8 @@ public:
     void Finalize();
     static void Delete();
 
+    void OnUnitDeath(const EntityId parUnit);
+
 protected:
     void VirtualUpdate() override;
 
