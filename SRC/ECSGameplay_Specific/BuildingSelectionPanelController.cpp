@@ -58,12 +58,8 @@ void BuildingSelectionPanelController::VirtualInit()
     sBuildingSelectionPanelCallbackListener.reset(new BuildingSelectionPanelCallbackListener(this));
 
     Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("buildingResourcesModel");
-    if (auto handle = ctr2.RegisterStruct<UIResourceView>())
-    {
-        handle.RegisterMember("name", &UIResourceView::ResourceName);
-        handle.RegisterMember("quantity", &UIResourceView::Quantity);
-    }
-    ctr2.RegisterArray<std::vector<UIResourceView>>();
+
+    ctr2.RegisterArray<UIResourceArray>();
     if (auto handle = ctr2.RegisterStruct<BuildingSelectionPanelDataView>())
     {
         handle.RegisterMember("has_resources", &BuildingSelectionPanelDataView::HasResources);

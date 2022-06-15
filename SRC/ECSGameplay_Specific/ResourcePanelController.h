@@ -28,7 +28,7 @@ private:
 
 private:
     std::map<GameResource::Type, u32> FResourceToIndex;
-    std::vector<UIResourceView> FResourceView;
+    UIResourceArray FResourceView;
 
     std::unique_ptr<IDataModelWrapper> FDataModelWrapper;
     Rml::ElementDocument* FDocument = nullptr;

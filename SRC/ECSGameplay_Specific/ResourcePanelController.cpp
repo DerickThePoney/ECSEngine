@@ -32,7 +32,7 @@ void ResourcePanelController::VirtualInit()
         handle.RegisterMember("quantity", &UIResourceView::Quantity);
     }
 
-    ctr2.RegisterArray<std::vector<UIResourceView>>();
+    ctr2.RegisterArray<UIResourceArray>();
 
     ctr2.Bind("resources", &FResourceView);
 

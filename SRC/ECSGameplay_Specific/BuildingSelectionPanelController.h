@@ -11,15 +11,16 @@ class RecipeProductionModule;
 namespace UI
 {
 class UIResourceView;
+using UIResourceArray = std::vector<UIResourceView>;
 struct BuildingSelectionPanelDataView
 {
     bool HasResources = false;
-    std::vector<UIResourceView> FResourcesInCurrentBuilding;
+    UIResourceArray FResourcesInCurrentBuilding;
     std::map<GameResource::Type, u32> FResourceToIndex;
 
     bool HasRecipe = false;
-    std::vector<UIResourceView> FRecipeInputs;
-    std::vector<UIResourceView> FRecipeOutputs;
+    UIResourceArray FRecipeInputs;
+    UIResourceArray FRecipeOutputs;
     float FRecipeDuration = 0.f;
 
     bool ProducesEnergy = false;
