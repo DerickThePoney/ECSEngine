@@ -7,6 +7,9 @@ namespace ECSEngine
 class EntityWorld;
 class EntityTemplate;
 class EntityId;
+
+using UnitDeathListener = Delegate<void(const EntityId)>;
+
 class WorldManager final : public Singleton<WorldManager>
 {
 public:
@@ -29,9 +32,13 @@ public:
 
     const EntityTemplate* GetTemplateForEntityId(const EntityId& parUnitId) const;
 
+    void RegisterListener(UnitDeathListener parListener);
+    void RemoveListener(UnitDeathListener parListener);
+
 private:
     std::vector<std::unique_ptr<EntityWorld>> FWorlds;
-
     std::set<EntityId> FDeadEntities;
+
+    std::vector<UnitDeathListener> FUnitDeathListeners;
 };
 } // namespace ECSEngine

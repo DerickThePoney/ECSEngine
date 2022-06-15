@@ -65,7 +65,7 @@ void WorldManager::DestroyAllRemainingEntities()
 void WorldManager::MarkAsDead(const EntityId& parId)
 {
     AssertRelease(parId.Valid());
-#ifdef PERFORM_SECURITY_CHECKS
+#ifdef ENABLE_SECURITY_CHECKS
     EntityWorld* world = WorldManager::Instance().GetWorldIFP((EEntityWorlds)parId.GetWorldId());
     AssertRelease(world != nullptr);
 #endif
@@ -79,10 +79,38 @@ const EntityTemplate* WorldManager::GetTemplateForEntityId(const EntityId& parUn
     return world.GetTemplateForEntity(parUnitId);
 }
 
+void WorldManager::RegisterListener(UnitDeathListener parListener)
+{
+#ifdef ENABLE_SECURITY_CHECKS
+    foreachitemconst(listener, FUnitDeathListeners) AlwaysCheckedAssert(listener != parListener);
+#endif
+    FUnitDeathListeners.push_back(parListener);
+}
+
+void WorldManager::RemoveListener(UnitDeathListener parListener)
+{
+    auto pos = FUnitDeathListeners.end();
+    for (auto it = FUnitDeathListeners.begin(); it != FUnitDeathListeners.end(); ++it)
+    {
+        if (*it == parListener)
+        {
+            pos = it;
+            break;
+        }
+    }
+    AlwaysCheckedAssert(pos != FUnitDeathListeners.end());
+    FUnitDeathListeners.erase(pos);
+#ifdef ENABLE_SECURITY_CHECKS
+    foreachitemconst(listener, FUnitDeathListeners) AlwaysCheckedAssert(listener != parListener);
+#endif
+}
+
 void WorldManager::ProcessDestroyEntities()
 {
     foreachitemconst(id, FDeadEntities)
     {
+        foreachitemconst(listener, FUnitDeathListeners) listener(id);
+
         EntityWorld* world = WorldManager::Instance().GetWorldIFP((EEntityWorlds)id.GetWorldId());
         AssertRelease(world != nullptr);
 
