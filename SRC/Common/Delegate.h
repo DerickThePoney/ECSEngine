@@ -27,6 +27,7 @@ public:
     return_type operator()(params... xs) const { return (*fpCallbackFunction)(fpCallee, xs...); }
 
     bool operator==(const BaseDelegate& other) const { return (fpCallee == other.fpCallee) && (fpCallbackFunction == other.fpCallbackFunction); }
+    bool operator!=(const BaseDelegate& other) const { return !(*this == other); }
 
 private:
     void* fpCallee;
