@@ -10,11 +10,11 @@ class ProductionRecipe
 {
 public:
     const std::string& Name() const { return FName; }
-    u32 CraftDuration() const { return FCraftDuration; }
+    float CraftDuration() const { return FCraftDuration; }
     MemoryView<const RecipeComponent> InputComponents() const { return MemoryView(FInputComponents.data(), FInputComponents.size()); }
     MemoryView<const RecipeComponent> OutputComponents() const { return MemoryView(FOutputComponents.data(), FOutputComponents.size()); }
-	u32 TotalQuantityOfInputResourcesNecessary() const;
-	u32 TotalQuantityOfOutputResourcesNecessary() const;
+    u32 TotalQuantityOfInputResourcesNecessary() const;
+    u32 TotalQuantityOfOutputResourcesNecessary() const;
 
     void DrawInEditor();
 
