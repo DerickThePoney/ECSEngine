@@ -6,12 +6,31 @@
 
 namespace ECSEngine
 {
+class ResourceStorageModule;
+class RecipeProductionModule;
 namespace UI
 {
-class IDataModelWrapper;
 class UIResourceView;
+struct BuildingSelectionPanelDataView
+{
+    bool HasResources = false;
+    std::vector<UIResourceView> FResourcesInCurrentBuilding;
+    std::map<GameResource::Type, u32> FResourceToIndex;
+
+    bool HasRecipe = false;
+    std::vector<UIResourceView> FRecipeInputs;
+    std::vector<UIResourceView> FRecipeOutputs;
+    float FRecipeDuration = 0.f;
+
+    bool ProducesEnergy = false;
+    float EnergyProduced = 0;
+};
+
+class IDataModelWrapper;
 class BuildingSelectionPanelController : public UIController
 {
+    friend struct BuildingSelectionPanelCallbackListener;
+
 public:
     BuildingSelectionPanelController();
     ~BuildingSelectionPanelController();
@@ -23,13 +42,17 @@ protected:
 
 private:
     bool HandleVisibility();
+    void ResetDataView();
+    void HandleResources(const ResourceStorageModule* storageModule);
+    void HandleRecipe(const RecipeProductionModule* storageModule);
+
+    void OnDeleteButtonClicked();
 
 private:
     EntityId FCurrentIdSelected;
     EntityId FPreviousIdSelected;
 
-    std::vector<UIResourceView> FResourcesInCurrentBuilding;
-    std::map<GameResource::Type, u32> FResourceToIndex;
+    BuildingSelectionPanelDataView FDataView;
 
     std::unique_ptr<IDataModelWrapper> FDataModelWrapper;
     Rml::ElementDocument* FDocument = nullptr;

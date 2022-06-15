@@ -2,10 +2,12 @@
 
 #include "BuildingSelectionPanelController.h"
 
+#include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityTemplate.h"
 #include "ECSCore/ScopedModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/SelectionManager.h"
+#include "EnergyProducerModule.h"
 #include "RecipeProductionModule.h"
 #include "ResourceStorageModule.h"
 #include "UICore/RMLUIManager.h"
@@ -17,7 +19,29 @@ namespace ECSEngine
 {
 namespace UI
 {
-using AccessHelpers = ScopedModuleAccessor<MC<ResourceStorageModule, EEntityWorlds::BUILDINGS>, MC<RecipeProductionModule, EEntityWorlds::BUILDINGS>>;
+using AccessHelpers = ScopedModuleAccessor<MC<ResourceStorageModule, EEntityWorlds::BUILDINGS>,
+      MC<RecipeProductionModule, EEntityWorlds::BUILDINGS>,
+      MC<EnergyProducerModule, EEntityWorlds::BUILDINGS>>;
+
+struct BuildingSelectionPanelCallbackListener
+{
+    BuildingSelectionPanelCallbackListener(BuildingSelectionPanelController* parController);
+    void OnDeleteButtonClicked(Rml::DataModelHandle parHandle, Rml::Event& parEvent, const Rml::VariantList& parArgs);
+
+    BuildingSelectionPanelController* FController = nullptr;
+};
+
+BuildingSelectionPanelCallbackListener::BuildingSelectionPanelCallbackListener(BuildingSelectionPanelController* parController)
+    : FController(parController)
+{
+}
+
+void BuildingSelectionPanelCallbackListener::OnDeleteButtonClicked(Rml::DataModelHandle parHandle, Rml::Event& parEvent, const Rml::VariantList& parArgs)
+{
+    FController->OnDeleteButtonClicked();
+}
+
+static std::unique_ptr<BuildingSelectionPanelCallbackListener> sBuildingSelectionPanelCallbackListener;
 
 BuildingSelectionPanelController::BuildingSelectionPanelController()
 {
@@ -31,17 +55,29 @@ void BuildingSelectionPanelController::VirtualInit()
 {
     UIController::VirtualInit();
 
-    Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("buildingResourcesModel");
+    sBuildingSelectionPanelCallbackListener.reset(new BuildingSelectionPanelCallbackListener(this));
 
+    Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("buildingResourcesModel");
     if (auto handle = ctr2.RegisterStruct<UIResourceView>())
     {
         handle.RegisterMember("name", &UIResourceView::ResourceName);
         handle.RegisterMember("quantity", &UIResourceView::Quantity);
     }
-
     ctr2.RegisterArray<std::vector<UIResourceView>>();
+    if (auto handle = ctr2.RegisterStruct<BuildingSelectionPanelDataView>())
+    {
+        handle.RegisterMember("has_resources", &BuildingSelectionPanelDataView::HasResources);
+        handle.RegisterMember("has_recipe", &BuildingSelectionPanelDataView::HasRecipe);
+        handle.RegisterMember("recipeInput", &BuildingSelectionPanelDataView::FRecipeInputs);
+        handle.RegisterMember("recipeOutput", &BuildingSelectionPanelDataView::FRecipeOutputs);
+        handle.RegisterMember("recipeDuration", &BuildingSelectionPanelDataView::FRecipeDuration);
+        handle.RegisterMember("produces_energy", &BuildingSelectionPanelDataView::ProducesEnergy);
+        handle.RegisterMember("energy_produced", &BuildingSelectionPanelDataView::EnergyProduced);
+        handle.RegisterMember("resources", &BuildingSelectionPanelDataView::FResourcesInCurrentBuilding);
+    }
 
-    ctr2.Bind("buildingResourcesModel", &FResourcesInCurrentBuilding);
+    ctr2.Bind("buildingResourcesModel", &FDataView);
+    ctr2.BindEventCallback("deletebuilding", &BuildingSelectionPanelCallbackListener::OnDeleteButtonClicked, sBuildingSelectionPanelCallbackListener.get());
 
     FDataModelWrapper = RmlDataModelWrapperFactory::CreateDataModelWrapper(ctr2.GetModelHandle());
 
@@ -64,30 +100,27 @@ void BuildingSelectionPanelController::VirtualUpdate()
 
     if (FPreviousIdSelected != FCurrentIdSelected)
     {
-        FResourceToIndex.clear();
-        FResourcesInCurrentBuilding.clear();
+        ResetDataView();
     }
 
     AccessHelpers accessHelpers;
-    const ResourceStorageModule* storageModule = accessHelpers.GetModule<ResourceStorageModule>(FCurrentIdSelected);
+    const RecipeProductionModule* recipeProductionModule = accessHelpers.GetModule<RecipeProductionModule>(FCurrentIdSelected);
+    if (recipeProductionModule != nullptr)
+    {
+        HandleRecipe(recipeProductionModule);
+    }
 
+    const ResourceStorageModule* storageModule = accessHelpers.GetModule<ResourceStorageModule>(FCurrentIdSelected);
     if (storageModule != nullptr)
     {
-        auto storageSlots = storageModule->Resources();
-        foreachitemconst(slot, storageSlots)
-        {
-            auto itFind = FResourceToIndex.find(slot.first);
-            if (itFind == FResourceToIndex.end())
-            {
-                FResourceToIndex.insert_or_assign(slot.first, (u32)FResourcesInCurrentBuilding.size());
-                FResourcesInCurrentBuilding.emplace_back(UIResourceView{ slot.first, GameResource::GetName(slot.first), (int)slot.second });
-            }
-            else
-            {
-                AlwaysCheckedAssert(FResourcesInCurrentBuilding[itFind->second].Resource == slot.first);
-                FResourcesInCurrentBuilding[itFind->second].Quantity = (int)slot.second;
-            }
-        }
+        HandleResources(storageModule);
+    }
+
+    const EnergyProducerModule* energyProducerModule = accessHelpers.GetModule<EnergyProducerModule>(FCurrentIdSelected);
+    if (energyProducerModule != nullptr)
+    {
+        FDataView.ProducesEnergy = true;
+        FDataView.EnergyProduced = energyProducerModule->ProducedEnergy();
     }
 
     FDataModelWrapper->DirtyVariable("buildingResourcesModel");
@@ -101,6 +134,9 @@ void BuildingSelectionPanelController::VirtualDestroy()
     {
         RmlUiManager::Instance().UnloadDocument(FDocument);
     }
+
+    RmlUiManager::Instance().RemoveDataModel("buildingResourcesModel");
+    sBuildingSelectionPanelCallbackListener.reset(nullptr);
 }
 
 bool BuildingSelectionPanelController::HandleVisibility()
@@ -136,6 +172,74 @@ bool BuildingSelectionPanelController::HandleVisibility()
         FDocument->Hide();
     }
     return FShow;
+}
+
+void BuildingSelectionPanelController::ResetDataView()
+{
+    FDataView.HasResources = false;
+    FDataView.FResourceToIndex.clear();
+    FDataView.FResourcesInCurrentBuilding.clear();
+    FDataView.HasRecipe = false;
+    FDataView.FRecipeInputs.clear();
+    FDataView.FRecipeOutputs.clear();
+    FDataView.FRecipeDuration = 0.f;
+    FDataView.ProducesEnergy = false;
+    FDataView.EnergyProduced = 0.f;
+}
+
+void BuildingSelectionPanelController::HandleResources(const ResourceStorageModule* parStorageModule)
+{
+    FDataView.HasResources = true;
+    auto storageSlots = parStorageModule->Resources();
+    foreachitemconst(slot, storageSlots)
+    {
+        auto itFind = FDataView.FResourceToIndex.find(slot.first);
+        if (itFind == FDataView.FResourceToIndex.end())
+        {
+            FDataView.FResourceToIndex.insert_or_assign(slot.first, (u32)FDataView.FResourcesInCurrentBuilding.size());
+            FDataView.FResourcesInCurrentBuilding.emplace_back(UIResourceView{ slot.first, GameResource::GetName(slot.first), (int)slot.second });
+        }
+        else
+        {
+
+            AlwaysCheckedAssert(FDataView.FResourcesInCurrentBuilding[itFind->second].Resource == slot.first);
+            FDataView.FResourcesInCurrentBuilding[itFind->second].Quantity = (int)slot.second;
+        }
+    }
+}
+
+void BuildingSelectionPanelController::HandleRecipe(const RecipeProductionModule* parRecipeModule)
+{
+    FDataView.HasRecipe = true;
+
+    const ProductionRecipe* recipe = parRecipeModule->GetProductionRecipe();
+    FDataView.FRecipeInputs.clear();
+    FDataView.FRecipeOutputs.clear();
+
+    foreachitemconst(input, recipe->InputComponents())
+    {
+        FDataView.FRecipeInputs.emplace_back(UIResourceView{ input.first, GameResource::GetName(input.first), (int)input.second });
+    }
+
+    foreachitemconst(input, recipe->OutputComponents())
+    {
+        FDataView.FRecipeOutputs.emplace_back(UIResourceView{ input.first, GameResource::GetName(input.first), (int)input.second });
+    }
+
+    FDataView.FRecipeDuration = recipe->CraftDuration();
+
+    const float progress = (recipe->CraftDuration() - parRecipeModule->ProductionTimeRemaining()) / recipe->CraftDuration();
+    Rml::Element* progressBar = FDocument->GetElementById("progress");
+    AssertRelease(progressBar != nullptr);
+    progressBar->SetAttribute("value", progress);
+}
+
+void BuildingSelectionPanelController::OnDeleteButtonClicked()
+{
+    AssertRelease(FCurrentIdSelected.Valid());
+    EntityFactory::MarkEntityAsDead(FCurrentIdSelected);
+    FPreviousIdSelected = FCurrentIdSelected;
+    ResetDataView();
 }
 
 } // namespace UI
