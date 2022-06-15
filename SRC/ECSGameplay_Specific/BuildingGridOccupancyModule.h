@@ -43,6 +43,7 @@ public:
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
+    void VirtualDeinit() override;
 
 private:
     CircularGridAccessor FGridAccessor;

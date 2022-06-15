@@ -45,7 +45,15 @@ void BuildingGridOccupancyModule::VirtualInit(const EntityId& parUnitId, const M
 
     // Make a new obstacle
     const Polygon2D obstacle = FGridAccessor.CreatePolygon(Template<BuildingGridOccupancyModuleTemplate>()->CellsOccupancy());
-    Pathfinding::AddObstacle(obstacle);
+    // Pathfinding::AddObstacle(obstacle);
+}
+
+void BuildingGridOccupancyModule::VirtualDeinit()
+{
+    parent_type::VirtualDeinit();
+
+    const BuildingGridOccupancyModuleTemplate* t = Template<BuildingGridOccupancyModuleTemplate>();
+    FGridAccessor.SetOccupied(false, t->CellsOccupancy());
 }
 
 } // namespace ECSEngine
