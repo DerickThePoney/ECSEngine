@@ -37,9 +37,23 @@ LinkToStorageModule::~LinkToStorageModule()
 {
 }
 
+void LinkToStorageModule::OnUnitDeath(const EntityId parId)
+{
+    if (parId == FStorageId)
+    {
+        FStorageId = EntityId();
+
+        BuildingNeedsStorageMessage* message = new BuildingNeedsStorageMessage();
+        message->FUnitId = UnitId();
+        GenericMessageManager::Instance().PushMessage<GenericMessageId::BUILDING_NEEDS_STORAGE>(message);
+    }
+}
+
 void LinkToStorageModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
     Module::VirtualInit(parUnitId, parParameters);
+
+    WorldManager::Instance().RegisterDeathListener(DELEGATE(&LinkToStorageModule::OnUnitDeath, *this));
 
     BuildingNeedsStorageMessage* message = new BuildingNeedsStorageMessage();
     message->FUnitId = UnitId();
@@ -49,6 +63,8 @@ void LinkToStorageModule::VirtualInit(const EntityId& parUnitId, const ModulePar
 void LinkToStorageModule::VirtualDeinit()
 {
     Module::VirtualDeinit();
+
+    WorldManager::Instance().RemoveDeathListener(DELEGATE(&LinkToStorageModule::OnUnitDeath, *this));
 
     if (FStorageId.Valid())
     {

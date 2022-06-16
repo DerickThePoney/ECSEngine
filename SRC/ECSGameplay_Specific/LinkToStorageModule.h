@@ -35,6 +35,9 @@ public:
     const EntityId StorageId() const { return FStorageId; }
     void SetStorageId(const EntityId parId) { FStorageId = parId; }
 
+private:
+    void OnUnitDeath(const EntityId parId);
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
     void VirtualDeinit() override;
