@@ -32,6 +32,8 @@ struct BuildingSelectionPanelDataView
     UIResourceArray FRecipeInputs;
     UIResourceArray FRecipeOutputs;
     float FRecipeDuration = 0.f;
+    float FRecipeBaseDuration = 0.f;
+    float FEfficiency = 0.f;
 
     bool ProducesEnergy = false;
     float EnergyProduced = 0;

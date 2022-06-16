@@ -8,6 +8,8 @@
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/SelectionManager.h"
 #include "EnergyProducerModule.h"
+#include "EnergySystem.h"
+#include "RecipeHelpers.h"
 #include "RecipeProductionModule.h"
 #include "ResourceStorageModule.h"
 #include "StorageSlotModule.h"
@@ -77,6 +79,8 @@ void BuildingSelectionPanelController::VirtualInit()
         handle.RegisterMember("recipeInput", &BuildingSelectionPanelDataView::FRecipeInputs);
         handle.RegisterMember("recipeOutput", &BuildingSelectionPanelDataView::FRecipeOutputs);
         handle.RegisterMember("recipeDuration", &BuildingSelectionPanelDataView::FRecipeDuration);
+        handle.RegisterMember("recipeBaseDuration", &BuildingSelectionPanelDataView::FRecipeBaseDuration);
+        handle.RegisterMember("efficiency", &BuildingSelectionPanelDataView::FEfficiency);
         handle.RegisterMember("produces_energy", &BuildingSelectionPanelDataView::ProducesEnergy);
         handle.RegisterMember("energy_produced", &BuildingSelectionPanelDataView::EnergyProduced);
         handle.RegisterMember("resources", &BuildingSelectionPanelDataView::FResourcesInCurrentBuilding);
@@ -242,7 +246,9 @@ void BuildingSelectionPanelController::HandleRecipe(const RecipeProductionModule
         FDataView.FRecipeOutputs.emplace_back(UIResourceView{ input.first, GameResource::GetName(input.first), (int)input.second });
     }
 
-    FDataView.FRecipeDuration = recipe->CraftDuration();
+    FDataView.FRecipeDuration = ProductionRecipeHelpers::ComputeCraftDuration(recipe);
+    FDataView.FRecipeBaseDuration = recipe->CraftDuration();
+    FDataView.FEfficiency = EnergySystem::Instance().EnergyEfficiency();
 
     const float progress = (recipe->CraftDuration() - parRecipeModule->ProductionTimeRemaining()) / recipe->CraftDuration();
     Rml::Element* progressBar = FDocument->GetElementById("progress");
