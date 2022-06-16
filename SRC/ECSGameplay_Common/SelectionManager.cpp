@@ -15,13 +15,13 @@ SelectionManager::SelectionManager()
     , Singleton()
 {
     RegisterDepency<ApparenceModule>(EEntityWorlds::BUILDINGS);
-    WorldManager::Instance().RegisterListener(DELEGATE(&SelectionManager::OnUnitDeath, *this));
+    WorldManager::Instance().RegisterDeathListener(DELEGATE(&SelectionManager::OnUnitDeath, *this));
 }
 
 void SelectionManager::Finalize()
 {
     ModuleSystem::Destroy();
-    WorldManager::Instance().RemoveListener(DELEGATE(&SelectionManager::OnUnitDeath, *this));
+    WorldManager::Instance().RemoveDeathListener(DELEGATE(&SelectionManager::OnUnitDeath, *this));
 }
 
 void SelectionManager::Delete()

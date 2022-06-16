@@ -79,7 +79,7 @@ const EntityTemplate* WorldManager::GetTemplateForEntityId(const EntityId& parUn
     return world.GetTemplateForEntity(parUnitId);
 }
 
-void WorldManager::RegisterListener(UnitDeathListener parListener)
+void WorldManager::RegisterDeathListener(UnitDeathListener parListener)
 {
 #ifdef ENABLE_SECURITY_CHECKS
     foreachitemconst(listener, FUnitDeathListeners) AlwaysCheckedAssert(listener != parListener);
@@ -87,7 +87,7 @@ void WorldManager::RegisterListener(UnitDeathListener parListener)
     FUnitDeathListeners.push_back(parListener);
 }
 
-void WorldManager::RemoveListener(UnitDeathListener parListener)
+void WorldManager::RemoveDeathListener(UnitDeathListener parListener)
 {
     auto pos = FUnitDeathListeners.end();
     for (auto it = FUnitDeathListeners.begin(); it != FUnitDeathListeners.end(); ++it)

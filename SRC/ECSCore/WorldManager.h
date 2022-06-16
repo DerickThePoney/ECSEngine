@@ -32,8 +32,8 @@ public:
 
     const EntityTemplate* GetTemplateForEntityId(const EntityId& parUnitId) const;
 
-    void RegisterListener(UnitDeathListener parListener);
-    void RemoveListener(UnitDeathListener parListener);
+    void RegisterDeathListener(UnitDeathListener parListener);
+    void RemoveDeathListener(UnitDeathListener parListener);
 
 private:
     std::vector<std::unique_ptr<EntityWorld>> FWorlds;
