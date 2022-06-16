@@ -38,6 +38,11 @@ glm::vec4 HighlightedColor = glm::vec4(1.f);
 glm::vec4 SelectedColor = glm::vec4(1.f);
 float CircleThickness = 0.1f;
 } // namespace Storage
+
+namespace Energy
+{
+EnergyEfficiencyDescriptor EnergyEfficiency;
+}
 } // namespace GameplayConstants
 
 void GameplayConstantsLoader::PostSerialize()
@@ -64,6 +69,9 @@ void GameplayConstantsLoader::PostSerialize()
     GameplayConstants::Storage::HighlightedColor = FHighlightedColor;
     GameplayConstants::Storage::SelectedColor = FSelectedColor;
     GameplayConstants::Storage::CircleThickness = FCircleThickness;
+
+    // Energy
+    GameplayConstants::Energy::EnergyEfficiency = FEnergyEfficiency;
 }
 
 void GameplayConstantsLoader::DrawEditor()
@@ -99,6 +107,11 @@ void GameplayConstantsLoader::DrawEditor()
         EDITOR_PROPERTY_COLOR("Storage range feedback highlighted color", FHighlightedColor);
         EDITOR_PROPERTY_COLOR("Storage range feedback selected color", FSelectedColor);
         EDITOR_PROPERTY_SIMPLE("Storage range thickness", FCircleThickness);
+    }
+
+    if (ImGui::CollapsingHeader("Energy parameters"))
+    {
+        FEnergyEfficiency.DrawEditor();
     }
 
     PostSerialize();

@@ -6,6 +6,7 @@
 #include "ECSCore/WorldIds.h"
 #include "EnergyConsumerModule.h"
 #include "EnergyProducerModule.h"
+#include "GameplayConstants.h"
 
 namespace ECSEngine
 {
@@ -18,12 +19,7 @@ EnergySystem::EnergySystem()
     RegisterDepency<EnergyConsumerModule>(EEntityWorlds::BUILDINGS);
 }
 
-float EnergySystem::ConsumedToProducedEnergyRatio() const
-{
-    return FConsumedToProducedEnergyRatio;
-}
-
-i32 EnergySystem::TotalEnergy() const
+i32 EnergySystem::TotalAvailableEnergy() const
 {
     return (i32)FProducedEnergy - (i32)FConsumedEnergy;
 }
@@ -54,6 +50,13 @@ void EnergySystem::VirtualUpdate()
         foreachitemconst(energyModule, accessor) { FConsumedEnergy += energyModule.ConsumedEnergy(); }
     }
 
-    FConsumedToProducedEnergyRatio = (float)FConsumedEnergy / (float)FProducedEnergy;
+    if (FProducedEnergy == 0 && FConsumedEnergy > 0)
+        FConsumedToProducedEnergyRatio = 0.f;
+    else if (FProducedEnergy >= FConsumedEnergy)
+        FConsumedToProducedEnergyRatio = 1.f;
+    else
+        FConsumedToProducedEnergyRatio = (float)FProducedEnergy / (float)FConsumedEnergy;
+
+    FEnergyEfficiency = GameplayConstants::Energy::EnergyEfficiency.GetEfficiency(FConsumedToProducedEnergyRatio);
 }
 } // namespace ECSEngine

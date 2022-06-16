@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "EnergyEfficiencyDescriptor.h"
 
 namespace ECSEngine
 {
@@ -32,6 +33,11 @@ extern glm::vec4 HighlightedColor;
 extern glm::vec4 SelectedColor;
 extern float CircleThickness;
 } // namespace Storage
+
+namespace Energy
+{
+extern EnergyEfficiencyDescriptor EnergyEfficiency;
+}
 } // namespace GameplayConstants
 
 // work it out as actual extern X Y;
@@ -60,6 +66,9 @@ public:
         PROPERTYFIELD(HighlightedColor, glm::vec4(1.f));
         PROPERTYFIELD(SelectedColor, glm::vec4(1.f));
         PROPERTYFIELD(CircleThickness, 0.1f);
+
+        // Energy
+        PROPERTYFIELD(EnergyEfficiency, EnergyEfficiencyDescriptor());
 
         PostSerialize();
     }
@@ -91,5 +100,8 @@ private:
     glm::vec4 FHighlightedColor = glm::vec4(1.f);
     glm::vec4 FSelectedColor = glm::vec4(1.f);
     float FCircleThickness = 0.1f;
+
+    // energy efficiency
+    EnergyEfficiencyDescriptor FEnergyEfficiency;
 };
 } // namespace ECSEngine

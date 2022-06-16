@@ -9,9 +9,10 @@ class EnergySystem : public ModuleSystem, public Singleton<EnergySystem>
 public:
     EnergySystem();
 
-    float ConsumedToProducedEnergyRatio() const;
+    float ConsumedToProducedEnergyRatio() const { return FConsumedToProducedEnergyRatio; }
+    float EnergyEfficiency() const { return FEnergyEfficiency; }
 
-    i32 TotalEnergy() const;
+    i32 TotalAvailableEnergy() const;
 
     // Hackos
     void Finalize();
@@ -24,5 +25,6 @@ private:
     u32 FProducedEnergy = 0;
     u32 FConsumedEnergy = 0;
     float FConsumedToProducedEnergyRatio = 1.f;
+    float FEnergyEfficiency = 1.f;
 };
 } // namespace ECSEngine

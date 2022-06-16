@@ -128,7 +128,7 @@ bool MainMenuBarController::HandleVisibility()
 
 void MainMenuBarController::UpdateEnergy()
 {
-    FModel.Energy = EnergySystem::Instance().TotalEnergy();
+    FModel.Energy = EnergySystem::Instance().TotalAvailableEnergy();
     FDataModelWrapper->DirtyVariable("energy");
 }
 
