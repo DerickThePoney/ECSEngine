@@ -61,6 +61,7 @@ public:
     i32 FreeSlots() const;
 
     bool ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<const GameResource::Type> parRessources);
+    void RemoveSlotsReservationsIFN(const EntityId& parUnitId);
 
     u32 GetNbResources(const GameResource::Type parResource) const;
     u32 GetFreeSpaceInSlot(const EntityId& parUnitId, const GameResource::Type parResource) const;

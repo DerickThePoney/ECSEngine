@@ -7,7 +7,10 @@
 #include "Common/GenericMessageIdentifiers.h"
 #include "Common/GenericMessageManager.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
+#include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleUtils.h"
+#include "ECSCore/WorldIds.h"
+#include "StorageSlotModule.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::LinkToStorageModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::LinkToStorageModuleTemplate);
@@ -41,6 +44,23 @@ void LinkToStorageModule::VirtualInit(const EntityId& parUnitId, const ModulePar
     BuildingNeedsStorageMessage* message = new BuildingNeedsStorageMessage();
     message->FUnitId = UnitId();
     GenericMessageManager::Instance().PushMessage<GenericMessageId::BUILDING_NEEDS_STORAGE>(message);
+}
+
+void LinkToStorageModule::VirtualDeinit()
+{
+    Module::VirtualDeinit();
+
+    if (FStorageId.Valid())
+    {
+        ManualLockModuleAccessor<StorageSlotModule> buildingAccessor(EEntityWorlds::BUILDINGS);
+        buildingAccessor.LockIFN();
+        StorageSlotModule* slotModule = buildingAccessor[FStorageId];
+        buildingAccessor.UnlockIFN();
+        if (slotModule != nullptr)
+        {
+            slotModule->RemoveSlotsReservationsIFN(UnitId());
+        }
+    }
 }
 
 } // namespace ECSEngine

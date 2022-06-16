@@ -61,6 +61,7 @@ i32 StorageSlotModule::FreeSlots() const
     return FFreeSlots;
 }
 
+// TODO: ReserveSlots for same resource with no building anymore ?
 bool StorageSlotModule::ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<const GameResource::Type> parRessources)
 {
     AlwaysCheckedAssert(parRessources.size() < NumberOfSlots());
@@ -97,6 +98,15 @@ bool StorageSlotModule::ReserveSlotsIFP(const EntityId& parUnitId, MemoryView<co
         AlwaysCheckedAssert(FFreeSlots >= 0);
     }
     return true;
+}
+
+void StorageSlotModule::RemoveSlotsReservationsIFN(const EntityId& parUnitId)
+{
+    foreachitem(slot, FSlots)
+    {
+        if (slot.FReservedForBuilding == parUnitId)
+            slot.FReservedForBuilding = EntityId();
+    }
 }
 
 u32 StorageSlotModule::GetNbResources(const GameResource::Type parResource) const
@@ -155,6 +165,14 @@ u32 StorageSlotModule::RemoveResourceInSlot(const GameResource::Type parResource
         slot.Quantity -= resourceToRemove;
         currentlyRemoved += resourceToRemove;
         toRemove -= resourceToRemove;
+
+        if (slot.Quantity == 0 && !slot.FReservedForBuilding.Valid())
+        {
+            slot.Resource = GameResource::LENGTH;
+            slot.FReservedForBuilding = EntityId();
+            FFreeSlots += 1;
+        }
+
         if (toRemove == 0)
             return parQuantity;
     }

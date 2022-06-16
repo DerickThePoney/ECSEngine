@@ -31,7 +31,7 @@ void ResourceManager::VirtualUpdate()
         MemoryView<const StorageSlot> slots = storageSlotModule.StorageSlots();
         foreachitemconst(slot, slots)
         {
-            if (!slot.FReservedForBuilding.Valid())
+            if (!slot.FReservedForBuilding.Valid() && slot.Quantity == 0)
                 continue;
 
             auto itFind = FResources.find(slot.Resource);
