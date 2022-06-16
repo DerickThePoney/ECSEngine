@@ -10,6 +10,7 @@
 #include "EnergyProducerModule.h"
 #include "RecipeProductionModule.h"
 #include "ResourceStorageModule.h"
+#include "StorageSlotModule.h"
 #include "UICore/RMLUIManager.h"
 #include "UICore/RML_includes.h"
 #include "UICore/RmlDataModelWrapper.h"
@@ -21,7 +22,8 @@ namespace UI
 {
 using AccessHelpers = ScopedModuleAccessor<MC<ResourceStorageModule, EEntityWorlds::BUILDINGS>,
       MC<RecipeProductionModule, EEntityWorlds::BUILDINGS>,
-      MC<EnergyProducerModule, EEntityWorlds::BUILDINGS>>;
+      MC<EnergyProducerModule, EEntityWorlds::BUILDINGS>,
+      MC<StorageSlotModule, EEntityWorlds::BUILDINGS>>;
 
 struct BuildingSelectionPanelCallbackListener
 {
@@ -59,7 +61,15 @@ void BuildingSelectionPanelController::VirtualInit()
 
     Rml::DataModelConstructor ctr2 = RmlUiManager::Instance().CreateDataModel("buildingResourcesModel");
 
+    if (auto handle = ctr2.RegisterStruct<UIStorageSlotsView>())
+    {
+        handle.RegisterMember("resource", &UIStorageSlotsView::ResourceName);
+        handle.RegisterMember("quantity", &UIStorageSlotsView::Quantity);
+        handle.RegisterMember("isFree", &UIStorageSlotsView::IsFree);
+    }
+
     ctr2.RegisterArray<UIResourceArray>();
+    ctr2.RegisterArray<std::vector<UIStorageSlotsView>>();
     if (auto handle = ctr2.RegisterStruct<BuildingSelectionPanelDataView>())
     {
         handle.RegisterMember("has_resources", &BuildingSelectionPanelDataView::HasResources);
@@ -70,6 +80,8 @@ void BuildingSelectionPanelController::VirtualInit()
         handle.RegisterMember("produces_energy", &BuildingSelectionPanelDataView::ProducesEnergy);
         handle.RegisterMember("energy_produced", &BuildingSelectionPanelDataView::EnergyProduced);
         handle.RegisterMember("resources", &BuildingSelectionPanelDataView::FResourcesInCurrentBuilding);
+        handle.RegisterMember("has_storage_slots", &BuildingSelectionPanelDataView::HasStorageSlots);
+        handle.RegisterMember("storage_slots", &BuildingSelectionPanelDataView::StorageSlots);
     }
 
     ctr2.Bind("buildingResourcesModel", &FDataView);
@@ -117,6 +129,12 @@ void BuildingSelectionPanelController::VirtualUpdate()
     {
         FDataView.ProducesEnergy = true;
         FDataView.EnergyProduced = energyProducerModule->ProducedEnergy();
+    }
+
+    const StorageSlotModule* storageSlotModule = accessHelpers.GetModule<StorageSlotModule>(FCurrentIdSelected);
+    if (storageSlotModule != nullptr)
+    {
+        HandleStorageSlots(storageSlotModule);
     }
 
     FDataModelWrapper->DirtyVariable("buildingResourcesModel");
@@ -181,6 +199,8 @@ void BuildingSelectionPanelController::ResetDataView()
     FDataView.FRecipeDuration = 0.f;
     FDataView.ProducesEnergy = false;
     FDataView.EnergyProduced = 0.f;
+    FDataView.HasStorageSlots = false;
+    FDataView.StorageSlots.clear();
 }
 
 void BuildingSelectionPanelController::HandleResources(const ResourceStorageModule* parStorageModule)
@@ -228,6 +248,18 @@ void BuildingSelectionPanelController::HandleRecipe(const RecipeProductionModule
     Rml::Element* progressBar = FDocument->GetElementById("progress");
     AssertRelease(progressBar != nullptr);
     progressBar->SetAttribute("value", progress);
+}
+
+void BuildingSelectionPanelController::HandleStorageSlots(const StorageSlotModule* storageModule)
+{
+    FDataView.HasStorageSlots = true;
+    MemoryView<const StorageSlot> storageSlots = storageModule->StorageSlots();
+    FDataView.StorageSlots.clear();
+    FDataView.StorageSlots.reserve(storageSlots.size());
+    foreachitemconst(slot, storageSlots)
+    {
+        FDataView.StorageSlots.push_back(UIStorageSlotsView{ slot.Resource, GameResource::GetName(slot.Resource), slot.Quantity, !slot.FReservedForBuilding.Valid() });
+    }
 }
 
 void BuildingSelectionPanelController::OnDeleteButtonClicked()

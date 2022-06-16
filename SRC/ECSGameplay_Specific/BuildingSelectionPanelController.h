@@ -8,10 +8,20 @@ namespace ECSEngine
 {
 class ResourceStorageModule;
 class RecipeProductionModule;
+class StorageSlotModule;
 namespace UI
 {
 class UIResourceView;
 using UIResourceArray = std::vector<UIResourceView>;
+
+struct UIStorageSlotsView
+{
+    GameResource::Type Resource = GameResource::LENGTH;
+    std::string ResourceName;
+    u32 Quantity = 0;
+    bool IsFree = false;
+};
+
 struct BuildingSelectionPanelDataView
 {
     bool HasResources = false;
@@ -25,6 +35,9 @@ struct BuildingSelectionPanelDataView
 
     bool ProducesEnergy = false;
     float EnergyProduced = 0;
+
+    bool HasStorageSlots = false;
+    std::vector<UIStorageSlotsView> StorageSlots;
 };
 
 class IDataModelWrapper;
@@ -46,6 +59,7 @@ private:
     void ResetDataView();
     void HandleResources(const ResourceStorageModule* storageModule);
     void HandleRecipe(const RecipeProductionModule* storageModule);
+    void HandleStorageSlots(const StorageSlotModule* storageModule);
 
     void OnDeleteButtonClicked();
 
