@@ -5,6 +5,7 @@
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
+#include "RecipeHelpers.h"
 #include "RecipeProductionModule.h"
 #include "ResourceStorageModule.h"
 
@@ -95,7 +96,8 @@ void ResourceProductionSystem::VirtualUpdate()
             }
             else
             {
-                producer.SetProductionTimeRemaining(remainingTime - TimeManager::GameplayDeltaTime());
+                const float efficiencyDT = ProductionRecipeHelpers::GetEfficiencyDeltaTime();
+                producer.SetProductionTimeRemaining(remainingTime - efficiencyDT);
             }
             break;
         }
