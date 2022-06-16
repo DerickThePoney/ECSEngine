@@ -209,7 +209,7 @@ public:
             }
             else
             {
-                ImGui::DragFloat(FName.c_str(), FProperty, .5f, FMin, FMax);
+                ImGui::DragFloat(FName.c_str(), FProperty, 0.1f * (FMax - FMin), FMin, FMax);
             }
         }
         else
@@ -246,7 +246,7 @@ public:
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
 
         if (FUseLimits)
-            ImGui::DragInt(FName.c_str(), FProperty, .5f, FMin, FMax);
+            ImGui::DragInt(FName.c_str(), FProperty, 0.1f * (FMax - FMin), FMin, FMax);
         else
             ImGui::InputInt(FName.c_str(), FProperty);
     }
@@ -278,7 +278,7 @@ public:
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
 
         if (FUseLimits)
-            ImGui::DragInt(FName.c_str(), (i32*)FProperty, .5f, (i32)FMin, (i32)FMax);
+            ImGui::DragInt(FName.c_str(), (i32*)FProperty, 0.1f * (FMax - FMin), (i32)FMin, (i32)FMax);
         else
             ImGui::InputInt(FName.c_str(), (i32*)FProperty);
     }
