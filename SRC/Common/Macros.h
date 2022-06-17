@@ -66,3 +66,5 @@ ReverseWrapper<T> reverse(T&& container)
 #ifdef FINAL
 #define COMPILE_FINAL
 #endif
+
+#define FORCEINLINE inline __forceinline
