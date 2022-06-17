@@ -2,7 +2,7 @@
 
 #include "PositionModule.h"
 
-#include "Common/SaveLoadData.h"
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
@@ -31,33 +31,11 @@ void PositionModule::VirtualInit(const EntityId& parUnitId, const ModuleParamete
     FPosition = parParameters.Get_IFP<ModuleParameters::Position>(glm::vec3(0.0f));
 }
 
-template<>
-void SaveLoad<SavingSystem::SaveChunk, PositionModule, true>(SavingSystem::SaveChunk& parChunk, PositionModule& parValue)
-{
-    parChunk.GetBuffer().WriteGuards(typeid(PositionModule).hash_code());
-    parValue.SaveLoad<SavingSystem::SaveChunk, true>(parChunk);
-}
-
-template<>
-void SaveLoad<SavingSystem::ReadChunk, PositionModule, false>(SavingSystem::ReadChunk& parChunk, PositionModule& parValue)
-{
-    u32 id = parChunk.GetBuffer().ReadId();
-    u32 size = parChunk.GetBuffer().ReadSize();
-
-    u32 expectedId = typeid(PositionModule).hash_code();
-    AlwaysCheckedAssertMsg(id == expectedId, "SaveFile is probably corrupted as the id for PositionModule does not match the id we got !");
-    AlwaysCheckedAssert(size == 0, "Got non zero size while reading guards...");
-
-    parValue.SaveLoad<SavingSystem::ReadChunk, false>(parChunk);
-}
-
+IMPLEMENT_SAVELOAD_ABILITIES(PositionModule);
 template<typename Chunk, bool isWriting>
 void PositionModule::SaveLoad(Chunk& parChunk)
 {
     parChunk& FPosition;
 }
-
-template void PositionModule::SaveLoad<SavingSystem::SaveChunk, true>(SavingSystem::SaveChunk& parChunk);
-template void PositionModule::SaveLoad<SavingSystem::ReadChunk, false>(SavingSystem::ReadChunk& parChunk);
 
 } // namespace ECSEngine
