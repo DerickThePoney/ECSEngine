@@ -10,6 +10,7 @@
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/FeedbackParameters.h"
 #include "RenderingCore/GFXRepresentation.h"
+#include "RenderingCore/GFXRepresentationDescriptor.h"
 #include "RenderingCore/GFXRepresentationDescriptorManager.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"

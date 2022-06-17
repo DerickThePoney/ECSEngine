@@ -14,6 +14,7 @@
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/FeedbackParameters.h"
 #include "RenderingCore/Framebuffer.h"
+#include "RenderingCore/GFXRepresentation.h"
 #include "RenderingCore/GFXRepresentationManager.h"
 #include "RenderingCore/GFXSelectable.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"

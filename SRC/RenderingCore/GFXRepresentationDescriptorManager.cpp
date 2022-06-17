@@ -2,8 +2,6 @@
 
 #include "GFXRepresentationDescriptorManager.h"
 
-#include "GFXRepresentation.h"
-
 namespace ECSEngine
 {
 namespace Rendering

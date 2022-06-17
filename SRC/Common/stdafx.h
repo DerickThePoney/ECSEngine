@@ -10,6 +10,7 @@
 #include <map>
 #include <queue>
 #include <array>
+#include <mutex>
 #include <atomic>
 #include <malloc.h>
 #include <chrono>
