@@ -33,6 +33,9 @@ public:
     {
     }
 
+    template<typename Chunk, bool isWriting>
+    void SaveLoad(Chunk& parChunk);
+
     const glm::vec3& GetPosition3D() const { return FPosition; }
     void SetPosition3D(const glm::vec3& parPosition) { FPosition = parPosition; }
 
