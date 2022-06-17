@@ -1,12 +1,12 @@
 #pragma once
 #include "Common/MemoryView.h"
 #include "Common/Singleton.h"
+#include "GFXRepresentationDescriptor.h"
 
 namespace ECSEngine
 {
 namespace Rendering
 {
-class GFXRepresentationDescriptor;
 class GFXRepresentationDescriptorManager : public Singleton<GFXRepresentationDescriptorManager>
 {
 public:

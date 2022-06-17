@@ -11,55 +11,7 @@ class Carrier;
 class VisualModel;
 class GFXSelectable;
 
-class GFXRepresentation;
-class GFXRepresentationDescriptor
-{
-    DECLARE_POOL_ALLOCATED(GFXRepresentationDescriptor);
-
-public:
-    const std::string& Name() const { return FName; }
-    const std::string& MaterialName() const { return FMaterialName; }
-    const bool IsMultiPassMaterial() const { return FIsMultpassMaterial; }
-    const std::string& MeshFile() const { return FMeshFile; }
-    const MemoryView<const std::unique_ptr<AbstractGFXOperatorDescriptor>> OperatorDescriptors() const
-    {
-        return MemoryView(FOperatorDescriptors.data(), (u32)FOperatorDescriptors.size());
-    }
-
-    void DrawInEditor();
-
-    SERIALIZE()
-    {
-        PROPERTYFIELD(Name, "Default");
-        PROPERTYFIELD(MeshFile, "none");
-        PROPERTYFIELD(MaterialName, "none");
-        PROPERTYFIELD(IsMultpassMaterial, false);
-        PROPERTYFIELD(OperatorDescriptors, std::vector<std::unique_ptr<AbstractGFXOperatorDescriptor>>());
-    }
-
-private:
-    std::string FName = "Default";
-    std::string FMeshFile = "none";
-    std::string FMaterialName = "none";
-    bool FIsMultpassMaterial = false;
-    std::vector<std::unique_ptr<AbstractGFXOperatorDescriptor>> FOperatorDescriptors;
-};
-
-struct GFXRepresentationInitialiser
-{
-    float FCurrentTime = 0.f;
-
-    glm::vec3 FPosition = glm::vec3(0.f);
-    glm::quat FOrientation = glm::quat(1.f, 0.f, 0.f, 0.f);
-
-    std::string FRepresentationDescriptor;
-
-    std::pair<bool, bool> FIsSelectable;
-
-    bool HasCarier = false;
-    bool HasVisuals = false;
-};
-
+struct GFXRepresentationInitialiser;
 class GFXRepresentation
 {
     DECLARE_POOL_ALLOCATED(GFXRepresentation);

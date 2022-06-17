@@ -1,15 +1,18 @@
 ﻿#pragma once
 #include "Common/IdGenerator.h"
 #include "Common/Singleton.h"
-#include "GFXRepresentation.h"
 
 namespace ECSEngine
 {
 namespace Rendering
 {
+class GFXRepresentation;
+struct GFXRepresentationInitialiser;
 class GFXRepresentationManager : public Singleton<GFXRepresentationManager>
 {
 public:
+    GFXRepresentationManager();
+    ~GFXRepresentationManager();
     void Update(float parCurrentTime);
 
     void OnGameplayFrameEnded();
@@ -19,14 +22,7 @@ public:
     std::pair<bool, bool> IsGFXSelectedOrHighlighted(const u32 parId) const;
 
     template<typename T>
-    void PushMessage(const u32& parId, u32 parKey, const T& parData, const float parTime)
-    {
-        AssertRelease(parId != -1);
-        auto itFind = FGFXRepresentations.find(parId);
-        AssertRelease(itFind != FGFXRepresentations.end());
-        AssertRelease(itFind->second != nullptr);
-        FGFXRepresentations[parId]->GetCurrentQueueForPushingMessage().PushMessage(parKey, parData, parTime);
-    }
+    void PushMessage(const u32& parId, u32 parKey, const T& parData, const float parTime);
 
     std::map<u32, std::unique_ptr<GFXRepresentation>>::const_iterator begin() const { return FGFXRepresentations.begin(); }
     std::map<u32, std::unique_ptr<GFXRepresentation>>::const_iterator end() const { return FGFXRepresentations.end(); }
@@ -39,5 +35,6 @@ private:
     std::atomic_bool FGameplayFrameEnded = false;
     mutable std::mutex FMutex;
 };
+
 } // namespace Rendering
 } // namespace ECSEngine

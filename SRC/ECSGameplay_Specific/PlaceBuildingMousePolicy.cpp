@@ -16,6 +16,7 @@
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
 #include "RenderingCore/GFXKeyHelper.h"
+#include "RenderingCore/GFXRepresentationInitialiser.h"
 #include "RenderingCore/GFXRepresentationProxy.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 

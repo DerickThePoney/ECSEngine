@@ -4,6 +4,7 @@
 
 #include "Common/ResourceCache.h"
 #include "RenderingCore/GFXRepresentation.h"
+#include "RenderingCore/GFXRepresentationDescriptor.h"
 #include "RenderingCore/GFXRepresentationDescriptorManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 

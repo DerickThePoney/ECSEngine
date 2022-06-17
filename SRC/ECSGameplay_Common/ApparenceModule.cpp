@@ -3,16 +3,14 @@
 #include "ApparenceModule.h"
 
 #include "Application/PropertyDrawer.h"
-#include "Common/Resource.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
-#include "RenderingCore/Carrier.h"
+#include "RenderingCore/GFXRepresentationDescriptor.h"
 #include "RenderingCore/GFXRepresentationDescriptorManager.h"
+#include "RenderingCore/GFXRepresentationInitialiser.h"
 #include "RenderingCore/GFXRepresentationProxy.h"
-#include "RenderingCore/MaterialManager.h"
-#include "RenderingCore/MeshManager.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::ApparenceModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::ApparenceModuleTemplate)
