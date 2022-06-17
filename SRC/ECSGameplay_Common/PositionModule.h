@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Common/SavingSystemDeclaration.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
 
@@ -26,15 +27,14 @@ class PositionModule final : public Module
 {
     DECLARE_MODULE(PositionModule);
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     PositionModule()
         : Module()
         , FPosition(0.0f)
     {
     }
-
-    template<typename Chunk, bool isWriting>
-    void SaveLoad(Chunk& parChunk);
 
     const glm::vec3& GetPosition3D() const { return FPosition; }
     void SetPosition3D(const glm::vec3& parPosition) { FPosition = parPosition; }
