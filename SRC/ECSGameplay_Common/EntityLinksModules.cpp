@@ -2,6 +2,7 @@
 
 #include "EntityLinksModules.h"
 
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityId.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleParameters.h"
@@ -28,6 +29,15 @@ void LinkToOwnerModule::VirtualInit(const EntityId& parUnitId, const ModuleParam
     parent_type::VirtualInit(parUnitId, parParameters);
 
     FOwnerId = parParameters.Get_IFP<ModuleParameters::OwnerId>(EntityId());
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(LinkToOwnerModule);
+template<typename Chunk, bool isWriting>
+void LinkToOwnerModule::SaveLoad(Chunk& parChunk)
+{
+    parent_type::SaveLoad(parChunk);
+
+    parChunk& FOwnerId;
 }
 
 } // namespace ECSEngine

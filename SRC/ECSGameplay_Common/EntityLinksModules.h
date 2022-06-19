@@ -30,6 +30,7 @@ protected:
 class LinkToOwnerModule final : public Module
 {
     DECLARE_MODULE(LinkToOwnerModule);
+    DECLARE_SAVELOAD_ABILITIES();
 
 public:
     LinkToOwnerModule()
