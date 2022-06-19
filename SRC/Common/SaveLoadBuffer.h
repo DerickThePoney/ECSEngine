@@ -11,6 +11,7 @@ class Buffer
 
 public:
     void WriteData(u32 parId, u32 parSize, u8* parData);
+    void WriteRawData(u32 parSize, u8* parData);
     void WriteGuards(u32 parId);
 
     u32 WrittenBytes() const { return FWrittenBytes; }
@@ -21,7 +22,7 @@ public:
     void ReadData(u32 parSize, u8* parData);
 
 private:
-    void GrowAtLeast(u32 parSize);
+    void GrowToAccomodateAtLeast(u32 parSize);
     void IncrementReadData(u32 parValue);
 
 private:

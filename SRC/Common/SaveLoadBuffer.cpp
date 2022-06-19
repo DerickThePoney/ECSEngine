@@ -11,7 +11,7 @@ namespace SavingSystem
 IMPLEMENT_POOL_ALLOCATED(Buffer);
 void Buffer::WriteData(u32 parId, u32 parSize, u8* parData)
 {
-    GrowAtLeast(parSize + 2 * sizeof(u32));
+    GrowToAccomodateAtLeast(parSize + 2 * sizeof(u32));
 
     memcpy(&FData[FWrittenBytes], &parId, sizeof(u32));
     FWrittenBytes += sizeof(u32);
@@ -21,9 +21,18 @@ void Buffer::WriteData(u32 parId, u32 parSize, u8* parData)
     FWrittenBytes += parSize;
 }
 
+void Buffer::WriteRawData(u32 parSize, u8* parData)
+{
+    GrowToAccomodateAtLeast(parSize + sizeof(u32));
+    memcpy(&FData[FWrittenBytes], &parSize, sizeof(u32));
+    FWrittenBytes += sizeof(u32);
+    memcpy(&FData[FWrittenBytes], parData, parSize);
+    FWrittenBytes += parSize;
+}
+
 void Buffer::WriteGuards(u32 parId)
 {
-    GrowAtLeast(2 * sizeof(u32));
+    GrowToAccomodateAtLeast(2 * sizeof(u32));
 
     u32 size = 0;
     memcpy(&FData[FWrittenBytes], &parId, sizeof(u32));
@@ -55,7 +64,7 @@ void Buffer::ReadData(u32 parSize, u8* parData)
     IncrementReadData(parSize);
 }
 
-void Buffer::GrowAtLeast(u32 parSize)
+void Buffer::GrowToAccomodateAtLeast(u32 parSize)
 {
     u32 nextPow2 = MathHelpers::NextPowerOfTwo(FWrittenBytes + parSize);
     if (FData.size() < nextPow2)
