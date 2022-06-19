@@ -47,6 +47,8 @@ class ApparenceModule final : public Module
 {
     DECLARE_MODULE(ApparenceModule);
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     ApparenceModule();
     ~ApparenceModule() { }
@@ -56,6 +58,10 @@ public:
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
     void VirtualDeinit() override;
+    void VirtualOnLoaded() override;
+
+private:
+    void InitGFXProxy(const glm::vec3& parPosition, const glm::quat& parOrientation);
 
 private:
     Rendering::GFXRepresentationProxy* FProxy = nullptr;
