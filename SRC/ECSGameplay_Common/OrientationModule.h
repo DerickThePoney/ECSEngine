@@ -30,6 +30,8 @@ class OrientationModule final : public Module
 {
     DECLARE_MODULE(OrientationModule);
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     OrientationModule()
         : Module()
