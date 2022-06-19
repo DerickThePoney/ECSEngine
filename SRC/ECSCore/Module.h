@@ -26,6 +26,7 @@ protected:
 public:
     void Init(const ModuleTemplate* parTemplate, const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
     void Deinit();
+    void OnLoaded();
 
     virtual u32 GetModuleId() const
     {
@@ -41,12 +42,14 @@ public:
 protected:
     virtual void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
     virtual void VirtualDeinit();
+    virtual void VirtualOnLoaded();
 
 private:
     EntityId FUnitId;
 #ifdef PERFORM_SECURITY_CHECKS
     bool FVirtualInitCalled = false;
     bool FVirtualDeinitCalled = false;
+    bool FVirtualOnLoadedCalled = false;
 #endif
 
     const ModuleTemplate* FTemplate;
