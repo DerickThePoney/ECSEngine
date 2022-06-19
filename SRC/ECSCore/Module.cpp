@@ -38,7 +38,18 @@ void Module::Deinit()
     VirtualDeinit();
 
 #ifdef PERFORM_SECURITY_CHECKS
-    AlwaysCheckedAssertMsg(FVirtualDeinitCalled, "You forgot to call the parent's VirtualInit, you naughtyboy !");
+    AlwaysCheckedAssertMsg(FVirtualDeinitCalled, "You forgot to call the parent's VirtualDeinit, you naughtyboy !");
+#endif
+}
+
+void Module::OnLoaded()
+{
+#ifdef ENABLE_SECURITY_CHECKS
+    FVirtualOnLoadedCalled = false;
+#endif
+
+#ifdef ENABLE_SECURITY_CHECKS
+    AlwaysCheckedAssertMsg(FVirtualOnLoadedCalled, "You forgot to call the parent's VirtualOnLoaded, you naughtyboy !");
 #endif
 }
 
@@ -56,6 +67,13 @@ void Module::VirtualDeinit()
 {
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualDeinitCalled = true;
+#endif
+}
+
+void Module::VirtualOnLoaded()
+{
+#ifdef ENABLE_SECURITY_CHECKS
+    FVirtualOnLoadedCalled = true;
 #endif
 }
 
