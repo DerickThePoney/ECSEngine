@@ -4,6 +4,7 @@
 
 #include "Application/PropertyDrawer.h"
 #include "Common/CameraManager.h"
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 
@@ -37,6 +38,22 @@ void CameraMoverModule::VirtualInit(const EntityId& parUnitId, const ModuleParam
 
     FCamId = CameraManager::Instance().CreateCameraIFN(moduleTemplate->CameraName());
     AssertRelease(FCamId != -1);
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(CameraMoverModule);
+template<typename Chunk, bool isWriting>
+void CameraMoverModule::SaveLoad(Chunk& parChunk)
+{
+    parent_type::SaveLoad(parChunk);
+
+    parChunk& FCamId;
+    parChunk& FCurrentSpeed;
+    parChunk& FCurrentRotationSpeed;
+
+    if (!isWriting)
+    {
+        AlwaysCheckedAssert(CameraManager::Instance().GetCamera(FCamId) != nullptr);
+    }
 }
 
 } // namespace ECSEngine
