@@ -3,11 +3,14 @@
 #include "SaveLoadData.h"
 
 #define IMPLEMENT_SAVELOAD_ABILITIES_IMPL(TYPE)                                                                                                                                    \
+    void TYPE::SaveLoad(class SavingSystem::SaveChunk& parChunk) { SaveLoad<SavingSystem::SaveChunk, true>(parChunk); }                                                            \
+    void TYPE::SaveLoad(class SavingSystem::ReadChunk& parChunk) { SaveLoad<SavingSystem::ReadChunk, false>(parChunk); }                                                           \
+                                                                                                                                                                                   \
     template<>                                                                                                                                                                     \
     void SaveLoad<SavingSystem::SaveChunk, TYPE, true>(SavingSystem::SaveChunk & parChunk, TYPE & parValue)                                                                        \
     {                                                                                                                                                                              \
         parChunk.GetBuffer().WriteGuards(typeid(TYPE).hash_code());                                                                                                                \
-        parValue.SaveLoad<SavingSystem::SaveChunk, true>(parChunk);                                                                                                                \
+        parValue.SaveLoad(parChunk);                                                                                                                                               \
     }                                                                                                                                                                              \
                                                                                                                                                                                    \
     template<>                                                                                                                                                                     \
@@ -20,7 +23,7 @@
         AlwaysCheckedAssertMsg(id == expectedId, fmt::format("SaveFile is probably corrupted as the id for {} does not match the id we got !", #TYPE).c_str());                    \
         AlwaysCheckedAssertMsg(size == 0, "Got non zero size while reading guards...");                                                                                            \
                                                                                                                                                                                    \
-        parValue.SaveLoad<SavingSystem::ReadChunk, false>(parChunk);                                                                                                               \
+        parValue.SaveLoad(parChunk);                                                                                                                                               \
     }
 
 #define IMPLEMENT_SAVELOAD_ABILITIES_INSTANCIATIONS(TYPE)                                                                                                                          \
