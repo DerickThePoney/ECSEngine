@@ -57,6 +57,7 @@ private:
 class CameraMoverModule final : public Module
 {
     DECLARE_MODULE(CameraMoverModule);
+    DECLARE_SAVELOAD_ABILITIES();
 
 public:
     CameraMoverModule()
