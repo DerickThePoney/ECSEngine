@@ -48,6 +48,15 @@ void SaveLoad<SavingSystem::SaveChunk, glm::vec3, true>(SavingSystem::SaveChunk&
 }
 
 template<>
+void SaveLoad<SavingSystem::SaveChunk, glm::quat, true>(SavingSystem::SaveChunk& parChunk, glm::quat& parValue)
+{
+    u32 id = typeid(glm::quat).hash_code();
+    u32 size = sizeof(glm::quat);
+    u8* data = reinterpret_cast<u8*>(&parValue);
+    parChunk.GetBuffer().WriteData(id, size, data);
+}
+
+template<>
 void SaveLoad<SavingSystem::SaveChunk, EntityId, true>(SavingSystem::SaveChunk& parChunk, EntityId& parValue)
 {
     u32 id = typeid(EntityId).hash_code();
@@ -108,6 +117,13 @@ void SaveLoad<SavingSystem::ReadChunk, glm::vec3, false>(SavingSystem::ReadChunk
 {
     u8* data = reinterpret_cast<u8*>(&parValue);
     GenericLoad(parChunk, data, typeid(glm::vec3).hash_code(), sizeof(glm::vec3));
+}
+
+template<>
+void SaveLoad<SavingSystem::ReadChunk, glm::quat, false>(SavingSystem::ReadChunk& parChunk, glm::quat& parValue)
+{
+    u8* data = reinterpret_cast<u8*>(&parValue);
+    GenericLoad(parChunk, data, typeid(glm::quat).hash_code(), sizeof(glm::quat));
 }
 
 template<>

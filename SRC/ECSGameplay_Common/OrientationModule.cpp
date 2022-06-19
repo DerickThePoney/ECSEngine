@@ -2,6 +2,7 @@
 
 #include "OrientationModule.h"
 
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
@@ -63,6 +64,15 @@ const glm::vec3 OrientationModule::Up() const
 {
     glm::mat4 rotationMatrix(FOrientation);
     return glm::vec3(rotationMatrix[2]);
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(OrientationModule);
+template<typename Chunk, bool isWriting>
+void OrientationModule::SaveLoad(Chunk& parChunk)
+{
+    Module::SaveLoad(parChunk);
+
+    parChunk& FOrientation;
 }
 
 } // namespace ECSEngine
