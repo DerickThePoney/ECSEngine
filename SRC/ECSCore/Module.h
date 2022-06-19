@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Common/SavingSystemDeclaration.h"
 #include "EntityId.h"
 #include "ModuleId.h"
 
@@ -15,6 +16,8 @@ namespace ECSEngine
 class ModuleTemplate;
 class alignas(16) Module
 {
+    DECLARE_VIRTUAL_SAVELOAD_ABILITIES();
+
 public:
 protected:
     Module();

@@ -35,6 +35,8 @@ IMPLEMENT_SAVELOAD_ABILITIES(PositionModule);
 template<typename Chunk, bool isWriting>
 void PositionModule::SaveLoad(Chunk& parChunk)
 {
+    Module::SaveLoad(parChunk);
+
     parChunk& FPosition;
 }
 

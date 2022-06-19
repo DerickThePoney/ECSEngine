@@ -2,6 +2,11 @@
 
 #include "Module.h"
 
+#include "Common/SavingSystemImplementation.h"
+#include "EntityTemplate.h"
+#include "EntityTemplateManager.h"
+#include "ModuleTemplate.h"
+
 namespace ECSEngine
 {
 
@@ -52,6 +57,32 @@ void Module::VirtualDeinit()
 #ifdef PERFORM_SECURITY_CHECKS
     FVirtualDeinitCalled = true;
 #endif
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(Module);
+template<typename Chunk, bool isWriting>
+void Module::SaveLoad(Chunk& parChunk)
+{
+    parChunk& FUnitId;
+
+    if (isWriting)
+    {
+        if (FTemplate != nullptr)
+        {
+            std::string templateName = FTemplate->GetTemplate()->GetName();
+            parChunk& templateName;
+        }
+    }
+    else
+    {
+        std::string templateName;
+        parChunk& templateName;
+
+        const EntityTemplate* entityTemplate = EntityTemplateManager::Instance().GetEntityTemplate(templateName);
+        AssertRelease(entityTemplate != nullptr);
+        FTemplate = entityTemplate->GetModuleTemplate(GetModuleId());
+        AssertRelease(FTemplate != nullptr);
+    }
 }
 
 } // namespace ECSEngine
