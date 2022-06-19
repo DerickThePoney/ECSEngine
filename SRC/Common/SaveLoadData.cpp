@@ -2,11 +2,24 @@
 
 #include "SaveLoadData.h"
 
+#include "ECSCore/EntityId.h"
+
+#include <string>
+
 namespace ECSEngine
 {
 /**********************************************************************************/
 /*                          SAVING FUNCTIONS                                      */
 /**********************************************************************************/
+template<>
+void SaveLoad<SavingSystem::SaveChunk, std::size_t, true>(SavingSystem::SaveChunk& parChunk, std::size_t& parValue)
+{
+    u32 id = typeid(std::size_t).hash_code();
+    u32 size = sizeof(std::size_t);
+    u8* data = reinterpret_cast<u8*>(&parValue);
+    parChunk.GetBuffer().WriteData(id, size, data);
+}
+
 template<>
 void SaveLoad<SavingSystem::SaveChunk, u32, true>(SavingSystem::SaveChunk& parChunk, u32& parValue)
 {
@@ -34,6 +47,27 @@ void SaveLoad<SavingSystem::SaveChunk, glm::vec3, true>(SavingSystem::SaveChunk&
     parChunk.GetBuffer().WriteData(id, size, data);
 }
 
+template<>
+void SaveLoad<SavingSystem::SaveChunk, EntityId, true>(SavingSystem::SaveChunk& parChunk, EntityId& parValue)
+{
+    u32 id = typeid(EntityId).hash_code();
+    u32 size = sizeof(EntityId);
+    u8* data = reinterpret_cast<u8*>(&parValue);
+    parChunk.GetBuffer().WriteData(id, size, data);
+}
+
+template<>
+void SaveLoad<SavingSystem::SaveChunk, std::string, true>(SavingSystem::SaveChunk& parChunk, std::string& parValue)
+{
+    const u32 id = typeid(std::string).hash_code();
+    parChunk.GetBuffer().WriteGuards(id);
+
+    const u32 size = parValue.size();
+
+    u8* data = reinterpret_cast<u8*>(parValue.data());
+    parChunk.GetBuffer().WriteRawData(size, data);
+}
+
 /**********************************************************************************/
 /*                          LOADING FUNCTIONS                                     */
 /**********************************************************************************/
@@ -46,6 +80,13 @@ void GenericLoad(SavingSystem::ReadChunk& parChunk, u8* parData, u32 expectedId,
     AlwaysCheckedAssert(size == expectedSize);
 
     parChunk.GetBuffer().ReadData(size, parData);
+}
+
+template<>
+void SaveLoad<SavingSystem::ReadChunk, std::size_t, false>(SavingSystem::ReadChunk& parChunk, std::size_t& parValue)
+{
+    u8* data = reinterpret_cast<u8*>(&parValue);
+    GenericLoad(parChunk, data, typeid(std::size_t).hash_code(), sizeof(std::size_t));
 }
 
 template<>
@@ -67,6 +108,26 @@ void SaveLoad<SavingSystem::ReadChunk, glm::vec3, false>(SavingSystem::ReadChunk
 {
     u8* data = reinterpret_cast<u8*>(&parValue);
     GenericLoad(parChunk, data, typeid(glm::vec3).hash_code(), sizeof(glm::vec3));
+}
+
+template<>
+void SaveLoad<SavingSystem::ReadChunk, EntityId, false>(SavingSystem::ReadChunk& parChunk, EntityId& parValue)
+{
+    u8* data = reinterpret_cast<u8*>(&parValue);
+    GenericLoad(parChunk, data, typeid(EntityId).hash_code(), sizeof(EntityId));
+}
+
+template<>
+void SaveLoad<SavingSystem::ReadChunk, std::string, false>(SavingSystem::ReadChunk& parChunk, std::string& parValue)
+{
+    const u32 expectedId = typeid(std::string).hash_code();
+    const u32 id = parChunk.GetBuffer().ReadId();
+    AlwaysCheckedAssert(id == expectedId);
+
+    u32 stringSize = parChunk.GetBuffer().ReadSize();
+    parValue.resize(stringSize);
+    u8* data = reinterpret_cast<u8*>(parValue.data());
+    parChunk.GetBuffer().ReadData(stringSize, data);
 }
 
 namespace SavingSystem
