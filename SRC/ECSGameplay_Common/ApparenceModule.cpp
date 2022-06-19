@@ -3,10 +3,14 @@
 #include "ApparenceModule.h"
 
 #include "Application/PropertyDrawer.h"
+#include "Common/SavingSystemImplementation.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
+#include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
+#include "OrientationModule.h"
+#include "PositionModule.h"
 #include "RenderingCore/GFXRepresentationDescriptor.h"
 #include "RenderingCore/GFXRepresentationDescriptorManager.h"
 #include "RenderingCore/GFXRepresentationInitialiser.h"
@@ -66,8 +70,6 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
 {
     parent_type::VirtualInit(parUnitId, parParameters);
 
-    FProxy = new Rendering::GFXRepresentationProxy();
-
     glm::vec3 pos = parParameters.Get_IFP<ModuleParameters::Position>(glm::vec3(0.0f));
     glm::quat orient(1.0f, 0.0f, 0.0f, 0.0f);
     if (parParameters.HasParameter<ModuleParameters::YawPitchRoll>())
@@ -85,17 +87,7 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
         orient = parParameters.Get_IFP<ModuleParameters::Orientation>(glm::quat());
     }
 
-    Rendering::GFXRepresentationInitialiser init;
-    init.FPosition = pos;
-    init.FOrientation = orient;
-    init.HasCarier = true;
-    init.FCurrentTime = TimeManager::FrameStartTime();
-    AssertRelease(!Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName().empty());
-    init.FRepresentationDescriptor = Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName();
-    init.HasVisuals = true;
-    init.FIsSelectable = { true, true };
-
-    FProxy->Initialise(init);
+    InitGFXProxy(pos, orient);
 }
 
 void ApparenceModule::VirtualDeinit()
@@ -104,4 +96,45 @@ void ApparenceModule::VirtualDeinit()
     delete FProxy;
 }
 
+void ApparenceModule::VirtualOnLoaded()
+{
+    parent_type::VirtualOnLoaded();
+
+    ManualLockModuleAccessor<PositionModule> positionAccessor(UnitId().GetWorld());
+    ManualLockModuleAccessor<OrientationModule> orientationAccessor(UnitId().GetWorld());
+    positionAccessor.LockIFN();
+    orientationAccessor.LockIFN();
+    const PositionModule* positionModule = positionAccessor[UnitId()];
+    AlwaysCheckedAssert(positionModule != nullptr);
+    const OrientationModule* orientationModule = orientationAccessor[UnitId()];
+    AssertRelease(orientationModule != nullptr);
+
+    positionAccessor.UnlockIFN();
+    orientationAccessor.UnlockIFN();
+
+    InitGFXProxy(positionModule->GetPosition3D(), orientationModule->GetOrientation());
+}
+
+void ApparenceModule::InitGFXProxy(const glm::vec3& parPosition, const glm::quat& parOrientation)
+{
+    Rendering::GFXRepresentationInitialiser init;
+    init.FPosition = parPosition;
+    init.FOrientation = parOrientation;
+    init.HasCarier = true;
+    init.FCurrentTime = TimeManager::FrameStartTime();
+    AssertRelease(!Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName().empty());
+    init.FRepresentationDescriptor = Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName();
+    init.HasVisuals = true;
+    init.FIsSelectable = { true, true };
+
+    FProxy = new Rendering::GFXRepresentationProxy();
+    FProxy->Initialise(init);
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(ApparenceModule);
+template<typename Chunk, bool isWriting>
+void ApparenceModule::SaveLoad(Chunk& parChunk)
+{
+    parent_type::SaveLoad(parChunk);
+}
 } // namespace ECSEngine
