@@ -3,6 +3,7 @@
 
 #include "RecipeProductionModule.h"
 
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 #include "ECSGameplaySpecificPropertyDrawers.h"
@@ -39,6 +40,17 @@ void RecipeProductionModuleTemplate::VirtualDrawEditor()
 void RecipeProductionModuleTemplate::VirtualPostLoad()
 {
     ModuleTemplate::VirtualPostLoad();
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES_FREEFUNC(RecipeProductionState::Type);
+
+IMPLEMENT_SAVELOAD_ABILITIES(RecipeProductionModule);
+template<typename Chunk, bool isWriting>
+void RecipeProductionModule::SaveLoad(Chunk& parChunk)
+{
+    parent_type::SaveLoad(parChunk);
+    parChunk& FState;
+    parChunk& FProductionTimeRemaining;
 }
 
 RecipeProductionModule::RecipeProductionModule()
