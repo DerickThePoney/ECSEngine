@@ -42,6 +42,24 @@ void Buffer::WriteGuards(u32 parId)
     FWrittenBytes += sizeof(u32);
 }
 
+void Buffer::WriteSize(u32 parSize)
+{
+    GrowToAccomodateAtLeast(sizeof(u32));
+    memcpy(&FData[FWrittenBytes], &parSize, sizeof(u32));
+    FWrittenBytes += sizeof(u32);
+}
+
+void Buffer::WriteIdAndSize(u32 parId, u32 parSize)
+{
+    GrowToAccomodateAtLeast(2 * sizeof(u32));
+
+    memcpy(&FData[FWrittenBytes], &parId, sizeof(u32));
+    FWrittenBytes += sizeof(u32);
+
+    memcpy(&FData[FWrittenBytes], &parSize, sizeof(u32));
+    FWrittenBytes += sizeof(u32);
+}
+
 u32 Buffer::ReadId()
 {
     u32 id;
