@@ -148,5 +148,17 @@ void SaveLoad<SavingSystem::ReadChunk, std::string, false>(SavingSystem::ReadChu
 
 namespace SavingSystem
 {
+
+void SaveChunk::WriteIdAndSize(u32 id, u32 size)
+{
+    FDataBuffer.WriteIdAndSize(id, size);
+}
+
+void ReadChunk::ReadIdAndSize(u32& id, u32& size)
+{
+    id = FDataBuffer.ReadId();
+    size = FDataBuffer.ReadSize();
+}
+
 } // namespace SavingSystem
 } // namespace ECSEngine

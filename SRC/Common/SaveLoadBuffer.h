@@ -13,6 +13,8 @@ public:
     void WriteData(u32 parId, u32 parSize, u8* parData);
     void WriteRawData(u32 parSize, u8* parData);
     void WriteGuards(u32 parId);
+    void WriteSize(u32 parSize);
+    void WriteIdAndSize(u32 parId, u32 parSize);
 
     u32 WrittenBytes() const { return FWrittenBytes; }
     const u8* Data() const { return FData.data(); }
