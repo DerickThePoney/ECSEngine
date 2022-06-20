@@ -33,6 +33,8 @@ class EnergyProducerModule : public Module
 {
     DECLARE_MODULE(EnergyProducerModule);
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     EnergyProducerModule();
     ~EnergyProducerModule();
