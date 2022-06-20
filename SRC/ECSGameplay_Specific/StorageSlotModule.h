@@ -42,6 +42,9 @@ private:
 
 struct StorageSlot
 {
+    DECLARE_SAVELOAD_ABILITIES();
+
+public:
     GameResource::Type Resource = GameResource::LENGTH;
     u32 Quantity = 0;
     EntityId FReservedForBuilding;
@@ -50,6 +53,8 @@ struct StorageSlot
 class StorageSlotModule : public Module
 {
     DECLARE_MODULE(StorageSlotModule);
+
+    DECLARE_SAVELOAD_ABILITIES();
 
 public:
     StorageSlotModule();
