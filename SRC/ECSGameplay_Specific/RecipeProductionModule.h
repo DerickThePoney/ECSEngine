@@ -45,6 +45,8 @@ class RecipeProductionModule : public Module
 {
     DECLARE_MODULE(RecipeProductionModule);
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     RecipeProductionModule();
     ~RecipeProductionModule();
@@ -55,7 +57,7 @@ public:
     float ProductionTimeRemaining() const { return FProductionTimeRemaining; }
     void SetProductionTimeRemaining(float parTime) { FProductionTimeRemaining = parTime; }
 
-	const ProductionRecipe* GetProductionRecipe() const;
+    const ProductionRecipe* GetProductionRecipe() const;
 
 private:
     RecipeProductionState::Type FState = RecipeProductionState::IDLE;
