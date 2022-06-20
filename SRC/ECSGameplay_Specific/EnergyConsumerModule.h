@@ -33,6 +33,8 @@ class EnergyConsumerModule : public Module
 {
     DECLARE_MODULE(EnergyConsumerModule);
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     EnergyConsumerModule();
     ~EnergyConsumerModule();
