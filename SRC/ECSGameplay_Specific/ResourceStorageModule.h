@@ -52,19 +52,24 @@ class ResourcesStatistics
 {
     constexpr static float MaxTimeForMovingAverage = 5.f;
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     void AddResourceChange(const GameResource::Type parResource, const i32 parQuantity);
     float GetAverageResourcePerUnitOfTime(const GameResource::Type parResource) const;
 
     void UpdateStatistics(const float parNow);
 
-private:
     struct ResourceData
     {
+        DECLARE_SAVELOAD_ABILITIES();
+
+    public:
         std::list<std::pair<float, i32>> Changes;
         float AverageResourcePerUnitOfTime = 0.f;
     };
 
+private:
     std::map<GameResource::Type, ResourceData> FStatistics;
 };
 

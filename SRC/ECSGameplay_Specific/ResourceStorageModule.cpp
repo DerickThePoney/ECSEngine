@@ -172,6 +172,21 @@ void ResourceStorageModule::SaveLoad(Chunk& parChunk)
     parChunk& FCarriedResources;
 }
 
+IMPLEMENT_SAVELOAD_ABILITIES(ResourcesStatistics);
+template<typename Chunk, bool isWriting>
+void ResourcesStatistics::SaveLoad(Chunk& parChunk)
+{
+    parChunk& FStatistics;
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(ResourcesStatistics::ResourceData);
+template<typename Chunk, bool isWriting>
+void ResourcesStatistics::ResourceData::SaveLoad(Chunk& parChunk)
+{
+    parChunk& Changes;
+    parChunk& AverageResourcePerUnitOfTime;
+}
+
 void ResourcesStatistics::AddResourceChange(const GameResource::Type parResource, const i32 parQuantity)
 {
     auto itFind = FStatistics.find(parResource);
