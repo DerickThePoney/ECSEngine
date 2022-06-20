@@ -6,6 +6,7 @@
 #include "BuildingNeedsStorageMessgage.h"
 #include "Common/GenericMessageIdentifiers.h"
 #include "Common/GenericMessageManager.h"
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleUtils.h"
@@ -77,6 +78,15 @@ void LinkToStorageModule::VirtualDeinit()
             slotModule->RemoveSlotsReservationsIFN(UnitId());
         }
     }
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(LinkToStorageModule);
+template<typename Chunk, bool isWriting>
+void LinkToStorageModule::SaveLoad(Chunk& parChunk)
+{
+    parent_type::SaveLoad(parChunk);
+
+    parChunk& FStorageId;
 }
 
 } // namespace ECSEngine

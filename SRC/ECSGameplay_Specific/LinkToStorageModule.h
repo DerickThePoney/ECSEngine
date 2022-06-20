@@ -28,6 +28,8 @@ class LinkToStorageModule : public Module
 {
     DECLARE_MODULE(LinkToStorageModule);
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     LinkToStorageModule();
     ~LinkToStorageModule();
