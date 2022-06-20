@@ -33,3 +33,20 @@
 #define IMPLEMENT_SAVELOAD_ABILITIES(TYPE)                                                                                                                                         \
     IMPLEMENT_SAVELOAD_ABILITIES_IMPL(TYPE)                                                                                                                                        \
     IMPLEMENT_SAVELOAD_ABILITIES_INSTANCIATIONS(TYPE)
+
+#define IMPLEMENT_SAVELOAD_ABILITIES_FREEFUNC(TYPE)                                                                                                                                \
+    template<>                                                                                                                                                                     \
+    void SaveLoad<SavingSystem::SaveChunk, TYPE, true>(SavingSystem::SaveChunk & parChunk, TYPE & parValue)                                                                        \
+    {                                                                                                                                                                              \
+        u32 id = typeid(TYPE).hash_code();                                                                                                                                         \
+        u32 size = sizeof(TYPE);                                                                                                                                                   \
+        u8* data = reinterpret_cast<u8*>(&parValue);                                                                                                                               \
+        parChunk.GetBuffer().WriteData(id, size, data);                                                                                                                            \
+    }                                                                                                                                                                              \
+                                                                                                                                                                                   \
+    template<>                                                                                                                                                                     \
+    void SaveLoad<SavingSystem::ReadChunk, TYPE, false>(SavingSystem::ReadChunk & parChunk, TYPE & parValue)                                                                       \
+    {                                                                                                                                                                              \
+        u8* data = reinterpret_cast<u8*>(&parValue);                                                                                                                               \
+        GenericLoad(parChunk, data, typeid(TYPE).hash_code(), sizeof(TYPE));                                                                                                       \
+    }

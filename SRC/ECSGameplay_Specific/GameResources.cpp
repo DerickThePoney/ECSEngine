@@ -2,6 +2,8 @@
 
 #include "GameResources.h"
 
+#include "Common/SavingSystemImplementation.h"
+
 namespace ECSEngine
 {
 namespace GameResource
@@ -23,6 +25,7 @@ const char* GetName(const Type parResource)
         break;
     }
 }
-
 } // namespace GameResource
+
+IMPLEMENT_SAVELOAD_ABILITIES_FREEFUNC(GameResource::Type);
 } // namespace ECSEngine
