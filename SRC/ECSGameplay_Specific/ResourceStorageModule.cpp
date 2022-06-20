@@ -3,6 +3,7 @@
 #include "ResourceStorageModule.h"
 
 #include "Application/PropertyDrawer.h"
+#include "Common/SavingSystemImplementation.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/EntityId.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
@@ -160,6 +161,15 @@ GameResource::Type ResourceStorageModule::GetMainResource() const
         }
     }
     return maxResource;
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(ResourceStorageModule);
+template<typename Chunk, bool isWriting>
+void ResourceStorageModule::SaveLoad(Chunk& parChunk)
+{
+    parent_type::SaveLoad(parChunk);
+
+    parChunk& FCarriedResources;
 }
 
 void ResourcesStatistics::AddResourceChange(const GameResource::Type parResource, const i32 parQuantity)

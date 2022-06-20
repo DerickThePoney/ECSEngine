@@ -72,6 +72,8 @@ class ResourceStorageModule final : public Module
 {
     DECLARE_MODULE(ResourceStorageModule);
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     ResourceStorageModule();
     ~ResourceStorageModule() { }
