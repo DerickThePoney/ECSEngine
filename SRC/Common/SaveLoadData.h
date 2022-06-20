@@ -29,10 +29,24 @@ public:
     template<typename T, typename U>
     void operator&(std::pair<T, U>& parValue)
     {
-        u32 id = typeid(std::vector<T>).hash_code();
+        u32 id = typeid(std::pair<T, U>).hash_code();
         WriteIdAndSize(id, 0);
         this->operator&(parValue.first);
         this->operator&(parValue.second);
+    }
+
+    template<typename T, typename U>
+    void operator&(std::map<T, U>& parValue)
+    {
+        u32 id = typeid(std::map<T, U>).hash_code();
+        u32 size = parValue.size();
+        WriteIdAndSize(id, size);
+
+        foreachitem(value, parValue)
+        {
+            this->operator&(value.first);
+            this->operator&(value.second);
+        }
     }
 
     Buffer& GetBuffer() { return FDataBuffer; }
@@ -77,6 +91,26 @@ public:
 
         this->operator&(parValue.first);
         this->operator&(parValue.second);
+    }
+
+    template<typename T, typename U>
+    void operator&(std::map<T, U>& parValue)
+    {
+        u32 expectedid = typeid(std::map<T, U>).hash_code();
+
+        u32 id, size;
+        ReadIdAndSize(id, size);
+        AlwaysCheckedAssert(id == expectedid);
+        parValue.reserve(size);
+
+        forrange(i, 0, size)
+        {
+            T key;
+            this->operator&(key);
+            U val;
+            this->operator&(val);
+            parValue.insert_or_assign(key, val);
+        }
     }
 
     Buffer& GetBuffer() { return FDataBuffer; }
