@@ -12,9 +12,9 @@ class SaveChunk
 {
 public:
     template<typename T>
-    void operator&(T& parValue)
+    void operator&(const T& parValue)
     {
-        SaveLoad<SaveChunk, T, true>(*this, parValue);
+        SaveLoad<SaveChunk, T, true>(*this, (T&)parValue); // ouip. Deso.
     }
 
     template<typename T>
@@ -47,6 +47,16 @@ public:
             this->operator&(value.first);
             this->operator&(value.second);
         }
+    }
+
+    template<typename T>
+    void operator&(std::list<T>& parValue)
+    {
+        u32 id = typeid(std::list<T>).hash_code();
+        u32 size = parValue.size();
+        WriteIdAndSize(id, size);
+
+        foreachitem(value, parValue) this->operator&(value);
     }
 
     Buffer& GetBuffer() { return FDataBuffer; }
@@ -101,7 +111,6 @@ public:
         u32 id, size;
         ReadIdAndSize(id, size);
         AlwaysCheckedAssert(id == expectedid);
-        parValue.reserve(size);
 
         forrange(i, 0, size)
         {
@@ -111,6 +120,19 @@ public:
             this->operator&(val);
             parValue.insert_or_assign(key, val);
         }
+    }
+
+    template<typename T>
+    void operator&(std::list<T>& parValue)
+    {
+        u32 expectedid = typeid(std::list<T>).hash_code();
+
+        u32 id, size;
+        ReadIdAndSize(id, size);
+        AlwaysCheckedAssert(id == expectedid);
+
+        parValue.resize(size);
+        foreachitem(value, parValue) this->operator&(value);
     }
 
     Buffer& GetBuffer() { return FDataBuffer; }
