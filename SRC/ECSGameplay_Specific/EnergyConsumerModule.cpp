@@ -4,6 +4,7 @@
 #include "EnergyConsumerModule.h"
 
 #include "Application/PropertyDrawer.h"
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 
@@ -38,6 +39,13 @@ u32 EnergyConsumerModule::ConsumedEnergy() const
     const auto* moduleTemplate = Template<EnergyConsumerModuleTemplate>();
     AssertRelease(moduleTemplate != nullptr);
     return moduleTemplate->ConsumedEnergy();
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(EnergyConsumerModule);
+template<typename Chunk, bool isWriting>
+void EnergyConsumerModule::SaveLoad(Chunk& parChunk)
+{
+    parent_type::SaveLoad(parChunk);
 }
 
 } // namespace ECSEngine
