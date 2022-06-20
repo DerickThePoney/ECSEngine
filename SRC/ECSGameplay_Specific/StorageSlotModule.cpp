@@ -4,6 +4,7 @@
 #include "StorageSlotModule.h"
 
 #include "Application/PropertyDrawer.h"
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 
@@ -24,6 +25,24 @@ void StorageSlotModuleTemplate::VirtualDrawEditor()
     EDITOR_PROPERTY_SIMPLE("Number of slots", FNumberOfSlots);
     EDITOR_PROPERTY_SIMPLE("Slot size", FSlotSize);
     EDITOR_PROPERTY_SIMPLE("Radius of effect", FRadiusOfEffect);
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(StorageSlot);
+template<typename Chunk, bool isWriting>
+void StorageSlot::SaveLoad(Chunk& parChunk)
+{
+    parChunk& Resource;
+    parChunk& Quantity;
+    parChunk& FReservedForBuilding;
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(StorageSlotModule);
+template<typename Chunk, bool isWriting>
+void StorageSlotModule::SaveLoad(Chunk& parChunk)
+{
+    parent_type::SaveLoad(parChunk);
+    parChunk& FSlots;
+    parChunk& FFreeSlots;
 }
 
 StorageSlotModule::StorageSlotModule()
