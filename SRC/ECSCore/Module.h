@@ -52,7 +52,7 @@ private:
     bool FVirtualOnLoadedCalled = false;
 #endif
 
-    const ModuleTemplate* FTemplate;
+    const ModuleTemplate* FTemplate = nullptr;
 };
 
 #define DECLARE_MODULE(TYPE)                                                                                                                                                       \
