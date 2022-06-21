@@ -18,6 +18,12 @@ public:
     }
 
     template<typename T>
+    void operator&(const T* parValue)
+    {
+        SaveLoad<SaveChunk, T, true>(*this, (T*)parValue); // ouip. Deso.
+    }
+
+    template<typename T>
     void operator&(std::vector<T>& parValue)
     {
         u32 id = typeid(std::vector<T>).hash_code();
@@ -75,6 +81,12 @@ public:
     void operator&(T& parValue)
     {
         SaveLoad<ReadChunk, T, false>(*this, parValue);
+    }
+
+    template<typename T>
+    void operator&(const T* parValue)
+    {
+        SaveLoad<ReadChunk, T, false>(*this, (T*)parValue); // ouip. Deso.
     }
 
     template<typename T>
