@@ -61,10 +61,8 @@ void GameScenarioUpdater::Initialise()
     ResourceManager::CreateIFP();
     ResourceManager::Instance().Init();
     FCameraMoverSystem.Init();
-    FMovementSystem.Init();
     FRenderingSystem.Init();
     FColonyManagementSystem.Init();
-    FPeonHarvestingSytem.Init();
     FRawResourceProductionSystem.Init();
     FPeonSpawnSystem.Init();
     FPeonLifeSpanSystem.Init();
@@ -97,10 +95,8 @@ void GameScenarioUpdater::Destroy()
     FPeonLifeSpanSystem.Destroy();
     FPeonSpawnSystem.Destroy();
     FRawResourceProductionSystem.Destroy();
-    FPeonHarvestingSytem.Destroy();
     FColonyManagementSystem.Destroy();
     FRenderingSystem.Destroy();
-    FMovementSystem.Destroy();
     FCameraMoverSystem.Destroy();
     ResourceManager::Instance().Finalize();
     ResourceManager::Delete();
@@ -138,11 +134,9 @@ void GameScenarioUpdater::GameplayUpdate()
 
         AssertRelease(FScenario != nullptr);
         FScenario->Update();
-        FMovementSystem.Update();
 
         EnergySystem::Instance().Update();
         FColonyManagementSystem.Update();
-        FPeonHarvestingSytem.Update();
         FRawResourceProductionSystem.Update();
         FPeonSpawnSystem.Update();
         FPeonLifeSpanSystem.Update();
@@ -190,8 +184,6 @@ void GameScenarioUpdater::DebugRender()
         Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
         DrawAdjustables();
 
-        FPeonHarvestingSytem.Debug();
-
         Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
         u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
         Camera* camera = CameraManager::Instance().GetCamera(camId);
@@ -213,7 +205,6 @@ void GameScenarioUpdater::DebugRender()
         }
 
         Pathfinding::Debug(*buffer, handle);
-        FMovementSystem.VisualDebug(*buffer, handle);
 
         ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showDebugForCircularGraph, false, "show debug", "Pathfinding/CircularGraph");
         if (showDebugForCircularGraph)

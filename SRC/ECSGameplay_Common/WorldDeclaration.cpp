@@ -27,7 +27,6 @@
 #include "ECSGameplay_Specific/StorageSlotModule.h"
 #include "ECSGameplay_Specific/WorkPlaceModule.h"
 #include "EntityLinksModules.h"
-#include "MovementModule.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
 #include "brigand/algorithms/for_each.hpp"
@@ -35,17 +34,7 @@
 
 namespace ECSEngine
 {
-using StandardControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::MovementModule>;
-
-using PeonsControllers = brigand::list<ECSEngine::PositionModule,
-      ECSEngine::OrientationModule,
-      ECSEngine::ApparenceModule,
-      ECSEngine::MovementModule,
-      ECSEngine::ResourceStorageModule,
-      ECSEngine::LinkToOwnerModule,
-      ECSEngine::ResourceHarvesterModule,
-      ECSEngine::LinkToHousingPlaceModule,
-      ECSEngine::LinkToWorkPlaceModule>;
+using StandardControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule>;
 
 using ResourceProducerControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule>;
 
@@ -107,12 +96,6 @@ void CreateWorlds()
         EntityWorld* world = new EntityWorld(EEntityWorlds::RESOURCE_PROD);
         auto r = brigand::for_each<ResourceProducerControllers>(f{ world });
         WorldManager::Instance().AddEntityWorldStealOwnership(EEntityWorlds::RESOURCE_PROD, world);
-    }
-
-    {
-        EntityWorld* world = new EntityWorld(EEntityWorlds::PEONS);
-        auto r = brigand::for_each<PeonsControllers>(f{ world });
-        WorldManager::Instance().AddEntityWorldStealOwnership(EEntityWorlds::PEONS, world);
     }
 
     {
