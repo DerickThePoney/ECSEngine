@@ -28,7 +28,7 @@ ResourceStatisticsUpdateSystem::ResourceStatisticsUpdateSystem()
 {
     RegisterDepency<ResourceStorageModule>(EEntityWorlds::COLONY);
     RegisterDepency<ResourceStorageModule>(EEntityWorlds::RESOURCE_PROD);
-    RegisterDepency<ResourceStorageModule>(EEntityWorlds::PEONS);
+    RegisterDepency<ResourceStorageModule>(EEntityWorlds::BUILDINGS);
 }
 
 void ResourceStatisticsUpdateSystem::VirtualUpdate()
@@ -36,12 +36,12 @@ void ResourceStatisticsUpdateSystem::VirtualUpdate()
     ModuleSystem::VirtualUpdate();
 
     ModuleAccessor<ResourceStorageModule> colonyStorageAccessor(EEntityWorlds::COLONY);
-    ModuleAccessor<ResourceStorageModule> peonsStorageAccessor(EEntityWorlds::PEONS);
     ModuleAccessor<ResourceStorageModule> producerStorageAccessor(EEntityWorlds::RESOURCE_PROD);
+    ModuleAccessor<ResourceStorageModule> buildingsStorageAccessor(EEntityWorlds::BUILDINGS);
 
     UpdateStorageStats(colonyStorageAccessor);
     UpdateStorageStats(producerStorageAccessor);
-    UpdateStorageStats(peonsStorageAccessor);
+    UpdateStorageStats(buildingsStorageAccessor);
 }
 
 } // namespace ECSEngine

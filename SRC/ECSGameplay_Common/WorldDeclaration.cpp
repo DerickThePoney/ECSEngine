@@ -11,21 +11,12 @@
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Specific/BuildingGridOccupancyModule.h"
 #include "ECSGameplay_Specific/ColonyModule.h"
-#include "ECSGameplay_Specific/ColonyPeonsManagementModule.h"
-#include "ECSGameplay_Specific/ColonyTraitsModule.h"
 #include "ECSGameplay_Specific/EnergyConsumerModule.h"
 #include "ECSGameplay_Specific/EnergyProducerModule.h"
-#include "ECSGameplay_Specific/HousingPlaceModule.h"
-#include "ECSGameplay_Specific/LinkToHousingPlaceModule.h"
 #include "ECSGameplay_Specific/LinkToStorageModule.h"
-#include "ECSGameplay_Specific/LinkToWorkPlaceModule.h"
-#include "ECSGameplay_Specific/PeonFeedingTimeModule.h"
-#include "ECSGameplay_Specific/PeonSpawnModule.h"
 #include "ECSGameplay_Specific/RecipeProductionModule.h"
-#include "ECSGameplay_Specific/ResourceHarvesterModule.h"
 #include "ECSGameplay_Specific/ResourceStorageModule.h"
 #include "ECSGameplay_Specific/StorageSlotModule.h"
-#include "ECSGameplay_Specific/WorkPlaceModule.h"
 #include "EntityLinksModules.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
@@ -38,22 +29,14 @@ using StandardControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::
 
 using ResourceProducerControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule>;
 
-using ColonyControllers = brigand::list<ECSEngine::PositionModule,
-      ECSEngine::ColonyModule,
-      ECSEngine::ResourceStorageModule,
-      ECSEngine::ColonyPeonsManagementModule,
-      ECSEngine::PeonSpawnModule,
-      ECSEngine::PeonFeedingTimeModule,
-      ECSEngine::ColonyTraitsModule>;
+using ColonyControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::ColonyModule, ECSEngine::ResourceStorageModule>;
 
 using BuildingControllers = brigand::list<ECSEngine::PositionModule,
       ECSEngine::OrientationModule,
       ECSEngine::ApparenceModule,
       ECSEngine::ResourceStorageModule,
       ECSEngine::RecipeProductionModule,
-      ECSEngine::HousingPlaceModule,
       ECSEngine::BuildingGridOccupancyModule,
-      ECSEngine::WorkPlaceModule,
       ECSEngine::EnergyProducerModule,
       ECSEngine::EnergyConsumerModule,
       ECSEngine::LinkToStorageModule,

@@ -23,10 +23,6 @@ SynchroWithRenderSystem::SynchroWithRenderSystem()
     RegisterDepency<ApparenceModule>(EEntityWorlds::RESOURCE_PROD);
     RegisterDepency<PositionModule>(EEntityWorlds::RESOURCE_PROD);
     RegisterDepency<OrientationModule>(EEntityWorlds::RESOURCE_PROD);
-
-    RegisterDepency<ApparenceModule>(EEntityWorlds::PEONS);
-    RegisterDepency<PositionModule>(EEntityWorlds::PEONS);
-    RegisterDepency<OrientationModule>(EEntityWorlds::PEONS);
 }
 
 SynchroWithRenderSystem::~SynchroWithRenderSystem()
@@ -62,7 +58,6 @@ void SynchroWithRenderSystem::VirtualUpdate()
 
     UpdateObjectsForRendering<EEntityWorlds::STANDARD>();
     UpdateObjectsForRendering<EEntityWorlds::RESOURCE_PROD>();
-    UpdateObjectsForRendering<EEntityWorlds::PEONS>();
 }
 
 } // namespace ECSEngine

@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "ECSCore/EntityId.h"
-#include "PeonSpawningRulesManager.h"
 
 namespace ECSEngine
 {
@@ -17,22 +16,5 @@ public:
 
 private:
     Action FAction;
-};
-
-class SpawnPeonOrder
-{
-public:
-    SpawnPeonOrder() { }
-    SpawnPeonOrder(const EntityId& parColonyId, const PeonSpawningCostRule& parPeonCostRule)
-        : FColonyId(parColonyId)
-        , FPeonCostRule(parPeonCostRule)
-    {
-    }
-
-    void Execute();
-
-private:
-    EntityId FColonyId;
-    PeonSpawningCostRule FPeonCostRule;
 };
 } // namespace ECSEngine

@@ -3,16 +3,12 @@
 #include "MainMenuBarController.h"
 
 #include "ColonyModule.h"
-#include "ColonyPeonsManagementModule.h"
 #include "Common/Logger.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/ScopedModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "EnergyProducerModule.h"
 #include "EnergySystem.h"
-#include "HousingPlaceModule.h"
-#include "PeonFeedingTimeModule.h"
-#include "PeonSpawnModule.h"
 #include "ResourceStorageModule.h"
 #include "UICore/RMLUIManager.h"
 #include "UICore/RML_includes.h"
@@ -22,13 +18,8 @@ namespace ECSEngine
 namespace UI
 {
 
-using AccessHelpers = ScopedModuleAccessor<MC<ColonyModule, EEntityWorlds::COLONY>,
-      MC<ResourceStorageModule, EEntityWorlds::COLONY>,
-      MC<PeonSpawnModule, EEntityWorlds::COLONY>,
-      MC<ColonyPeonsManagementModule, EEntityWorlds::COLONY>,
-      MC<PeonFeedingTimeModule, EEntityWorlds::COLONY>,
-      MC<HousingPlaceModule, EEntityWorlds::BUILDINGS>,
-      MC<EnergyProducerModule, EEntityWorlds::BUILDINGS>>;
+using AccessHelpers =
+      ScopedModuleAccessor<MC<ColonyModule, EEntityWorlds::COLONY>, MC<ResourceStorageModule, EEntityWorlds::COLONY>, MC<EnergyProducerModule, EEntityWorlds::BUILDINGS>>;
 
 void ClickedTestData(Rml::DataModelHandle model_handle, Rml::Event& ev, const Rml::VariantList& ag)
 {
@@ -77,17 +68,9 @@ void MainMenuBarController::VirtualUpdate()
     const ResourceStorageModule* resourceStorage = accessHelpers.GetModule<ResourceStorageModule>(colonyId);
     AssertRelease(resourceStorage != nullptr);
 
-    const ColonyPeonsManagementModule* peonManagerModule = accessHelpers.GetModule<ColonyPeonsManagementModule>(colonyId);
-    AssertRelease(peonManagerModule != nullptr);
-
-    PeonSpawnModule* peonSpawnModule = accessHelpers.GetModule<PeonSpawnModule>(colonyId);
-    AssertRelease(peonSpawnModule != nullptr);
-
-    const PeonFeedingTimeModule* peonFeedingTimeModule = accessHelpers.GetModule<PeonFeedingTimeModule>(colonyId);
-
-    FModel.TotalPeons = peonManagerModule->PeonsInColony();
-    FModel.IdlePeons = peonManagerModule->IdlePeons().size();
-    FModel.RemainingFeedingTime = peonFeedingTimeModule->RemainingTimeBeforeNextFeed();
+    FModel.TotalPeons = 0;
+    FModel.IdlePeons = 0;
+    FModel.RemainingFeedingTime = 0;
     FModel.Influence = resourceStorage->GetResourceQuantity(GameResource::INFLUENCE);
     FDataModelWrapper->DirtyVariable("peons");
     FDataModelWrapper->DirtyVariable("idle");
@@ -96,7 +79,7 @@ void MainMenuBarController::VirtualUpdate()
 
     UpdateEnergy();
 
-    const float progress = peonFeedingTimeModule->RemainTimeBeforeNextFeedAsRatio();
+    const float progress = 0;
     Rml::Element* progressBar = FDocument->GetElementById("progress");
     AssertRelease(progressBar != nullptr);
     progressBar->SetAttribute("value", progress);

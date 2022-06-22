@@ -3,13 +3,9 @@
 #include "ColonySelectionPanelController.h"
 
 #include "ColonyModule.h"
-#include "ColonyPeonsManagementModule.h"
 #include "ECSCore/ScopedModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "GameplayRulesManager.h"
-#include "HousingPlaceModule.h"
-#include "PeonFeedingTimeModule.h"
-#include "PeonSpawnModule.h"
 #include "PeonSpawningRulesManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "ResourceStorageModule.h"
@@ -20,12 +16,7 @@ namespace ECSEngine
 namespace UI
 {
 
-using AccessHelpers = ScopedModuleAccessor<MC<ColonyModule, EEntityWorlds::COLONY>,
-      MC<ResourceStorageModule, EEntityWorlds::COLONY>,
-      MC<PeonSpawnModule, EEntityWorlds::COLONY>,
-      MC<ColonyPeonsManagementModule, EEntityWorlds::COLONY>,
-      MC<PeonFeedingTimeModule, EEntityWorlds::COLONY>,
-      MC<HousingPlaceModule, EEntityWorlds::BUILDINGS>>;
+using AccessHelpers = ScopedModuleAccessor<MC<ColonyModule, EEntityWorlds::COLONY>, MC<ResourceStorageModule, EEntityWorlds::COLONY>>;
 
 ColonySelectionPanelController::ColonySelectionPanelController()
     : UIController()
@@ -51,12 +42,6 @@ void ColonySelectionPanelController::VirtualUpdate()
     const ResourceStorageModule* resourceStorage = accessHelpers.GetModule<ResourceStorageModule>(colonyId);
     AssertRelease(resourceStorage != nullptr);
 
-    const ColonyPeonsManagementModule* peonManagerModule = accessHelpers.GetModule<ColonyPeonsManagementModule>(colonyId);
-    AssertRelease(peonManagerModule != nullptr);
-
-    PeonSpawnModule* peonSpawnModule = accessHelpers.GetModule<PeonSpawnModule>(colonyId);
-    AssertRelease(peonSpawnModule != nullptr);
-
     const float size_x = 0.2f, size_y = 0.4f;
     const float pos_x = 10.f, pos_y = 1.f;
     glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
@@ -65,21 +50,16 @@ void ColonySelectionPanelController::VirtualUpdate()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));
     ImGui::Begin(colonyModule->Name().c_str(), NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
 
-    const u32 peonsInColony = peonManagerModule->PeonsInColony();
+    const u32 peonsInColony = 0;
 
     // Show Basic informations
     if (ImGui::CollapsingHeader("Basic information", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Text("PEONS\t%d", peonsInColony);
-        ImGui::Text("Idle PEONS\t%d", peonManagerModule->IdlePeons().size());
+        ImGui::Text("Idle PEONS\t%d", 0);
 
         u32 totalPlace = 0;
         u32 freePlace = 0;
-        foreachitemconst(house, accessHelpers.Accessor<HousingPlaceModule>())
-        {
-            totalPlace += house.MaxPlace();
-            freePlace += house.RemainingFreeSpace();
-        }
 
         if (peonsInColony < totalPlace)
         {
@@ -98,8 +78,7 @@ void ColonySelectionPanelController::VirtualUpdate()
     // show colony resources
     if (ImGui::CollapsingHeader("Resources", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        const PeonFeedingTimeModule* peonFeedingTimeModule = accessHelpers.GetModule<PeonFeedingTimeModule>(colonyId);
-        const float progress = peonFeedingTimeModule->RemainTimeBeforeNextFeedAsRatio();
+        const float progress = 0;
         ImGui::PushID("feedingTimeProgress");
         ImGui::Text("Next feeding time: ");
         ImGui::SameLine();
@@ -109,7 +88,7 @@ void ColonySelectionPanelController::VirtualUpdate()
         else
             ImGui::Text("Needs %d food", peonsInColony * GameplayConstants::PeonFeeding::PeonEatQuantity);
 
-        ImGui::ProgressBar(progress, ImVec2(-1.f, 0.f), fmt::format("{:.2f}s remaining", peonFeedingTimeModule->RemainingTimeBeforeNextFeed()).c_str());
+        ImGui::ProgressBar(progress, ImVec2(-1.f, 0.f), fmt::format("{:.2f}s remaining", 0).c_str());
         ImGui::PopID();
 
         constexpr static u32 maxResourcesPerColumns = 4;
@@ -140,7 +119,7 @@ void ColonySelectionPanelController::VirtualUpdate()
         {
             const std::string& peonTemplateName = spawnRule.PeonTemplateName();
 
-            std::vector<std::pair<GameResource::Type, u32>> costs = spawnRule.CostForNextSpawn(peonManagerModule->PeonsInColony());
+            std::vector<std::pair<GameResource::Type, u32>> costs = spawnRule.CostForNextSpawn(0);
 
             bool disabled = false;
             foreachitemconst(resQ, costs)
@@ -154,10 +133,7 @@ void ColonySelectionPanelController::VirtualUpdate()
                 ImGui::PushItemFlag(ImGuiItemFlags_ReadOnly, true);
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
             }
-            if (ImGui::Button(fmt::format("Spawn {}", peonTemplateName).c_str()) && !disabled)
-            {
-                peonSpawnModule->RequestPeonSpawn(SpawnPeonOrder(colonyId, spawnRule));
-            }
+            if (ImGui::Button(fmt::format("Spawn {}", peonTemplateName).c_str()) && !disabled) { }
             ImGui::SameLine();
 
             std::string coststr = "Cost:";
