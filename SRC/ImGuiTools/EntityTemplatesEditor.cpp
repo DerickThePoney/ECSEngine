@@ -98,6 +98,11 @@ void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/, const float parMen
     ImGui::BeginChild(ImGui::GetID("Entity template editor"), editorPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
     if (et != nullptr)
     {
+        if (ImGui::Button("Delete template"))
+        {
+            ImGui::OpenPopup("Delete template modal");
+        }
+
         et->DrawEditor();
         ImGui::Separator();
 
@@ -124,6 +129,32 @@ void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/, const float parMen
             }
         }
     }
+
+    bool shouldDeleteTemplate = false;
+    if (ImGui::BeginPopupModal("Delete template modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        if (ImGui::Button("Yes"))
+        {
+            shouldDeleteTemplate = true;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("No"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+    if (shouldDeleteTemplate)
+    {
+        AlwaysCheckedAssert(et != nullptr);
+        AlwaysCheckedAssert(selected != -1);
+
+        EntityTemplateManager::Instance().DeleteEntityTemplate_IKNOWWHATIMDOING(selected);
+        selected = -1;
+    }
+
     ImGui::EndChild();
     ImGui::End();
 }

@@ -45,6 +45,12 @@ EntityTemplate* EntityTemplateManager::GetEntityTemplateForWriting(u32 parIndex)
     return FEntityTemplates[parIndex].get();
 }
 
+void EntityTemplateManager::DeleteEntityTemplate_IKNOWWHATIMDOING(u32 parIndex)
+{
+    AssertRelease(parIndex < FEntityTemplates.size());
+    FEntityTemplates.erase(FEntityTemplates.begin() + parIndex);
+}
+
 EntityTemplateManager::~EntityTemplateManager()
 {
 }
