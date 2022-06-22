@@ -6,7 +6,6 @@
 #include "ECSGameplay_Specific/HousingSystem.h"
 #include "ECSGameplay_Specific/PeonFeedingTimeSystem.h"
 #include "ECSGameplay_Specific/PeonSpawnSystem.h"
-#include "ECSGameplay_Specific/PeonsHarvestingSystem.h"
 #include "ECSGameplay_Specific/ResourceProductionSystem.h"
 #include "ECSGameplay_Specific/ResourceStatisticsUpdateSystem.h"
 #include "ECSGameplay_Specific/StorageFeedbackDrawer.h"
@@ -14,7 +13,6 @@
 #include "ECSGameplay_Specific/UserInterfaceSystem.h"
 #include "ECSGameplay_Specific/WorkSystem.h"
 #include "IScenarioUpdater.h"
-#include "MovementSystem.h"
 #include "SynchroWithRenderSystem.h"
 
 namespace ECSEngine
@@ -40,12 +38,10 @@ private:
     SceneScenario* FScenario;
 
     CameraMoverSystem FCameraMoverSystem;
-    MovementSystem FMovementSystem;
     SynchroWithRenderSystem FRenderingSystem;
 
     ColonyBuildingSystem FColonyBuildingSystem;
     ColonyPeonsTaskAssignmentSystem FColonyManagementSystem;
-    PeonsHaverstingSystem FPeonHarvestingSytem;
     ResourceProductionSystem FRawResourceProductionSystem;
     PeonSpawnSystem FPeonSpawnSystem;
     PeonFeedingTimeSystem FPeonLifeSpanSystem;
