@@ -109,7 +109,33 @@ void EntityTemplate::DrawEditor()
 
 void EntityTemplate::UpdateKey()
 {
-    foreachitem(modTemplate, FModuleTemplates) { FKey.SetHasModule(modTemplate.first); }
+    bool shouldUpdateMap = false;
+    foreachitem(modTemplate, FModuleTemplates)
+    {
+        if (modTemplate.first != modTemplate.second->GetModuleId())
+        {
+            shouldUpdateMap = true;
+        }
+
+        if (!FKey.HasModule(modTemplate.first))
+        {
+            shouldUpdateMap = true;
+        }
+    }
+
+    if (shouldUpdateMap)
+    {
+        FKey.Clear();
+        std::map<u32, std::unique_ptr<ModuleTemplate>> newMap;
+        foreachitem(modTemplate, FModuleTemplates)
+        {
+            u32 key = modTemplate.second->GetModuleId();
+            FKey.SetHasModule(key);
+            newMap.insert_or_assign(key, std::move(modTemplate.second));
+        }
+
+        FModuleTemplates = std::move(newMap);
+    }
 }
 
 template<typename Module>

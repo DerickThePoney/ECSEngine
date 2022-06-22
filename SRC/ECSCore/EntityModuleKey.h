@@ -31,6 +31,8 @@ public:
 
     const BitSet<MaxModuleNumber>& GetKey() const;
 
+    void Clear();
+
 private:
     BitSet<MaxModuleNumber> FKey;
 };
