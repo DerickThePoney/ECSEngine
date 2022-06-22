@@ -24,7 +24,9 @@
         AlwaysCheckedAssertMsg(size == 0, "Got non zero size while reading guards...");                                                                                            \
                                                                                                                                                                                    \
         parValue.SaveLoad(parChunk);                                                                                                                                               \
-    }                                                                                                                                                                              \
+    }
+
+#define IMPLEMENT_SAVELOAD_ABILITIES_POINTERS_IMPL(TYPE)                                                                                                                           \
     template<>                                                                                                                                                                     \
     void SaveLoad<SavingSystem::SaveChunk, TYPE*, true>(SavingSystem::SaveChunk & parChunk, TYPE * &parValue)                                                                      \
     {                                                                                                                                                                              \
@@ -51,6 +53,11 @@
 
 #define IMPLEMENT_SAVELOAD_ABILITIES(TYPE)                                                                                                                                         \
     IMPLEMENT_SAVELOAD_ABILITIES_IMPL(TYPE)                                                                                                                                        \
+    IMPLEMENT_SAVELOAD_ABILITIES_INSTANCIATIONS(TYPE)
+
+#define IMPLEMENT_VIRTUAL_SAVELOAD_ABILITIES(TYPE)                                                                                                                                 \
+    IMPLEMENT_SAVELOAD_ABILITIES_IMPL(TYPE)                                                                                                                                        \
+    IMPLEMENT_SAVELOAD_ABILITIES_POINTERS_IMPL(TYPE)                                                                                                                               \
     IMPLEMENT_SAVELOAD_ABILITIES_INSTANCIATIONS(TYPE)
 
 #define IMPLEMENT_SAVELOAD_ABILITIES_FREEFUNC(TYPE)                                                                                                                                \

@@ -77,7 +77,7 @@ void Module::VirtualOnLoaded()
 #endif
 }
 
-IMPLEMENT_SAVELOAD_ABILITIES(Module);
+IMPLEMENT_VIRTUAL_SAVELOAD_ABILITIES(Module);
 template<typename Chunk, bool isWriting>
 void Module::SaveLoad(Chunk& parChunk)
 {
