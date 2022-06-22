@@ -2,7 +2,6 @@
 
 #include "WorldBuilder.h"
 
-#include "ColonyPeonsManagementModule.h"
 #include "Common/RandomGenerator.h"
 #include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityId.h"
@@ -68,26 +67,6 @@ void WorldBuilder::CreateWorld() const
     ModuleParameters::ParameterContainer firePlaceContainer;
     firePlaceContainer.Set<ModuleParameters::Position>(glm::vec3(0.f));
     const EntityId firePlaceId = EntityFactory::CreateEntity(firePlaceTemplate, firePlaceContainer);
-
-    const EntityTemplate* peonTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FPeonTemplateName);
-    AssertRelease(peonTemplate != nullptr);
-    AssertRelease(peonTemplate->GetWorldId() == EEntityWorlds::PEONS);
-    std::vector<EntityId> createdPeons;
-    createdPeons.reserve(FGenerationParameters.FStartingPeonsNumber);
-    ModuleParameters::ParameterContainer peonsParamContainer;
-    peonsParamContainer.Set<ModuleParameters::OwnerId>(colonyId);
-    CreateNEntityInCicle(
-          FGenerationParameters.FSpawnRadius, FGenerationParameters.FSpawnRadius, FGenerationParameters.FStartingPeonsNumber, peonTemplate, createdPeons, peonsParamContainer);
-
-    {
-        ManualLockModuleAccessor<ColonyPeonsManagementModule> colonyPeonsManagementModuleAccessor(EEntityWorlds::COLONY);
-        colonyPeonsManagementModuleAccessor.LockIFN();
-        ColonyPeonsManagementModule* colonyPeonsModule = colonyPeonsManagementModuleAccessor[colonyId];
-        AssertRelease(colonyPeonsModule != nullptr);
-        colonyPeonsManagementModuleAccessor.UnlockIFN();
-
-        colonyPeonsModule->IdlePeons().assign(createdPeons.begin(), createdPeons.end());
-    }
 }
 
 } // namespace ECSEngine

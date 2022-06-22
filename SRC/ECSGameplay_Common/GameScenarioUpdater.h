@@ -2,15 +2,11 @@
 #include "CameraMoverSystem.h"
 #include "ECSGameplay_Specific/ColonyBuildingSystem.h"
 #include "ECSGameplay_Specific/ColonyFeedbackSystem.h"
-#include "ECSGameplay_Specific/HousingSystem.h"
-#include "ECSGameplay_Specific/PeonFeedingTimeSystem.h"
-#include "ECSGameplay_Specific/PeonSpawnSystem.h"
 #include "ECSGameplay_Specific/ResourceProductionSystem.h"
 #include "ECSGameplay_Specific/ResourceStatisticsUpdateSystem.h"
 #include "ECSGameplay_Specific/StorageFeedbackDrawer.h"
 #include "ECSGameplay_Specific/StorageSlotSystem.h"
 #include "ECSGameplay_Specific/UserInterfaceSystem.h"
-#include "ECSGameplay_Specific/WorkSystem.h"
 #include "IScenarioUpdater.h"
 #include "SynchroWithRenderSystem.h"
 
@@ -41,12 +37,8 @@ private:
 
     ColonyBuildingSystem FColonyBuildingSystem;
     ResourceProductionSystem FRawResourceProductionSystem;
-    PeonSpawnSystem FPeonSpawnSystem;
-    PeonFeedingTimeSystem FPeonLifeSpanSystem;
     ResourceStatisticsUpdateSystem FResourceStatsUpdateSystem;
     StorageSlotSystem FStorageSlotSystem;
-    HousingSystem FHousingSystem;
-    WorkSystem FWorkSystem;
 
     ColonyFeedbackSystem FColonyFeedbackSystem;
     StorageFeedbackDrawer FStorageFeedback;

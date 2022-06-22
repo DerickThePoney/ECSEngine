@@ -4,7 +4,6 @@
 
 #include "CircularBuildingGrid.h"
 #include "CircularGridAccessor.h"
-#include "ColonyTraitsModule.h"
 #include "Common/CameraHelpers.h"
 #include "Common/CameraManager.h"
 #include "Common/InputManager.h"
@@ -20,26 +19,11 @@ namespace ECSEngine
 
 ColonyFeedbackSystem::ColonyFeedbackSystem()
 {
-    RegisterDepency<PositionModule>(EEntityWorlds::COLONY);
-    RegisterDepency<ColonyTraitsModule>(EEntityWorlds::COLONY);
 }
 
 void ColonyFeedbackSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
-
-    ModuleAccessor<ColonyTraitsModule> colonyTraitsAccessor(EEntityWorlds::COLONY);
-    ModuleAccessor<PositionModule> colonyPositionAccessor(EEntityWorlds::COLONY);
-
-    foreachitemconst(traits, colonyTraitsAccessor)
-    {
-        const PositionModule* colonyPositionModule = colonyPositionAccessor[traits.UnitId()];
-        AssertRelease(colonyPositionModule != nullptr);
-
-        GameplayFeedbackDrawer::Instance().AddCircle(
-              { traits.InfluenceRange(), GameplayConstants::Colony::ColonyRangeFeedbackThickness, GameplayConstants::Colony::ColonyRangeFeedbackColor },
-              glm::translate(colonyPositionModule->GetPosition3D()));
-    }
 
     if (CircularBuildingGrid::HasInstance())
     {

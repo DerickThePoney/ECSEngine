@@ -63,12 +63,8 @@ void GameScenarioUpdater::Initialise()
     FCameraMoverSystem.Init();
     FRenderingSystem.Init();
     FRawResourceProductionSystem.Init();
-    FPeonSpawnSystem.Init();
-    FPeonLifeSpanSystem.Init();
     FResourceStatsUpdateSystem.Init();
     FStorageSlotSystem.Init();
-    FHousingSystem.Init();
-    FWorkSystem.Init();
     FColonyFeedbackSystem.Init();
     FColonyBuildingSystem.Init();
     FUserInterfaceSystem.Init();
@@ -87,12 +83,8 @@ void GameScenarioUpdater::Destroy()
     FUserInterfaceSystem.Destroy();
     FColonyBuildingSystem.Destroy();
     FColonyFeedbackSystem.Destroy();
-    FWorkSystem.Destroy();
-    FHousingSystem.Destroy();
     FStorageSlotSystem.Destroy();
     FResourceStatsUpdateSystem.Destroy();
-    FPeonLifeSpanSystem.Destroy();
-    FPeonSpawnSystem.Destroy();
     FRawResourceProductionSystem.Destroy();
     FRenderingSystem.Destroy();
     FCameraMoverSystem.Destroy();
@@ -135,12 +127,8 @@ void GameScenarioUpdater::GameplayUpdate()
 
         EnergySystem::Instance().Update();
         FRawResourceProductionSystem.Update();
-        FPeonSpawnSystem.Update();
-        FPeonLifeSpanSystem.Update();
         FResourceStatsUpdateSystem.Update();
         FStorageSlotSystem.Update();
-        FHousingSystem.Update();
-        FWorkSystem.Update();
 
         FColonyBuildingSystem.Update();
 
