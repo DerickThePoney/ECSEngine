@@ -59,7 +59,11 @@ void WorldManager::AddEntityWorldStealOwnership(EEntityWorlds parType, EntityWor
 
 void WorldManager::DestroyAllRemainingEntities()
 {
-    foreachitem(world, FWorlds) { world->DestroyAllRemainingEntities(); }
+    foreachitem(world, FWorlds)
+    {
+        if (world != nullptr)
+            world->DestroyAllRemainingEntities();
+    }
 }
 
 void WorldManager::MarkAsDead(const EntityId& parId)
