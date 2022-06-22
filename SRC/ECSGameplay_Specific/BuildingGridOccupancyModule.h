@@ -1,6 +1,6 @@
 ﻿
 #pragma once
-#include "CircularBuildingGrid.h"
+#include "CircularGridAccessor.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
 
@@ -33,6 +33,8 @@ private:
 class BuildingGridOccupancyModule : public Module
 {
     DECLARE_MODULE(BuildingGridOccupancyModule);
+
+    DECLARE_SAVELOAD_ABILITIES();
 
 public:
     BuildingGridOccupancyModule();

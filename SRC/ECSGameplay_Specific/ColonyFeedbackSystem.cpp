@@ -3,6 +3,7 @@
 #include "ColonyFeedbackSystem.h"
 
 #include "CircularBuildingGrid.h"
+#include "CircularGridAccessor.h"
 #include "ColonyTraitsModule.h"
 #include "Common/CameraHelpers.h"
 #include "Common/CameraManager.h"
