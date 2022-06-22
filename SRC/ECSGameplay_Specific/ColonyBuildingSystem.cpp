@@ -3,6 +3,7 @@
 #include "ColonyBuildingSystem.h"
 
 #include "CircularBuildingGrid.h"
+#include "CircularGridAccessor.h"
 #include "Common/GenericMessageIdentifiers.h"
 #include "Common/GenericMessageManager.h"
 #include "Common/Logger.h"

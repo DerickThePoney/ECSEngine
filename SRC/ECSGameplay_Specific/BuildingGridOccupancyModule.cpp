@@ -4,11 +4,10 @@
 #include "BuildingGridOccupancyModule.h"
 
 #include "Application/PropertyDrawer.h"
-#include "Common/Polygon.h"
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
-#include "ECSGameplay_Common/NavMeshPathfindingManager.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::BuildingGridOccupancyModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::BuildingGridOccupancyModuleTemplate);
@@ -42,10 +41,6 @@ void BuildingGridOccupancyModule::VirtualInit(const EntityId& parUnitId, const M
 
     FGridAccessor = parParameters.Get<ModuleParameters::GridAccessor>();
     AlwaysCheckedAssert(FGridAccessor.Valid());
-
-    // Make a new obstacle
-    const Polygon2D obstacle = FGridAccessor.CreatePolygon(Template<BuildingGridOccupancyModuleTemplate>()->CellsOccupancy());
-    // Pathfinding::AddObstacle(obstacle);
 }
 
 void BuildingGridOccupancyModule::VirtualDeinit()
@@ -54,6 +49,15 @@ void BuildingGridOccupancyModule::VirtualDeinit()
 
     const BuildingGridOccupancyModuleTemplate* t = Template<BuildingGridOccupancyModuleTemplate>();
     FGridAccessor.SetOccupied(false, t->CellsOccupancy());
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(BuildingGridOccupancyModule);
+template<typename Chunk, bool isWriting>
+void BuildingGridOccupancyModule::SaveLoad(Chunk& parChunk)
+{
+    parent_type::SaveLoad(parChunk);
+
+    parChunk& FGridAccessor;
 }
 
 } // namespace ECSEngine
