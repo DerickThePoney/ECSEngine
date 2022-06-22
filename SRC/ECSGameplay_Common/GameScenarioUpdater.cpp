@@ -62,7 +62,6 @@ void GameScenarioUpdater::Initialise()
     ResourceManager::Instance().Init();
     FCameraMoverSystem.Init();
     FRenderingSystem.Init();
-    FColonyManagementSystem.Init();
     FRawResourceProductionSystem.Init();
     FPeonSpawnSystem.Init();
     FPeonLifeSpanSystem.Init();
@@ -95,7 +94,6 @@ void GameScenarioUpdater::Destroy()
     FPeonLifeSpanSystem.Destroy();
     FPeonSpawnSystem.Destroy();
     FRawResourceProductionSystem.Destroy();
-    FColonyManagementSystem.Destroy();
     FRenderingSystem.Destroy();
     FCameraMoverSystem.Destroy();
     ResourceManager::Instance().Finalize();
@@ -136,7 +134,6 @@ void GameScenarioUpdater::GameplayUpdate()
         FScenario->Update();
 
         EnergySystem::Instance().Update();
-        FColonyManagementSystem.Update();
         FRawResourceProductionSystem.Update();
         FPeonSpawnSystem.Update();
         FPeonLifeSpanSystem.Update();
