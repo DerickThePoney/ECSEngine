@@ -34,6 +34,11 @@ const BitSet<MaxModuleNumber>& EntityModuleKey::GetKey() const
     return FKey;
 }
 
+void EntityModuleKey::Clear()
+{
+    FKey.SetAllBits(false);
+}
+
 template<typename T>
 const bool EntityModuleKey::HasModule() const
 {
