@@ -2,7 +2,6 @@
 #include "CameraMoverSystem.h"
 #include "ECSGameplay_Specific/ColonyBuildingSystem.h"
 #include "ECSGameplay_Specific/ColonyFeedbackSystem.h"
-#include "ECSGameplay_Specific/ColonyPeonsTaskAsignmentSystem.h"
 #include "ECSGameplay_Specific/HousingSystem.h"
 #include "ECSGameplay_Specific/PeonFeedingTimeSystem.h"
 #include "ECSGameplay_Specific/PeonSpawnSystem.h"
@@ -41,7 +40,6 @@ private:
     SynchroWithRenderSystem FRenderingSystem;
 
     ColonyBuildingSystem FColonyBuildingSystem;
-    ColonyPeonsTaskAssignmentSystem FColonyManagementSystem;
     ResourceProductionSystem FRawResourceProductionSystem;
     PeonSpawnSystem FPeonSpawnSystem;
     PeonFeedingTimeSystem FPeonLifeSpanSystem;
