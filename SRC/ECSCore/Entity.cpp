@@ -2,11 +2,32 @@
 
 #include "Entity.h"
 
+#include "Common/SavingSystemImplementation.h"
 #include "EntityTemplate.h"
+#include "EntityTemplateManager.h"
 #include "ModuleId.h"
 
 namespace ECSEngine
 {
+
+IMPLEMENT_SAVELOAD_ABILITIES(Entity);
+template<typename Chunk, bool isWriting>
+void Entity::SaveLoad(Chunk& parChunk)
+{
+    parChunk& Fid;
+
+    if (isWriting)
+    {
+        std::string templateName = FTemplate->GetName();
+        parChunk& templateName;
+    }
+    else
+    {
+        std::string templateName;
+        parChunk& templateName;
+        FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(templateName);
+    }
+}
 
 Entity::Entity(const EntityId& parId, const EntityTemplate* parTemplate)
     : Fid(parId)
