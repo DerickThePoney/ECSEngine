@@ -2,11 +2,24 @@
 
 #include "EntityIDGenerator.h"
 
+#include "Common/SavingSystemImplementation.h"
 #include "EntityId.h"
 #include "WorldIds.h"
 
 namespace ECSEngine
 {
+
+IMPLEMENT_SAVELOAD_ABILITIES(EntityIDGenerator);
+template<typename Chunk, bool isWriting>
+void EntityIDGenerator::SaveLoad(Chunk& parChunk)
+{
+    IdGenerator::SaveLoad(parChunk);
+
+    u32 worldId = (u32)FAssociatedWorldID;
+    parChunk& worldId;
+    if (!isWriting)
+        FAssociatedWorldID = (EEntityWorlds)worldId;
+}
 
 EntityIDGenerator::EntityIDGenerator(u32 parWorldID)
     : IdGenerator()
