@@ -65,6 +65,21 @@ public:
         foreachitem(value, parValue) this->operator&(value);
     }
 
+    template<typename T>
+    void operator&(std::queue<T>& parValue)
+    {
+        u32 id = typeid(std::queue<T>).hash_code();
+        u32 size = parValue.size();
+        WriteIdAndSize(id, size);
+
+        while (!parValue.empty())
+        {
+            T& value = parValue.front();
+            parValue.pop();
+            this->operator&(value);
+        }
+    }
+
     Buffer& GetBuffer() { return FDataBuffer; }
 
 private:
@@ -145,6 +160,23 @@ public:
 
         parValue.resize(size);
         foreachitem(value, parValue) this->operator&(value);
+    }
+
+    template<typename T>
+    void operator&(std::queue<T>& parValue)
+    {
+        u32 expectedid = typeid(std::queue<T>).hash_code();
+
+        u32 id, size;
+        ReadIdAndSize(id, size);
+        AlwaysCheckedAssert(id == expectedid);
+
+        forrange(i, 0, size)
+        {
+            T value;
+            this->operator&(value);
+            parValue.push(value);
+        }
     }
 
     Buffer& GetBuffer() { return FDataBuffer; }
