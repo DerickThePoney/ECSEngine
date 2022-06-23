@@ -2,10 +2,19 @@
 
 #include "IdGenerator.h"
 
+#include "SavingSystemImplementation.h"
+
 #include <cereal/types/queue.hpp>
 
 namespace ECSEngine
 {
+IMPLEMENT_VIRTUAL_SAVELOAD_ABILITIES(IdGenerator);
+template<typename Chunk, bool isWriting>
+void IdGenerator::SaveLoad(Chunk& parChunk)
+{
+    parChunk& FNextIncrementalId;
+    parChunk& FReusableIds;
+}
 
 IdGenerator::IdGenerator()
     : FNextIncrementalId(0)
