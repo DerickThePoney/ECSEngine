@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Common/Constants.h"
 #include "Common/ModulePoolAllocator.h"
+#include "Common/SavingSystemDeclaration.h"
 #include "EntityId.h"
 
 namespace ECSEngine
@@ -9,6 +10,8 @@ class Module;
 
 class IModuleController
 {
+    DECLARE_VIRTUAL_SAVELOAD_ABILITIES();
+
 public:
     virtual void Lock() = 0;
     virtual void Unlock() = 0;
@@ -16,11 +19,15 @@ public:
     virtual void AllocateForEntity(const EntityId& parEntity) = 0;
     virtual void DeallocateForEntity(const EntityId& parEntity) = 0;
     virtual Module* GetModulePtrForEntity(const EntityId& parEntity) = 0;
+
+protected:
+    virtual std::set<EntityId>& GetAllocatedEntities() = 0;
 };
 
 template<class Mod>
 class ModuleController final : public IModuleController
 {
+
 public:
     ModuleController()
         : FLock(false)
@@ -203,9 +210,13 @@ public:
 
     u32 GetSize() const { return (u32)FAllocatedModules.size(); }
 
+protected:
+    std::set<EntityId>& GetAllocatedEntities() { return FAllocatedModules; }
+
 private:
     std::atomic_bool FLock;
     ModulePoolAllocator<Mod, ModulePoolSize, false> FAllocator;
     std::set<EntityId> FAllocatedModules;
 };
+
 } // namespace ECSEngine
