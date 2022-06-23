@@ -2,11 +2,55 @@
 
 #include "WorldManager.h"
 
+#include "Common/SavingSystemImplementation.h"
 #include "EntityWorld.h"
 #include "WorldIds.h"
 
 namespace ECSEngine
 {
+
+IMPLEMENT_SAVELOAD_ABILITIES(WorldManager);
+template<typename Chunk, bool isWriting>
+void WorldManager::SaveLoad(Chunk& parChunk)
+{
+    if (isWriting)
+    {
+        AlwaysCheckedAssertMsg(FDeadEntities.empty(), "Please do not save before have killed the entities, thank you !");
+        u32 nonNullWorlds = 0;
+        foreachitem(world, FWorlds)
+        {
+            if (world != nullptr)
+                nonNullWorlds++;
+        }
+        parChunk& nonNullWorlds;
+
+        foreachitem(world, FWorlds)
+        {
+            if (world == nullptr)
+                continue;
+
+            u32 worldId = world->WorldID();
+            parChunk& worldId;
+            EntityWorld& worldRef = *(world.get());
+            parChunk& worldRef;
+        }
+    }
+    else
+    {
+        u32 nonNullWorlds = 0;
+        parChunk& nonNullWorlds;
+
+        forrange(i, 0, nonNullWorlds)
+        {
+            u32 worldId;
+            parChunk& worldId;
+
+            AssertRelease(FWorlds[worldId] != nullptr);
+            EntityWorld& worldRef = *(FWorlds[worldId]);
+            parChunk& worldRef;
+        }
+    }
+}
 
 WorldManager::WorldManager()
     : Singleton<WorldManager>()
