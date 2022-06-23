@@ -11,6 +11,8 @@ namespace ECSEngine
 {
 class EntityIDGenerator : public IdGenerator
 {
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     EntityIDGenerator(u32 parWorldID = 0xFF);
     virtual ~EntityIDGenerator();
