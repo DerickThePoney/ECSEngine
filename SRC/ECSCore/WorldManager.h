@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Common/SavingSystemDeclaration.h"
 #include "Common/Singleton.h"
 #include "WorldIds_fwd.h"
 
@@ -12,6 +13,8 @@ using UnitDeathListener = Delegate<void(const EntityId)>;
 
 class WorldManager final : public Singleton<WorldManager>
 {
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     WorldManager();
     ~WorldManager();
