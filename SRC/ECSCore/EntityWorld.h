@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Entity.h"
 #include "EntityIDGenerator.h"
 
 namespace ECSEngine
@@ -14,8 +13,12 @@ namespace ECSEngine
 {
 class IModuleController;
 class EntityId;
+class Entity;
+class EntityTemplate;
 class EntityWorld
 {
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     EntityWorld(const EEntityWorlds parWorldId);
     EntityWorld(EntityWorld&& other) noexcept = delete;

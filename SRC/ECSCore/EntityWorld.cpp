@@ -3,6 +3,7 @@
 #include "EntityWorld.h"
 
 #include "Common/Constants.h"
+#include "Common/SavingSystemImplementation.h"
 #include "Entity.h"
 #include "EntityTemplate.h"
 #include "Module.h"
@@ -12,6 +13,21 @@
 
 namespace ECSEngine
 {
+IMPLEMENT_SAVELOAD_ABILITIES(EntityWorld);
+template<typename Chunk, bool isWriting>
+void EntityWorld::SaveLoad(Chunk& parChunk)
+{
+    parChunk& FSize;
+    u32 worldId = (u32)FWorldID;
+    parChunk& worldId;
+    if (!isWriting)
+        FWorldID = (EEntityWorlds)worldId;
+    parChunk& FEntityIdGenerator;
+    parChunk& FEntities;
+    parChunk& FAllocatedEntities;
+    parChunk& FControllers;
+}
+
 EntityWorld::EntityWorld(const EEntityWorlds parWorldId)
     : FSize((u32)EModuleId::Length)
     , FWorldID(parWorldId)
