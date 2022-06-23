@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Common/SavingSystemDeclaration.h"
 #include "EntityId.h"
 
 namespace ECSEngine
@@ -6,13 +7,14 @@ namespace ECSEngine
 class EntityTemplate;
 class Entity
 {
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     Entity(const EntityId& parId = EntityId(), const EntityTemplate* parTemplate = nullptr);
     ~Entity();
 
     const EntityId& GetEntityId() const { return Fid; }
 
-    // TODO remove entitytemplate.h
     template<typename T>
     const bool HasModule() const;
 
