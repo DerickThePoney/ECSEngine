@@ -6,7 +6,6 @@
 #include "ECSCore/ScopedModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "GameplayRulesManager.h"
-#include "PeonSpawningRulesManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "ResourceStorageModule.h"
 #include "imgui/imgui_internal.h"
@@ -108,47 +107,6 @@ void ColonySelectionPanelController::VirtualUpdate()
             {
                 ImGui::Text("%s\t%d (%.2f/s)", GameResource::GetName((GameResource::Type)i), resource,
                       resourceStorage->Statistics().GetAverageResourcePerUnitOfTime((GameResource::Type)i));
-            }
-        }
-    }
-
-    // show colony actions
-    if (ImGui::CollapsingHeader("Actions", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        foreachitemconst(spawnRule, GameplayRulesManager::Instance().FPeonSpawningRulesManager.GetCostSpawnRules())
-        {
-            const std::string& peonTemplateName = spawnRule.PeonTemplateName();
-
-            std::vector<std::pair<GameResource::Type, u32>> costs = spawnRule.CostForNextSpawn(0);
-
-            bool disabled = false;
-            foreachitemconst(resQ, costs)
-            {
-                const u32 resourceInStorage = resourceStorage->GetResourceQuantity(resQ.first);
-                disabled = disabled || resourceInStorage < resQ.second;
-            }
-
-            if (disabled)
-            {
-                ImGui::PushItemFlag(ImGuiItemFlags_ReadOnly, true);
-                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-            }
-            if (ImGui::Button(fmt::format("Spawn {}", peonTemplateName).c_str()) && !disabled) { }
-            ImGui::SameLine();
-
-            std::string coststr = "Cost:";
-
-            foreachitemconst(resQ, costs) { coststr = fmt::format("{} {} {} /", coststr, resQ.second, GameResource::GetName(resQ.first)); }
-
-            if (disabled)
-                ImGui::TextDisabled(coststr.c_str());
-            else
-                ImGui::Text(coststr.c_str());
-
-            if (disabled)
-            {
-                ImGui::PopItemFlag();
-                ImGui::PopStyleVar();
             }
         }
     }
