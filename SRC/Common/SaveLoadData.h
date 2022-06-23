@@ -66,6 +66,16 @@ public:
     }
 
     template<typename T>
+    void operator&(std::set<T>& parValue)
+    {
+        u32 id = typeid(std::set<T>).hash_code();
+        u32 size = parValue.size();
+        WriteIdAndSize(id, size);
+
+        foreachitem(value, parValue) this->operator&(value);
+    }
+
+    template<typename T>
     void operator&(std::queue<T>& parValue)
     {
         u32 id = typeid(std::queue<T>).hash_code();
@@ -146,6 +156,23 @@ public:
             U val;
             this->operator&(val);
             parValue.insert_or_assign(key, val);
+        }
+    }
+
+    template<typename T>
+    void operator&(std::set<T>& parValue)
+    {
+        u32 expectedid = typeid(std::set<T>).hash_code();
+
+        u32 id, size;
+        ReadIdAndSize(id, size);
+        AlwaysCheckedAssert(id == expectedid);
+
+        forrange(i, 0, size)
+        {
+            T val;
+            this->operator&(val);
+            parValue.insert(val);
         }
     }
 
