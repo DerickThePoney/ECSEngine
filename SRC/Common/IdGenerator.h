@@ -1,10 +1,13 @@
 ﻿#pragma once
+#include "Common/SavingSystemDeclaration.h"
 
 namespace ECSEngine
 {
 
 class IdGenerator
 {
+    DECLARE_VIRTUAL_SAVELOAD_ABILITIES();
+
 public:
     IdGenerator();
     ~IdGenerator();
