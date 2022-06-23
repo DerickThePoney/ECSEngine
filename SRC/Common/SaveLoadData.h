@@ -82,10 +82,12 @@ public:
         u32 size = parValue.size();
         WriteIdAndSize(id, size);
 
-        while (!parValue.empty())
+        std::queue<T> copy = parValue; // we don't want to dequeue the actual queue...
+
+        while (!copy.empty())
         {
-            T& value = parValue.front();
-            parValue.pop();
+            T& value = copy.front();
+            copy.pop();
             this->operator&(value);
         }
     }
@@ -117,6 +119,8 @@ public:
     template<typename T>
     void operator&(std::vector<T>& parValue)
     {
+        parValue.clear();
+
         u32 expectedid = typeid(std::vector<T>).hash_code();
 
         u32 id, size;
@@ -143,6 +147,7 @@ public:
     template<typename T, typename U>
     void operator&(std::map<T, U>& parValue)
     {
+        parValue.clear();
         u32 expectedid = typeid(std::map<T, U>).hash_code();
 
         u32 id, size;
@@ -162,6 +167,7 @@ public:
     template<typename T>
     void operator&(std::set<T>& parValue)
     {
+        parValue.clear();
         u32 expectedid = typeid(std::set<T>).hash_code();
 
         u32 id, size;
@@ -179,6 +185,7 @@ public:
     template<typename T>
     void operator&(std::list<T>& parValue)
     {
+        parValue.clear();
         u32 expectedid = typeid(std::list<T>).hash_code();
 
         u32 id, size;
@@ -192,6 +199,8 @@ public:
     template<typename T>
     void operator&(std::queue<T>& parValue)
     {
+        std::queue<T> empty;
+        std::swap(parValue, empty);
         u32 expectedid = typeid(std::queue<T>).hash_code();
 
         u32 id, size;
