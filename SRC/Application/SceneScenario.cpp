@@ -2,11 +2,21 @@
 
 #include "SceneScenario.h"
 
+#include "Common/SavingSystemImplementation.h"
 #include "ECSGameplay_Common/GameplaySceneActions.h"
 #include "SceneItems.h"
 
 namespace ECSEngine
 {
+
+IMPLEMENT_SAVELOAD_ABILITIES(SceneScenario);
+template<typename Chunk, bool isWriting>
+void SceneScenario::SaveLoad(Chunk& parChunk)
+{
+    parChunk& FCurrentAction;
+
+    foreachitem(action, FActions) { parChunk&*(action.get()); }
+}
 
 SceneScenario::SceneScenario()
 {
@@ -38,7 +48,6 @@ void SceneScenario::RemoveSceneItem(const SceneItemsContainer::iterator parWhere
 void SceneScenario::Initialise()
 {
     FCurrentAction = 0;
-    // FActions.push_back(std::unique_ptr<SpawnEntitySceneAction>(new SpawnEntitySceneAction));
     foreachitem(action, FActions) action->Initialise(this);
 }
 
