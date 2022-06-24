@@ -102,6 +102,22 @@ void ScenarioEditor::Render()
     UpdateSceneEditorStatus();
 }
 
+void ScenarioEditor::EndUpdate()
+{
+    switch (FState)
+    {
+    case ECSEngine::ScenarioEditorStatus::EDITING_SCENARIO:;
+        break;
+    case ECSEngine::ScenarioEditorStatus::PLAYING_SCENARIO:
+        AssertRelease(FInGameScenarioPlayer != nullptr);
+        FInGameScenarioPlayer->EndUpdate();
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
+}
+
 void ScenarioEditor::UpdateSelectedItems(const std::pair<u32, u32>& parSelectedItem, const bool parSelected, const bool parUnselect)
 {
     SceneScenario* currentScene = GetEditedScenario();
