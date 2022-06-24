@@ -3,6 +3,7 @@
 #include "ModuleController.h"
 
 #include "Common/SavingSystemImplementation.h"
+#include "Module.h"
 
 namespace ECSEngine
 {
@@ -48,6 +49,17 @@ void IModuleController::SaveLoad(Chunk& parChunk)
 
             allocatedIds.insert(unit);
         }
+    }
+}
+
+void IModuleController::OnLoaded()
+{
+    std::set<EntityId>& allocatedIds = GetAllocatedEntities();
+    foreachitemconst(unit, allocatedIds)
+    {
+        Module* mod = GetModulePtrForEntity(unit);
+        AssertRelease(mod != nullptr);
+        mod->OnLoaded();
     }
 }
 

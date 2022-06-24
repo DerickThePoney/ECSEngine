@@ -48,6 +48,8 @@ void WorldManager::SaveLoad(Chunk& parChunk)
             AssertRelease(FWorlds[worldId] != nullptr);
             EntityWorld& worldRef = *(FWorlds[worldId]);
             parChunk& worldRef;
+
+            worldRef.OnLoaded();
         }
     }
 }
