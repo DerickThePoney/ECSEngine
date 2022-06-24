@@ -2,13 +2,14 @@
 
 #include "UserInterfaceSystem.h"
 
+#include "UIInGameMenuController.h"
+
 namespace ECSEngine
 {
 
 UserInterfaceSystem::UserInterfaceSystem()
     : ModuleSystem()
 {
-    FInGameMenu.Show(true);
 }
 
 UserInterfaceSystem::~UserInterfaceSystem()
@@ -19,19 +20,21 @@ void UserInterfaceSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    FInGameMenu.Update();
+    FInGameMenu->Update();
 }
 
 void UserInterfaceSystem::VirtualInit()
 {
     ModuleSystem::VirtualInit();
-    FInGameMenu.Init();
+    FInGameMenu.reset(new UI::UIInGameMenuController);
+    FInGameMenu->Show(true);
+    FInGameMenu->Init();
 }
 
 void UserInterfaceSystem::VirtualDestroy()
 {
     ModuleSystem::VirtualDestroy();
-    FInGameMenu.Destroy();
+    FInGameMenu->Destroy();
 }
 
 } // namespace ECSEngine
