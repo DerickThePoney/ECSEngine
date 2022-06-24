@@ -60,6 +60,13 @@ void Buffer::WriteIdAndSize(u32 parId, u32 parSize)
     FWrittenBytes += sizeof(u32);
 }
 
+void Buffer::SetData(u32 parSize, u8* parData)
+{
+    GrowToAccomodateAtLeast(parSize);
+    memcpy(&FData[FWrittenBytes], parData, parSize);
+    FWrittenBytes += parSize;
+}
+
 u32 Buffer::ReadId()
 {
     u32 id;
