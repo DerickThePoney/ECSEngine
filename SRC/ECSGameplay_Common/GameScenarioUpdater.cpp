@@ -57,7 +57,6 @@ void GameScenarioUpdater::SaveLoad(Chunk& parChunk)
         AssertRelease(FScenario != nullptr);
 
         SelectionManager::Instance().ClearAll();
-        // CircularBuildingGrid::Instance().FreeAllPositions();
     }
 
     parChunk&(*FScenario);
