@@ -62,7 +62,7 @@ void RmlUiManager::NewFrame()
     ProcessInput();
 
 #if !defined(COMPILE_FINAL) and !defined(COMPILE_PROFILE)
-    if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F8) && Input::GetButtonHasChanged(InputKeyNames::INPUT_KEY_F8))
+    if (Input::IsCtrlDown() && Input::GetButtonDown(InputKeyNames::INPUT_KEY_F8) && Input::GetButtonHasChanged(InputKeyNames::INPUT_KEY_F8))
     {
         Rml::Debugger::SetVisible(!Rml::Debugger::IsVisible());
     }
