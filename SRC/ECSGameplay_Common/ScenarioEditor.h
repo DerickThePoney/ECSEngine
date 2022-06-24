@@ -66,6 +66,7 @@ public:
     void UIUpdate() override;
     void DebugRender() override;
     void Render() override;
+    void EndUpdate() override;
 
     const SceneScenario* GetEditedScenario() const { return FCurrentScenario; }
     SceneScenario* GetEditedScenario() { return FCurrentScenario; }
