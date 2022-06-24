@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Common/IdGenerator.h"
+#include "Common/SavingSystemDeclaration.h"
 #include "SceneActions.h"
 #include "SceneItems.h"
 
@@ -9,6 +10,8 @@ using SceneItemsContainer = std::map<u32, std::shared_ptr<BaseSceneItem>>;
 class SceneScenario
 {
     friend class ScenarioEditor;
+
+    DECLARE_SAVELOAD_ABILITIES();
 
 public:
     SceneScenario();
