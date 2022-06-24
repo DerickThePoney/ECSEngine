@@ -20,6 +20,8 @@ public:
     virtual void DeallocateForEntity(const EntityId& parEntity) = 0;
     virtual Module* GetModulePtrForEntity(const EntityId& parEntity) = 0;
 
+    void OnLoaded();
+
 protected:
     virtual std::set<EntityId>& GetAllocatedEntities() = 0;
 };
