@@ -13,6 +13,10 @@ public:
     const std::set<EntityId>& SelectedUnits() const { return FSelectedUnits; }
     const std::set<EntityId>& HighlightedUnits() const { return FHighlightedUnits; }
 
+    void ClearSelection();
+    void ClearHighlighted();
+    void ClearAll();
+
     void Finalize();
     static void Delete();
 
