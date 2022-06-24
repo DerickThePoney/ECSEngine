@@ -48,6 +48,8 @@ void Module::OnLoaded()
     FVirtualOnLoadedCalled = false;
 #endif
 
+    VirtualOnLoaded();
+
 #ifdef ENABLE_SECURITY_CHECKS
     AlwaysCheckedAssertMsg(FVirtualOnLoadedCalled, "You forgot to call the parent's VirtualOnLoaded, you naughtyboy !");
 #endif
