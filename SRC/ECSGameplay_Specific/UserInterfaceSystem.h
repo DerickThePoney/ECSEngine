@@ -1,10 +1,13 @@
 ﻿#pragma once
 
 #include "ECSCore/ModuleSystem.h"
-#include "UIInGameMenuController.h"
 
 namespace ECSEngine
 {
+namespace UI
+{
+class UIInGameMenuController;
+}
 class UserInterfaceSystem final : public ModuleSystem
 {
 public:
@@ -17,6 +20,6 @@ protected:
     void VirtualDestroy() override;
 
 private:
-    UI::UIInGameMenuController FInGameMenu;
+    std::unique_ptr<UI::UIInGameMenuController> FInGameMenu;
 };
 } // namespace ECSEngine
