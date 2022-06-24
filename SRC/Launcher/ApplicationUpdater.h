@@ -3,37 +3,7 @@
 
 namespace ECSEngine
 {
-class EntityTemplate;
-class IScenarioUpdater;
-class ApplicationUpdater
-{
-public:
-    void Initialise();
-
-    void Shutdown();
-
-    bool CheckShouldFinish();
-
-    void StartUpdate();
-
-    void UpdateGameplay();
-
-    void UIUpdate();
-
-    void DebugRender();
-
-    void Render();
-
-    void EndUpdate();
-
-    template<typename Archive>
-    void serialize(Archive& ar)
-    {
-    }
-
-private:
-    IScenarioUpdater* FScene;
-};
+class ApplicationUpdater;
 
 class ApplicationUpdaterWrapper final : public IGameplayUpdater
 {

@@ -13,6 +13,30 @@
 
 namespace ECSEngine
 {
+class ApplicationUpdater
+{
+public:
+    void Initialise();
+
+    void Shutdown();
+
+    bool CheckShouldFinish();
+
+    void StartUpdate();
+
+    void UpdateGameplay();
+
+    void UIUpdate();
+
+    void DebugRender();
+
+    void Render();
+
+    void EndUpdate();
+
+private:
+    IScenarioUpdater* FScene;
+};
 
 void ApplicationUpdater::Initialise()
 {
@@ -25,7 +49,7 @@ void ApplicationUpdater::Initialise()
     {
         const std::string startScene = SceneManager::Instance().GetSceneFilenameFromIndex(0);
         AssertRelease(!startScene.empty());
-        GameScenarioUpdater* scene = new GameScenarioUpdater();
+        GameScenarioUpdater* scene = new GameScenarioUpdater(); // TODO Main menu updater (//single ui system ?)
         scene->SetScenario(startScene);
         FScene = scene;
     }
@@ -99,6 +123,7 @@ void ApplicationUpdater::Render()
 
 void ApplicationUpdater::EndUpdate()
 {
+    FScene->EndUpdate();
     Input::EndFrame();
     Rendering::GLFWDisplayWindowHandler::Instance().PollEvents();
 }
