@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/SavingSystemDeclaration.h"
 #include "Common/Singleton.h"
 #include "ECSCore/ModuleSystem.h"
 
@@ -6,6 +7,8 @@ namespace ECSEngine
 {
 class EnergySystem : public ModuleSystem, public Singleton<EnergySystem>
 {
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     EnergySystem();
 

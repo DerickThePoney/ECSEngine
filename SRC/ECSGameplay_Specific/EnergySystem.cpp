@@ -2,6 +2,7 @@
 
 #include "EnergySystem.h"
 
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "EnergyConsumerModule.h"
@@ -10,6 +11,15 @@
 
 namespace ECSEngine
 {
+IMPLEMENT_SAVELOAD_ABILITIES(EnergySystem);
+template<typename Chunk, bool isWriting>
+void EnergySystem::SaveLoad(Chunk& parChunk)
+{
+    parChunk& FConsumedEnergy;
+    parChunk& FProducedEnergy;
+    parChunk& FConsumedToProducedEnergyRatio;
+    parChunk& FEnergyEfficiency;
+}
 
 EnergySystem::EnergySystem()
     : ModuleSystem()
