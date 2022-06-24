@@ -51,6 +51,14 @@ void BuildingGridOccupancyModule::VirtualDeinit()
     FGridAccessor.SetOccupied(false, t->CellsOccupancy());
 }
 
+void BuildingGridOccupancyModule::VirtualOnLoaded()
+{
+    parent_type::VirtualOnLoaded();
+
+    const BuildingGridOccupancyModuleTemplate* t = Template<BuildingGridOccupancyModuleTemplate>();
+    FGridAccessor.SetOccupied(true, t->CellsOccupancy());
+}
+
 IMPLEMENT_SAVELOAD_ABILITIES(BuildingGridOccupancyModule);
 template<typename Chunk, bool isWriting>
 void BuildingGridOccupancyModule::SaveLoad(Chunk& parChunk)
