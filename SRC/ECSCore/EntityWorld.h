@@ -39,6 +39,8 @@ public:
 
     const EntityTemplate* GetTemplateForEntity(const EntityId& parId) const;
 
+    void OnLoaded();
+
 private:
     u32 FSize;
     EEntityWorlds FWorldID;

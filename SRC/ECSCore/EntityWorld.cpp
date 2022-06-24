@@ -17,15 +17,64 @@ IMPLEMENT_SAVELOAD_ABILITIES(EntityWorld);
 template<typename Chunk, bool isWriting>
 void EntityWorld::SaveLoad(Chunk& parChunk)
 {
+    if (!isWriting)
+    {
+        // Cleanup !!
+        DestroyAllRemainingEntities();
+    }
+
     parChunk& FSize;
     u32 worldId = (u32)FWorldID;
     parChunk& worldId;
     if (!isWriting)
         FWorldID = (EEntityWorlds)worldId;
     parChunk& FEntityIdGenerator;
-    parChunk& FEntities;
     parChunk& FAllocatedEntities;
-    parChunk& FControllers;
+
+    u32 entitiesSize = FEntities.size();
+    parChunk& entitiesSize;
+
+    if (!isWriting)
+    {
+        FEntities.clear();
+        FEntities.resize(entitiesSize);
+    }
+
+    foreachitemconst(entity, FAllocatedEntities) parChunk& FEntities[entity];
+
+    u32 nonNullControllers = 0;
+    if (isWriting)
+    {
+        foreachitemconst(ctr, FControllers)
+        {
+            if (ctr == nullptr)
+                continue;
+            nonNullControllers++;
+        }
+    }
+
+    parChunk& nonNullControllers;
+    if (isWriting)
+    {
+        forrange(i, 0, FControllers.size())
+        {
+            if (FControllers[i] == nullptr)
+                continue;
+            parChunk& i;
+            parChunk& FControllers[i];
+        }
+    }
+    else
+    {
+        forrange(i, 0, nonNullControllers)
+        {
+            size_t idx = -1;
+            parChunk& idx;
+            AssertRelease(idx != -1);
+            AssertRelease(idx < FControllers.size());
+            parChunk& FControllers[idx];
+        }
+    }
 }
 
 EntityWorld::EntityWorld(const EEntityWorlds parWorldId)
@@ -137,6 +186,16 @@ const EntityTemplate* EntityWorld::GetTemplateForEntity(const EntityId& parId) c
 {
     AssertRelease(FAllocatedEntities.find(parId.GetSequentialId()) != FAllocatedEntities.end());
     return FEntities[parId.GetSequentialId()].GetTemplate();
+}
+
+void EntityWorld::OnLoaded()
+{
+    foreachitem(ctr, FControllers)
+    {
+        if (ctr == nullptr)
+            continue;
+        ctr->OnLoaded();
+    }
 }
 
 } // namespace ECSEngine
