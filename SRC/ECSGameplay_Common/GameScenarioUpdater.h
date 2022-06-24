@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "CameraMoverSystem.h"
+#include "Common/SavingSystemDeclaration.h"
 #include "ECSGameplay_Specific/ColonyBuildingSystem.h"
 #include "ECSGameplay_Specific/ColonyFeedbackSystem.h"
 #include "ECSGameplay_Specific/ResourceProductionSystem.h"
@@ -15,6 +16,8 @@ namespace ECSEngine
 class SceneScenario;
 class GameScenarioUpdater : public IScenarioUpdater
 {
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     GameScenarioUpdater();
     virtual ~GameScenarioUpdater();
@@ -26,11 +29,13 @@ public:
     void UIUpdate() override;
     void DebugRender() override;
     void Render() override;
+    void EndUpdate() override;
 
     void SetScenario(const std::string& parScenarioFile);
 
 private:
     SceneScenario* FScenario;
+    std::string FScenarioFileName;
 
     CameraMoverSystem FCameraMoverSystem;
     SynchroWithRenderSystem FRenderingSystem;
@@ -45,6 +50,7 @@ private:
 
     UserInterfaceSystem FUserInterfaceSystem;
 
-    float FTimeBeforeNextUpdate = 0.f;
+    bool FSaveDemanded = false;
+    bool FLoadDemanded = false;
 };
 } // namespace ECSEngine

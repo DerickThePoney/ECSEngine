@@ -4,6 +4,7 @@
 
 #include "Common/CameraManager.h"
 #include "Common/ResourceHandle.h"
+#include "Common/SavingSystemImplementation.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
@@ -25,6 +26,8 @@
 #include "SelectionManager.h"
 #include "UICore/RMLUIManager.h"
 
+#include <fstream>
+
 namespace ECSEngine
 {
 
@@ -36,6 +39,34 @@ GameScenarioUpdater::GameScenarioUpdater()
 GameScenarioUpdater::~GameScenarioUpdater()
 {
     delete FScenario;
+}
+
+IMPLEMENT_SAVELOAD_ABILITIES(GameScenarioUpdater);
+template<typename Chunk, bool isWriting>
+void GameScenarioUpdater::SaveLoad(Chunk& parChunk)
+{
+    parChunk& FScenarioFileName;
+
+    if (!isWriting)
+    {
+        FScenario->Destroy();
+        delete FScenario;
+        FScenario = nullptr;
+
+        SetScenario(FScenarioFileName);
+        AssertRelease(FScenario != nullptr);
+
+        SelectionManager::Instance().ClearAll();
+        // CircularBuildingGrid::Instance().FreeAllPositions();
+    }
+
+    parChunk&(*FScenario);
+
+    parChunk& WorldManager::Instance();
+
+    parChunk& EnergySystem::Instance();
+
+    // save resource manager ?
 }
 
 void GameScenarioUpdater::Initialise()
@@ -113,6 +144,17 @@ void GameScenarioUpdater::RealtimeUpdate()
 {
     SCOPED_PROFILE(GameScenarioUpdater_RealtimeUpdate);
     FCameraMoverSystem.Update();
+
+    if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F5))
+    {
+        FSaveDemanded = true;
+    }
+    else if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F8))
+    {
+        FLoadDemanded = true;
+    }
+
+    AlwaysCheckedAssert(!(FLoadDemanded && FSaveDemanded));
 }
 
 void GameScenarioUpdater::GameplayUpdate()
@@ -223,19 +265,70 @@ void GameScenarioUpdater::Render()
     }
 
     {
-        SCOPED_PROFILE(ApplicationUpdater_Render_RmlUiManager);
+        SCOPED_PROFILE(GameScenarioUpdater_Render_RmlUiManager);
         UI::RmlUiManager::Instance().Render();
     }
 
     {
-        SCOPED_PROFILE(ApplicationUpdater_Render_FinalCombinePass);
+        SCOPED_PROFILE(GameScenarioUpdater_Render_FinalCombinePass);
         Rendering::FinalCombinePass::Instance().SetTextures(Rendering::GameRenderer::Instance().GetFinalTexture(), UI::RmlUiManager::Instance().GetTexture());
         Rendering::FinalCombinePass::Instance().Render();
     }
 }
 
+void GameScenarioUpdater::EndUpdate()
+{
+    SCOPED_PROFILE_SIMPLE;
+    AlwaysCheckedAssert(!(FLoadDemanded && FSaveDemanded));
+    if (FSaveDemanded)
+    {
+        FSaveDemanded = false;
+        // Handle save
+        SavingSystem::SaveChunk sc;
+        sc&(*this);
+
+        std::ofstream ofstr("SaveTest.sav", std::ios::binary);
+        if (ofstr.good())
+            ofstr.write(reinterpret_cast<const char*>(sc.GetBuffer().Data()), sc.GetBuffer().WrittenBytes());
+    }
+    else if (FLoadDemanded)
+    {
+        FLoadDemanded = false;
+        SavingSystem::ReadChunk rc;
+
+        {
+            char* data = nullptr;
+            u32 length = 0;
+
+            std::ifstream ifstr("SaveTest.sav", std::ios::binary);
+            if (ifstr.good())
+            {
+                ifstr.seekg(0, ifstr.end);
+                length = ifstr.tellg();
+                ifstr.seekg(0, ifstr.beg);
+
+                if (length > 0)
+                {
+                    data = new char[length];
+                    ifstr.read(data, length);
+                }
+            }
+
+            if (data != nullptr)
+            {
+                rc.GetBuffer().SetData(length, reinterpret_cast<u8*>(data));
+            }
+
+            delete[] data;
+        }
+
+        rc&(*this);
+    }
+}
+
 void GameScenarioUpdater::SetScenario(const std::string& parScenarioFile)
 {
+    FScenarioFileName = parScenarioFile;
     AssertRelease(FScenario == nullptr);
     Resource r(parScenarioFile);
     auto handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
