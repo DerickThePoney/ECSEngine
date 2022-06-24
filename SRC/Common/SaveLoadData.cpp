@@ -171,6 +171,8 @@ void SaveLoad<SavingSystem::ReadChunk, std::string, false>(SavingSystem::ReadChu
     const u32 expectedId = typeid(std::string).hash_code();
     const u32 id = parChunk.GetBuffer().ReadId();
     AlwaysCheckedAssert(id == expectedId);
+    const u32 sizeGuard = parChunk.GetBuffer().ReadSize();
+    AlwaysCheckedAssert(sizeGuard == 0);
 
     u32 stringSize = parChunk.GetBuffer().ReadSize();
     parValue.resize(stringSize);
