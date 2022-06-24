@@ -2,11 +2,19 @@
 
 #include "SceneActions.h"
 
+#include "Common/SavingSystemImplementation.h"
 #include "PropertyDrawer.h"
 #include "RenderingCore/DrawCommands.h"
 
 namespace ECSEngine
 {
+IMPLEMENT_VIRTUAL_SAVELOAD_ABILITIES(ISceneAction);
+template<typename Chunk, bool isWriting>
+void ISceneAction::SaveLoad(Chunk& parChunk)
+{
+    parChunk& FStarted;
+    parChunk& FFinished;
+}
 
 ISceneAction::ISceneAction(const std::string& parFName /*= "Dummy"*/)
     : FName(parFName)

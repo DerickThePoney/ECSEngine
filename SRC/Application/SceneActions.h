@@ -5,6 +5,8 @@
 // - Type id comme les sceneitems et les modules
 // - Factories
 
+#include "Common/SavingSystemDeclaration.h"
+
 namespace ECSEngine
 {
 /*************************************************************/
@@ -21,6 +23,8 @@ class MaterialInstanceHandle;
 class ISceneAction
 {
     friend class SceneScenario;
+
+    DECLARE_VIRTUAL_SAVELOAD_ABILITIES();
 
 public:
     ISceneAction(const std::string& parFName = "Dummy");
