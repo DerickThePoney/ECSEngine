@@ -18,6 +18,22 @@ SelectionManager::SelectionManager()
     WorldManager::Instance().RegisterDeathListener(DELEGATE(&SelectionManager::OnUnitDeath, *this));
 }
 
+void SelectionManager::ClearSelection()
+{
+    FSelectedUnits.clear();
+}
+
+void SelectionManager::ClearHighlighted()
+{
+    FHighlightedUnits.clear();
+}
+
+void SelectionManager::ClearAll()
+{
+    ClearSelection();
+    ClearHighlighted();
+}
+
 void SelectionManager::Finalize()
 {
     ModuleSystem::Destroy();
