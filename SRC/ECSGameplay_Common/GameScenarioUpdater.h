@@ -49,8 +49,5 @@ private:
     StorageFeedbackDrawer FStorageFeedback;
 
     UserInterfaceSystem FUserInterfaceSystem;
-
-    bool FSaveDemanded = false;
-    bool FLoadDemanded = false;
 };
 } // namespace ECSEngine
