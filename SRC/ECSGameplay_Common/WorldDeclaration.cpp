@@ -5,8 +5,6 @@
 #include "ApparenceModule.h"
 #include "CameraMoverModule.h"
 #include "ECSCore/EntityWorld.h"
-#include "ECSCore/ModuleId.h"
-#include "ECSCore/ModuleTemplate.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Specific/BuildingGridOccupancyModule.h"
@@ -17,7 +15,6 @@
 #include "ECSGameplay_Specific/RecipeProductionModule.h"
 #include "ECSGameplay_Specific/ResourceStorageModule.h"
 #include "ECSGameplay_Specific/StorageSlotModule.h"
-#include "EntityLinksModules.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
 #include "brigand/algorithms/for_each.hpp"
@@ -87,24 +84,4 @@ void CreateWorlds()
         WorldManager::Instance().AddEntityWorldStealOwnership(EEntityWorlds::BUILDINGS, world);
     }
 }
-
-namespace ModuleTemplates
-{
-std::unordered_map<u32, ModuleTemplate* (*)()> FModuleTemplateFactories;
-std::map<u32, std::string> FModuleList;
-void InitModuleTemplateFactories()
-{
-#define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE)                                                                                                                                \
-    {                                                                                                                                                                              \
-        FModuleTemplateFactories[ModuleTraits<NAME>::GetModuleId()] = &TEMPLATE::CreateTemplate;                                                                                   \
-    }
-#include "ECSCore/ModuleList.inl"
-#undef DECLARE_MODULE_AND_TEMPLATE
-}
-
-void DestroyModyleTemplateFactories()
-{
-}
-
-} // namespace ModuleTemplates
 } // namespace ECSEngine

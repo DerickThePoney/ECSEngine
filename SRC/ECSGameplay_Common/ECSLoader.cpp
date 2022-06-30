@@ -31,7 +31,6 @@ bool ECSLoader::VirtualInitialise()
     RandomNumbers::InitRandomNumberGenerator(772);
 
     ModuleParameters::InitParameterIdentifiersTraits();
-    ModuleTemplates::InitModuleTemplateFactories();
 
     WorldManager::CreateIFP();
     AssertRelease(WorldManager::HasInstance());
