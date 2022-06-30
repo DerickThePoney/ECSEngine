@@ -23,10 +23,22 @@ void DrawResourceCacheDebug(bool* parOpen)
 
     if (ImGui::CollapsingHeader("Allocated Resources", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        foreachitemconst(res, GlobalResourceCache::Instance().FCache->AllocatedResources())
+        const ResourceHandleMap& resources = GlobalResourceCache::Instance().FCache->AllocatedResources();
+
+        struct ResourceRecord
         {
-            ImGui::Text("%s: %.2f MB (%d bytes)", res.first.c_str(), (float)res.second->Size() / 1024.f / 1024.f, res.second->Size());
-        }
+            std::string Name;
+            float sizeMB;
+            u32 sizeB;
+        };
+        std::vector<ResourceRecord> records;
+        records.reserve(resources.size());
+
+        foreachitemconst(res, resources) { records.emplace_back(ResourceRecord{ res.first, (float)res.second->Size() / 1024.f / 1024.f, res.second->Size() }); }
+
+        std::sort(records.begin(), records.end(), [](ResourceRecord& a, ResourceRecord& b) { return a.sizeB > b.sizeB; });
+
+        foreachitemconst(rec, records) { ImGui::Text("%s: %.2f MB (%d bytes)", rec.Name.c_str(), rec.sizeMB, rec.sizeB); }
     }
     ImGui::End();
 }
