@@ -46,13 +46,16 @@ void CameraMoverModule::SaveLoad(Chunk& parChunk)
 {
     parent_type::SaveLoad(parChunk);
 
-    parChunk& FCamId;
     parChunk& FCurrentSpeed;
     parChunk& FCurrentRotationSpeed;
 
     if (!isWriting)
     {
-        AlwaysCheckedAssert(CameraManager::Instance().GetCamera(FCamId) != nullptr);
+        const CameraMoverModuleTemplate* moduleTemplate = Template<CameraMoverModuleTemplate>();
+        AssertRelease(moduleTemplate != nullptr);
+
+        FCamId = CameraManager::Instance().CreateCameraIFN(moduleTemplate->CameraName());
+        AssertRelease(FCamId != -1);
     }
 }
 
