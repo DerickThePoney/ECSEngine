@@ -26,6 +26,7 @@
 #include "SaveLoadManager.h"
 #include "SelectionManager.h"
 #include "UICore/RMLUIManager.h"
+#include "Common/GenericMessageManager.h"
 
 namespace ECSEngine
 {
@@ -56,6 +57,8 @@ void GameScenarioUpdater::SaveLoad(Chunk& parChunk)
         AssertRelease(FScenario != nullptr);
 
         SelectionManager::Instance().ClearAll();
+
+        GenericMessageManager::Instance().Reset();
     }
 
     parChunk&(*FScenario);
@@ -143,11 +146,11 @@ void GameScenarioUpdater::RealtimeUpdate()
     SCOPED_PROFILE(GameScenarioUpdater_RealtimeUpdate);
     FCameraMoverSystem.Update();
 
-    if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F5))
+    if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F5) && Input::GetButtonHasChanged(InputKeyNames::INPUT_KEY_F5))
     {
         SaveLoadManager::Instance().RequestQuickSave();
     }
-    else if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F8))
+    else if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F8) && Input::GetButtonHasChanged(InputKeyNames::INPUT_KEY_F8))
     {
         SaveLoadManager::Instance().RequestQuickLoad();
     }

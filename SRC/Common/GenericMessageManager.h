@@ -37,6 +37,12 @@ public:
         foreachitem(message, messages) { parFunctor(*message->UserDataAs<UserData>()); }
     }
 
+    void Reset()
+    {
+        std::scoped_lock<std::mutex> lock(FMutex);
+        foreachitem(messageQueue, FMessagesQueues) messageQueue.clear();
+    }
+
 private:
     std::vector<std::vector<std::unique_ptr<GenericMessage>>> FMessagesQueues;
     std::mutex FMutex;
