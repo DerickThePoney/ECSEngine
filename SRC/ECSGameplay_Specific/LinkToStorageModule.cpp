@@ -89,7 +89,15 @@ void LinkToStorageModule::SaveLoad(Chunk& parChunk)
     parChunk& FStorageId;
 
     if (!isWriting)
+    {
         WorldManager::Instance().RegisterDeathListener(DELEGATE(&LinkToStorageModule::OnUnitDeath, *this));
+        if (!FStorageId.Valid())
+        {
+            BuildingNeedsStorageMessage* message = new BuildingNeedsStorageMessage();
+            message->FUnitId = UnitId();
+            GenericMessageManager::Instance().PushMessage<GenericMessageId::BUILDING_NEEDS_STORAGE>(message);
+        }
+    }
 }
 
 } // namespace ECSEngine
