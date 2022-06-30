@@ -54,6 +54,9 @@ void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMe
 {
     LinkToStorageModule* linkToStorageForEntity = parLinkToStorageAccessor[parMessage.FUnitId];
     AssertRelease(linkToStorageForEntity != nullptr);
+    if (linkToStorageForEntity->StorageId().Valid())
+        return;
+
     const PositionModule* positionModuleForEntity = parPositionModuleAccessor[parMessage.FUnitId];
     AssertRelease(positionModuleForEntity != nullptr);
 
