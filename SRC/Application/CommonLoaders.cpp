@@ -9,6 +9,7 @@
 #include "Common/ResourceFileDirectoryView.h"
 #include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
+#include "ECSGameplay_Common/SaveLoadManager.h"
 #include "SceneManager.h"
 
 namespace ECSEngine
@@ -65,12 +66,19 @@ bool LoaderInitialiseCommonResources::VirtualInitialise()
         }
     }
 
+    SaveLoadManager::CreateIFP();
+    SaveLoadManager::Instance().Initialise();
+
     return true;
 }
 
 void LoaderInitialiseCommonResources::VirtualShutdown()
 {
     ILoader::VirtualShutdown();
+
+    SaveLoadManager::Instance().Cleanup();
+    SaveLoadManager::Destroy();
+
     SceneManager::Destroy();
     CameraManager::Destroy();
     TimeManager::End();
