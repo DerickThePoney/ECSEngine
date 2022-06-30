@@ -23,10 +23,9 @@
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/RenderPass.h"
+#include "SaveLoadManager.h"
 #include "SelectionManager.h"
 #include "UICore/RMLUIManager.h"
-
-#include <fstream>
 
 namespace ECSEngine
 {
@@ -146,14 +145,12 @@ void GameScenarioUpdater::RealtimeUpdate()
 
     if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F5))
     {
-        FSaveDemanded = true;
+        SaveLoadManager::Instance().RequestQuickSave();
     }
     else if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_F8))
     {
-        FLoadDemanded = true;
+        SaveLoadManager::Instance().RequestQuickLoad();
     }
-
-    AlwaysCheckedAssert(!(FLoadDemanded && FSaveDemanded));
 }
 
 void GameScenarioUpdater::GameplayUpdate()
@@ -278,51 +275,8 @@ void GameScenarioUpdater::Render()
 void GameScenarioUpdater::EndUpdate()
 {
     SCOPED_PROFILE_SIMPLE;
-    AlwaysCheckedAssert(!(FLoadDemanded && FSaveDemanded));
-    if (FSaveDemanded)
-    {
-        FSaveDemanded = false;
-        // Handle save
-        SavingSystem::SaveChunk sc;
-        sc&(*this);
 
-        std::ofstream ofstr("SaveTest.sav", std::ios::binary);
-        if (ofstr.good())
-            ofstr.write(reinterpret_cast<const char*>(sc.GetBuffer().Data()), sc.GetBuffer().WrittenBytes());
-    }
-    else if (FLoadDemanded)
-    {
-        FLoadDemanded = false;
-        SavingSystem::ReadChunk rc;
-
-        {
-            char* data = nullptr;
-            u32 length = 0;
-
-            std::ifstream ifstr("SaveTest.sav", std::ios::binary);
-            if (ifstr.good())
-            {
-                ifstr.seekg(0, ifstr.end);
-                length = ifstr.tellg();
-                ifstr.seekg(0, ifstr.beg);
-
-                if (length > 0)
-                {
-                    data = new char[length];
-                    ifstr.read(data, length);
-                }
-            }
-
-            if (data != nullptr)
-            {
-                rc.GetBuffer().SetData(length, reinterpret_cast<u8*>(data));
-            }
-
-            delete[] data;
-        }
-
-        rc&(*this);
-    }
+    SaveLoadManager::Instance().HandleSaveLoad(this);
 }
 
 void GameScenarioUpdater::SetScenario(const std::string& parScenarioFile)
