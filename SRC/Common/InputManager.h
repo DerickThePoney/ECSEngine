@@ -85,6 +85,7 @@ bool GetButtonHasChanged(int button);
 bool IsShiftDown();
 bool IsCtrlDown();
 bool IsAltDown();
+bool NoSpecialKeysPressed();
 bool IsCapsLock();
 
 void GamepadIsConnected(const int parGamepadId, const char* parGamepadName);
