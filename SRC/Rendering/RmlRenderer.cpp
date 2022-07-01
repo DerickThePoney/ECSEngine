@@ -80,6 +80,7 @@ void RmlRenderer::RenderGeometry(Rml::Vertex* vertices, int num_vertices, int* i
         instance = Rendering::MaterialManager::GetMaterialInstance(FRenderMaterial);
     AssertRelease(instance != nullptr);
 
+    bgfx::setScissor(FScissorIdx);
     bgfx::submit(renderPass, instance->GetProgram()->ProgramHandle());
 }
 
@@ -136,6 +137,7 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
     bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
     bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
     AssertRelease(instance != nullptr);
+    bgfx::setScissor(FScissorIdx);
     bgfx::submit(renderPass, instance->GetProgram()->ProgramHandle());
 }
 
@@ -170,12 +172,31 @@ void RmlRenderer::ReleaseCompiledGeometry(Rml::CompiledGeometryHandle geometry)
 void RmlRenderer::EnableScissorRegion(bool enable)
 {
     if (!enable)
-        bgfx::setScissor(0, 0, 0, 0);
+    {
+        glm::uvec2 size = GLFWDisplayWindowHandler::Instance().GetSize();
+        FScissorIdx = bgfx::setScissor(0, 0, size.x, size.y);
+    }
+    else
+    {
+        bgfx::setScissor(FScissorIdx);
+    }
 }
 
 void RmlRenderer::SetScissorRegion(int x, int y, int width, int height)
 {
-    bgfx::setScissor(x, y, width, height);
+    if (x < 0)
+    {
+        width += x;
+        x = 0;
+    }
+
+    if (y < 0)
+    {
+        height += y;
+        y = 0;
+    }
+
+    FScissorIdx = bgfx::setScissor(x, y, width, height);
 }
 
 bool RmlRenderer::LoadTexture(Rml::TextureHandle& texture_handle, Rml::Vector2i& texture_dimensions, const Rml::String& source)

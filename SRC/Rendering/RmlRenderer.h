@@ -43,6 +43,8 @@ private:
     glm::mat4 FCurrentMatrix = glm::identity<glm::mat4>();
     glm::mat4 FProjMat = glm::identity<glm::mat4>();
     glm::vec4 FScissor = glm::vec4(0.f);
+
+    u16 FScissorIdx = 0;
 };
 } // namespace Rendering
 } // namespace ECSEngine
