@@ -81,10 +81,10 @@ void MaterialManagerSingleton::Initialise()
     LOG_RENDERING("Initialising programs v2");
     std::vector<std::string> programsList;
     GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.programv2", programsList);
-    foreachitemconst(program, programsList)
+    foreachitemconst(programDescFile, programsList)
     {
-        LOG_RENDERING(fmt::format("Loading multipass programs {}...", program));
-        Resource res(program);
+        LOG_RENDERING(fmt::format("Loading multipass programs {}...", programDescFile));
+        Resource res(programDescFile);
         std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
 
         ResourceBuffer buff = handle->GetResourceBuffer();
@@ -94,11 +94,13 @@ void MaterialManagerSingleton::Initialise()
         input(*programDesc);
         FMultiPassProgramDescriptors.push_back(programDesc);
 
-        FMultiPassPrograms.push_back(new MultiPassProgram(programDesc));
+        MultiPassProgram* program = new MultiPassProgram(programDesc);
 
-        FFileToMultiPassProgramDescriptor[program] = FFileToMultiPassProgramDescriptor.size();
+        FMultiPassPrograms.push_back(program);
 
-        LOG_RENDERING(fmt::format("Loading Multi Pass Program {}...    SUCCESS", program));
+        FFileToMultiPassProgramDescriptor[programDescFile] = FFileToMultiPassProgramDescriptor.size();
+
+        LOG_RENDERING(fmt::format("Loading Multi Pass Program {}...    SUCCESS", programDescFile));
     }
 
     LOG_RENDERING("Initialising materials");
