@@ -63,6 +63,8 @@ void GameScenarioUpdater::SaveLoad(Chunk& parChunk)
 
     parChunk&(*FScenario);
 
+    parChunk& CircularBuildingGrid::Instance();
+
     parChunk& WorldManager::Instance();
 
     parChunk& EnergySystem::Instance();

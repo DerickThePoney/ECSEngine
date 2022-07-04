@@ -8,6 +8,8 @@ class Polygon2D;
 class CircularGridAccessor;
 class CircularBuildingGrid : public Singleton<CircularBuildingGrid>
 {
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     void Initialise();
     void Shutdown();

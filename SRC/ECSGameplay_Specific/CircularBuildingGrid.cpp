@@ -6,12 +6,29 @@
 #include "Common/AngleRange.h"
 #include "Common/ColorUtils.h"
 #include "Common/Polygon.h"
+#include "Common/SavingSystemImplementation.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "GameplayConstants.h"
 #include "GameplayFeedbackDrawer.h"
 
 namespace ECSEngine
 {
+IMPLEMENT_SAVELOAD_ABILITIES(CircularBuildingGrid);
+template<typename Chunk, bool isWriting>
+void CircularBuildingGrid::SaveLoad(Chunk& parChunk)
+{
+    u32 nbChunks = FChunks.size();
+    parChunk& nbChunks;
+    if (!isWriting)
+    {
+        if (nbChunks != FChunks.size())
+        {
+            FChunks.clear();
+            FGraph.Cleanup();
+            forrange(i, 0, nbChunks) { CreateNewGridChunk(); }
+        }
+    }
+}
 
 void CircularBuildingGrid::Initialise()
 {
