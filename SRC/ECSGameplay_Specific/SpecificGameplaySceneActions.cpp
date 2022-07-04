@@ -69,11 +69,22 @@ bool CreateWorldSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuff
         AssertRelease(descriptor != nullptr);
 
         const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(descriptor->MeshFile());
-        const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(descriptor->MaterialName());
         if (!meshHandle.IsValid())
             return false;
 
-        parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial);
+        if (descriptor->IsMultiPassMaterial())
+        {
+            const Rendering::MultiPassMaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMultiPassMaterialInstanceIFN(descriptor->MaterialName());
+
+            if (instanceHandle.IsValid())
+                parCommandBuffer.DrawMesh(meshHandle, instanceHandle);
+        }
+        else
+        {
+            const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(descriptor->MaterialName());
+
+            parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial);
+        }
 
         // todo specific feedbackrenderer
         Rendering::CircleFeedbackParameters params = { GameplayConstants::Colony::ColonyInitialRange, GameplayConstants::Colony::ColonyRangeFeedbackThickness,
