@@ -299,7 +299,8 @@ void CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION
 
     std::wstring cookedFilename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + fileNoExtension + ".bin");
     std::wstring pathW = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + path);
-    wideString += L"--varyingdef " + pathW + L"varying.def.sc -f " + filename + L" -o " + cookedFilename + L" -i ..\\External\\BGFX\\bgfx\\src\\ --platform windows -O 3 -V ";
+    wideString += L"--varyingdef " + pathW + L"varying.def.sc -f " + filename + L" -o " + cookedFilename +
+          L" -i ..\\External\\BGFX\\bgfx\\src\\ --platform windows -O 3 -V --disasm ";
 
     if (type == 0)
         wideString += L"-p vs_5_0 --type vertex";
