@@ -23,6 +23,8 @@
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
 
+#include <random>
+
 CEREAL_REGISTER_TYPE(ECSEngine::SpawnEntitySceneAction);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionWithBaseSceneItem, ECSEngine::SpawnEntitySceneAction)
 
@@ -366,6 +368,20 @@ void ConvexHullTestsPolygonalPatternSceneAction::GenerateHull()
 {
     if (FRandomPoints.size() == 0)
         GeneratePoints();
+    else
+    {
+        static std::mt19937_64 gen64;
+        std::uniform_int_distribution<size_t> distrib;
+
+        reverseforrange(i, 1, FRandomPoints.size() - 1)
+        {
+            distrib.param(std::uniform_int_distribution<size_t>::param_type(0, i - 1));
+            size_t val = distrib(gen64);
+            glm::vec2 val1 = FRandomPoints[val];
+            FRandomPoints[val] = FRandomPoints[i];
+            FRandomPoints[i] = val1;
+        }
+    }
     FConvexHull.clear();
     auto start = std::chrono::high_resolution_clock::now();
     ConvexHull(FRandomPoints, FConvexHull);
