@@ -42,6 +42,8 @@ public:
     bool IsClockWise() const;
     Polygon2D Revert() const;
 
+    void clear() { FPoints.clear(); }
+
     template<class Archive>
     void serialize(Archive& ar)
     {
