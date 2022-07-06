@@ -26,66 +26,60 @@ void ConvexHull(std::vector<glm::vec2>& parPoints, Polygon2D& outPolygon)
 
     // 2- Lupper
     // 2.a- Push the first two points
-    std::vector<glm::vec2> lupper;
-    lupper.reserve(parPoints.size());
-    lupper.push_back(parPoints[0]);
-    lupper.push_back(parPoints[1]);
+    outPolygon.reserve(parPoints.size());
+    outPolygon.push_back(parPoints[0]);
+    outPolygon.push_back(parPoints[1]);
 
     // 2.b loop over the vertices
     forrange(i, 2, parPoints.size())
     {
-        lupper.push_back(parPoints[i]);
-        while (lupper.size() > 2)
+        outPolygon.push_back(parPoints[i]);
+        while (outPolygon.size() > 2)
         {
-            size_t idx0 = lupper.size() - 3;
-            size_t idx1 = lupper.size() - 2;
-            size_t idx2 = lupper.size() - 1;
+            size_t idx0 = outPolygon.size() - 3;
+            size_t idx1 = outPolygon.size() - 2;
+            size_t idx2 = outPolygon.size() - 1;
 
-            glm::vec2 vec1 = lupper[idx1] - lupper[idx0];
-            glm::vec2 vec2 = lupper[idx2] - lupper[idx1];
+            glm::vec2 vec1 = outPolygon[idx1] - outPolygon[idx0];
+            glm::vec2 vec2 = outPolygon[idx2] - outPolygon[idx1];
 
             // if right turn terminate
             if ((vec1.x * vec2.y - vec1.y * vec2.x) > 0.f)
                 break;
 
             // if left turn or colinear remove Point idx2
-            lupper.erase(lupper.begin() + idx1);
+            outPolygon.erase(idx1);
         }
     }
 
     // 2- Llower
     // 2.a- Push the first two points
-    std::vector<glm::vec2> llower;
-    llower.reserve(parPoints.size());
-    llower.push_back(parPoints[parPoints.size() - 1]);
-    llower.push_back(parPoints[parPoints.size() - 2]);
+    outPolygon.push_back(parPoints[parPoints.size() - 2]);
 
     // 2.b loop over the vertices
     reverseforrange(i, 0, parPoints.size() - 3)
     {
-        llower.push_back(parPoints[i]);
-        while (llower.size() > 2)
+        outPolygon.push_back(parPoints[i]);
+        while (outPolygon.size() > 2)
         {
-            size_t idx0 = llower.size() - 3;
-            size_t idx1 = llower.size() - 2;
-            size_t idx2 = llower.size() - 1;
+            size_t idx0 = outPolygon.size() - 3;
+            size_t idx1 = outPolygon.size() - 2;
+            size_t idx2 = outPolygon.size() - 1;
 
-            glm::vec2 vec1 = llower[idx1] - llower[idx0];
-            glm::vec2 vec2 = llower[idx2] - llower[idx1];
+            glm::vec2 vec1 = outPolygon[idx1] - outPolygon[idx0];
+            glm::vec2 vec2 = outPolygon[idx2] - outPolygon[idx1];
 
             // if right turn terminate
             if ((vec1.x * vec2.y - vec1.y * vec2.x) > 0.f)
                 break;
 
             // if left turn or colinear remove Point idx2
-            llower.erase(llower.begin() + idx1);
+            outPolygon.erase(idx1);
         }
     }
 
     // concatenate both lists
-    outPolygon.reserve(lupper.size() + llower.size() - 2);
-    outPolygon.append(lupper);
-    forrange(i, 1, llower.size() - 1) { outPolygon.push_back(llower[i]); }
+    outPolygon.resize(outPolygon.size());
 }
 
 } // namespace ECSEngine
