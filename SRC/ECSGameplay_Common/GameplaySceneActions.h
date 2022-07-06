@@ -88,6 +88,49 @@ private:
     bool FShowEntitiesInEditor = true;
 };
 
+/*************************************************************/
+/*        ConvexHullTestsPolygonalPatternSceneAction         */
+/*************************************************************/
+class ConvexHullTestsPolygonalPatternSceneAction : public SceneActionPolygonalPattern
+{
+    DECLARE_SCENE_ACTION(ConvexHullTestsPolygonalPatternSceneAction, SceneActionPolygonalPattern);
+
+public:
+    ConvexHullTestsPolygonalPatternSceneAction(const std::string& parFName = "Dummy");
+    virtual ~ConvexHullTestsPolygonalPatternSceneAction();
+
+protected:
+    virtual void VirtualInitialise(const SceneScenario* parScene) override;
+
+    virtual void VirtualStart() override;
+
+    virtual void VirtualDrawEditor() override;
+    virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial);
+
+public:
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(cereal::base_class<parent_type>(this));
+        PROPERTYFIELD(NumberOfEntities, 500);
+    }
+
+protected:
+    void GeneratePoints();
+    void GenerateHull();
+
+private:
+    std::vector<glm::vec2> FRandomPoints;
+    std::vector<glm::vec3> FPolygonVertices;
+
+    u32 FNumberOfEntities = 1000;
+
+    bool FShowEntitiesInEditor = true;
+
+    float FTimeTaken = 0.f;
+    Polygon2D FConvexHull;
+};
+
 /*******************************************/
 /*        CreateNavMeshSceneAction         */
 /*******************************************/

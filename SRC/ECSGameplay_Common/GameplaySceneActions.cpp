@@ -5,6 +5,8 @@
 #include "ApparenceModule.h"
 #include "Application/SceneActionManagement.h"
 #include "Application/SceneItems.h"
+#include "Common/ColorUtils.h"
+#include "Common/ConvexHull.h"
 #include "Common/NavMeshPathSmoother.h"
 #include "Common/NavMeshPathSolver.h"
 #include "Common/NavMeshSolver.h"
@@ -26,6 +28,9 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionWithBaseSceneItem, EC
 
 CEREAL_REGISTER_TYPE(ECSEngine::SpawnEntitiesInPolygonalPatternSceneAction);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionPolygonalPattern, ECSEngine::SpawnEntitiesInPolygonalPatternSceneAction)
+
+CEREAL_REGISTER_TYPE(ECSEngine::ConvexHullTestsPolygonalPatternSceneAction);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionPolygonalPattern, ECSEngine::ConvexHullTestsPolygonalPatternSceneAction)
 
 CEREAL_REGISTER_TYPE(ECSEngine::CreateNavMeshSceneAction);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionPolygonalPattern, ECSEngine::CreateNavMeshSceneAction)
@@ -258,4 +263,113 @@ bool CreateNavMeshSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBu
 {
     return parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 }
+
+/*************************************************************/
+/*        ConvexHullTestsPolygonalPatternSceneAction         */
+/*************************************************************/
+IMPLEMENT_SCENE_ACTION(ConvexHullTestsPolygonalPatternSceneAction);
+ConvexHullTestsPolygonalPatternSceneAction::ConvexHullTestsPolygonalPatternSceneAction(const std::string& parFName /*= "Dummy"*/)
+    : parent_type(parFName)
+{
+}
+
+ConvexHullTestsPolygonalPatternSceneAction::~ConvexHullTestsPolygonalPatternSceneAction()
+{
+}
+
+void ConvexHullTestsPolygonalPatternSceneAction::VirtualInitialise(const SceneScenario* parScene)
+{
+    parent_type::VirtualInitialise(parScene);
+}
+
+void ConvexHullTestsPolygonalPatternSceneAction::VirtualStart()
+{
+    parent_type::VirtualStart();
+}
+
+void ConvexHullTestsPolygonalPatternSceneAction::VirtualDrawEditor()
+{
+    parent_type::VirtualDrawEditor();
+    if (ShouldShowEditor())
+    {
+        EDITOR_PROPERTY_WITH_LIMITS("Number of entities", FNumberOfEntities, 1u, 1000u);
+
+        ImGui::Checkbox("Show entities in editor", &FShowEntitiesInEditor);
+
+        if (ImGui::Button("Regenerate Points"))
+        {
+            GeneratePoints();
+        }
+
+        if (ImGui::Button("Generate Hull"))
+        {
+            GenerateHull();
+        }
+
+        if (!FConvexHull.empty())
+            ImGui::Text("Time taken: %.4f ms", FTimeTaken);
+    }
+}
+
+bool ConvexHullTestsPolygonalPatternSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
+{
+    parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+
+    if (!FShowEntitiesInEditor)
+        return false;
+
+    if (FRandomPoints.size() == 0)
+        return false;
+
+    const BaseSceneItem* item = GetSceneItem();
+    if (item == nullptr)
+        return false;
+
+    const glm::vec3 offset = (item == nullptr) ? glm::vec3(0.f) : item->GetPosition();
+    foreachitemconst(point, FRandomPoints)
+    {
+        const glm::vec3 eulerAngles = item->GetEulerAngles();
+        const glm::mat4 mtx = glm::translate(item->GetPosition() + glm::vec3(point.x, 0.f, point.y)) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+        const glm::vec3 pos = glm::xyz(mtx[3]);
+        parCommandBuffer.DrawAABBAsCube(parMaterial, pos - glm::vec3(0.01f), pos + glm::vec3(0.01f), ColorUtils::FromRGBA(175, 175, 175, 255));
+    }
+
+    if (!FConvexHull.empty())
+    {
+        FPolygonVertices.clear();
+
+        const Polygon2D& polygonToShow = FConvexHull;
+        forrange(i, 0, polygonToShow.size())
+        {
+            const glm::vec2& currentVertex = polygonToShow[i];
+            FPolygonVertices.push_back(glm::vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
+        }
+
+        parCommandBuffer.DrawLines(parMaterial, FPolygonVertices.data(), (u32)FPolygonVertices.size(), ColorUtils::FromRGBA(255, 0, 255, 255), true);
+    }
+
+    return true;
+}
+
+void ConvexHullTestsPolygonalPatternSceneAction::GeneratePoints()
+{
+    PolygonRandomGenerator randomGenerator;
+    RandomPolygonGenerationParameters params = { FNumberOfEntities };
+
+    FRandomPoints.clear();
+    FRandomPoints.reserve(params.NumberOfPoints);
+
+    randomGenerator.GenerateRandomPoints(Polygon(), PolygonHoles(), params, FRandomPoints);
+}
+
+void ConvexHullTestsPolygonalPatternSceneAction::GenerateHull()
+{
+    if (FRandomPoints.size() == 0)
+        GeneratePoints();
+    FConvexHull.clear();
+    auto start = std::chrono::high_resolution_clock::now();
+    ConvexHull(FRandomPoints, FConvexHull);
+    FTimeTaken = (float)(std::chrono::high_resolution_clock::now() - start).count() / 1000000.f;
+}
+
 } // namespace ECSEngine
