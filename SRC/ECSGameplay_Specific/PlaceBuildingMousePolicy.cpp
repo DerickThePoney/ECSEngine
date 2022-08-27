@@ -85,6 +85,8 @@ void PlaceBuildingMousePolicy::VirtualUpdate()
 
     if (CircularBuildingGrid::HasInstance())
     {
+        // TODO CHECK RESOURCES !
+
         bool foundPos = false;
         glm::vec3 mouseWorldPosition = GetMouseWorldPosition();
 
