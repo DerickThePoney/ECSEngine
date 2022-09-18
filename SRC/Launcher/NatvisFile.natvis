@@ -3,4 +3,28 @@
   <Type Name="ECSEngine::EntityId">
     <DisplayString>{{[{(ECSEngine::Worlds::Type)(FId.FId >> 24 &amp; 0xFF)} : {FId.FId &amp; 0xFFFFFF}]}}</DisplayString>
   </Type>
+  <Type Name="ECSEngine::Vector2&lt;*&gt;">
+    <DisplayString>{{[{x}, {y}]}}</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+    </Expand>    
+  </Type>
+  <Type Name="ECSEngine::Vector3&lt;*&gt;">
+    <DisplayString>{{[{x}, {y}, {z}]}}</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+      <Item Name="z">z</Item>
+    </Expand>
+  </Type>
+  <Type Name="ECSEngine::Vector4&lt;*&gt;">
+    <DisplayString>{{[{x}, {y}, {z}, {w}]}}</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+      <Item Name="z">z</Item>
+      <Item Name="w">w</Item>
+    </Expand>
+  </Type>
 </AutoVisualizer>
