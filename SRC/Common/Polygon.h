@@ -42,6 +42,12 @@ public:
     bool IsClockWise() const;
     Polygon2D Revert() const;
 
+    float Area2Signed() const;
+    float AreaSigned() const;
+
+    float Area2() const;
+    float Area() const;
+
     void clear() { FPoints.clear(); }
 
     template<class Archive>

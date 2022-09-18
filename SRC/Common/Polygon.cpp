@@ -32,4 +32,38 @@ Polygon2D Polygon2D::Revert() const
     return result;
 }
 
+float Polygon2D::Area2Signed() const
+{
+    AlwaysCheckedAssert(FPoints.size() > 2);
+    float area = 0.f;
+
+    const bool isClosed = FPoints.front() == FPoints.back();
+    const u32 endIndex = (isClosed) ? FPoints.size() - 2 : FPoints.size() - 1;
+
+    const glm::vec2& pivotPoint = FPoints[0];
+    u32 idx = 2;
+    do
+    {
+        area += (FPoints[idx - 1].x - pivotPoint.x) * (FPoints[idx].y - pivotPoint.y) - (FPoints[idx].x - pivotPoint.x) * (FPoints[idx - 1].y - pivotPoint.y);
+        idx++;
+    } while (idx < endIndex);
+
+    return area;
+}
+
+float Polygon2D::AreaSigned() const
+{
+    return 0.5f * Area2Signed();
+}
+
+float Polygon2D::Area2() const
+{
+    return glm::abs(Area2Signed());
+}
+
+float Polygon2D::Area() const
+{
+    return 0.5f * Area2();
+}
+
 } // namespace ECSEngine
