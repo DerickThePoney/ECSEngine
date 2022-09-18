@@ -101,6 +101,7 @@ Print( "Disabling Incremental Link")
     + ' /Zc:inline'         ; https://msdn.microsoft.com/fr-fr/library/dn642448.aspx
     + ' /Zc:rvalueCast'     ; https://msdn.microsoft.com/fr-fr/library/dn449507.aspx
     + ' /Zc:static_assert-'
+    + ' /std:c++17 /Zc:__cplusplus'
     + ' -c "%1"'
 
     .PreprocessorOptions = ''
@@ -582,16 +583,12 @@ Compiler( 'Compiler-MSVC2019-x64' )
     .CompilerOptions = ''
         + ' /errorreport:none'
         + ' /utf-8'
-        + ' /std:c++17'
-        + ' /Zc:__cplusplus'
-        + ' /permissive-'
+        + ' /std:c++17 /Zc:__cplusplus'
         + .CompilerOptionsHacks
     .PCHOptions = ''
         + ' /errorreport:none'
         + ' /utf-8'
-        + ' /std:c++17'
-        + ' /Zc:__cplusplus'
-        + ' /permissive-'
+        + ' /std:c++17 /Zc:__cplusplus'
         + .CompilerOptionsHacks
     .CompilerFamily     = 'Visual'
 
