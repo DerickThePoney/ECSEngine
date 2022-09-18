@@ -1,0 +1,13 @@
+#once
+{
+    .ProjectName = 'Math'
+    .ProjectPath = 'SRC'
+    .AdditionnalIncludePaths = {"SRC" }
+
+    .SolutionFolder = 'Core'
+
+    .ExeName = .GameName
+
+    .BuildTarget = { '$ProjectName$' }
+    #include "../Utils/MakeProjectStandard.bff"
+}

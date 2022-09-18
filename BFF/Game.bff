@@ -33,6 +33,7 @@
 
 #include "Projects/DataPack.bff"
 #include "Projects/Common.bff"
+#include "Projects/Math.bff"
 #include "Projects/Application.bff"
 #include "Projects/ECSCore.bff"
 #include "Projects/RenderingCore.bff"
