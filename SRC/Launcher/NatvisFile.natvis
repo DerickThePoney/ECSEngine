@@ -27,4 +27,21 @@
       <Item Name="w">w</Item>
     </Expand>
   </Type>
+  <Type Name="ECSEngine::Matrix4x4f">
+    <DisplayString>{{[{FValues[0]}, {FValues[1]}, {FValues[2]}, {FValues[3]}]}}</DisplayString>
+    <Expand>
+      <Synthetic Name="r0">
+        <DisplayString>{{[{FValues[0]}, {FValues[1]}, {FValues[2]}, {FValues[3]}]}}</DisplayString>
+      </Synthetic>
+      <Synthetic Name="r1">
+        <DisplayString>{{[{FValues[4]}, {FValues[5]}, {FValues[6]}, {FValues[7]}]}}</DisplayString>
+      </Synthetic>
+      <Synthetic Name="r2">
+        <DisplayString>{{[{FValues[8]}, {FValues[9]}, {FValues[10]}, {FValues[11]}]}}</DisplayString>
+      </Synthetic>
+      <Synthetic Name="r3">
+        <DisplayString>{{[{FValues[12]}, {FValues[13]}, {FValues[14]}, {FValues[15]}]}}</DisplayString>
+      </Synthetic>
+    </Expand>
+  </Type>
 </AutoVisualizer>
