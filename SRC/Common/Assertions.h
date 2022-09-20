@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "Config.h"
 namespace ECSEngine
 {
 class AssertImplementation

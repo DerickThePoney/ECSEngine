@@ -17,6 +17,7 @@
 // clang-format on
 
 #include "GLMIncludes.h"
+#include "Config.h"
 #include "Macros.h"
 #include "Profiling.h"
 
