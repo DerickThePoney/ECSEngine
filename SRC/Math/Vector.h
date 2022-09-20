@@ -12,12 +12,12 @@ struct alignas(16) Vector2
 {
 public:
     Vector2() = default;
-    Vector2(T parValue)
+    explicit Vector2(T parValue)
         : x(parValue)
         , y(parValue)
     {
     }
-    Vector2(T parX, T parY)
+    explicit Vector2(T parX, T parY)
         : x(parX)
         , y(parY)
     {
@@ -106,24 +106,24 @@ struct alignas(16) Vector3
 {
 public:
     Vector3() = default;
-    Vector3(T parValue)
+    explicit Vector3(T parValue)
         : x(parValue)
         , y(parValue)
         , z(parValue)
     {
     }
-    Vector3(T parX, T parY)
+    explicit Vector3(T parX, T parY)
         : x(parX)
         , y(parY)
     {
     }
-    Vector3(T parX, T parY, T parZ)
+    explicit Vector3(T parX, T parY, T parZ)
         : x(parX)
         , y(parY)
         , z(parZ)
     {
     }
-    Vector3(const Vector2<T>& parVec2)
+    explicit Vector3(const Vector2<T>& parVec2)
         : x(parVec2.x)
         , y(parVec2.y)
     {
@@ -132,7 +132,7 @@ public:
 #define MAKESCALAROP(OP)                                                                                                                                                           \
     inline Vector3 operator OP(const T parA)                                                                                                                                       \
     {                                                                                                                                                                              \
-        return Vector3(x OP parA, y OP parA);                                                                                                                                      \
+        return Vector3(x OP parA, y OP parA, z OP parA);                                                                                                                                      \
     }                                                                                                                                                                              \
     inline void operator OP=(const T parA)                                                                                                                                        \
     {                                                                                                                                                                              \
@@ -258,37 +258,44 @@ struct alignas(16) Vector4
 {
 public:
     Vector4() = default;
-    Vector4(T parValue)
+    explicit Vector4(T parValue)
         : x(parValue)
         , y(parValue)
         , z(parValue)
         , w(parValue)
     {
     }
-    Vector4(T parX, T parY)
+    explicit Vector4(T parX, T parY)
         : x(parX)
         , y(parY)
     {
     }
-    Vector4(T parX, T parY, T parZ)
+    explicit Vector4(T parX, T parY, T parZ)
         : x(parX)
         , y(parY)
         , z(parZ)
     {
     }
-    Vector4(T parX, T parY, T parZ, T parW)
+    explicit Vector4(T parX, T parY, T parZ, T parW)
         : x(parX)
         , y(parY)
         , z(parZ)
         , w(parW)
     {
     }
-    Vector4(const Vector2<T>& parVec2)
+    explicit Vector4(const Vector2<T>& parVec2)
         : x(parVec2.x)
         , y(parVec2.y)
     {
     }
-    Vector4(const Vector3<T>& parVec3)
+    explicit Vector4(const Vector2<T>& parVec21, const Vector2<T>& parVec22)
+        : x(parVec21.x)
+        , y(parVec21.y) 
+        , z(parVec22.x)
+        , w(parVec22.y)
+    {
+    }
+    explicit Vector4(const Vector3<T>& parVec3)
         : x(parVec3.x)
         , y(parVec3.y)
         , z(parVec3.z)
@@ -301,7 +308,7 @@ public:
 #define MAKESCALAROP(OP)                                                                                                                                                           \
     inline Vector4 operator OP(const T parA)                                                                                                                                       \
     {                                                                                                                                                                              \
-        return Vector4(x OP parA, y OP parA);                                                                                                                                      \
+        return Vector4(x OP parA, y OP parA, z OP parA, w OP parA);                                                                                                                                      \
     }                                                                                                                                                                              \
     inline void operator OP=(const T parA)                                                                                                                                        \
     {                                                                                                                                                                              \
@@ -314,7 +321,7 @@ public:
 #define MAKEVECOP(OP)                                                                                                                                                              \
     inline Vector4 operator OP(const Vector4& parA)                                                                                                                                \
     {                                                                                                                                                                              \
-        return Vector4(x OP parA.x, y OP parA.y, z OP parA.z);                                                                                                                     \
+        return Vector4(x OP parA.x, y OP parA.y, z OP parA.z, w OP parA.w);                                                                                                                     \
     }                                                                                                                                                                              \
     inline void operator OP=(const Vector4& parA)                                                                                                                                 \
     {                                                                                                                                                                              \
