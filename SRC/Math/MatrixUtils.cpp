@@ -1,6 +1,7 @@
 #include "MatrixUtils.h"
 #include "Matrix.h"
 #include "Vector.h"
+#include "VectorUtils.h"
 #include "Common/Assertions.h"
 
 namespace ECSEngine
@@ -125,7 +126,17 @@ float Determinant(const mat3& parA)
 
 float Determinant(const mat4& parA)
 {
-    return 0.f;
+    float f00 = parA.FValues[10] * parA.FValues[15] - parA.FValues[11] * parA.FValues[14];
+    float f01 = parA.FValues[6] * parA.FValues[15] - parA.FValues[7] * parA.FValues[14];
+    float f02 = parA.FValues[6] * parA.FValues[11] - parA.FValues[7] * parA.FValues[10];
+    float f03 = parA.FValues[2] * parA.FValues[15] - parA.FValues[3] * parA.FValues[14];
+    float f04 = parA.FValues[2] * parA.FValues[11] - parA.FValues[3] * parA.FValues[10];
+    float f05 = parA.FValues[2] * parA.FValues[7] - parA.FValues[3] * parA.FValues[6];
+
+    vec4 DetCof(+(parA.FValues[5] * f00 - parA.FValues[9] * f01 + parA.FValues[13] * f02), -(parA.FValues[1] * f00 - parA.FValues[9] * f03 + parA.FValues[13] * f04),
+          +(parA.FValues[1] * f01 - parA.FValues[5] * f03 + parA.FValues[13] * f05), -(parA.FValues[1] * f02 - parA.FValues[5] * f04 + parA.FValues[9] * f05));
+
+    return Dot(parA.Column(0), DetCof);
 }
 
 mat2 Invert(const mat2& parA)
@@ -169,7 +180,63 @@ mat3 Invert(const mat3& parA)
 
 mat4 Invert(const mat4& parA)
 {
-    return mat4();
+    float Coef00 = parA.FValues[10] * parA.FValues[15] - parA.FValues[11] * parA.FValues[14];
+    float Coef02 = parA.FValues[9] * parA.FValues[15] - parA.FValues[11] * parA.FValues[13];
+    float Coef03 = parA.FValues[9] * parA.FValues[14] - parA.FValues[10] * parA.FValues[13];
+
+    float Coef04 = parA.FValues[6] * parA.FValues[15] - parA.FValues[7] * parA.FValues[14];
+    float Coef06 = parA.FValues[5] * parA.FValues[15] - parA.FValues[7] * parA.FValues[13];
+    float Coef07 = parA.FValues[5] * parA.FValues[14] - parA.FValues[6] * parA.FValues[13];
+
+    float Coef08 = parA.FValues[6] * parA.FValues[11] - parA.FValues[7] * parA.FValues[10];
+    float Coef10 = parA.FValues[5] * parA.FValues[11] - parA.FValues[7] * parA.FValues[9];
+    float Coef11 = parA.FValues[5] * parA.FValues[10] - parA.FValues[6] * parA.FValues[9];
+
+    float Coef12 = parA.FValues[2] * parA.FValues[15] - parA.FValues[3] * parA.FValues[14];
+    float Coef14 = parA.FValues[1] * parA.FValues[15] - parA.FValues[3] * parA.FValues[13];
+    float Coef15 = parA.FValues[1] * parA.FValues[14] - parA.FValues[2] * parA.FValues[13];
+
+    float Coef16 = parA.FValues[2] * parA.FValues[11] - parA.FValues[3] * parA.FValues[10];
+    float Coef18 = parA.FValues[1] * parA.FValues[11] - parA.FValues[3] * parA.FValues[9];
+    float Coef19 = parA.FValues[1] * parA.FValues[10] - parA.FValues[2] * parA.FValues[9];
+
+    float Coef20 = parA.FValues[2] * parA.FValues[7] - parA.FValues[3] * parA.FValues[6];
+    float Coef22 = parA.FValues[1] * parA.FValues[7] - parA.FValues[3] * parA.FValues[5];
+    float Coef23 = parA.FValues[1] * parA.FValues[6] - parA.FValues[2] * parA.FValues[5];
+
+    vec4 Fac0(Coef00, Coef00, Coef02, Coef03);
+    vec4 Fac1(Coef04, Coef04, Coef06, Coef07);
+    vec4 Fac2(Coef08, Coef08, Coef10, Coef11);
+    vec4 Fac3(Coef12, Coef12, Coef14, Coef15);
+    vec4 Fac4(Coef16, Coef16, Coef18, Coef19);
+    vec4 Fac5(Coef20, Coef20, Coef22, Coef23);
+
+    vec4 Vec0(parA.FValues[1], parA.FValues[0], parA.FValues[0], parA.FValues[0]);
+    vec4 Vec1(parA.FValues[5], parA.FValues[4], parA.FValues[4], parA.FValues[4]);
+    vec4 Vec2(parA.FValues[9], parA.FValues[8], parA.FValues[8], parA.FValues[8]);
+    vec4 Vec3(parA.FValues[13], parA.FValues[12], parA.FValues[12], parA.FValues[12]);
+
+    vec4 Inv0(Vec1 * Fac0 - Vec2 * Fac1 + Vec3 * Fac2);
+    vec4 Inv1(Vec0 * Fac0 - Vec2 * Fac3 + Vec3 * Fac4);
+    vec4 Inv2(Vec0 * Fac1 - Vec1 * Fac3 + Vec3 * Fac5);
+    vec4 Inv3(Vec0 * Fac2 - Vec1 * Fac4 + Vec2 * Fac5);
+
+    vec4 SignA(+1, -1, +1, -1);
+    vec4 SignB(-1, +1, -1, +1);
+    mat4 Inverse(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
+
+    vec4 Row0(Inverse.FValues[0], Inverse.FValues[1], Inverse.FValues[2], Inverse.FValues[3]);
+
+    vec4 Dot0(parA.Column(0) * Row0);
+    float Dot1 = (Dot0.x + Dot0.y) + (Dot0.z + Dot0.w);
+
+    AlwaysCheckedAssert(Dot1 != 0.f);
+    if (Dot1 == 0.f)
+        return mat4();
+
+    float ooDeter = 1.f / Dot1;
+
+    return Inverse * ooDeter;
 }
 
 mat2 Transpose(const mat2& parA)
