@@ -236,12 +236,16 @@ struct alignas(16) Matrix4x4f
 
     inline void operator*=(const Matrix4x4f& parA)
     {
-        for (u32 r = 0; r < Matrix4x4f::Size * Matrix4x4f::Size; ++r)
-            for (u32 c = 0; c < Matrix4x4f::Size * Matrix4x4f::Size; ++c)
-                FValues[r * Size + c] = FValues[r * Size] * parA.FValues[c] 
-                                      + FValues[r * Size + 1] * parA.FValues[Size + c] 
-                                      + FValues[r * Size + 2] * parA.FValues[2 * Size + c] 
-                                      + FValues[r * Size + 3] * parA.FValues[3 * Size + c];
+        for (u32 r = 0; r < Matrix4x4f::Size; ++r)
+        {
+            for (u32 c = 0; c < Matrix4x4f::Size; ++c)
+            {
+                FValues[r * Size + c] = FValues[r * Size] * parA.FValues[c] + 
+                                        FValues[r * Size + 1] * parA.FValues[Size + c] + 
+                                        FValues[r * Size + 2] * parA.FValues[2 * Size + c] +
+                                        FValues[r * Size + 3] * parA.FValues[3 * Size + c];
+            }
+        }
     }
 
     inline Matrix4x4f operator*=(const float parA)

@@ -183,14 +183,17 @@ Matrix4x4f::Matrix4x4f(const vec4& A, const vec4& B, const vec4& C, const vec4& 
     FValues[1] = B.x;
     FValues[2] = C.x;
     FValues[3] = D.x;
+
     FValues[4] = A.y;
     FValues[5] = B.y;
     FValues[6] = C.y;
     FValues[7] = D.y;
+
     FValues[8] = A.z;
     FValues[9] = B.z;
     FValues[10] = C.z;
     FValues[11] = D.z;
+
     FValues[12] = A.w;
     FValues[13] = B.w;
     FValues[14] = C.w;
