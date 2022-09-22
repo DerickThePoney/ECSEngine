@@ -71,7 +71,7 @@ def main():
         return CloneAssets()
     elif args.tests:
         print('Clone Test')
-        return CloneAssets()
+        return CloneTests()
 
 if __name__ == "__main__":
    sys.exit(main())
