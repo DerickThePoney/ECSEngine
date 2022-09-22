@@ -64,7 +64,7 @@ def BuildEngineTools(config, MSBUILD):
     return result.returncode
 
 def BuildAndRunUnitTests(config, MSBUILD):
-    print('BUILDING ECSEngine')
+    print('BUILDING UnitTests')
     sys.stdout.flush()
 
     command = ['py', '-u', 'Script/FastBuild/fastbuild.py']
@@ -80,6 +80,9 @@ def BuildAndRunUnitTests(config, MSBUILD):
 
     if result.returncode != 0:
         return result.returncode
+
+    print('\nRUNNING UnitTests')
+    sys.stdout.flush()
 
     command = ['./bin/UnitTests-x64-%s.exe'%(config)]
 

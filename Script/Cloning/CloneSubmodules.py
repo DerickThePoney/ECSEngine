@@ -69,7 +69,7 @@ def main():
     elif args.assets:
         print('Clone Assets')
         return CloneAssets()
-    elif args.test:
+    elif args.tests:
         print('Clone Test')
         return CloneAssets()
 
