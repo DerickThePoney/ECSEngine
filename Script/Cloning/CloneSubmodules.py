@@ -27,13 +27,24 @@ def CloneAssets():
 
     return result.returncode
 
+def CloneTests():
+    print('CLONING FOR TESTS')
+    sys.stdout.flush()
+    result = subprocess.run('git submodule update --depth 1 --init -- External/Test', shell=True)
+
+    return result.returncode
+
 def CloneAll():
     result = CloneEngine()
 
     if result != 0:
         return result
 
-    return CloneAssets()
+    result = CloneAssets()
+    if result != 0:
+        return result
+
+    return CloneTests()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -42,6 +53,7 @@ def main():
     group.add_argument('-b', '--bgfx', action="store_true", help='Clone BGFX')
     group.add_argument('-e', '--engine', action="store_true", help='Clone all for engine (adds -b)')
     group.add_argument('-s', '--assets', action="store_true", help='Clone Assets')
+    group.add_argument('-t', '--tests', action="store_true", help='Clone Test')
 
     args = parser.parse_args()
 
@@ -56,6 +68,9 @@ def main():
         return CloneEngine()
     elif args.assets:
         print('Clone Assets')
+        return CloneAssets()
+    elif args.test:
+        print('Clone Test')
         return CloneAssets()
 
 if __name__ == "__main__":

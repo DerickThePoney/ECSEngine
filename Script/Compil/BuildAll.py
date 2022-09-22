@@ -63,6 +63,30 @@ def BuildEngineTools(config, MSBUILD):
 
     return result.returncode
 
+def BuildAndRunUnitTests(config, MSBUILD):
+    print('BUILDING ECSEngine')
+    sys.stdout.flush()
+
+    command = ['py', '-u', 'Script/FastBuild/fastbuild.py']
+
+    result = subprocess.run(command)
+
+    if result.returncode != 0:
+        return result.returncode
+
+    command = ['./tools/FBuild.exe', '-summary', 'Build-UnitTests-x64-%s'%(config)]
+
+    result = subprocess.run(command)
+
+    if result.returncode != 0:
+        return result.returncode
+
+    command = ['./bin/UnitTests-x64-%s.exe'%(config)]
+
+    result = subprocess.run(command)
+
+    return result.returncode
+
 def BuildSolution():
     print('BUILDING Solution')
     sys.stdout.flush()
@@ -97,6 +121,7 @@ def main():
     group.add_argument('-b', '--bgfx', action="store_true", help='Build BGFX')
     group.add_argument('-e', '--engine', action="store_true", help='Build Engine')
     group.add_argument('-et', '--enginetools', action="store_true", help='Build Engine tools')
+    group.add_argument('-ut', '--unittests', action="store_true", help='Build And Run Unit Tests')
     parser.add_argument('-sln', '--solution', action="store_true", help='Build Solution')
     parser.add_argument('-c', '--config', type=str, help='Configuration to build', default='Release', choices=['Debug','Release','Profile','Final'])
     parser.add_argument('-m', '--msbuild', type=str, help='Path to MSBuild')
@@ -125,6 +150,8 @@ def main():
         return BuildEngine(args.config, MSBUILD)
     elif args.enginetools:
         return BuildEngineTools(args.config, MSBUILD)
+    elif args.unittests:
+        return BuildAndRunUnitTests(args.config, MSBUILD)
 
 if __name__ == "__main__":
    sys.exit(main())

@@ -13,6 +13,7 @@
 .'$GameName$Projects' = {}
 .AssetCookerProjects = {}
 .DataPackerProjects = {}
+.UnitTestsProjects = {}
 
 #include "Projects/External/Assimp.bff"
 #include "Projects/External/RenderingLibs.bff"
@@ -48,6 +49,8 @@
 #include "Projects/AssetCooker.bff"
 #include "Projects/DataPacker.bff"
 
+#include "Projects/UnitTests.bff"
+
 {
     .ExeName = .GameName
     .ProjectList = .'$GameName$Projects'
@@ -57,6 +60,12 @@
 {
     .ExeName = 'DataPacker'
     .ProjectList = .DataPackerProjects
+    #include "Utils/Executable.bff"
+}
+
+{
+    .ExeName = 'UnitTests'
+    .ProjectList = .UnitTestsProjects
     #include "Utils/Executable.bff"
 }
 
@@ -76,8 +85,7 @@
 #include "Utils/BuildSolutionProjects.bff"
 
 {
-    .ProjectList = .'$GameName$Projects' + .AssetCookerProjects + .DataPackerProjects
-    Print(.ProjectList)
+    .ProjectList = .'$GameName$Projects' + .AssetCookerProjects + .DataPackerProjects + .UnitTestsProjects
     #include "Utils/SolutionFile.bff"
 }
 
@@ -89,6 +97,14 @@ Alias('all')
 ForEach(.SolutionConfig in .SolutionConfigs)
 {
     Using(.SolutionConfig)
+
+    {
+        .ExeName = 'UnitTests'
+        Alias('Build-$ExeName$-$Platform$-$Config$')
+        {
+            .Targets = {'$ExeName$-Exe-$Platform$-$Config$'}
+        }
+    }
 
     {
         .ExeName = 'DataPacker'

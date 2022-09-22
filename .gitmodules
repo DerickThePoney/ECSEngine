@@ -94,3 +94,6 @@
 [submodule "External/tracy"]
 	path = External/tracy
 	url = https://github.com/wolfpld/tracy.git
+[submodule "External/Test/doctest"]
+	path = External/Test/doctest
+	url = https://github.com/doctest/doctest.git
