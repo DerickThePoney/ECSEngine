@@ -24,6 +24,13 @@ struct alignas(16) Quaternionf
     {
     }
 
+    explicit Quaternionf(const vec3& parAxis, const float parAngle);
+
+
+    inline bool operator==(const Quaternionf& parA) { return parA.x == x && parA.y == y && parA.z == z && parA.w == w; }
+
+    inline bool operator!=(const Quaternionf& parA) { return !(*this == parA); }
+
     inline quat operator*(const float parA) { return quat(x * parA, y * parA, z * parA, w * parA); }
 
     float x = 0.f;
