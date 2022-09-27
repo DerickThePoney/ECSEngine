@@ -1,7 +1,7 @@
 #pragma once
-#include "Vector.h"
+#include "MatrixTypes.h"
 #include "QuaternionTypes.h"
-
+#include "Vector.h"
 
 namespace ECSEngine
 {
@@ -26,12 +26,15 @@ struct alignas(16) Quaternionf
 
     explicit Quaternionf(const vec3& parAxis, const float parAngle);
 
-
     inline bool operator==(const Quaternionf& parA) { return parA.x == x && parA.y == y && parA.z == z && parA.w == w; }
 
     inline bool operator!=(const Quaternionf& parA) { return !(*this == parA); }
 
     inline quat operator*(const float parA) { return quat(x * parA, y * parA, z * parA, w * parA); }
+    quat operator*(const quat& parA);
+    void operator*=(const quat& parA);
+
+    explicit operator mat4() const;
 
     float x = 0.f;
     float y = 0.f;
@@ -43,4 +46,11 @@ inline quat operator*(const quat& parQ, const float parA)
 {
     return quat(parQ.x * parA, parQ.y * parA, parQ.z * parA, parQ.w * parA);
 }
+
+inline quat operator*(const quat& parA, const quat& parB)
+{
+    quat res = parA;
+    res *= parB;
+    return res;
 }
+} // namespace ECSEngine

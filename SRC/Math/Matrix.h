@@ -1,6 +1,6 @@
 #pragma once
-#include "VectorTypes.h"
 #include "MatrixTypes.h"
+#include "VectorTypes.h"
 
 namespace ECSEngine
 {
@@ -30,10 +30,10 @@ struct alignas(16) Matrix2x2f
         result.FValues[3] = parA * FValues[3];
         return result;
     }
-    Matrix2x2f operator*(const Matrix2x2f& parA);    
+    Matrix2x2f operator*(const Matrix2x2f& parA);
     vec2 operator*(const vec2& parA);
-    Matrix2x2f operator + (const Matrix2x2f& parA);
-    Matrix2x2f operator - (const Matrix2x2f& parA);
+    Matrix2x2f operator+(const Matrix2x2f& parA);
+    Matrix2x2f operator-(const Matrix2x2f& parA);
 
     inline void operator-=(const Matrix2x2f& parA)
     {
@@ -42,7 +42,7 @@ struct alignas(16) Matrix2x2f
         FValues[2] -= parA.FValues[2];
         FValues[3] -= parA.FValues[3];
     }
-    
+
     inline void operator+=(const Matrix2x2f& parA)
     {
         FValues[0] += parA.FValues[0];
@@ -50,7 +50,7 @@ struct alignas(16) Matrix2x2f
         FValues[2] += parA.FValues[2];
         FValues[3] += parA.FValues[3];
     }
-    
+
     inline void operator*=(const Matrix2x2f& parA)
     {
         FValues[0] = FValues[0] * parA.FValues[0] + FValues[1] * parA.FValues[2];
@@ -66,9 +66,8 @@ struct alignas(16) Matrix2x2f
         FValues[2] = parA * FValues[2];
         FValues[3] = parA * FValues[3];
     }
-    
-    static Matrix2x2f Identity();
 
+    static Matrix2x2f Identity();
 
     float FValues[4] = { 0.f, 0.f, 0.f, 0.f };
 };
@@ -80,6 +79,13 @@ inline Matrix2x2f operator*(const float parA, const Matrix2x2f& parB)
     result.FValues[1] = parA * parB.FValues[1];
     result.FValues[2] = parA * parB.FValues[2];
     result.FValues[3] = parA * parB.FValues[3];
+    return result;
+}
+
+inline Matrix2x2f operator*(const Matrix2x2f& parA, const Matrix2x2f& parB)
+{
+    Matrix2x2f result = parA;
+    result *= parB;
     return result;
 }
 
@@ -192,6 +198,13 @@ inline Matrix3x3f operator*(const float parA, const Matrix3x3f& parB)
     return result;
 }
 
+inline Matrix3x3f operator*(const Matrix3x3f& parA, const Matrix3x3f& parB)
+{
+    Matrix3x3f result = parA;
+    result *= parB;
+    return result;
+}
+
 /****************************
  * Matrix4x4f
  ****************************/
@@ -240,10 +253,8 @@ struct alignas(16) Matrix4x4f
         {
             for (u32 c = 0; c < Matrix4x4f::Size; ++c)
             {
-                FValues[r * Size + c] = FValues[r * Size] * parA.FValues[c] + 
-                                        FValues[r * Size + 1] * parA.FValues[Size + c] + 
-                                        FValues[r * Size + 2] * parA.FValues[2 * Size + c] +
-                                        FValues[r * Size + 3] * parA.FValues[3 * Size + c];
+                FValues[r * Size + c] = FValues[r * Size] * parA.FValues[c] + FValues[r * Size + 1] * parA.FValues[Size + c] + FValues[r * Size + 2] * parA.FValues[2 * Size + c] +
+                      FValues[r * Size + 3] * parA.FValues[3 * Size + c];
             }
         }
     }
@@ -267,4 +278,11 @@ inline Matrix4x4f operator*(const float parA, const Matrix4x4f& parB)
     return result;
 }
 
+inline Matrix4x4f operator*(const Matrix4x4f& parA, const Matrix4x4f& parB)
+{
+    Matrix4x4f result = parA;
+    result *= parB;
+    return result;
 }
+
+} // namespace ECSEngine
