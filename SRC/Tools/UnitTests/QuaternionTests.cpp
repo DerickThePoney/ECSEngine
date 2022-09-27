@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "doctest.h"
 
 #include "Math/Quaternion.h"
+#include "doctest.h"
 
 using namespace ECSEngine;
 
@@ -20,7 +20,7 @@ TEST_SUITE("Quaternion tests")
         CHECK(a == b);
     }
 
-    TEST_CASE("Quaternion multiplications")
+    TEST_CASE("Quaternion scalar multiplications")
     {
         vec4 one(1.f);
         quat a(one);
