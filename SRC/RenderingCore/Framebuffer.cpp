@@ -8,7 +8,7 @@ namespace Rendering
 
 IMPLEMENT_POOL_ALLOCATED(FramebufferInstance);
 
-FramebufferInstance::FramebufferInstance(const FramebufferSizeType::Type parSizeType, const glm::vec2 parSize)
+FramebufferInstance::FramebufferInstance(const FramebufferSizeType::Type parSizeType, const uvec2 parSize)
     : FFramebufferSizeType(parSizeType)
     , FSize(parSize)
 {
@@ -19,7 +19,7 @@ FramebufferInstance::~FramebufferInstance()
     Destroy();
 }
 
-glm::uvec2 FramebufferInstance::Size() const
+uvec2 FramebufferInstance::Size() const
 {
     return FSize;
 }
@@ -70,7 +70,7 @@ void FramebufferInstance::AddAttachement(bool parHasMips,
     FAttachments[idx].init(handle, parAccess, parLayer, parMip);
 }
 
-bool FramebufferInstance::ResizeIFN(const glm::uvec2 parNewSize)
+bool FramebufferInstance::ResizeIFN(const uvec2 parNewSize)
 {
     if (!ShouldResizeWithScreen() || parNewSize == FSize)
         return false;

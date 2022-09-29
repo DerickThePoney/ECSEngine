@@ -42,11 +42,11 @@ void EnergyEfficiencyDescriptor::DrawEditor()
         {
             ImGui::PushID(i);
             EDITOR_PROPERTY_SIMPLE("##threshold", value.first);
-            value.first = glm::clamp(value.first, 0.f, 1.f);
+            value.first = Clamp(value.first, 0.f, 1.f);
 
             ImGui::SameLine();
             EDITOR_PROPERTY_SIMPLE("##efficiency", value.second);
-            value.second = glm::clamp(value.second, 0.f, 100.f);
+            value.second = Clamp(value.second, 0.f, 100.f);
             ImGui::SameLine();
             if (ImGui::Button("X"))
             {
@@ -71,7 +71,7 @@ void EnergyEfficiencyDescriptor::DrawEditor()
         }
         if (shouldSort)
         {
-            ImGui::TextColored(glm::vec4(1.f, 0.f, 0.f, 1.f), "ATTENTION: NEEDS SORTING!!!!!!");
+            ImGui::TextColored(vec4(1.f, 0.f, 0.f, 1.f), "ATTENTION: NEEDS SORTING!!!!!!");
             if (ImGui::Button("Sort values"))
             {
                 std::sort(FValues.begin(), FValues.end());

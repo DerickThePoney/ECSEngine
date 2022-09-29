@@ -38,7 +38,7 @@ void ReadSkelettonImplementation(const MeshHandle parHandle, const MeshFileHeade
         AssertRelease(nameLength > 0);
         parStream.read((c8*)buff, nameLength);
         joint.Name = std::string(buff, nameLength);
-        parStream.read((c8*)&joint.InverseLocalTransform, sizeof(glm::mat4));
+        parStream.read((c8*)&joint.InverseLocalTransform, sizeof(mat4));
     }
 
     Skeletton* skeletton = SkelettonManager::Instance().CreateSkeletton_ReturnCreatedSkeletton(parHandle);
@@ -63,7 +63,7 @@ void ReadSkelettonImplementation(const MeshHandle parHandle, const MeshFileHeade
             SkelettonJoint& joint = skeletton->GetJoint((u8)i);
             if (joint.ParentId == 0xFF)
             {
-                joint.ModelToJointMatrix = glm::identity<glm::mat4>();
+                joint.ModelToJointMatrix = mat4::Identity();
                 computed[i] = true;
                 continue;
             }
@@ -95,13 +95,13 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
     VertexDataStream vertexDataStream(fileHeader.NbVertices, fileHeader.VertexSizeInOctet, hash);
 
     std::vector<u32> indices;
-    glm::vec3 verticesGravityCenter = glm::vec3(0.0f);
+    vec3 verticesGravityCenter = vec3(0.0f);
     indices.resize(fileHeader.NbIndices);
     forrange(i, 0, fileHeader.NbVertices)
     {
         if (fileHeader.layout.HasPositions)
         {
-            glm::vec3 data(0.0f);
+            vec3 data(0.0f);
             parStream.read((c8*)&data.x, 4);
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
@@ -118,7 +118,7 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
 
         forrange(j, 0, fileHeader.layout.NbUVs)
         {
-            glm::vec2 uv(0.0f);
+            vec2 uv(0.0f);
             parStream.read((c8*)&uv.x, 4);
             parStream.read((c8*)&uv.y, 4);
             vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, uv);
@@ -126,7 +126,7 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
 
         if (fileHeader.layout.HasNormals)
         {
-            glm::vec3 data(0.0f);
+            vec3 data(0.0f);
             parStream.read((c8*)&data.x, 4);
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
@@ -135,7 +135,7 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
 
         if (fileHeader.layout.HasTangents)
         {
-            glm::vec3 data(0.0f);
+            vec3 data(0.0f);
             parStream.read((c8*)&data.x, 4);
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
@@ -144,7 +144,7 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
 
         if (fileHeader.layout.HasBinormals)
         {
-            glm::vec3 data(0.0f);
+            vec3 data(0.0f);
             parStream.read((c8*)&data.x, 4);
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
@@ -168,8 +168,8 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
     {
         forrange(i, 0, fileHeader.NbVertices)
         {
-            const glm::vec3 currentVertex = vertexDataStream.GetValue<glm::vec3>(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (u32)i);
-            radius = std::max(radius, glm::length2(currentVertex - verticesGravityCenter));
+            const vec3 currentVertex = vertexDataStream.GetValue<vec3>(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (u32)i);
+            radius = std::max(radius, LengthSq(currentVertex - verticesGravityCenter));
         }
     }
 
@@ -183,7 +183,7 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
 
     parMesh->SetRawVertexData(vertexDataStream);
     parMesh->SetRawIndexData(indices.data(), fileHeader.NbIndices * 4u);
-    parMesh->SetBoundingCircle(glm::vec4(verticesGravityCenter, radius));
+    parMesh->SetBoundingCircle(vec4(verticesGravityCenter, radius));
 
     ReadSkelettonImplementation(parHandle, fileHeader, parStream);
 }

@@ -52,16 +52,17 @@ void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/, const float parMen
     const u32 templatesToDraw = EntityTemplateManager::Instance().GetEntityTemplatesNumber();
     static EEntityWorlds worldIdFilter = EEntityWorlds::LENGTH;
 
-    glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    ImGui::SetNextWindowSize(windowSize * glm::vec2(1.0f, 1.0f - (parMenuBarHeight / windowSize.y)));
-    ImGui::SetNextWindowPos(glm::vec2(0.0f, parMenuBarHeight));
+    const uvec2 uwindowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const vec2 windowSize(uwindowSize.x, uwindowSize.y);
+    ImGui::SetNextWindowSize(windowSize * vec2(1.0f, 1.0f - (parMenuBarHeight / windowSize.y)));
+    ImGui::SetNextWindowPos(vec2(0.0f, parMenuBarHeight));
 
     ImGui::Begin("Entity templates editor", parOutOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
     DrawEditorMenu(worldIdFilter);
-    const glm::vec2 currentWindowSize = ImGui::GetContentRegionAvail();
-    const glm::vec2 utilityPlace = currentWindowSize - 50.0f;
+    const vec2 currentWindowSize = ImGui::GetContentRegionAvail();
+    const vec2 utilityPlace = currentWindowSize - 50.0f;
     const float listProportion = 0.30f;
-    const glm::vec2 listSize = utilityPlace * glm::vec2(listProportion, 1.0f);
+    const vec2 listSize = utilityPlace * vec2(listProportion, 1.0f);
     ImGui::SetCursorPosX(((currentWindowSize - utilityPlace) * 0.5f).x);
     ImGui::BeginChild(ImGui::GetID("Entity templates list"), listSize, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
@@ -94,7 +95,7 @@ void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/, const float parMen
     ImGui::SameLine();
 
     EntityTemplate* et = (selected != -1) ? EntityTemplateManager::Instance().GetEntityTemplateForWriting(selected) : nullptr;
-    const glm::vec2 editorPlace = utilityPlace * glm::vec2(1 - listProportion, 1.0f);
+    const vec2 editorPlace = utilityPlace * vec2(1 - listProportion, 1.0f);
     ImGui::BeginChild(ImGui::GetID("Entity template editor"), editorPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
     if (et != nullptr)
     {

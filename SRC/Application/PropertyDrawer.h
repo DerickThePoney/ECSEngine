@@ -86,10 +86,10 @@ private:
 };
 
 template<>
-class PropertyDrawer<glm::vec2>
+class PropertyDrawer<vec2>
 {
 public:
-    PropertyDrawer(const std::string& parPropertyName, glm::vec2* parProperty, bool parUseLimits, glm::vec2 parMin, glm::vec2 parMax)
+    PropertyDrawer(const std::string& parPropertyName, vec2* parProperty, bool parUseLimits, vec2 parMin, vec2 parMax)
         : FName(parPropertyName)
         , FProperty(parProperty)
         , FUseLimits(parUseLimits)
@@ -102,17 +102,17 @@ public:
 
 private:
     std::string FName;
-    glm::vec2* FProperty = nullptr;
+    vec2* FProperty = nullptr;
     bool FUseLimits;
-    glm::vec2 FMin;
-    glm::vec2 FMax;
+    vec2 FMin;
+    vec2 FMax;
 };
 
 template<>
-class PropertyDrawer<glm::vec3>
+class PropertyDrawer<vec3>
 {
 public:
-    PropertyDrawer(const std::string& parPropertyName, glm::vec3* parProperty, bool parUseLimits, glm::vec3 parMin, glm::vec3 parMax)
+    PropertyDrawer(const std::string& parPropertyName, vec3* parProperty, bool parUseLimits, vec3 parMin, vec3 parMax)
         : FName(parPropertyName)
         , FProperty(parProperty)
         , FUseLimits(parUseLimits)
@@ -125,17 +125,17 @@ public:
 
 private:
     std::string FName;
-    glm::vec3* FProperty = nullptr;
+    vec3* FProperty = nullptr;
     bool FUseLimits;
-    glm::vec3 FMin;
-    glm::vec3 FMax;
+    vec3 FMin;
+    vec3 FMax;
 };
 
 template<>
-class PropertyDrawer<glm::vec4>
+class PropertyDrawer<vec4>
 {
 public:
-    PropertyDrawer(const std::string& parPropertyName, glm::vec4* parProperty, bool parUseLimits, glm::vec4 parMin, glm::vec4 parMax)
+    PropertyDrawer(const std::string& parPropertyName, vec4* parProperty, bool parUseLimits, vec4 parMin, vec4 parMax)
         : FName(parPropertyName)
         , FProperty(parProperty)
         , FUseLimits(parUseLimits)
@@ -149,17 +149,17 @@ public:
 
 private:
     std::string FName;
-    glm::vec4* FProperty = nullptr;
+    vec4* FProperty = nullptr;
     bool FUseLimits;
-    glm::vec4 FMin;
-    glm::vec4 FMax;
+    vec4 FMin;
+    vec4 FMax;
 };
 
 template<>
-class PropertyDrawer<glm::quat>
+class PropertyDrawer<quat>
 {
 public:
-    PropertyDrawer(const std::string& parPropertyName, glm::quat* parProperty)
+    PropertyDrawer(const std::string& parPropertyName, quat* parProperty)
         : FName(parPropertyName)
         , FProperty(parProperty)
     {
@@ -169,7 +169,7 @@ public:
 
 private:
     std::string FName;
-    glm::quat* FProperty = nullptr;
+    quat* FProperty = nullptr;
 };
 
 template<>
@@ -198,7 +198,7 @@ public:
 
     void ShowProperty()
     {
-        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
 
         if (FUseLimits)
@@ -242,7 +242,7 @@ public:
 
     void ShowProperty()
     {
-        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
 
         if (FUseLimits)
@@ -274,7 +274,7 @@ public:
 
     void ShowProperty()
     {
-        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
 
         if (FUseLimits)
@@ -303,7 +303,7 @@ public:
 
     void ShowProperty()
     {
-        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
 
         ImGui::Checkbox(FName.c_str(), FProperty);
@@ -326,11 +326,11 @@ public:
 
     void ShowProperty()
     {
-        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
 
-        glm::vec2 min = FProperty->Min();
-        glm::vec2 max = FProperty->Max();
+        vec2 min = FProperty->Min();
+        vec2 max = FProperty->Max();
 
         ImGui::Text(FName.c_str());
         ImGui::Indent();
@@ -383,7 +383,7 @@ void MakePropertyWithLimits(const std::string& parName, T* parProperty, const T&
 
 #define EDITOR_PROPERTY_COLOR(NAME, PROPERTY)                                                                                                                                      \
     {                                                                                                                                                                              \
-        PropertyDrawer<glm::vec4> drawer(NAME, &PROPERTY, false, glm::vec4(-1), glm::vec4(-1));                                                                                    \
+        PropertyDrawer<vec4> drawer(NAME, &PROPERTY, false, vec4(-1), vec4(-1));                                                                                    \
         drawer.EditColor();                                                                                                                                                        \
     }
 

@@ -38,9 +38,9 @@ IMPLEMENT_POOL_ALLOCATED(GeneratorRotatorOperatorDescriptor);
 
 void GeneratorRotatorOperatorDescriptor::VirtualDrawInEditor()
 {
-    float rotationTRS = 0.5f * FRotationSpeed / glm::pi<float>();
+    float rotationTRS = 0.5f * FRotationSpeed / Pi();
     ImGui::InputFloat("Rotation speed (TRS)", &rotationTRS, 1.f, 10.f);
-    FRotationSpeed = 2.f * glm::pi<float>() * rotationTRS;
+    FRotationSpeed = 2.f * Pi() * rotationTRS;
 }
 
 REGISTER_OPERATOR_FACTORY(GeneratorRotatorOperatorDescriptor);
@@ -83,10 +83,10 @@ void GeneratorRotatorOperator::ApplyChangesOnMesh(const GFXMessage& parMessages,
             return;
     }
 
-    glm::mat4* localPoses = parSkelettonPose->LocalPoses();
+    mat4* localPoses = parSkelettonPose->LocalPoses();
     AssertRelease(localPoses != nullptr);
     const float angle = FDescriptor->RotationSpeed() * TimeManager::FrameDeltaTime();
-    localPoses[FSkelettonJoint] = glm::rotate(angle, glm::vec3(0.f, 0.f, 1.f)) * localPoses[FSkelettonJoint];
+    localPoses[FSkelettonJoint] = rotate(angle, vec3(0.f, 0.f, 1.f)) * localPoses[FSkelettonJoint];
     parSkelettonPose->SetDirty();
 }
 

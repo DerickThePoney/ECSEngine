@@ -1,5 +1,8 @@
 #pragma once
 
+#define WITH_GLM 0
+
+#if WITH_GLM
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_ALIGNED_GENTYPES
 #define GLM_FORCE_INTRINSICS
@@ -19,3 +22,13 @@
 #include <glm/gtx/norm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/vec_swizzle.hpp>
+#else
+#include "Math/Vector.h"
+#include "Math/VectorUtils.h"
+#include "Math/Matrix.h"
+#include "Math/MatrixUtils.h"
+#include "Math/Quaternion.h"
+#include "Math/QuaternionUtils.h"
+#include "Math/MathSerialization.h"
+#include "Math/MathFunctions.h"
+#endif

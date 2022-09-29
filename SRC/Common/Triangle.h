@@ -6,7 +6,7 @@ class Triangle2D
 {
 public:
     Triangle2D() { }
-    Triangle2D(const glm::vec2 parA, const glm::vec2 parB, const glm::vec2 parC)
+    Triangle2D(const vec2 parA, const vec2 parB, const vec2 parC)
         : A(parA)
         , B(parB)
         , C(parC)
@@ -16,8 +16,8 @@ public:
     float Area() const;
     bool IsDegenerate() const;
 
-    glm::vec2 A = glm::vec2(0.f);
-    glm::vec2 B = glm::vec2(0.f);
-    glm::vec2 C = glm::vec2(0.f);
+    vec2 A = vec2(0.f);
+    vec2 B = vec2(0.f);
+    vec2 C = vec2(0.f);
 };
 } // namespace ECSEngine

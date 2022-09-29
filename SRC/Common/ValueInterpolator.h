@@ -78,7 +78,7 @@ public:
         }
 
         // lerp the values and store it in the first keyframe
-        FKeyframes[0].Value = glm::lerp(
+        FKeyframes[0].Value = Lerp(
               FKeyframes[0].Value, FKeyframes[1].Value, (parCurrentTime - FKeyframes[0].KeyFrameTime) / (FKeyframes[1].KeyFrameTime - FKeyframes[0].KeyFrameTime));
         FKeyframes[0].KeyFrameTime = parCurrentTime;
     }

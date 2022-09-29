@@ -16,7 +16,7 @@ namespace Colony
 {
 float ColonyInitialRange = 20.f;
 float ColonyRangeFeedbackThickness = 1.f;
-glm::vec4 ColonyRangeFeedbackColor = glm::vec4(0.f);
+vec4 ColonyRangeFeedbackColor = vec4(0.f);
 } // namespace Colony
 namespace CircularBuildingGrid
 {
@@ -29,13 +29,13 @@ float NavigationNodesDistance = 0.5f;
 
 float GridChunkFeedbackThickness = 0.1f;
 u32 StartingGridChunkNumber = 2;
-glm::vec4 GridFeedbackColor = glm::vec4(0.f);
+vec4 GridFeedbackColor = vec4(0.f);
 } // namespace CircularBuildingGrid
 
 namespace Storage
 {
-glm::vec4 HighlightedColor = glm::vec4(1.f);
-glm::vec4 SelectedColor = glm::vec4(1.f);
+vec4 HighlightedColor = vec4(1.f);
+vec4 SelectedColor = vec4(1.f);
 float CircleThickness = 0.1f;
 } // namespace Storage
 

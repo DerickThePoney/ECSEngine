@@ -52,7 +52,7 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
 
     FDrawCommandBuffer->SetDebugMarker("Editor rendering");
 
-    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
 
     bgfx::setViewRect(Rendering::RenderPassId::EDITOR_PASS, 0, 0, windowSize.x, windowSize.y);
@@ -67,7 +67,7 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
     foreachitemconst(sceneItemIt, sceneItems)
     {
         const BaseSceneItem* sceneItem = sceneItemIt.second.get();
-        const glm::vec3& position = sceneItem->GetPosition();
+        const vec3& position = sceneItem->GetPosition();
 
         const bool isSelected = sceneItem->ItemSelected();
         const bool isHovered = sceneItem->ItemHovered();
@@ -78,12 +78,12 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
         else if (isHovered)
             color = 0xFFFF00FF;
 
-        FDrawCommandBuffer->DrawAABB(FHandleMaterial, position - glm::vec3(1.0f), position + glm::vec3(1.0f), color);
+        FDrawCommandBuffer->DrawAABB(FHandleMaterial, position - vec3(1.0f), position + vec3(1.0f), color);
 
         if (isSelected)
         {
-            glm::vec3 angles = sceneItem->GetEulerAngles();
-            glm::mat4 mtx = glm::translate(position) * glm::eulerAngleXYZ(angles.x, angles.y, angles.z);
+            vec3 angles = sceneItem->GetEulerAngles();
+            mat4 mtx = Translation(position) * EulerAnglesXYZ(angles.x, angles.y, angles.z);
 
             FDrawCommandBuffer->DrawMesh(FHandleMesh, FHandleMaterial, mtx);
         }
@@ -93,11 +93,11 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
     foreachitem(sceneAction, sceneActions) { sceneAction->DrawInSceneEditor(*FDrawCommandBuffer, FHandleMaterial); }
 
     bool foundPos = false;
-    glm::vec3 mouseWorldPosition = GetWorldPositionFromScreenPosition(*camera, aspectRatio, windowSize, Input::GetMousePosition(), foundPos);
+    vec3 mouseWorldPosition = GetWorldPositionFromScreenPosition(*camera, aspectRatio, windowSize, Input::GetMousePosition(), foundPos);
 
     if (foundPos)
     {
-        FDrawCommandBuffer->DrawAABBAsCube(FHandleMaterial, mouseWorldPosition + glm::vec3(-0.1f), mouseWorldPosition + glm::vec3(0.1f), 0xFF00FFFF);
+        FDrawCommandBuffer->DrawAABBAsCube(FHandleMaterial, mouseWorldPosition + vec3(-0.1f), mouseWorldPosition + vec3(0.1f), 0xFF00FFFF);
     }
 
     FDrawCommandBuffer->Submit();

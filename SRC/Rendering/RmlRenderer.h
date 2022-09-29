@@ -40,9 +40,9 @@ private:
 
     std::set<std::pair<MeshHandle, u32>> FCompiledGeometry;
 
-    glm::mat4 FCurrentMatrix = glm::identity<glm::mat4>();
-    glm::mat4 FProjMat = glm::identity<glm::mat4>();
-    glm::vec4 FScissor = glm::vec4(0.f);
+    mat4 FCurrentMatrix = mat4::Identity();
+    mat4 FProjMat = mat4::Identity();
+    vec4 FScissor = vec4(0.f);
 
     u16 FScissorIdx = 0;
 };

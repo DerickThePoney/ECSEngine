@@ -4,7 +4,6 @@
 
 #include "CameraMoverModule.h"
 #include "Common/CameraManager.h"
-#include "Common/GLMHelpers.h"
 #include "Common/Logger.h"
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
@@ -60,26 +59,26 @@ void CameraMoverSystem::VirtualUpdate()
         const float speedFactor = (slowMo) ? 0.2f : 1.0f;
 
         bool overrideWorldViewMatrix = false;
-        glm::vec3 movementCommand = glm::vec3(0.0f);
-        glm::vec2 rotationScreenDirection = glm::vec2(0.0f);
+        vec3 movementCommand = vec3(0.0f);
+        vec2 rotationScreenDirection = vec2(0.0f);
 
         rotationScreenDirection = Input::GetMousePositionDelta();
-        glm::mat4 newViewWorldMatrix = glm::identity<glm::mat4>();
+        mat4 newViewWorldMatrix = mat4::Identity();
 
         if (FMiddleMouseRotation.Evaluate())
         {
-            if (rotationScreenDirection != glm::vec2(0.0f))
+            if (rotationScreenDirection != vec2(0.0f))
             {
-                rotationScreenDirection = glm::normalize(rotationScreenDirection);
+                rotationScreenDirection = Normalize(rotationScreenDirection);
 
-                AssertRelease(!glm::isNan(rotationScreenDirection));
+                AssertRelease(!isNan(rotationScreenDirection));
 
-                const float rotationSpeed = speedFactor * glm::radians(moverTemplate->CameraRotationMaxSpeed());
+                const float rotationSpeed = speedFactor * Radians(moverTemplate->CameraRotationMaxSpeed());
                 moverModule.SetCurrentRotationSpeed(rotationSpeed);
 
-                const glm::quat currentOrientation = orientationModule->GetOrientation();
-                glm::quat newOrientation = glm::angleAxis(rotationScreenDirection.x * rotationSpeed * deltaTime, glm::vec3(0.f, 1.f, 0.f)) * currentOrientation;
-                newOrientation = glm::angleAxis(rotationScreenDirection.y * rotationSpeed * deltaTime, glm::vec3(glm::mat4_cast(newOrientation)[0])) * newOrientation;
+                const quat currentOrientation = orientationModule->GetOrientation();
+                quat newOrientation = angleAxis(rotationScreenDirection.x * rotationSpeed * deltaTime, vec3(0.f, 1.f, 0.f)) * currentOrientation;
+                newOrientation = angleAxis(rotationScreenDirection.y * rotationSpeed * deltaTime, ((mat4)newOrientation).Column(0).xyz()) * newOrientation;
 
                 orientationModule->SetOrientation(newOrientation);
                 overrideWorldViewMatrix = true;
@@ -104,19 +103,19 @@ void CameraMoverSystem::VirtualUpdate()
 
         if (FMiddleMouseScroll.Evaluate())
         {
-            glm::vec2 mouseScroll = Input::GetMouseScrollDelta();
+            vec2 mouseScroll = Input::GetMouseScrollDelta();
 
             float delta = mouseScroll.y;
 
             movementCommand.z += 10.0f * delta * speedFactor;
         }
 
-        if (movementCommand != glm::vec3(.0f))
+        if (movementCommand != vec3(.0f))
         {
             const float incrementFactor = moverModule.CurrentSpeed() +
-                  glm::clamp(moverTemplate->CameraAcceleration() * speedFactor * deltaTime, 0.f, moverTemplate->CameraMaxSpeed());
+                  Clamp(moverTemplate->CameraAcceleration() * speedFactor * deltaTime, 0.f, moverTemplate->CameraMaxSpeed());
 
-            glm::vec3 movement = glm::vec3(glm::mat4_cast(orientationModule->GetOrientation()) * incrementFactor * glm::vec4(movementCommand, 1.0f));
+            vec3 movement = vec3(mat4_cast(orientationModule->GetOrientation()) * incrementFactor * vec4(movementCommand, 1.0f));
             positionModule->SetPosition3D(positionModule->GetPosition3D() + movement);
 
             overrideWorldViewMatrix = true;
@@ -125,8 +124,8 @@ void CameraMoverSystem::VirtualUpdate()
         if (overrideWorldViewMatrix)
         {
             Camera* camera = CameraManager::Instance().GetCamera(moverModule.CamId());
-            const glm::mat4 worldview = glm::translate(positionModule->GetPosition3D()) * glm::mat4_cast(orientationModule->GetOrientation());
-            camera->SetWorldViewMatrix(glm::inverse(worldview));
+            const mat4 worldview = Translation(positionModule->GetPosition3D()) * mat4_cast(orientationModule->GetOrientation());
+            camera->SetWorldViewMatrix(Invert(worldview));
         }
     }
 }

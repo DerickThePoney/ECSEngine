@@ -62,18 +62,18 @@ class SetViewTranformCommand : public IDrawCommand
     DECLARE_POOL_ALLOCATED(SetViewTranformCommand);
 
 public:
-    SetViewTranformCommand(const u16 parViewId, const glm::mat4& parViewTransform, const glm::mat4& parProjection);
+    SetViewTranformCommand(const u16 parViewId, const mat4& parViewTransform, const mat4& parProjection);
     virtual ~SetViewTranformCommand();
 
     virtual void SubmitCommand() const override;
 
 private:
-    glm::mat4 FViewTransform;
-    glm::mat4 FProjection;
+    mat4 FViewTransform;
+    mat4 FProjection;
 };
 
 IMPLEMENT_POOL_ALLOCATED(SetViewTranformCommand);
-SetViewTranformCommand::SetViewTranformCommand(const u16 parViewId, const glm::mat4& parViewTransform, const glm::mat4& parProjection)
+SetViewTranformCommand::SetViewTranformCommand(const u16 parViewId, const mat4& parViewTransform, const mat4& parProjection)
     : IDrawCommand(parViewId)
     , FViewTransform(parViewTransform)
     , FProjection(parProjection)
@@ -86,7 +86,7 @@ SetViewTranformCommand::~SetViewTranformCommand()
 
 void SetViewTranformCommand::SubmitCommand() const
 {
-    bgfx::setViewTransform(FViewId, &FViewTransform[0][0], &FProjection[0][0]);
+    bgfx::setViewTransform(FViewId, &FViewTransform.FValues[0], &FProjection.FValues[0]);
 }
 
 //----------------------------------------------------------------
@@ -99,8 +99,8 @@ class DrawAABBCommand : public IDrawCommand
 public:
     DrawAABBCommand(const u16 parViewId,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::vec3& parMin,
-          const glm::vec3& parMax,
+          const vec3& parMin,
+          const vec3& parMax,
           const bool parDrawAsCube,
           const u32 parColor = 0xFFFFFFFF);
     virtual ~DrawAABBCommand();
@@ -108,8 +108,8 @@ public:
     virtual void SubmitCommand() const override;
 
 private:
-    glm::vec3 FMin;
-    glm::vec3 FMax;
+    vec3 FMin;
+    vec3 FMax;
     bool FDrawAsCube;
     u32 FColor;
     const MaterialInstanceHandle& FMaterialInstanceHandle;
@@ -117,8 +117,8 @@ private:
 
 DrawAABBCommand::DrawAABBCommand(const u16 parViewId,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::vec3& parMin,
-      const glm::vec3& parMax,
+      const vec3& parMin,
+      const vec3& parMax,
       const bool parDrawAsCube,
       const u32 parColor /*= 0xFFFFFFFF*/)
     : IDrawCommand(parViewId)
@@ -157,23 +157,23 @@ void DrawAABBCommand::SubmitCommand() const
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMax.x, FMin.y, FMin.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMax.x, FMin.y, FMin.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMax.x, FMin.y, FMax.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMax.x, FMin.y, FMax.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMin.x, FMin.y, FMax.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMin.x, FMin.y, FMax.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMin.x, FMax.y, FMin.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMin.x, FMax.y, FMin.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMax.x, FMax.y, FMin.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMax.x, FMax.y, FMin.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
@@ -181,7 +181,7 @@ void DrawAABBCommand::SubmitCommand() const
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(FMin.x, FMax.y, FMax.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMin.x, FMax.y, FMax.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
@@ -286,8 +286,8 @@ void DrawAABBCommand::SubmitCommand() const
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, 8, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, nbIndices);
 
-    glm::mat4 transform = glm::identity<glm::mat4>();
-    bgfx::setTransform(&transform[0][0]);
+    mat4 transform = mat4::Identity();
+    bgfx::setTransform(&transform.FValues[0]);
 
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
@@ -308,7 +308,7 @@ class DrawLines3DCommand : public IDrawCommand
 public:
     DrawLines3DCommand(const u16 parViewId,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::vec3* parVertices,
+          const vec3* parVertices,
           const u32 parVerticesSize,
           const u32 parColor,
           const bool parClose);
@@ -317,7 +317,7 @@ public:
     virtual void SubmitCommand() const override;
 
 private:
-    const glm::vec3* FVertices;
+    const vec3* FVertices;
     u32 FVerticesSize;
     u32 FColor;
     bool FClose;
@@ -326,7 +326,7 @@ private:
 
 DrawLines3DCommand::DrawLines3DCommand(const u16 parViewId,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::vec3* parVertices,
+      const vec3* parVertices,
       const u32 parVerticesSize,
       const u32 parColor,
       const bool parClose)
@@ -394,8 +394,8 @@ void DrawLines3DCommand::SubmitCommand() const
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, FVerticesSize, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, (u32)indices.size());
 
-    glm::mat4 transform = glm::identity<glm::mat4>();
-    bgfx::setTransform(&transform[0][0]);
+    mat4 transform = mat4::Identity();
+    bgfx::setTransform(&transform.FValues[0]);
 
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialHandle);
     AssertRelease(instance != nullptr);
@@ -416,7 +416,7 @@ class DrawLines2DCommand : public IDrawCommand
 public:
     DrawLines2DCommand(const u16 parViewId,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::vec2* parVertices,
+          const vec2* parVertices,
           const u32 parVerticesSize,
           const float parHeight,
           const u32 parColor,
@@ -426,10 +426,10 @@ public:
     virtual void SubmitCommand() const override;
 
 protected:
-    virtual const glm::vec2* Vertices() const { return FVertices; }
+    virtual const vec2* Vertices() const { return FVertices; }
 
 private:
-    const glm::vec2* FVertices;
+    const vec2* FVertices;
     u32 FVerticesSize;
     float FHeight;
     u32 FColor;
@@ -439,7 +439,7 @@ private:
 
 DrawLines2DCommand::DrawLines2DCommand(const u16 parViewId,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::vec2* parVertices,
+      const vec2* parVertices,
       const u32 parVerticesSize,
       const float parHeight,
       const u32 parColor,
@@ -479,7 +479,7 @@ void DrawLines2DCommand::SubmitCommand() const
 
     forrange(i, 0, FVerticesSize)
     {
-        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(Vertices()[i].x, FHeight, Vertices()[i].y));
+        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(Vertices()[i].x, FHeight, Vertices()[i].y));
         stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
         stream.Advance();
     }
@@ -509,8 +509,8 @@ void DrawLines2DCommand::SubmitCommand() const
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, FVerticesSize, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, (u32)indices.size());
 
-    glm::mat4 transform = glm::identity<glm::mat4>();
-    bgfx::setTransform(&transform[0][0]);
+    mat4 transform = mat4::Identity();
+    bgfx::setTransform(&transform.FValues[0]);
 
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialHandle);
     AssertRelease(instance != nullptr);
@@ -531,22 +531,22 @@ class DrawLines2DKeepDataCommand : public DrawLines2DCommand
 public:
     DrawLines2DKeepDataCommand(const u16 parViewId,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const std::vector<glm::vec2>& parVertices,
+          const std::vector<vec2>& parVertices,
           const u32 parVerticesSize,
           const float parHeight,
           const u32 parColor,
           const bool parClose);
 
 protected:
-    const glm::vec2* Vertices() const override { return FLineVertices.data(); }
+    const vec2* Vertices() const override { return FLineVertices.data(); }
 
 private:
-    std::vector<glm::vec2> FLineVertices;
+    std::vector<vec2> FLineVertices;
 };
 
 DrawLines2DKeepDataCommand::DrawLines2DKeepDataCommand(const u16 parViewId,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const std::vector<glm::vec2>& parVertices,
+      const std::vector<vec2>& parVertices,
       const u32 parVerticesSize,
       const float parHeight,
       const u32 parColor,
@@ -562,7 +562,7 @@ IMPLEMENT_POOL_ALLOCATED(DrawLines2DKeepDataCommand);
 //----------------------------------------------------------------
 namespace
 {
-void PushNormalVertices(const glm::vec3 vertex, const glm::vec3 normal, const u32 color, VertexDataStream& stream)
+void PushNormalVertices(const vec3 vertex, const vec3 normal, const u32 color, VertexDataStream& stream)
 {
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vertex);
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
@@ -581,8 +581,8 @@ class DrawFrustumCommand : public IDrawCommand
 public:
     DrawFrustumCommand(const u16 parViewId,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::mat4& parWorldViewTransform,
-          const glm::mat4& parProjectionMatrix,
+          const mat4& parWorldViewTransform,
+          const mat4& parProjectionMatrix,
           const bool parDrawFrustumNormals = false,
           const u32 parColor = 0xFFFFFFFF,
           const u32 parNormalsColor = 0xFFFFFFFF);
@@ -591,8 +591,8 @@ public:
     virtual void SubmitCommand() const override;
 
 private:
-    glm::mat4 FViewWorldTransform;
-    glm::mat4 FInverseProjectionMatrix;
+    mat4 FViewWorldTransform;
+    mat4 FInverseProjectionMatrix;
     u32 FColor;
     u32 FNormalsColor;
     bool FDrawFrustumNormals;
@@ -601,15 +601,15 @@ private:
 
 DrawFrustumCommand::DrawFrustumCommand(const u16 parViewId,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4& parWorldViewTransform,
-      const glm::mat4& parProjectionMatrix,
+      const mat4& parWorldViewTransform,
+      const mat4& parProjectionMatrix,
       const bool parDrawFrustumNormals /*= false*/,
       const u32 parColor /*= 0xFFFFFFFF*/,
       const u32 parNormalsColor /*= 0xFFFFFFFF*/)
     : IDrawCommand(parViewId)
     , FMaterialInstanceHandle(parMaterialInstanceHandle)
     , FViewWorldTransform(parWorldViewTransform)
-    , FInverseProjectionMatrix(glm::inverse(parProjectionMatrix))
+    , FInverseProjectionMatrix(Invert(parProjectionMatrix))
     , FDrawFrustumNormals(parDrawFrustumNormals)
     , FColor(parColor)
     , FNormalsColor(parNormalsColor)
@@ -634,7 +634,7 @@ void DrawFrustumCommand::SubmitCommand() const
 
     FrustumCorners frustumCorners;
     frustumCorners.InitFromMatrices(FViewWorldTransform, FInverseProjectionMatrix);
-    const MemoryView<const glm::vec4> corners = frustumCorners.GetCorners();
+    const MemoryView<const vec4> corners = frustumCorners.GetCorners();
 
     const u32 wantedVertices = 8 + ((FDrawFrustumNormals) ? 12 : 0);
     const u32 availableVertices = bgfx::getAvailTransientVertexBuffer(wantedVertices, layout);
@@ -647,35 +647,35 @@ void DrawFrustumCommand::SubmitCommand() const
 
     VertexDataStream stream(wantedVertices, hash.GetByteSize(), hash);
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::NEAR_BOTTOM_LEFT]));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::NEAR_BOTTOM_LEFT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::NEAR_BOTTOM_RIGHT]));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::NEAR_BOTTOM_RIGHT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::FAR_BOTTOM_RIGHT]));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::FAR_BOTTOM_RIGHT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::FAR_BOTTOM_LEFT]));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::FAR_BOTTOM_LEFT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::NEAR_TOP_LEFT]));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::NEAR_TOP_LEFT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::NEAR_TOP_RIGHT]));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::NEAR_TOP_RIGHT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::FAR_TOP_RIGHT]));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::FAR_TOP_RIGHT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(corners[FrustumCorner::FAR_TOP_LEFT]));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::FAR_TOP_LEFT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
@@ -683,42 +683,42 @@ void DrawFrustumCommand::SubmitCommand() const
     {
         Frustum f;
         f.InitFromCorners(frustumCorners);
-        MemoryView<const glm::vec4> planes = f.GetPlanes();
+        MemoryView<const vec4> planes = f.GetPlanes();
 
         // NearPlane
-        const glm::vec4 nearPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_LEFT] +
+        const vec4 nearPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_LEFT] +
                                                corners[FrustumCorner::NEAR_TOP_RIGHT]) /
               4.f;
-        PushNormalVertices(nearPlanePoint, glm::xyz(planes[FrustumPlane::NEAR_PLANE]), FNormalsColor, stream);
+        PushNormalVertices(nearPlanePoint.xyz(), (planes[FrustumPlane::NEAR_PLANE]).xyz(), FNormalsColor, stream);
 
         // Farplane
-        const glm::vec4 farPlanePoint =
+        const vec4 farPlanePoint =
               (corners[FrustumCorner::FAR_BOTTOM_LEFT] + corners[FrustumCorner::FAR_BOTTOM_RIGHT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_RIGHT]) /
               4.f;
-        PushNormalVertices(farPlanePoint, glm::xyz(planes[FrustumPlane::FAR_PLANE]), FNormalsColor, stream);
+        PushNormalVertices(farPlanePoint.xyz(), (planes[FrustumPlane::FAR_PLANE]).xyz(), FNormalsColor, stream);
 
         // LEFTPlane
-        const glm::vec4 leftPlanePoint =
+        const vec4 leftPlanePoint =
               (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_BOTTOM_LEFT]) /
               4.f;
-        PushNormalVertices(leftPlanePoint, glm::xyz(planes[FrustumPlane::LEFT_PLANE]), FNormalsColor, stream);
+        PushNormalVertices(leftPlanePoint.xyz(), (planes[FrustumPlane::LEFT_PLANE]).xyz(), FNormalsColor, stream);
 
         // RightPlane
-        const glm::vec4 rightPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_RIGHT] +
+        const vec4 rightPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_RIGHT] +
                                                 corners[FrustumCorner::FAR_TOP_RIGHT]) /
               4.f;
-        PushNormalVertices(rightPlanePoint, glm::xyz(planes[FrustumPlane::RIGHT_PLANE]), FNormalsColor, stream);
+        PushNormalVertices(rightPlanePoint.xyz(), (planes[FrustumPlane::RIGHT_PLANE]).xyz(), FNormalsColor, stream);
 
         // TopPlane
-        const glm::vec4 topPlanePoint =
+        const vec4 topPlanePoint =
               (corners[FrustumCorner::NEAR_TOP_LEFT] + corners[FrustumCorner::NEAR_TOP_RIGHT] + corners[FrustumCorner::FAR_TOP_LEFT] + corners[FrustumCorner::FAR_TOP_RIGHT]) / 4.f;
-        PushNormalVertices(topPlanePoint, glm::xyz(planes[FrustumPlane::TOP_PLANE]), FNormalsColor, stream);
+        PushNormalVertices(topPlanePoint.xyz(), (planes[FrustumPlane::TOP_PLANE]).xyz(), FNormalsColor, stream);
 
         // BottomPlane
-        const glm::vec4 bottomPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_LEFT] +
+        const vec4 bottomPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_LEFT] +
                                                  corners[FrustumCorner::FAR_BOTTOM_RIGHT]) /
               4.f;
-        PushNormalVertices(bottomPlanePoint, glm::xyz(planes[FrustumPlane::BOTTOM_PLANE]), FNormalsColor, stream);
+        PushNormalVertices(bottomPlanePoint.xyz(), (planes[FrustumPlane::BOTTOM_PLANE]).xyz(), FNormalsColor, stream);
     }
 
     bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
@@ -784,8 +784,8 @@ void DrawFrustumCommand::SubmitCommand() const
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, stream.GetSize(), vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, (u32)indices.size());
 
-    glm::mat4 transform = glm::identity<glm::mat4>();
-    bgfx::setTransform(&transform[0][0]);
+    mat4 transform = mat4::Identity();
+    bgfx::setTransform(&transform.FValues[0]);
 
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
@@ -808,13 +808,13 @@ public:
           const MaterialInstanceHandle& parMaterialInstanceHandle,
           const MultiPassMaterialInstanceHandle& parMultiPassMaterialInstanceHandle,
           const SkelettonPose* parSkelettonPose = nullptr,
-          const glm::mat4& parTransform = glm::identity<glm::mat4>());
+          const mat4& parTransform = mat4::Identity());
     virtual ~DrawMeshCommand();
 
     virtual void SubmitCommand() const override;
 
 private:
-    glm::mat4 FTransform;
+    mat4 FTransform;
     const SkelettonPose* FSkelettonPose = nullptr;
     MeshHandle FMeshHandle;
     MaterialInstanceHandle FMaterialInstanceHandle;
@@ -827,7 +827,7 @@ DrawMeshCommand::DrawMeshCommand(const u16 parViewId,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
       const MultiPassMaterialInstanceHandle& parMultiPassMaterialInstanceHandle,
       const SkelettonPose* parSkelettonPose /*= nullptr*/,
-      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4& parTransform /*= mat4::Identity()*/)
     : IDrawCommand(parViewId)
     , FMeshHandle(parMeshHandle)
     , FMaterialInstanceHandle(parMaterialInstanceHandle)
@@ -851,7 +851,7 @@ void DrawMeshCommand::SubmitCommand() const
     bgfx::setVertexBuffer(0, mesh->GetVertexBufferHandle());
     bgfx::setIndexBuffer(mesh->GetIndexBufferHandle());
 
-    bgfx::setTransform(&FTransform[0][0]);
+    bgfx::setTransform(&FTransform.FValues[0]);
 
     bgfx::ProgramHandle program;
     if (FMaterialInstanceHandle.IsValid())
@@ -897,33 +897,33 @@ class DrawVerticesCommand : public IDrawCommand
 
 public:
     DrawVerticesCommand(const u16 parViewId,
-          const glm::vec3* parVertices,
+          const vec3* parVertices,
           const u32 parVerticesSize,
           const u16* parIndices,
           const u32 parIndicesSize,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::mat4& parTransform = glm::identity<glm::mat4>());
+          const mat4& parTransform = mat4::Identity());
     virtual ~DrawVerticesCommand();
 
     virtual void SubmitCommand() const override;
 
 private:
-    const glm::vec3* FVertices;
+    const vec3* FVertices;
     const u32 FVerticesSize;
     const u16* FIndices;
     const u32 FIndicesSize;
-    glm::mat4 FTransform;
+    mat4 FTransform;
     MaterialInstanceHandle FMaterialInstanceHandle;
 };
 
 IMPLEMENT_POOL_ALLOCATED(DrawVerticesCommand);
 DrawVerticesCommand::DrawVerticesCommand(const u16 parViewId,
-      const glm::vec3* parVertices,
+      const vec3* parVertices,
       const u32 parVerticesSize,
       const u16* parIndices,
       const u32 parIndicesSize,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4& parTransform /*= mat4::Identity()*/)
     : IDrawCommand(parViewId)
     , FVertices(parVertices)
     , FVerticesSize(parVerticesSize)
@@ -973,7 +973,7 @@ void DrawVerticesCommand::SubmitCommand() const
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, FVerticesSize, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, FIndicesSize);
 
-    bgfx::setTransform(&FTransform[0][0]);
+    bgfx::setTransform(&FTransform.FValues[0]);
 
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
@@ -993,14 +993,14 @@ public:
     DrawCircleCommand(const u16 parViewId,
           const CircleFeedbackParameters& parParams,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::mat4 parTransform = glm::identity<glm::mat4>());
+          const mat4 parTransform = mat4::Identity());
     virtual ~DrawCircleCommand();
 
     virtual void SubmitCommand() const override;
 
 private:
     CircleFeedbackParameters FParams;
-    glm::mat4 FTransform;
+    mat4 FTransform;
     MaterialInstanceHandle FMaterialInstanceHandle;
 };
 
@@ -1009,7 +1009,7 @@ IMPLEMENT_POOL_ALLOCATED(DrawCircleCommand);
 DrawCircleCommand::DrawCircleCommand(const u16 parViewId,
       const CircleFeedbackParameters& parParams,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4 parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4 parTransform /*= mat4::Identity()*/)
     : IDrawCommand(parViewId)
     , FParams(parParams)
     , FTransform(parTransform)
@@ -1049,19 +1049,19 @@ void DrawCircleCommand::SubmitCommand() const
     const float effectiveRange = FParams.Range * 1.1f;
 
     VertexDataStream stream(4, hash.GetByteSize(), hash);
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-effectiveRange, 0.01f, -effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(effectiveRange, 0.01f, -effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(effectiveRange, 0.01f, effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-effectiveRange, 0.01f, effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 
@@ -1081,14 +1081,14 @@ void DrawCircleCommand::SubmitCommand() const
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, 4, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, 6);
 
-    bgfx::setTransform(&FTransform[0][0]);
+    bgfx::setTransform(&FTransform.FValues[0]);
 
     Rendering::RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW | BGFX_STATE_BLEND_ALPHA);
     state.ApplyState();
 
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
-    Rendering::MaterialManager::SetVec4Uniform("u_circleRadius", glm::vec4(FParams.Range, FParams.Range - FParams.Thickness, 0.f, 0.f));
+    Rendering::MaterialManager::SetVec4Uniform("u_circleRadius", vec4(FParams.Range, FParams.Range - FParams.Thickness, 0.f, 0.f));
 
     bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
 }
@@ -1105,14 +1105,14 @@ public:
     DrawCircularChunkCommand(const u16 parViewId,
           const CircularGridChunkFeedbackParameters& parParameters,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::mat4 parTransform = glm::identity<glm::mat4>());
+          const mat4 parTransform = mat4::Identity());
     virtual ~DrawCircularChunkCommand();
 
     virtual void SubmitCommand() const override;
 
 private:
     CircularGridChunkFeedbackParameters FParameters;
-    glm::mat4 FTransform;
+    mat4 FTransform;
     MaterialInstanceHandle FMaterialInstanceHandle;
 };
 
@@ -1121,7 +1121,7 @@ IMPLEMENT_POOL_ALLOCATED(DrawCircularChunkCommand);
 DrawCircularChunkCommand::DrawCircularChunkCommand(const u16 parViewId,
       const CircularGridChunkFeedbackParameters& parParameters,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4 parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4 parTransform /*= mat4::Identity()*/)
     : IDrawCommand(parViewId)
     , FParameters(parParameters)
     , FTransform(parTransform)
@@ -1156,19 +1156,19 @@ void DrawCircularChunkCommand::SubmitCommand() const
     const float effectiveRange = FParameters.OuterCircleRadius * 1.1f;
 
     VertexDataStream stream(4, hash.GetByteSize(), hash);
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-effectiveRange, 0.01f, -effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FParameters.Color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(effectiveRange, 0.01f, -effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FParameters.Color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(effectiveRange, 0.01f, effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FParameters.Color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-effectiveRange, 0.01f, effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FParameters.Color);
     stream.Advance();
 
@@ -1188,7 +1188,7 @@ void DrawCircularChunkCommand::SubmitCommand() const
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, 4, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, 6);
 
-    bgfx::setTransform(&FTransform[0][0]);
+    bgfx::setTransform(&FTransform.FValues[0]);
 
     Rendering::RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_CULL_CW | BGFX_STATE_BLEND_ALPHA | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_MSAA);
     state.ApplyState();
@@ -1196,9 +1196,9 @@ void DrawCircularChunkCommand::SubmitCommand() const
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
     Rendering::MaterialManager::SetVec4Uniform("u_innerOuterCircles",
-          glm::vec4(FParameters.InnerCircleRadius + 0.5f * FParameters.Thickness, FParameters.InnerCircleRadius, FParameters.OuterCircleRadius,
+          vec4(FParameters.InnerCircleRadius + 0.5f * FParameters.Thickness, FParameters.InnerCircleRadius, FParameters.OuterCircleRadius,
                 FParameters.OuterCircleRadius - 0.5f * FParameters.Thickness));
-    Rendering::MaterialManager::SetVec4Uniform("u_arcAngle", glm::vec4(FParameters.ArcAngle));
+    Rendering::MaterialManager::SetVec4Uniform("u_arcAngle", vec4(FParameters.ArcAngle));
 
     bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
 }
@@ -1253,20 +1253,20 @@ void BlitWithMaterialCommand::SubmitCommand() const
     bgfx::allocTransientBuffers(&vertexBuffer, layout, 4, &indexBuffer, 6);
 
     VertexDataStream stream(4, hash.GetByteSize(), hash);
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.f, -1.f, 0.f));
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, glm::vec2(0.f, 1.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-1.f, -1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(0.f, 1.f));
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.f, -1.f, 0.f));
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, glm::vec2(1.f, 1.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(1.f, -1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(1.f, 1.f));
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(1.f, 1.f, 0.f));
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, glm::vec2(1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(1.f, 1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(1.f, 0.f));
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(-1.f, 1.f, 0.f));
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, glm::vec2(0.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-1.f, 1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(0.f, 0.f));
     stream.Advance();
 
     std::array<u16, 6> indices;
@@ -1373,19 +1373,19 @@ class SetVec4UniformCommand : public IDrawCommand
     DECLARE_POOL_ALLOCATED(SetVec4UniformCommand);
 
 public:
-    SetVec4UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::vec4& parUniformValue);
+    SetVec4UniformCommand(const u16 parViewId, const std::string& parUniformName, const vec4& parUniformValue);
     virtual ~SetVec4UniformCommand() = default;
 
     virtual void SubmitCommand() const override;
 
 private:
     std::string FUniformName;
-    glm::vec4 FData;
+    vec4 FData;
 };
 
 IMPLEMENT_POOL_ALLOCATED(SetVec4UniformCommand);
 
-SetVec4UniformCommand::SetVec4UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::vec4& parUniformValue)
+SetVec4UniformCommand::SetVec4UniformCommand(const u16 parViewId, const std::string& parUniformName, const vec4& parUniformValue)
     : IDrawCommand(parViewId)
     , FUniformName(parUniformName)
     , FData(parUniformValue)
@@ -1406,19 +1406,19 @@ class SetMat3UniformCommand : public IDrawCommand
     DECLARE_POOL_ALLOCATED(SetMat3UniformCommand);
 
 public:
-    SetMat3UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::mat3& parUniformValue);
+    SetMat3UniformCommand(const u16 parViewId, const std::string& parUniformName, const mat3& parUniformValue);
     virtual ~SetMat3UniformCommand() = default;
 
     virtual void SubmitCommand() const override;
 
 private:
     std::string FUniformName;
-    glm::mat3 FData;
+    mat3 FData;
 };
 
 IMPLEMENT_POOL_ALLOCATED(SetMat3UniformCommand);
 
-SetMat3UniformCommand::SetMat3UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::mat3& parUniformValue)
+SetMat3UniformCommand::SetMat3UniformCommand(const u16 parViewId, const std::string& parUniformName, const mat3& parUniformValue)
     : IDrawCommand(parViewId)
     , FUniformName(parUniformName)
     , FData(parUniformValue)
@@ -1439,19 +1439,19 @@ class SetMat4UniformCommand : public IDrawCommand
     DECLARE_POOL_ALLOCATED(SetMat4UniformCommand);
 
 public:
-    SetMat4UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::mat4& parUniformValue);
+    SetMat4UniformCommand(const u16 parViewId, const std::string& parUniformName, const mat4& parUniformValue);
     virtual ~SetMat4UniformCommand() = default;
 
     virtual void SubmitCommand() const override;
 
 private:
     std::string FUniformName;
-    glm::mat4 FData;
+    mat4 FData;
 };
 
 IMPLEMENT_POOL_ALLOCATED(SetMat4UniformCommand);
 
-SetMat4UniformCommand::SetMat4UniformCommand(const u16 parViewId, const std::string& parUniformName, const glm::mat4& parUniformValue)
+SetMat4UniformCommand::SetMat4UniformCommand(const u16 parViewId, const std::string& parUniformName, const mat4& parUniformValue)
     : IDrawCommand(parViewId)
     , FUniformName(parUniformName)
     , FData(parUniformValue)
@@ -1492,17 +1492,17 @@ void DrawCommandBuffer::SetDebugMarker(const std::string& parDebugMarker)
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetDebugMarkerCommand(FViewId, parDebugMarker)));
 }
 
-void DrawCommandBuffer::SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection)
+void DrawCommandBuffer::SetViewTranform(const mat4& parViewTransform, const mat4& parProjection)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetViewTranformCommand(FViewId, parViewTransform, parProjection)));
 }
 
-void DrawCommandBuffer::DrawVertices(const glm::vec3* parVertices,
+void DrawCommandBuffer::DrawVertices(const vec3* parVertices,
       const u32 parVerticesSize,
       const u16* parIndices,
       const u32 parIndicesSize,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4& parTransform)
+      const mat4& parTransform)
 {
     FCommandVector.push_back(
           std::unique_ptr<IDrawCommand>(new DrawVerticesCommand(FViewId, parVertices, parVerticesSize, parIndices, parIndicesSize, parMaterialInstanceHandle, parTransform)));
@@ -1510,7 +1510,7 @@ void DrawCommandBuffer::DrawVertices(const glm::vec3* parVertices,
 
 void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4& parTransform /*= mat4::Identity()*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
           new DrawMeshCommand(FViewId, parMeshHandle, parMaterialInstanceHandle, Rendering::MultiPassMaterialInstanceHandle(), nullptr, parTransform)));
@@ -1519,7 +1519,7 @@ void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
 void DrawCommandBuffer::DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
       const MeshHandle& parMeshHandle,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4& parTransform /*= mat4::Identity()*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
           new DrawMeshCommand(FViewId, parMeshHandle, parMaterialInstanceHandle, Rendering::MultiPassMaterialInstanceHandle(), parSkelettonPose, parTransform)));
@@ -1527,7 +1527,7 @@ void DrawCommandBuffer::DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
 
 void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
       const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4& parTransform /*= mat4::Identity()*/)
 {
     FCommandVector.push_back(
           std::unique_ptr<IDrawCommand>(new DrawMeshCommand(FViewId, parMeshHandle, Rendering::MaterialInstanceHandle(), parMaterialInstanceHandle, nullptr, parTransform)));
@@ -1536,28 +1536,28 @@ void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
 void DrawCommandBuffer::DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
       const MeshHandle& parMeshHandle,
       const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4& parTransform /*= mat4::Identity()*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
           new DrawMeshCommand(FViewId, parMeshHandle, Rendering::MaterialInstanceHandle(), parMaterialInstanceHandle, parSkelettonPose, parTransform)));
 }
 
-void DrawCommandBuffer::DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor /*= 0xFFFFFFFF*/)
+void DrawCommandBuffer::DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parMin, const vec3& parMax, const u32 parColor /*= 0xFFFFFFFF*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, false, parColor)));
 }
 
 void DrawCommandBuffer::DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::vec3& parMin,
-      const glm::vec3& parMax,
+      const vec3& parMin,
+      const vec3& parMax,
       const u32 parColor /*= 0xFFFFFFFF*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, true, parColor)));
 }
 
 void DrawCommandBuffer::DrawFrustum(const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4& parWorldViewTransform,
-      const glm::mat4& parProjectionMatrix,
+      const mat4& parWorldViewTransform,
+      const mat4& parProjectionMatrix,
       const bool parDrawFrustumNormals /*= false*/,
       const u32 parColor /*= 0xFFFFFFFF*/,
       const u32 parNormalsColor /*= 0xFFFFFFFF*/)
@@ -1567,7 +1567,7 @@ void DrawCommandBuffer::DrawFrustum(const MaterialInstanceHandle& parMaterialIns
 }
 
 void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::vec3* parVertices,
+      const vec3* parVertices,
       const u32 parVerticesSize,
       const u32 parColor,
       const bool parClose)
@@ -1576,7 +1576,7 @@ void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInsta
 }
 
 void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::vec2* parVertices,
+      const vec2* parVertices,
       const u32 parVerticesSize,
       const float parHeight,
       const u32 parColor,
@@ -1587,7 +1587,7 @@ void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInsta
 }
 
 void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const std::vector<glm::vec2>& parVertices,
+      const std::vector<vec2>& parVertices,
       const u32 parVerticesSize,
       const float parHeight,
       const u32 parColor,
@@ -1599,14 +1599,14 @@ void DrawCommandBuffer::DrawLines(const MaterialInstanceHandle& parMaterialInsta
 
 void DrawCommandBuffer::DrawCircle(const MaterialInstanceHandle& parMaterialInstanceHandle,
       const CircleFeedbackParameters& parParams,
-      const glm::mat4& parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4& parTransform /*= mat4::Identity()*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawCircleCommand(FViewId, parParams, parMaterialInstanceHandle, parTransform)));
 }
 
 void DrawCommandBuffer::DrawCircularChunk(const CircularGridChunkFeedbackParameters& parParameters,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const glm::mat4 parTransform /*= glm::identity<glm::mat4>()*/)
+      const mat4 parTransform /*= mat4::Identity()*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawCircularChunkCommand(FViewId, parParameters, parMaterialInstanceHandle, parTransform)));
 }
@@ -1626,17 +1626,17 @@ void DrawCommandBuffer::SetFreeFormSamplerUniform(const std::string& parUniformN
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetFreeFormSamplerUniformCommand(FViewId, parUniformName, parHandle, parSlot)));
 }
 
-void DrawCommandBuffer::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue)
+void DrawCommandBuffer::SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetVec4UniformCommand(FViewId, parUniformName, parUniformValue)));
 }
 
-void DrawCommandBuffer::SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue)
+void DrawCommandBuffer::SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetMat3UniformCommand(FViewId, parUniformName, parUniformValue)));
 }
 
-void DrawCommandBuffer::SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue)
+void DrawCommandBuffer::SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetMat4UniformCommand(FViewId, parUniformName, parUniformValue)));
 }

@@ -61,7 +61,7 @@ protected:
     void VirtualOnLoaded() override;
 
 private:
-    void InitGFXProxy(const glm::vec3& parPosition, const glm::quat& parOrientation);
+    void InitGFXProxy(const vec3& parPosition, const quat& parOrientation);
 
 private:
     Rendering::GFXRepresentationProxy* FProxy = nullptr;

@@ -8,7 +8,7 @@
 #include "PolygonTriangulator.h"
 #include "Triangle.h"
 
-#include <glm/gtx/hash.hpp>
+#include "Math/VectorHash.h"
 
 namespace ECSEngine
 {
@@ -16,7 +16,7 @@ namespace Navigation
 {
 namespace
 {
-NavMeshVertex* GetOrCreateVertex(std::unordered_map<glm::vec2, NavMeshVertex*>& parVerticesMap, const glm::vec2 parVertex, bool& outWasCreated)
+NavMeshVertex* GetOrCreateVertex(std::unordered_map<vec2, NavMeshVertex*>& parVerticesMap, const vec2 parVertex, bool& outWasCreated)
 {
     NavMeshVertex* nmv = nullptr;
     auto itFind = parVerticesMap.find(parVertex);
@@ -63,7 +63,7 @@ void NavMeshSolver::CreateNavMesh(const Polygon2D& parWorldExtents, const std::v
     std::vector<Polygon2D> partition = polyPart.Partition(parWorldExtents, parObstacles);
     AssertRelease(partition.size() > 0);
 
-    std::unordered_map<glm::vec2, NavMeshVertex*> verticesMap;
+    std::unordered_map<vec2, NavMeshVertex*> verticesMap;
     VerticesDataBase vertices;
     EdgesDataBase edges;
     FacesDataBase faces;
@@ -81,7 +81,7 @@ void NavMeshSolver::CreateNavMesh(const Polygon2D& parWorldExtents, const std::v
         face->FacePolygon = polygon;
         face->Id = faceId++;
 
-        glm::vec2 center(0.f);
+        vec2 center(0.f);
 
         std::vector<std::pair<NavMeshVertex*, bool>> verticesLoc;
         verticesLoc.resize(polygon.size());

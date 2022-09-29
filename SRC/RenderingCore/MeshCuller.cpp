@@ -13,12 +13,12 @@ namespace Rendering
 namespace MeshFrustumCulling
 {
 
-bool CullMesh(const MeshHandle& parMeshHandle, const glm::mat4& parLocalToWorldMatrix, const Frustum& parFrustum)
+bool CullMesh(const MeshHandle& parMeshHandle, const mat4& parLocalToWorldMatrix, const Frustum& parFrustum)
 {
     const Mesh* mesh = MeshManager::Instance().GetMesh(parMeshHandle);
     AssertRelease(mesh != nullptr);
 
-    glm::vec4 sphere = mesh->BoundingCircle();
+    vec4 sphere = mesh->BoundingCircle();
 
     const float radius = sphere.w;
     sphere.w = 1.0f;

@@ -56,10 +56,10 @@ void SkelettonPose::InitialiseFromSkeletton()
     // TODO init local poses by inverting local poses in the skeletton
     AssertRelease(FSkeletton != nullptr);
     const u8 nbBones = FSkeletton->NumberOfBones();
-    FLocalPoses = new glm::mat4[nbBones];
-    FSkinningMatrices = new glm::mat4[nbBones];
+    FLocalPoses = new mat4[nbBones];
+    FSkinningMatrices = new mat4[nbBones];
 
-    forrange(i, 0, nbBones) { FLocalPoses[i] = glm::inverse(FSkeletton->GetJoint(i).InvBindPose); }
+    forrange(i, 0, nbBones) { FLocalPoses[i] = Invert(FSkeletton->GetJoint(i).InvBindPose); }
 
     // Set dirty
     SetDirty();

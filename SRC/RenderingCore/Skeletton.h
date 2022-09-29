@@ -10,8 +10,8 @@ struct SkelettonJoint
     DECLARE_POOL_ALLOCATED(SkelettonJoint);
 
 public:
-    glm::mat4 InvBindPose = glm::identity<glm::mat4>();
-    glm::mat4 ModelToJointMatrix = glm::identity<glm::mat4>();
+    mat4 InvBindPose = mat4::Identity();
+    mat4 ModelToJointMatrix = mat4::Identity();
     std::string Name;
     u8 ParentId = 0xFF;
 };
@@ -53,8 +53,8 @@ public:
     void UpdateSkinningMatrix();
 
     const Skeletton* GetSkeletton() const { return FSkeletton; }
-    glm::mat4* LocalPoses() { return FLocalPoses; }
-    const glm::mat4* SkinningMatrices() const { return FSkinningMatrices; }
+    mat4* LocalPoses() { return FLocalPoses; }
+    const mat4* SkinningMatrices() const { return FSkinningMatrices; }
 
     u8 BonesNumber() const
     {
@@ -69,8 +69,8 @@ private:
 
 private:
     const Skeletton* FSkeletton = nullptr;
-    glm::mat4* FLocalPoses = nullptr;
-    glm::mat4* FSkinningMatrices = nullptr;
+    mat4* FLocalPoses = nullptr;
+    mat4* FSkinningMatrices = nullptr;
     bool FDirty = false;
 };
 } // namespace Rendering

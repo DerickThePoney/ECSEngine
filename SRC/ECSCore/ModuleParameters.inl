@@ -12,10 +12,9 @@ namespace ModuleParameters
 {
 #endif
 
-DECLARE_MODULE_PARAMETER(Position, glm::vec3)
-DECLARE_MODULE_PARAMETER(YawPitchRoll, glm::vec3)
-DECLARE_MODULE_PARAMETER(Orientation, glm::quat)
-DECLARE_MODULE_PARAMETER(EulerAngles, glm::vec3)
+DECLARE_MODULE_PARAMETER(Position, vec3)
+DECLARE_MODULE_PARAMETER(Orientation, quat)
+DECLARE_MODULE_PARAMETER(EulerAnglesXYZ, vec3)
 DECLARE_MODULE_PARAMETER(Mesh, Rendering::MeshHandle)
 DECLARE_MODULE_PARAMETER(OwnerId, EntityId)
 DECLARE_MODULE_PARAMETER(GridAccessor, CircularGridAccessor)

@@ -37,7 +37,7 @@ void DrawScenesManagerEditor(bool* parShow)
         archive(NAMEDPROPERTY("SceneManager", SceneManager::Instance()));
     }
 
-    ImGui::BeginChild("ListOfScenes", glm::vec2(-10.f, -10.f), true);
+    ImGui::BeginChild("ListOfScenes", vec2(-10.f, -10.f), true);
     bool up = false;
     bool down = false;
     bool suppr = false;

@@ -12,10 +12,10 @@ namespace ImGUITools
 void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow, bool* open)
 {
     static bool showMessages[ELoggingCategory::LENGTH] = { true, true, true, true, true, true, true, true };
-    static glm::vec4 colors[ELoggingCategory::LENGTH] = {
+    static vec4 colors[ELoggingCategory::LENGTH] = {
 
-        glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
-        glm::vec4(0.7f, 0.7f, 0.7f, 1.0f), glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), glm::vec4(0.0f, 1.0f, 1.0f, 1.0f), glm::vec4(0.0f, 0.7f, 0.0f, 1.0f)
+        vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(1.0f, 1.0f, 0.0f, 1.0f),
+        vec4(0.7f, 0.7f, 0.7f, 1.0f), vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.7f, 0.0f, 1.0f)
 
     };
 
@@ -23,11 +23,11 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
     if (drawOwnWindow)
         ImGui::Begin("Logger window", open);
 
-    const glm::vec2 currentWindowSize = ImGui::GetWindowSize();
-    const glm::vec2 loggerSize = currentWindowSize - 50.0f;
+    const vec2 currentWindowSize = ImGui::GetWindowSize();
+    const vec2 loggerSize = currentWindowSize - 50.0f;
     const float messagePlaceProportion = 0.75f;
-    const glm::vec2 messagePlace = loggerSize * glm::vec2(messagePlaceProportion, 1.0f);
-    const glm::vec2 checkboxesPlace = loggerSize * glm::vec2(1 - messagePlaceProportion, 1.0f);
+    const vec2 messagePlace = loggerSize * vec2(messagePlaceProportion, 1.0f);
+    const vec2 checkboxesPlace = loggerSize * vec2(1 - messagePlaceProportion, 1.0f);
     ImGui::SetCursorPosX(((currentWindowSize - loggerSize) * 0.5f).x);
 
     ImGui::BeginChildFrame(ImGui::GetID("Test"), messagePlace);

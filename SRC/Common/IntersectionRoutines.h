@@ -34,8 +34,8 @@ bool RayPolygonClosestIntersection2D(const Ray2D& parRay,
       u32& outClosestEdgeIndex);
 bool RayPlaneIntersection3D(const Ray3D& parRay, const Plane& parPlane, float& outIntersection);
 
-bool PointInTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint, const bool parStrictlyInside = false);
-bool PointInPolygon2D(const Polygon2D& parPolygon, const glm::vec2 parPoint, const bool parStrictlyInside = false);
-bool FrustumSphereIntersect(const Frustum& parFrustum, const glm::vec4& parSphere);
+bool PointInTriangle2D(const Triangle2D& parTriangle, const vec2 parPoint, const bool parStrictlyInside = false);
+bool PointInPolygon2D(const Polygon2D& parPolygon, const vec2 parPoint, const bool parStrictlyInside = false);
+bool FrustumSphereIntersect(const Frustum& parFrustum, const vec4& parSphere);
 } // namespace Intersection
 } // namespace ECSEngine

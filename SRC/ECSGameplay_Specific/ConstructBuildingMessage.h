@@ -11,6 +11,6 @@ struct ConstructBuildingMessage
 
 public:
     std::string FTemplateName;
-    glm::vec3 FPosition;
+    vec3 FPosition;
 };
 } // namespace ECSEngine

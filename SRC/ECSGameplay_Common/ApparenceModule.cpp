@@ -70,21 +70,17 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
 {
     parent_type::VirtualInit(parUnitId, parParameters);
 
-    glm::vec3 pos = parParameters.Get_IFP<ModuleParameters::Position>(glm::vec3(0.0f));
-    glm::quat orient(1.0f, 0.0f, 0.0f, 0.0f);
-    if (parParameters.HasParameter<ModuleParameters::YawPitchRoll>())
+    vec3 pos = parParameters.Get_IFP<ModuleParameters::Position>(vec3(0.0f));
+    quat orient(1.0f, 0.0f, 0.0f, 0.0f);
+    
+    if (parParameters.HasParameter<ModuleParameters::EulerAnglesXYZ>())
     {
-        const glm::vec3 yawPitchRoll = parParameters.Get_IFP<ModuleParameters::YawPitchRoll>(glm::vec3(0.0f));
-        orient = glm::quat(yawPitchRoll);
-    }
-    else if (parParameters.HasParameter<ModuleParameters::EulerAngles>())
-    {
-        const glm::vec3 euler = parParameters.Get_IFP<ModuleParameters::EulerAngles>(glm::vec3(0.0f));
-        orient = glm::quat_cast(glm::eulerAngleXYZ(euler.x, euler.y, euler.z));
+        const vec3 euler = parParameters.Get_IFP<ModuleParameters::EulerAnglesXYZ>(vec3(0.0f));
+        orient = quat::FromMat4(EulerAnglesXYZ(euler.x, euler.y, euler.z));
     }
     else if (parParameters.HasParameter<ModuleParameters::Orientation>())
     {
-        orient = parParameters.Get_IFP<ModuleParameters::Orientation>(glm::quat());
+        orient = parParameters.Get_IFP<ModuleParameters::Orientation>(quat());
     }
 
     InitGFXProxy(pos, orient);
@@ -115,7 +111,7 @@ void ApparenceModule::VirtualOnLoaded()
     InitGFXProxy(positionModule->GetPosition3D(), orientationModule->GetOrientation());
 }
 
-void ApparenceModule::InitGFXProxy(const glm::vec3& parPosition, const glm::quat& parOrientation)
+void ApparenceModule::InitGFXProxy(const vec3& parPosition, const quat& parOrientation)
 {
     Rendering::GFXRepresentationInitialiser init;
     init.FPosition = parPosition;

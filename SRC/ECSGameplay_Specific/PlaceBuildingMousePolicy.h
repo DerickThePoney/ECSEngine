@@ -23,7 +23,7 @@ protected:
     void VirtualUpdate() override;
 
 private:
-    glm::vec3 GetMouseWorldPosition() const;
+    vec3 GetMouseWorldPosition() const;
 
 private:
     const EntityTemplate* FTemplate = nullptr;

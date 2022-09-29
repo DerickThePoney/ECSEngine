@@ -16,7 +16,7 @@ public:
 
     void DrawFeedback() const;
 
-    CircularGridAccessor GetAccessorForWorldPosition(const glm::vec3& parWorldPosition) const;
+    CircularGridAccessor GetAccessorForWorldPosition(const vec3& parWorldPosition) const;
     bool IsPositionFree(const u32 parChunkId, const u32 parCellId) const;
 
     void SetPositionOccupied(const u32 parChunkId, const u32 parCellId, const bool parOccupied);

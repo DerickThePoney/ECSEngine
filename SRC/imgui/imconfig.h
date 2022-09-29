@@ -14,16 +14,17 @@
 
 #pragma once
 // clang-format off
-#include "Common/Types.h"
-#define GLM_ENABLE_EXPERIMENTAL
-#define GLM_FORCE_ALIGNED_GENTYPES
-#define GLM_FORCE_INTRINSICS
-#define GLM_FORCE_PRECISION_HIGHP_FLOAT
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_INLINE
-#include <glm/vec2.hpp>
-#include <glm/vec4.hpp>
-#include <glm/ext/vector_uint2.hpp>
+//#include "Common/Types.h"
+//#define GLM_ENABLE_EXPERIMENTAL
+//#define GLM_FORCE_ALIGNED_GENTYPES
+//#define GLM_FORCE_INTRINSICS
+//#define GLM_FORCE_PRECISION_HIGHP_FLOAT
+//#define GLM_FORCE_RADIANS
+//#define GLM_FORCE_INLINE
+//#include <glm/vec2.hpp>
+//#include <glm/vec4.hpp>
+//#include <glm/ext/vector_uint2.hpp>
+#include "Math/Vector.h"
 // clang-format on
 
 //---- Define assertion handler. Defaults to calling assert().
@@ -79,28 +80,37 @@
 //---- Define constructor and implicit cast operators to convert back<>forth between your math types and ImVec2/ImVec4.
 // This will be inlined as part of ImVec2 and ImVec4 class declarations.
 #define IM_VEC2_CLASS_EXTRA                                                                                                                                                        \
-    ImVec2(const glm::vec2& f)                                                                                                                                                     \
+    ImVec2(const ECSEngine::vec2& f)                                                                                                                                                     \
     {                                                                                                                                                                              \
         x = f.x;                                                                                                                                                                   \
         y = f.y;                                                                                                                                                                   \
     }                                                                                                                                                                              \
-    ImVec2(const glm::uvec2& f)                                                                                                                                                    \
+    ImVec2(const ECSEngine::uvec2& f)                                                                                                                                                    \
     {                                                                                                                                                                              \
         x = (float)f.x;                                                                                                                                                            \
         y = (float)f.y;                                                                                                                                                            \
     }                                                                                                                                                                              \
-    operator glm::vec2() const { return glm::vec2(x, y); }                                                                                                                         \
-    operator glm::uvec2() const { return glm::uvec2((u32)x, (u32)y); }
+    operator ECSEngine::vec2() const                                                                                                                                                          \
+    {                                                                                                                                                                              \
+        return ECSEngine::vec2(x, y);                                                                                                                                              \
+    }                                                                                                                         \
+    operator ECSEngine::uvec2() const                                                                                                                                                         \
+    {                                                                                                                                                                              \
+        return ECSEngine::uvec2((u32)x, (u32)y);                                                                                                                                   \
+    }
 
 #define IM_VEC4_CLASS_EXTRA                                                                                                                                                        \
-    ImVec4(const glm::vec4& f)                                                                                                                                                     \
+    ImVec4(const ECSEngine::vec4& f)                                                                                                                                                     \
     {                                                                                                                                                                              \
         x = f.x;                                                                                                                                                                   \
         y = f.y;                                                                                                                                                                   \
         z = f.z;                                                                                                                                                                   \
         w = f.w;                                                                                                                                                                   \
     }                                                                                                                                                                              \
-    operator glm::vec4() const { return glm::vec4(x, y, z, w); }
+    operator ECSEngine::vec4() const                                                                                                                                               \
+    {                                                                                                                                                                              \
+        return ECSEngine::vec4(x, y, z, w);                                                                                                                                                   \
+    }
 
 //---- Use 32-bit vertex indices (default is 16-bit) is one way to allow large meshes with more than 64K vertices.
 // Your renderer back-end will need to support it (most example renderer back-ends support both 16/32-bit indices).

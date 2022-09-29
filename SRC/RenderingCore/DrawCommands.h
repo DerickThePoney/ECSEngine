@@ -52,59 +52,59 @@ public:
 
     void SetDebugMarker(const std::string& parDebugMarker);
 
-    void SetViewTranform(const glm::mat4& parViewTransform, const glm::mat4& parProjection);
-    void DrawVertices(const glm::vec3* parVertices,
+    void SetViewTranform(const mat4& parViewTransform, const mat4& parProjection);
+    void DrawVertices(const vec3* parVertices,
           const u32 parVerticesSize,
           const u16* parIndices,
           const u32 parIndicesSize,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::mat4& parTransform = glm::identity<glm::mat4>());
-    void DrawMesh(const MeshHandle& parMeshHandle, const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::mat4& parTransform = glm::identity<glm::mat4>());
+          const mat4& parTransform = mat4::Identity());
+    void DrawMesh(const MeshHandle& parMeshHandle, const MaterialInstanceHandle& parMaterialInstanceHandle, const mat4& parTransform = mat4::Identity());
     void DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
           const MeshHandle& parMeshHandle,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::mat4& parTransform = glm::identity<glm::mat4>());
-    void DrawMesh(const MeshHandle& parMeshHandle, const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle, const glm::mat4& parTransform = glm::identity<glm::mat4>());
+          const mat4& parTransform = mat4::Identity());
+    void DrawMesh(const MeshHandle& parMeshHandle, const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle, const mat4& parTransform = mat4::Identity());
     void DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
           const MeshHandle& parMeshHandle,
           const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::mat4& parTransform = glm::identity<glm::mat4>());
-    void DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor = 0xFFFFFFFF);
-    void DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor = 0xFFFFFFFF);
+          const mat4& parTransform = mat4::Identity());
+    void DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parMin, const vec3& parMax, const u32 parColor = 0xFFFFFFFF);
+    void DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parMin, const vec3& parMax, const u32 parColor = 0xFFFFFFFF);
     void DrawFrustum(const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::mat4& parWorldViewTransform,
-          const glm::mat4& parProjectionMatrix,
+          const mat4& parWorldViewTransform,
+          const mat4& parProjectionMatrix,
           const bool parDrawFrustumNormals /*= false*/,
           const u32 parColor /*= 0xFFFFFFFF*/,
           const u32 parNormalsColor /*= 0xFFFFFFFF*/);
 
-    void DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle, const glm::vec3* parVertices, const u32 parVerticesSize, const u32 parColor, const bool parClose);
+    void DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3* parVertices, const u32 parVerticesSize, const u32 parColor, const bool parClose);
     void DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::vec2* parVertices,
+          const vec2* parVertices,
           const u32 parVerticesSize,
           const float parHeight,
           const u32 parColor,
           const bool parClose);
     void DrawLines(const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const std::vector<glm::vec2>& parVertices,
+          const std::vector<vec2>& parVertices,
           const u32 parVerticesSize,
           const float parHeight,
           const u32 parColor,
           const bool parClose);
 
-    void DrawCircle(const MaterialInstanceHandle& parMaterialInstanceHandle, const CircleFeedbackParameters& parParams, const glm::mat4& parTransform = glm::identity<glm::mat4>());
+    void DrawCircle(const MaterialInstanceHandle& parMaterialInstanceHandle, const CircleFeedbackParameters& parParams, const mat4& parTransform = mat4::Identity());
 
     void DrawCircularChunk(const CircularGridChunkFeedbackParameters& parParameters,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
-          const glm::mat4 parTransform = glm::identity<glm::mat4>());
+          const mat4 parTransform = mat4::Identity());
 
     void BlitWithMaterial(const MaterialInstanceHandle& parMaterialInstanceHandle);
 
     void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parHandle, const u32 parSlot);
     void SetFreeFormSamplerUniform(const std::string& parUniformName, const u32& parHandle, const u32 parSlot);
-    void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue);
-    void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue);
-    void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue);
+    void SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue);
+    void SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue);
+    void SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue);
 
     void Submit();
 

@@ -27,43 +27,38 @@ void OrientationModule::VirtualInit(const EntityId& parUnitId, const ModuleParam
 {
     parent_type::VirtualInit(parUnitId, parParameters);
 
-    if (parParameters.HasParameter<ModuleParameters::YawPitchRoll>())
+    if (parParameters.HasParameter<ModuleParameters::EulerAnglesXYZ>())
     {
-        const glm::vec3 yawPitchRoll = parParameters.Get_IFP<ModuleParameters::YawPitchRoll>(glm::vec3(0.0f));
-        FOrientation = glm::quat(yawPitchRoll);
-    }
-    else if (parParameters.HasParameter<ModuleParameters::EulerAngles>())
-    {
-        const glm::vec3 euler = parParameters.Get_IFP<ModuleParameters::EulerAngles>(glm::vec3(0.0f));
-        FOrientation = glm::quat_cast(glm::eulerAngleXYZ(euler.x, euler.y, euler.z));
+        const vec3 euler = parParameters.Get_IFP<ModuleParameters::EulerAnglesXYZ>(vec3(0.0f));
+        FOrientation = quat::FromMat4(EulerAnglesXYZ(euler.x, euler.y, euler.z));
     }
     else if (parParameters.HasParameter<ModuleParameters::Orientation>())
     {
-        FOrientation = parParameters.Get_IFP<ModuleParameters::Orientation>(glm::quat());
+        FOrientation = parParameters.Get_IFP<ModuleParameters::Orientation>(quat());
     }
 }
 
-const glm::vec3 OrientationModule::GetOrientationAsYawPitchRoll() const
+const vec3 OrientationModule::GetOrientationAsYawPitchRoll() const
 {
-    return glm::vec3(glm::yaw(FOrientation), glm::pitch(FOrientation), glm::roll(FOrientation));
+    return ExtractEulerAnglesXYZ((mat4) FOrientation);
 }
 
-const glm::vec3 OrientationModule::Forward() const
+const vec3 OrientationModule::Forward() const
 {
-    glm::mat4 rotationMatrix(FOrientation);
-    return glm::vec3(rotationMatrix[0]);
+    mat4 rotationMatrix(FOrientation);
+    return vec3(rotationMatrix.Column(0).xy0());
 }
 
-const glm::vec3 OrientationModule::Right() const
+const vec3 OrientationModule::Right() const
 {
-    glm::mat4 rotationMatrix(FOrientation);
-    return glm::vec3(rotationMatrix[1]);
+    mat4 rotationMatrix(FOrientation);
+    return vec3(rotationMatrix.Column(1).xy0());
 }
 
-const glm::vec3 OrientationModule::Up() const
+const vec3 OrientationModule::Up() const
 {
-    glm::mat4 rotationMatrix(FOrientation);
-    return glm::vec3(rotationMatrix[2]);
+    mat4 rotationMatrix(FOrientation);
+    return vec3(rotationMatrix.Column(2).xy0());
 }
 
 IMPLEMENT_SAVELOAD_ABILITIES(OrientationModule);

@@ -16,12 +16,12 @@ namespace Navigation
 
 namespace PathfindingHelpers
 {
-float Distance(const glm::vec2 parVertexPos, const glm::vec2 parLastVertexPos)
+float Distance(const vec2 parVertexPos, const vec2 parLastVertexPos)
 {
-    return glm::length2(parVertexPos - parLastVertexPos);
+    return LengthSq(parVertexPos - parLastVertexPos);
 }
 
-float Heuristic(const glm::vec2 parVertexPos, const glm::vec2 parGoal)
+float Heuristic(const vec2 parVertexPos, const vec2 parGoal)
 {
     return Distance(parGoal, parVertexPos);
 }
@@ -72,12 +72,12 @@ void NavMeshPathSolver::SolvePath(const NavMesh& parNavMesh, NavMeshPath& outPat
 /************************************************************************/
 void NavMeshPathSolver::SolveFacePath(const NavMesh& parNavMesh, NavMeshPath& outPath)
 {
-    const glm::vec2 start = outPath.Start();
+    const vec2 start = outPath.Start();
     const NavMeshFace* startFace = parNavMesh.FindContainingFace(start);
     if (startFace == nullptr)
         return;
 
-    const glm::vec2 end = outPath.End();
+    const vec2 end = outPath.End();
     const NavMeshFace* endFace = parNavMesh.FindContainingFace(end);
     if (endFace == nullptr)
         return;
@@ -202,12 +202,12 @@ void NavMeshPathSolver::SolveFacePath(const NavMesh& parNavMesh, NavMeshPath& ou
 
 void NavMeshPathSolver::SolveVertexPath(const NavMesh& parNavMesh, NavMeshPath& outPath)
 {
-    const glm::vec2 start = outPath.Start();
+    const vec2 start = outPath.Start();
     const NavMeshFace* startFace = parNavMesh.FindContainingFace(start);
     if (startFace == nullptr)
         return;
 
-    const glm::vec2 end = outPath.End();
+    const vec2 end = outPath.End();
     const NavMeshFace* endFace = parNavMesh.FindContainingFace(end);
     if (endFace == nullptr)
         return;

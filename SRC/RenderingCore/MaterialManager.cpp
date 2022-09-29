@@ -36,10 +36,10 @@ public:
     void SetSamplerUniform(const std::string& parUniformName, const u16& parTextureHandle, const u32 parSlot) const;
     void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parTextureHandle, const u32 parSlot) const;
     void SetFreeFormSamplerUniform(const std::string& parUniformName, const u32& parTextureHandle, const u32 parSlot) const;
-    void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue) const;
-    void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue) const;
-    void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue) const;
-    void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber) const;
+    void SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue) const;
+    void SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue) const;
+    void SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue) const;
+    void SetMat4Uniforms(const std::string& parUniformName, const mat4* parUniformValue, const u8 parNumber) const;
 
     std::vector<MultiPassProgramDescriptor*>& GetProgramsForEditor();
     std::vector<MultiPassMaterialDescriptor*>& GetMaterialsForEditor();
@@ -354,28 +354,28 @@ void MaterialManagerSingleton::SetFreeFormSamplerUniform(const std::string& parU
     }*/
 }
 
-void MaterialManagerSingleton::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue) const
+void MaterialManagerSingleton::SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue) const
 {
     const bgfx::UniformHandle& handle = MaterialManagerSingleton::Instance().GetUniform(parUniformName, bgfx::UniformType::Vec4);
     AssertRelease(bgfx::isValid(handle));
-    bgfx::setUniform(handle, &parUniformValue[0]);
+    bgfx::setUniform(handle, &parUniformValue);
 }
 
-void MaterialManagerSingleton::SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue) const
+void MaterialManagerSingleton::SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue) const
 {
     const bgfx::UniformHandle& handle = GetUniform(parUniformName, bgfx::UniformType::Mat3);
     AssertRelease(bgfx::isValid(handle));
-    bgfx::setUniform(handle, &parUniformValue[0][0]);
+    bgfx::setUniform(handle, &parUniformValue.FValues[0]);
 }
 
-void MaterialManagerSingleton::SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue) const
+void MaterialManagerSingleton::SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue) const
 {
     const bgfx::UniformHandle& handle = MaterialManagerSingleton::Instance().GetUniform(parUniformName, bgfx::UniformType::Mat4);
     AssertRelease(bgfx::isValid(handle));
-    bgfx::setUniform(handle, &parUniformValue[0][0]);
+    bgfx::setUniform(handle, &parUniformValue.FValues[0]);
 }
 
-void MaterialManagerSingleton::SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber) const
+void MaterialManagerSingleton::SetMat4Uniforms(const std::string& parUniformName, const mat4* parUniformValue, const u8 parNumber) const
 {
     const bgfx::UniformHandle& handle = MaterialManagerSingleton::Instance().GetUniform(parUniformName, bgfx::UniformType::Mat4);
     AssertRelease(bgfx::isValid(handle));
@@ -453,25 +453,25 @@ void SetFreeFormSamplerUniform(const std::string& parUniformName, const u32 parT
     MaterialManagerSingleton::Instance().SetFreeFormSamplerUniform(parUniformName, parTextureHandle, parSlot);
 }
 
-void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue)
+void SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue)
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     MaterialManagerSingleton::Instance().SetVec4Uniform(parUniformName, parUniformValue);
 }
 
-void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue)
+void SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue)
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     MaterialManagerSingleton::Instance().SetMat3Uniform(parUniformName, parUniformValue);
 }
 
-void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue)
+void SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue)
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     MaterialManagerSingleton::Instance().SetMat4Uniform(parUniformName, parUniformValue);
 }
 
-void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber)
+void SetMat4Uniforms(const std::string& parUniformName, const mat4* parUniformValue, const u8 parNumber)
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     MaterialManagerSingleton::Instance().SetMat4Uniforms(parUniformName, parUniformValue, parNumber);

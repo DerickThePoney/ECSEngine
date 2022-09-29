@@ -17,7 +17,7 @@ public:
     void EditorWindow(bool* parOpen);
 
 private:
-    glm::mat4 FViewWorldMatrix;
+    mat4 FViewWorldMatrix;
 
     KeyboardCommand FForward;
     KeyboardCommand FBackward;

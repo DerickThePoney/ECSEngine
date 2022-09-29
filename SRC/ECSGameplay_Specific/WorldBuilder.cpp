@@ -24,10 +24,10 @@ EntityId CreateEntityInCircle(const float parMinRadius, const float parMaxRadius
 
     // Get angle
     const float randomAngle = RandomNumbers::NextFloat();
-    const float angle = -0.5f * glm::pi<float>() + 2.f * randomAngle * glm::pi<float>();
+    const float angle = -0.5f * Pi() + 2.f * randomAngle * Pi();
 
     // get position
-    const glm::vec3 position = glm::vec3(glm::cos(angle) * radius, 0.f, glm::sin(angle) * radius);
+    const vec3 position = vec3(cos(angle) * radius, 0.f, sin(angle) * radius);
 
     // spawn entity
     parContainer.Set<ModuleParameters::Position>(position);
@@ -58,14 +58,14 @@ void WorldBuilder::CreateWorld() const
     AssertRelease(colonyTemplate != nullptr);
     AssertRelease(colonyTemplate->GetWorldId() == EEntityWorlds::COLONY);
     ModuleParameters::ParameterContainer colonyContainer;
-    colonyContainer.Set<ModuleParameters::Position>(glm::vec3(0.f));
+    colonyContainer.Set<ModuleParameters::Position>(vec3(0.f));
     const EntityId colonyId = EntityFactory::CreateEntity(colonyTemplate, colonyContainer);
 
     const EntityTemplate* firePlaceTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FFirePlaceTemplateName);
     AssertRelease(firePlaceTemplate != nullptr);
     AssertRelease(firePlaceTemplate->GetWorldId() == EEntityWorlds::BUILDINGS);
     ModuleParameters::ParameterContainer firePlaceContainer;
-    firePlaceContainer.Set<ModuleParameters::Position>(glm::vec3(0.f));
+    firePlaceContainer.Set<ModuleParameters::Position>(vec3(0.f));
     const EntityId firePlaceId = EntityFactory::CreateEntity(firePlaceTemplate, firePlaceContainer);
 }
 

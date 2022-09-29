@@ -24,7 +24,7 @@ public:
     u16 GetFinalTexture() const;
 
 private:
-    void SetViewFramebuffers(const glm::uvec2 parSize);
+    void SetViewFramebuffers(const uvec2 parSize);
 
 private:
     u32 FGameplayCameraId = -1;

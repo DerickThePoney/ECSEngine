@@ -39,10 +39,10 @@ void CircularPathfindingGraph::AddNewCircularChunk()
     const float pathDistance = minR - 0.5f * GameplayConstants::CircularBuildingGrid::InterChunkLength;
 
     const float wantedAngleSubdiv = GameplayConstants::CircularBuildingGrid::NavigationNodesDistance / pathDistance;
-    const float nbSubdiv = 2.0f * glm::pi<float>() / wantedAngleSubdiv;
+    const float nbSubdiv = 2.0f * Pi() / wantedAngleSubdiv;
 
     const u32 nodesCount = (u32)std::roundf(nbSubdiv);
-    const float nodesAngle = 2.0f * glm::pi<float>() / nodesCount;
+    const float nodesAngle = 2.0f * Pi() / nodesCount;
 
     std::vector<Node> newChunk;
     newChunk.reserve(nodesCount);
@@ -53,7 +53,7 @@ void CircularPathfindingGraph::AddNewCircularChunk()
     forrange(i, 0, nodesCount)
     {
         const float angle = i * nodesAngle;
-        glm::vec2 currentPos(pathDistance * glm::cos(angle), pathDistance * glm::sin(angle));
+        vec2 currentPos(pathDistance * cos(angle), pathDistance * sin(angle));
         newChunk.push_back(Node{ currentPos });
         const u32 edgeId = (u32)newEdges.size();
         const u32 prevNode = ((i == 0) ? nodesCount - 1 : (u32)i - 1);
@@ -88,12 +88,12 @@ void CircularPathfindingGraph::Cleanup()
 
 void CircularPathfindingGraph::Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial) const
 {
-    std::vector<glm::vec2> lines;
+    std::vector<vec2> lines;
     lines.reserve(FEdges.size() + 1);
-    lines.push_back(glm::vec2(0.f));
+    lines.push_back(vec2(0.f));
     foreachitemconst(edge, FEdges)
     {
-        const glm::vec2 start = FNavigationNodes[edge.FStart.ChunkId][edge.FStart.Id].FPosition;
+        const vec2 start = FNavigationNodes[edge.FStart.ChunkId][edge.FStart.Id].FPosition;
         lines.push_back(start);
     }
 
@@ -105,24 +105,24 @@ void CircularPathfindingGraph::Debug(Rendering::DrawCommandBuffer& parBuffer, co
 
     u32 FCameraId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
-    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
 
     bool foundPos = false;
-    glm::vec3 mouseWorldPosition = GetWorldPositionFromScreenPosition(*camera, aspectRatio, windowSize, Input::GetMousePosition(), foundPos);
+    vec3 mouseWorldPosition = GetWorldPositionFromScreenPosition(*camera, aspectRatio, windowSize, Input::GetMousePosition(), foundPos);
 
     NodeId closestNode = GetClosestNode(mouseWorldPosition);
     if (closestNode.ChunkId == -1)
         return;
 
-    const glm::vec3 pos = glm::vec3(FNavigationNodes[closestNode.ChunkId][closestNode.Id].FPosition.x, 0, FNavigationNodes[closestNode.ChunkId][closestNode.Id].FPosition.y);
-    GameplayFeedbackDrawer::Instance().AddAABB(pos - glm::vec3(0.1f), pos + glm::vec3(0.1f), 0xFF00FFFF, glm::identity<glm::mat4>(), true);
+    const vec3 pos = vec3(FNavigationNodes[closestNode.ChunkId][closestNode.Id].FPosition.x, 0, FNavigationNodes[closestNode.ChunkId][closestNode.Id].FPosition.y);
+    GameplayFeedbackDrawer::Instance().AddAABB(pos - vec3(0.1f), pos + vec3(0.1f), 0xFF00FFFF, mat4::Identity(), true);
 }
 
-CircularPathfindingGraph::NodeId CircularPathfindingGraph::GetClosestNode(const glm::vec3& parWorldPosition) const
+CircularPathfindingGraph::NodeId CircularPathfindingGraph::GetClosestNode(const vec3& parWorldPosition) const
 {
-    const glm::vec2 worldPos2D = glm::xz(parWorldPosition);
-    const float distanceToCenter = glm::length(worldPos2D);
+    const vec2 worldPos2D = parWorldPosition.xz();
+    const float distanceToCenter = Length(worldPos2D);
 
     // detect chunk
     forrange(i, 0, FNavigationNodes.size())
@@ -153,15 +153,15 @@ CircularPathfindingGraph::NodeId CircularPathfindingGraph::GetClosestNode(const 
 
         // We are in this circular chunk
         // now actually get the input angle
-        float inputAngle = glm::atan(worldPos2D.y, worldPos2D.x);
+        float inputAngle = atan(worldPos2D.y, worldPos2D.x);
         if (inputAngle < 0.f)
-            inputAngle += 2.f * glm::pi<float>();
+            inputAngle += 2.f * Pi();
 
         const float wantedAngleSubdiv = GameplayConstants::CircularBuildingGrid::NavigationNodesDistance / pathDistance;
-        const float nbSubdiv = 2.0f * glm::pi<float>() / wantedAngleSubdiv;
+        const float nbSubdiv = 2.0f * Pi() / wantedAngleSubdiv;
 
         const u32 nodesCount = (u32)std::roundf(nbSubdiv);
-        const float nodesAngle = 2.0f * glm::pi<float>() / nodesCount;
+        const float nodesAngle = 2.0f * Pi() / nodesCount;
 
         const float nodeIdxFlt = inputAngle / nodesAngle;
         const float interp = nodeIdxFlt - (float)((u32)nodeIdxFlt); // eurk

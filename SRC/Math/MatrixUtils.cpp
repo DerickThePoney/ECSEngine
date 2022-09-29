@@ -3,6 +3,7 @@
 #include "Vector.h"
 #include "VectorUtils.h"
 #include "Common/Assertions.h"
+#include <limits>
 
 namespace ECSEngine
 {
@@ -252,6 +253,62 @@ mat3 Transpose(const mat3& parA)
 mat4 Transpose(const mat4& parA)
 {
     return mat4(parA.Row(0), parA.Row(1), parA.Row(2), parA.Row(3));
+}
+
+mat4 Translation(const vec3& parT)
+{
+    mat4 t = mat4::Identity();
+    t.SetColumn(3, vec4(parT, 1.f));
+    return t;
+}
+
+mat4 Perspective(float fovy, float aspect, float zNear, float zFar)
+{
+    AlwaysCheckedAssert(abs(aspect - std::numeric_limits<float>::epsilon()) > 0.f);
+
+    const float tanHalfFovy = tan(0.5f * fovy);
+
+    mat4 Result;
+    Result.FValues[0] = 1.f / (aspect * tanHalfFovy);
+    Result.FValues[5] = 1.f / (tanHalfFovy);
+    Result.FValues[10] = zFar / (zFar - zNear);
+    Result.FValues[14] = 1.f;
+    Result.FValues[11] = -(zFar * zNear) / (zFar - zNear);
+    return Result;
+}
+
+mat4 EulerAnglesXYZ(const float X, const float Y, const float Z)
+{
+    float c1 = cosf(-X);
+    float c2 = cosf(-Y);
+    float c3 = cosf(-Z);
+    float s1 = sinf(-X);
+    float s2 = sinf(-Y);
+    float s3 = sinf(-Z);
+
+    mat4 Result;
+    Result.FValues[0] = c2 * c3;
+    Result.FValues[4] = -c1 * s3 + s1 * s2 * c3;
+    Result.FValues[8] = s1 * s3 + c1 * s2 * c3;
+    Result.FValues[1] = c2 * s3;
+    Result.FValues[5] = c1 * c3 + s1 * s2 * s3;
+    Result.FValues[9] = -s1 * c3 + c1 * s2 * s3;
+    Result.FValues[2] = -s2;
+    Result.FValues[6] = s1 * c2;
+    Result.FValues[10] = c1 * c2;
+    Result.FValues[15] = 1.f;
+    return Result;
+}
+
+ECSEngine::vec3 ExtractEulerAnglesXYZ(const mat4& m)
+{
+    float T1 = atan2f(m.FValues[6], m.FValues[10]);
+    float C2 = sqrtf(m.FValues[0] * m.FValues[0] + m.FValues[1] * m.FValues[1]);
+    float T2 = atan2f(-m.FValues[2], C2);
+    float S1 = sinf(T1);
+    float C1 = cosf(T1);
+    float T3 = atan2f(S1 * m.FValues[8] - C1 * m.FValues[4], C1 * m.FValues[5] - S1 * m.FValues[9]);
+    return vec3(-T1, -T2, -T3);
 }
 
 }

@@ -51,4 +51,10 @@ inline __forceinline VecType<float> Normalize(const VecType<float>& A)
 {
     return A * ooLength(A);
 }
+
+template<template<typename> typename VecType>
+inline __forceinline VecType<float> Lerp(const VecType<float>& A, const VecType<float>& B, const float t)
+{
+    return A * (1.f - t) + B * t;
+}
 }

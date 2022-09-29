@@ -103,7 +103,7 @@ public:
     {
         ar(cereal::base_class<parent_type>(this));
         Polygon2D defaultPolygon;
-        defaultPolygon.append(std::vector<glm::vec2>({ glm::vec2(0.f, 0.f), glm::vec2(1.f, 0.f), glm::vec2(0.f, 1.f) }));
+        defaultPolygon.append(std::vector<vec2>({ vec2(0.f, 0.f), vec2(1.f, 0.f), vec2(0.f, 1.f) }));
         PROPERTYFIELD(Polygon, defaultPolygon);
         PROPERTYFIELD(PolygonHoles, std::vector<Polygon2D>());
     }
@@ -117,9 +117,9 @@ private:
 
     std::vector<Polygon2D> FPartitions;
     std::vector<Triangle2D> FTriangles;
-    std::vector<glm::vec3> vertices;
-    std::vector<std::vector<glm::vec3>> holesVertices;
-    std::vector<std::vector<glm::vec3>> verticesForTriangles;
+    std::vector<vec3> vertices;
+    std::vector<std::vector<vec3>> holesVertices;
+    std::vector<std::vector<vec3>> verticesForTriangles;
 
     bool FShowExtentedPolygon = false;
 };

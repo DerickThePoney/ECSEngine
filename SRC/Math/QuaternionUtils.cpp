@@ -16,5 +16,10 @@ quat Normalize(const quat& parQ)
     return parQ * (1.f / sqrtf(lengthSq));
 }
 
+quat Lerp(const quat& A, const quat& B, const float t)
+{
+    return A * (1.f - t) + B * t;
+}
+
 }
 

@@ -26,26 +26,24 @@ struct alignas(16) Quaternionf
 
     explicit Quaternionf(const vec3& parAxis, const float parAngle);
 
-    inline bool operator==(const Quaternionf& parA) { return parA.x == x && parA.y == y && parA.z == z && parA.w == w; }
+    inline bool operator==(const Quaternionf& parA) const { return parA.x == x && parA.y == y && parA.z == z && parA.w == w; }
 
-    inline bool operator!=(const Quaternionf& parA) { return !(*this == parA); }
+    inline bool operator!=(const Quaternionf& parA) const { return !(*this == parA); }
 
-    inline quat operator*(const float parA) { return quat(x * parA, y * parA, z * parA, w * parA); }
-    quat operator*(const quat& parA);
+    inline quat operator*(const float parA) const { return quat(x * parA, y * parA, z * parA, w * parA); }
+    quat operator*(const quat& parA) const;
     void operator*=(const quat& parA);
+    inline quat operator+(const quat& parA) const { return quat(x + parA.x, y + parA.y, z + parA.z, w + parA.w); }
 
     explicit operator mat4() const;
+
+    static Quaternionf FromMat4(const mat4& parMatrix);
 
     float x = 0.f;
     float y = 0.f;
     float z = 0.f;
     float w = 0.f;
 };
-
-inline quat operator*(const quat& parQ, const float parA)
-{
-    return quat(parQ.x * parA, parQ.y * parA, parQ.z * parA, parQ.w * parA);
-}
 
 inline quat operator*(const quat& parA, const quat& parB)
 {

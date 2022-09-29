@@ -24,7 +24,7 @@ public:
     }
 
 #define MAKESCALAROP(OP)                                                                                                                                                           \
-    inline Vector2 operator OP(const T parA)                                                                                                                                       \
+    inline Vector2 operator OP(const T parA) const                                                                                                                                      \
     {                                                                                                                                                                              \
         return Vector2(x OP parA, y OP parA);                                                                                                                                      \
     }                                                                                                                                                                              \
@@ -35,7 +35,7 @@ public:
     }
 
 #define MAKEVECOP(OP)                                                                                                                                                              \
-    inline Vector2 operator OP(const Vector2& parA)                                                                                                                                \
+    inline Vector2 operator OP(const Vector2& parA) const                                                                                                                               \
     {                                                                                                                                                                              \
         return Vector2(x OP parA.x, y OP parA.y);                                                                                                                                  \
     }                                                                                                                                                                              \
@@ -58,12 +58,12 @@ public:
 #undef MAKESCALAROP
 #undef MAKEOP
 
-    inline bool operator==(const Vector2& parA)
+    inline bool operator==(const Vector2& parA) const
     {
         return parA.x == x && parA.y == y;
     }
 
-    inline bool operator!=(const Vector2& parA)
+    inline bool operator!=(const Vector2& parA) const
     {
         return !(*this == parA);
     }
@@ -130,7 +130,7 @@ public:
     }
 
 #define MAKESCALAROP(OP)                                                                                                                                                           \
-    inline Vector3 operator OP(const T parA)                                                                                                                                       \
+    inline Vector3 operator OP(const T parA) const                                                                                                                                      \
     {                                                                                                                                                                              \
         return Vector3(x OP parA, y OP parA, z OP parA);                                                                                                                                      \
     }                                                                                                                                                                              \
@@ -142,11 +142,11 @@ public:
     }
 
 #define MAKEVECOP(OP)                                                                                                                                                              \
-    inline Vector3 operator OP(const Vector3& parA)                                                                                                                                \
+    inline Vector3 operator OP(const Vector3& parA) const                                                                                                                               \
     {                                                                                                                                                                              \
         return Vector3(x OP parA.x, y OP parA.y, z OP parA.z);                                                                                                                     \
     }                                                                                                                                                                              \
-    inline void operator OP=(const Vector3& parA)                                                                                                                                 \
+    inline void operator OP=(const Vector3& parA)                                                                                                                                \
     {                                                                                                                                                                              \
         x OP= parA.x;                                                                                                                                                               \
         y OP= parA.y;                                                                                                                                                               \
@@ -167,7 +167,7 @@ public:
 #undef MAKEOP
 
 #define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
-    inline Vector2<T> OP()                                                                                                                                                         \
+    inline Vector2<T> OP() const                                                                                                                                                        \
     {                                                                                                                                                                              \
         return Vector2<T>(A, B);                                                                                                                                                   \
     }
@@ -185,7 +185,7 @@ public:
 #undef MAKE_SWIZZLE_OP_2
 
 #define MAKE_SWIZZLE_OP_3(OP, A, B, C)                                                                                                                                                \
-    inline Vector3 OP()                                                                                                                                                         \
+    inline Vector3 OP() const                                                                                                                                                        \
     {                                                                                                                                                                              \
         return Vector3(A, B, C);                                                                                                                                                   \
     }
@@ -208,12 +208,12 @@ public:
 
 #undef MAKE_SWIZZLE_OP_3
 
-    inline bool operator==(const Vector3& parA)
+    inline bool operator==(const Vector3& parA) const
     {
         return parA.x == x && parA.y == y && parA.z == z;
     }
 
-    inline bool operator!=(const Vector3& parA)
+    inline bool operator!=(const Vector3& parA) const
     {
         return !(*this == parA);
     }
@@ -302,11 +302,19 @@ public:
     {
     }
 
+    explicit Vector4(const Vector3<T>& parVec3, float parW)
+        : x(parVec3.x)
+        , y(parVec3.y)
+        , z(parVec3.z)
+        , w(parW)
+    {
+    }
+
     static inline Vector4 MakeHomogeneousVec4(const Vector2<T>& parVec2) { return Vector4(parVec2.x, parVec2.y, T(0), T(1)); }
     static inline Vector4 MakeHomogeneousVec4(const Vector3<T>& parVec3) { return Vector4(parVec3.x, parVec3.y, parVec3.z, T(1)); }
 
 #define MAKESCALAROP(OP)                                                                                                                                                           \
-    inline Vector4 operator OP(const T parA)                                                                                                                                       \
+    inline Vector4 operator OP(const T parA) const                                                                                                                                 \
     {                                                                                                                                                                              \
         return Vector4(x OP parA, y OP parA, z OP parA, w OP parA);                                                                                                                                      \
     }                                                                                                                                                                              \
@@ -319,7 +327,7 @@ public:
     }
 
 #define MAKEVECOP(OP)                                                                                                                                                              \
-    inline Vector4 operator OP(const Vector4& parA)                                                                                                                                \
+    inline Vector4 operator OP(const Vector4& parA) const                                                                                                                                \
     {                                                                                                                                                                              \
         return Vector4(x OP parA.x, y OP parA.y, z OP parA.z, w OP parA.w);                                                                                                                     \
     }                                                                                                                                                                              \
@@ -345,7 +353,7 @@ public:
 #undef MAKEOP
 
 #define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
-    inline Vector2<T> OP()                                                                                                                                                         \
+    inline Vector2<T> OP() const                                                                                                                                                        \
     {                                                                                                                                                                              \
         return Vector2<T>(A, B);                                                                                                                                                   \
     }
@@ -364,11 +372,12 @@ public:
 #undef MAKE_SWIZZLE_OP_2
 
 #define MAKE_SWIZZLE_OP_3(OP, A, B, C)                                                                                                                                             \
-    inline Vector3<T> OP()                                                                                                                                                            \
+    inline Vector3<T> OP() const                                                                                                                                                           \
     {                                                                                                                                                                              \
         return Vector3<T>(A, B, C);                                                                                                                                                   \
     }
 
+    MAKE_SWIZZLE_OP_3(xyz, x, y, z);
     MAKE_SWIZZLE_OP_3(xxx, x, x, x);
     MAKE_SWIZZLE_OP_3(yyy, y, y, y);
     MAKE_SWIZZLE_OP_3(zzz, z, z, z);
@@ -388,7 +397,7 @@ public:
 #undef MAKE_SWIZZLE_OP_3
 
 #define MAKE_SWIZZLE_OP_4(OP, A, B, C, D)                                                                                                                                             \
-    inline Vector4 OP()                                                                                                                                                            \
+    inline Vector4 OP() const                                                                                                                                                           \
     {                                                                                                                                                                              \
         return Vector4(A, B, C, D);                                                                                                                                                   \
     }
@@ -400,12 +409,12 @@ public:
 
 #undef MAKE_SWIZZLE_OP_4
 
-    inline bool operator==(const Vector4& parA)
+    inline bool operator==(const Vector4& parA) const
     {
         return parA.x == x && parA.y == y && parA.z == z && parA.w == w;
     }
 
-    inline bool operator!=(const Vector4& parA)
+    inline bool operator!=(const Vector4& parA) const
     {
         return !(*this == parA);
     }

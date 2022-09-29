@@ -32,8 +32,8 @@ public:
 
     virtual void SetRawIndexData(const void* parSrc, u32 parSizeInBytes);
 
-    virtual void SetBoundingCircle(const glm::vec4 parBoundingCircle);
-    virtual const glm::vec4& BoundingCircle() const { return FBoundingCircle; };
+    virtual void SetBoundingCircle(const vec4 parBoundingCircle);
+    virtual const vec4& BoundingCircle() const { return FBoundingCircle; };
 
     void SetMeshFilename(const std::string& parFilename)
     {
@@ -46,7 +46,7 @@ private:
     IndexBuffer FIndexBuffer;
     VertexBuffer FVertexBuffer;
 
-    glm::vec4 FBoundingCircle;
+    vec4 FBoundingCircle;
 
 #ifdef ENABLE_SECURITY_CHECKS
     std::string FMeshFilename;

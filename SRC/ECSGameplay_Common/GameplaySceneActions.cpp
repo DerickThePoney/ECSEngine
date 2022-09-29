@@ -69,7 +69,7 @@ void SpawnEntitySceneAction::VirtualStart()
 
     ModuleParameters::ParameterContainer container;
     container.Set<ModuleParameters::Position>(FSceneItem->GetPosition());
-    container.Set<ModuleParameters::EulerAngles>(FSceneItem->GetEulerAngles());
+    container.Set<ModuleParameters::EulerAnglesXYZ>(FSceneItem->GetEulerAngles());
 
     EntityFactory::CreateEntity(FTemplate, container);
 
@@ -110,8 +110,8 @@ bool SpawnEntitySceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuff
     const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(descriptor->MaterialName());
     if (meshHandle.IsValid())
     {
-        const glm::vec3 eulerAngles = item->GetEulerAngles();
-        const glm::mat4 mtx = glm::translate(item->GetPosition()) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+        const vec3 eulerAngles = item->GetEulerAngles();
+        const mat4 mtx = Translation(item->GetPosition()) * EulerAnglesXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
 
         parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial, mtx);
     }
@@ -149,13 +149,13 @@ void SpawnEntitiesInPolygonalPatternSceneAction::VirtualStart()
     if (FRandomPoints.size() == 0)
         GenerateRandomPoints();
 
-    const glm::vec3 position = FSceneItem->GetPosition();
-    const glm::vec3 eulerAngles = FSceneItem->GetEulerAngles();
+    const vec3 position = FSceneItem->GetPosition();
+    const vec3 eulerAngles = FSceneItem->GetEulerAngles();
     forrange(i, 0, FRandomPoints.size())
     {
         ModuleParameters::ParameterContainer container;
-        container.Set<ModuleParameters::Position>(position + glm::vec3(FRandomPoints[i].x, 0.f, FRandomPoints[i].y));
-        container.Set<ModuleParameters::EulerAngles>(FSceneItem->GetEulerAngles());
+        container.Set<ModuleParameters::Position>(position + vec3(FRandomPoints[i].x, 0.f, FRandomPoints[i].y));
+        container.Set<ModuleParameters::EulerAnglesXYZ>(FSceneItem->GetEulerAngles());
 
         EntityFactory::CreateEntity(FTemplate, container);
     }
@@ -212,11 +212,11 @@ bool SpawnEntitiesInPolygonalPatternSceneAction::VirtualDrawInSceneEditor(Render
     const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(descriptor->MaterialName());
     if (meshHandle.IsValid())
     {
-        const glm::vec3 offset = (GetSceneItem() == nullptr) ? glm::vec3(0.f) : GetSceneItem()->GetPosition();
+        const vec3 offset = (GetSceneItem() == nullptr) ? vec3(0.f) : GetSceneItem()->GetPosition();
         foreachitemconst(point, FRandomPoints)
         {
-            const glm::vec3 eulerAngles = item->GetEulerAngles();
-            const glm::mat4 mtx = glm::translate(item->GetPosition() + glm::vec3(point.x, 0.f, point.y)) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+            const vec3 eulerAngles = item->GetEulerAngles();
+            const mat4 mtx = Translation(item->GetPosition() + vec3(point.x, 0.f, point.y)) * EulerAnglesXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
             parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial, mtx);
         }
     }
@@ -327,13 +327,13 @@ bool ConvexHullTestsPolygonalPatternSceneAction::VirtualDrawInSceneEditor(Render
     if (item == nullptr)
         return false;
 
-    const glm::vec3 offset = (item == nullptr) ? glm::vec3(0.f) : item->GetPosition();
+    const vec3 offset = (item == nullptr) ? vec3(0.f) : item->GetPosition();
     foreachitemconst(point, FRandomPoints)
     {
-        const glm::vec3 eulerAngles = item->GetEulerAngles();
-        const glm::mat4 mtx = glm::translate(item->GetPosition() + glm::vec3(point.x, 0.f, point.y)) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
-        const glm::vec3 pos = glm::xyz(mtx[3]);
-        parCommandBuffer.DrawAABBAsCube(parMaterial, pos - glm::vec3(0.01f), pos + glm::vec3(0.01f), ColorUtils::FromRGBA(175, 175, 175, 255));
+        const vec3 eulerAngles = item->GetEulerAngles();
+        const mat4 mtx = Translation(item->GetPosition() + vec3(point.x, 0.f, point.y)) * EulerAnglesXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+        const vec3 pos = mtx.Column(3).xyz();
+        parCommandBuffer.DrawAABBAsCube(parMaterial, pos - vec3(0.01f), pos + vec3(0.01f), ColorUtils::FromRGBA(175, 175, 175, 255));
     }
 
     if (!FConvexHull.empty())
@@ -343,8 +343,8 @@ bool ConvexHullTestsPolygonalPatternSceneAction::VirtualDrawInSceneEditor(Render
         const Polygon2D& polygonToShow = FConvexHull;
         forrange(i, 0, polygonToShow.size())
         {
-            const glm::vec2& currentVertex = polygonToShow[i];
-            FPolygonVertices.push_back(glm::vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
+            const vec2& currentVertex = polygonToShow[i];
+            FPolygonVertices.push_back(vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
         }
 
         parCommandBuffer.DrawLines(parMaterial, FPolygonVertices.data(), (u32)FPolygonVertices.size(), ColorUtils::FromRGBA(255, 0, 255, 255), true);
@@ -377,7 +377,7 @@ void ConvexHullTestsPolygonalPatternSceneAction::GenerateHull()
         {
             distrib.param(std::uniform_int_distribution<size_t>::param_type(0, i - 1));
             size_t val = distrib(gen64);
-            glm::vec2 val1 = FRandomPoints[val];
+            vec2 val1 = FRandomPoints[val];
             FRandomPoints[val] = FRandomPoints[i];
             FRandomPoints[i] = val1;
         }

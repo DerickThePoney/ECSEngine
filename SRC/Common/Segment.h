@@ -17,14 +17,14 @@ struct Segment
     {
     }
 
-    T DirectionNormalized() const { return glm::normalize(End - Start); }
+    T DirectionNormalized() const { return Normalize(End - Start); }
     T Direction() const { return End - Start; }
     T Start;
     T End;
 };
 
-using Segment2D = Segment<glm::vec2>;
-using Segment3D = Segment<glm::vec3>;
+using Segment2D = Segment<vec2>;
+using Segment3D = Segment<vec3>;
 
 static_assert(std::is_trivially_copyable<Segment2D>(), "Segment2D must trivially copyable");
 static_assert(std::is_trivially_copyable<Segment3D>(), "Segment3D must trivially copyable");

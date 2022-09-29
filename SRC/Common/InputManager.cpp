@@ -85,12 +85,12 @@ public:
     InputManager();
     ~InputManager();
 
-    void Initialise(const u32 parNbKeyboardKeys, const glm::vec2& parMousePosition, const u32 parNbMouseButtons);
+    void Initialise(const u32 parNbKeyboardKeys, const vec2& parMousePosition, const u32 parNbMouseButtons);
     void EndFrame();
     void Shutdown();
 
-    void SetMousePosition(const glm::vec2& parMousePosition);
-    void SetMouseScrollDelta(const glm::vec2& parMouseScrollDelta);
+    void SetMousePosition(const vec2& parMousePosition);
+    void SetMouseScrollDelta(const vec2& parMouseScrollDelta);
     void SetMouseButtonState(int button, bool value);
     void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtrlDown, bool isAltDown);
 
@@ -101,9 +101,9 @@ public:
     void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed);
     void GetInputsAlreadyUsed(bool& parKeyboardInputUsed, bool& parMouseInputUsed);
 
-    const glm::vec2 GetMousePosition() { return (FMouse.AlreadyUsed) ? glm::vec2(0.f) : FMouse.MousePosition; }
-    const glm::vec2 GetMousePositionDelta() { return (FMouse.AlreadyUsed) ? glm::vec2(0.f) : FMouse.MousePosition - FMouse.PreviousMousePosition; }
-    const glm::vec2 GetMouseScrollDelta() { return (FMouse.AlreadyUsed) ? glm::vec2(0.f) : FMouse.MouseScrollDelta; }
+    const vec2 GetMousePosition() { return (FMouse.AlreadyUsed) ? vec2(0.f) : FMouse.MousePosition; }
+    const vec2 GetMousePositionDelta() { return (FMouse.AlreadyUsed) ? vec2(0.f) : FMouse.MousePosition - FMouse.PreviousMousePosition; }
+    const vec2 GetMouseScrollDelta() { return (FMouse.AlreadyUsed) ? vec2(0.f) : FMouse.MouseScrollDelta; }
     bool GetMouseButtonState(int button)
     {
         AssertRelease(button < FMouse.MouseButtons.ThisFrameValues.size());
@@ -174,16 +174,16 @@ private:
 
     struct MouseState
     {
-        glm::vec2 MousePosition;
-        glm::vec2 PreviousMousePosition;
-        glm::vec2 MouseScrollDelta;
-        glm::vec2 PreviousMouseScrollDelta;
+        vec2 MousePosition;
+        vec2 PreviousMousePosition;
+        vec2 MouseScrollDelta;
+        vec2 PreviousMouseScrollDelta;
 
         ButtonsState MouseButtons;
 
         bool AlreadyUsed = false;
 
-        void Initialise(const glm::vec2& parMousePosition, const u32 parNbButtons);
+        void Initialise(const vec2& parMousePosition, const u32 parNbButtons);
 
         bool HasChangedDuringLastFrame();
     };
@@ -217,7 +217,7 @@ private:
 namespace Input
 {
 
-void Initialise(const u32 parNbKeyboardKeys, const glm::vec2& parMousePosition, const u32 parNbMouseButtons)
+void Initialise(const u32 parNbKeyboardKeys, const vec2& parMousePosition, const u32 parNbMouseButtons)
 {
     InputManager::CreateIFP();
     InputManager::Instance().Initialise(parNbKeyboardKeys, parMousePosition, parNbMouseButtons);
@@ -234,12 +234,12 @@ void Shutdown()
     InputManager::Destroy();
 }
 
-void SetMousePosition(const glm::vec2& parMousePosition)
+void SetMousePosition(const vec2& parMousePosition)
 {
     InputManager::Instance().SetMousePosition(parMousePosition);
 }
 
-void SetMouseScrollDelta(const glm::vec2& parMouseScrollDelta)
+void SetMouseScrollDelta(const vec2& parMouseScrollDelta)
 {
     InputManager::Instance().SetMouseScrollDelta(parMouseScrollDelta);
 }
@@ -280,17 +280,17 @@ void GetInputsAlreadyUsed(bool& parKeyboardInputUsed, bool& parMouseInputUsed)
     InputManager::Instance().GetInputsAlreadyUsed(parKeyboardInputUsed, parMouseInputUsed);
 }
 
-const glm::vec2 GetMousePosition()
+const vec2 GetMousePosition()
 {
     return InputManager::Instance().GetMousePosition();
 }
 
-const glm::vec2 GetMousePositionDelta()
+const vec2 GetMousePositionDelta()
 {
     return InputManager::Instance().GetMousePositionDelta();
 }
 
-const glm::vec2 GetMouseScrollDelta()
+const vec2 GetMouseScrollDelta()
 {
     return InputManager::Instance().GetMouseScrollDelta();
 }
@@ -402,7 +402,7 @@ InputManager::~InputManager()
 {
 }
 
-void InputManager::Initialise(const u32 parNbKeyboardKeys, const glm::vec2& parMousePosition, const u32 parNbMouseButtons)
+void InputManager::Initialise(const u32 parNbKeyboardKeys, const vec2& parMousePosition, const u32 parNbMouseButtons)
 {
     FKeyboardState.KeyStates.Initialise(parNbKeyboardKeys);
     FMouse.Initialise(parMousePosition, parNbMouseButtons);
@@ -416,7 +416,7 @@ void InputManager::EndFrame()
     FKeyboardState.KeyStates.Swap();
     FMouse.PreviousMousePosition = FMouse.MousePosition;
     FMouse.PreviousMouseScrollDelta = FMouse.MouseScrollDelta;
-    FMouse.MouseScrollDelta = glm::vec2(0.f);
+    FMouse.MouseScrollDelta = vec2(0.f);
     FMouse.MouseButtons.Swap();
     FTextInput.clear();
 }
@@ -425,12 +425,12 @@ void InputManager::Shutdown()
 {
 }
 
-void InputManager::SetMousePosition(const glm::vec2& parMousePosition)
+void InputManager::SetMousePosition(const vec2& parMousePosition)
 {
     FMouse.MousePosition = parMousePosition;
 }
 
-void InputManager::SetMouseScrollDelta(const glm::vec2& parMouseScrollDelta)
+void InputManager::SetMouseScrollDelta(const vec2& parMouseScrollDelta)
 {
     FMouse.MouseScrollDelta = parMouseScrollDelta;
 }
@@ -576,11 +576,11 @@ bool InputManager::KeyboardState::HasChangedDuringLastFrame()
     return !AlreadyUsed && KeyStates.HasChangedDuringLastFrame();
 }
 
-void InputManager::MouseState::Initialise(const glm::vec2& parMousePosition, const u32 parNbButtons)
+void InputManager::MouseState::Initialise(const vec2& parMousePosition, const u32 parNbButtons)
 {
     MousePosition = parMousePosition;
     PreviousMousePosition = MousePosition;
-    MouseScrollDelta = glm::vec2(0.0f);
+    MouseScrollDelta = vec2(0.0f);
     PreviousMouseScrollDelta = MouseScrollDelta;
 
     MouseButtons.Initialise(parNbButtons);

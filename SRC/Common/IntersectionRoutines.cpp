@@ -12,13 +12,13 @@ namespace Intersection
 {
 namespace
 {
-float sign(const glm::vec2 p1, const glm::vec2 p2, const glm::vec2 p3)
+float sign(const vec2 p1, const vec2 p2, const vec2 p3)
 {
     return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
 }
 } // namespace
 
-bool PointInTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint, const bool parStrictlyInside /*= false*/)
+bool PointInTriangle2D(const Triangle2D& parTriangle, const vec2 parPoint, const bool parStrictlyInside /*= false*/)
 {
     float d1, d2, d3;
     bool has_neg, has_pos, has_zeros;
@@ -41,9 +41,9 @@ bool PointInTriangle2D(const Triangle2D& parTriangle, const glm::vec2 parPoint, 
     }
 }
 
-bool PointInPolygon2D(const Polygon2D& parPolygon, const glm::vec2 parPoint, const bool parStrictlyInside /*= false*/)
+bool PointInPolygon2D(const Polygon2D& parPolygon, const vec2 parPoint, const bool parStrictlyInside /*= false*/)
 {
-    Ray2D ray(parPoint, glm::vec2(1.f, 0.f));
+    Ray2D ray(parPoint, vec2(1.f, 0.f));
     std::vector<std::pair<bool, LinearComponentIntersection>> intersections;
     if (!RayPolygonIntersections2D(ray, parPolygon, intersections))
         return false;
@@ -59,25 +59,25 @@ bool PointInPolygon2D(const Polygon2D& parPolygon, const glm::vec2 parPoint, con
     return res;
 }
 
-bool LinearComponentIntersection2D(const glm::vec2& parPointsDifference,
-      const glm::vec2& parDirectionA,
-      const glm::vec2& parDirectionB,
+bool LinearComponentIntersection2D(const vec2& parPointsDifference,
+      const vec2& parDirectionA,
+      const vec2& parDirectionB,
       LinearComponentIntersection& outIntersection)
 {
-    const glm::vec2 rayDirPerp = glm::vec2(-parDirectionA.y, parDirectionA.x);
-    const glm::vec2 segDirPerp = glm::vec2(-parDirectionB.y, parDirectionB.x);
+    const vec2 rayDirPerp = vec2(-parDirectionA.y, parDirectionA.x);
+    const vec2 segDirPerp = vec2(-parDirectionB.y, parDirectionB.x);
 
-    const float denom = glm::dot(segDirPerp, parDirectionA);
+    const float denom = Dot(segDirPerp, parDirectionA);
 
-    if (glm::abs(denom) < 0.01f)
+    if (abs(denom) < 0.01f)
         return false;
 
-    const float aFactor = glm::dot(-segDirPerp, parPointsDifference) / denom;
+    const float aFactor = Dot(segDirPerp * -1.f, parPointsDifference) / denom;
 
     if (aFactor < 0.f)
         return false;
 
-    const float bFactor = glm::dot(rayDirPerp, parPointsDifference) / (-denom);
+    const float bFactor = Dot(rayDirPerp, parPointsDifference) / (-denom);
 
     if (bFactor < 0.f)
         return false;
@@ -90,10 +90,10 @@ bool LinearComponentIntersection2D(const glm::vec2& parPointsDifference,
 
 bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, LinearComponentIntersection& outIntersection)
 {
-    const glm::vec2 w = parRay.FOrigin - parSegment.Start;
-    const glm::vec2 segDirNormalised = parSegment.DirectionNormalized();
+    const vec2 w = parRay.FOrigin - parSegment.Start;
+    const vec2 segDirNormalised = parSegment.DirectionNormalized();
 
-    if (glm::abs(glm::dot(segDirNormalised, parRay.FDirection)) > 0.99f)
+    if (abs(Dot(segDirNormalised, parRay.FDirection)) > 0.99f)
     {
         return false;
     }
@@ -108,11 +108,11 @@ bool RaySegmentIntersection2D(const Ray2D& parRay, const Segment2D& parSegment, 
 
 bool SegmentSegmentIntersection2D(const Segment2D& parSegment1, const Segment2D& parSegment2, LinearComponentIntersection& outIntersection)
 {
-    const glm::vec2 w = parSegment1.Start - parSegment2.Start;
-    const glm::vec2 seg1DirNormalised = parSegment1.DirectionNormalized();
-    const glm::vec2 seg2DirNormalised = parSegment2.DirectionNormalized();
+    const vec2 w = parSegment1.Start - parSegment2.Start;
+    const vec2 seg1DirNormalised = parSegment1.DirectionNormalized();
+    const vec2 seg2DirNormalised = parSegment2.DirectionNormalized();
 
-    if (glm::abs(glm::dot(seg1DirNormalised, seg2DirNormalised)) > 0.99f)
+    if (abs(Dot(seg1DirNormalised, seg2DirNormalised)) > 0.99f)
     {
         return false;
     }
@@ -228,24 +228,24 @@ bool RayPolygonClosestIntersection2D(const Ray2D& parRay,
 
 bool RayPlaneIntersection3D(const Ray3D& parRay, const Plane& parPlane, float& outIntersection)
 {
-    const float rndotpn = glm::dot(parRay.FDirection, parPlane.Normal);
+    const float rndotpn = Dot(parRay.FDirection, parPlane.Normal);
     if (std::abs(rndotpn) < 1e-3)
     {
         outIntersection = -1.f;
         return false;
     }
 
-    outIntersection = glm::dot((parPlane.Position - parRay.FOrigin), parPlane.Normal) / rndotpn;
+    outIntersection = Dot((parPlane.Position - parRay.FOrigin), parPlane.Normal) / rndotpn;
     return outIntersection >= 0.f;
 }
 
-bool FrustumSphereIntersect(const Frustum& parFrustum, const glm::vec4& parSphere)
+bool FrustumSphereIntersect(const Frustum& parFrustum, const vec4& parSphere)
 {
-    MemoryView<const glm::vec4> frustumPlane = parFrustum.GetPlanes();
+    MemoryView<const vec4> frustumPlane = parFrustum.GetPlanes();
 
     foreachitem(plane, frustumPlane)
     {
-        const float dist = glm::dot(plane, glm::vec4(glm::xyz(parSphere), 1.0f));
+        const float dist = Dot(plane, vec4(parSphere.xyz(), 1.0f));
         if (dist < -parSphere.w)
             return false;
     }

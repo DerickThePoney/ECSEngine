@@ -125,7 +125,7 @@ void MaterialInstance::SetSamplerUniform(const std::string& parUniformName, cons
     MaterialManager::SetSamplerUniform(parUniformName, parHandle, parSlot);
 }
 
-void MaterialInstance::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue)
+void MaterialInstance::SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Vec4));
@@ -133,7 +133,7 @@ void MaterialInstance::SetVec4Uniform(const std::string& parUniformName, const g
     MaterialManager::SetVec4Uniform(parUniformName, parUniformValue);
 }
 
-void MaterialInstance::SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue)
+void MaterialInstance::SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Mat3));
@@ -141,7 +141,7 @@ void MaterialInstance::SetMat3Uniform(const std::string& parUniformName, const g
     MaterialManager::SetMat3Uniform(parUniformName, parUniformValue);
 }
 
-void MaterialInstance::SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue)
+void MaterialInstance::SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Mat4));
@@ -197,7 +197,7 @@ void MultiPassMaterialInstance::SetSamplerUniform(const std::string& parUniformN
     MaterialManager::SetSamplerUniform(parUniformName, parHandle, parSlot);
 }
 
-void MultiPassMaterialInstance::SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue)
+void MultiPassMaterialInstance::SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Vec4));
@@ -205,7 +205,7 @@ void MultiPassMaterialInstance::SetVec4Uniform(const std::string& parUniformName
     MaterialManager::SetVec4Uniform(parUniformName, parUniformValue);
 }
 
-void MultiPassMaterialInstance::SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue)
+void MultiPassMaterialInstance::SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Mat3));
@@ -213,7 +213,7 @@ void MultiPassMaterialInstance::SetMat3Uniform(const std::string& parUniformName
     MaterialManager::SetMat3Uniform(parUniformName, parUniformValue);
 }
 
-void MultiPassMaterialInstance::SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue)
+void MultiPassMaterialInstance::SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     AlwaysCheckedAssert(FProgram->Descriptor()->UsesUniformOfType(parUniformName, bgfx::UniformType::Mat4));

@@ -56,9 +56,10 @@ void DrawProgramsEditor(bool& parIsOpen, float parMenuBarHeight)
     GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.bin", shaders);
 
     // loop through all the programs and edit them
-    glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    ImGui::SetNextWindowSize(windowSize * glm::vec2(1.0f, 1.0f - (parMenuBarHeight / windowSize.y)));
-    ImGui::SetNextWindowPos(glm::vec2(0.0f, parMenuBarHeight));
+    uvec2 uwindowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    vec2 windowSize = vec2(uwindowSize.x, uwindowSize.y);
+    ImGui::SetNextWindowSize(windowSize * vec2(1.0f, 1.0f - (parMenuBarHeight / windowSize.y)));
+    ImGui::SetNextWindowPos(vec2(0.0f, parMenuBarHeight));
     ImGui::Begin("Programs editor", &parIsOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
     DrawMenuBar();
 

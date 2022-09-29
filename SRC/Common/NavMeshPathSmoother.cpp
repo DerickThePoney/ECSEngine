@@ -24,7 +24,7 @@ void NavMeshPathSmoother::SmoothPath(const NavMesh& parNavMesh, NavMeshPath& out
     NavMeshPath newNavMeshPath(outPath.Start(), outPath.End());
     newNavMeshPath.SetValid(true); // We know we are :)
 
-    glm::vec2 curentSegmentStart = outPath.Start();
+    vec2 curentSegmentStart = outPath.Start();
 
     // start at the second waypoint. LoS between start and first waypoint is assumed :)
     u32 currentIndex = 1;

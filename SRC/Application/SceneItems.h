@@ -25,13 +25,13 @@ public:
     bool ShouldShowItem() const { return FShowItem; }
 
     const std::string& GetName() const { return FName; }
-    const glm::vec3& GetPosition() const { return FPosition; }
-    const glm::vec3& GetEulerAngles() const { return FEulerAngles; }
+    const vec3& GetPosition() const { return FPosition; }
+    const vec3& GetEulerAngles() const { return FEulerAngles; }
     const u32 Id() const { return FId; }
 
     void SetName(const std::string& parName) { FName = parName; }
-    void SetPosition(const glm::vec3& parPosition) { FPosition = parPosition; }
-    void SetEulerAngles(const glm::vec3& parOrientation) { FEulerAngles = parOrientation; }
+    void SetPosition(const vec3& parPosition) { FPosition = parPosition; }
+    void SetEulerAngles(const vec3& parOrientation) { FEulerAngles = parOrientation; }
 
     bool ItemSelected() const { return FItemSelected; }
     bool ItemHovered() const { return FItemHovered; }
@@ -41,7 +41,7 @@ public:
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(PROPERTY(Name), PROPERTY(Id), PROPERTY(Position), PROPERTY(EulerAngles));
+        ar(PROPERTY(Name), PROPERTY(Id), PROPERTY(Position), PROPERTY(EulerAnglesXYZ));
     }
 
 protected:
@@ -49,8 +49,8 @@ protected:
 
 private:
     std::string FName;
-    glm::vec3 FPosition;
-    glm::vec3 FEulerAngles;
+    vec3 FPosition;
+    vec3 FEulerAngles;
 
     u32 FId;
     bool FShowItem;

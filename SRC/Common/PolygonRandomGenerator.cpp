@@ -13,7 +13,7 @@ namespace ECSEngine
 
 void PolygonRandomGenerator::GenerateRandomPoints(const Polygon2D& parPolygon,
       const RandomPolygonGenerationParameters& parGenerationParameters,
-      std::vector<glm::vec2>& parOutRandomPoints)
+      std::vector<vec2>& parOutRandomPoints)
 {
     PolygonTriangulator polyTri;
     std::vector<Triangle2D> polygonTriangulation = polyTri.Triangulate(parPolygon);
@@ -24,7 +24,7 @@ void PolygonRandomGenerator::GenerateRandomPoints(const Polygon2D& parPolygon,
 void PolygonRandomGenerator::GenerateRandomPoints(const Polygon2D& parPolygon,
       const std::vector<Polygon2D>& parHoles,
       RandomPolygonGenerationParameters& parGenerationParameters,
-      std::vector<glm::vec2>& parOutRandomPoints)
+      std::vector<vec2>& parOutRandomPoints)
 {
     PolygonTriangulator polyTri;
     std::vector<Triangle2D> polygonTriangulation = polyTri.Triangulate(parPolygon, parHoles);
@@ -34,7 +34,7 @@ void PolygonRandomGenerator::GenerateRandomPoints(const Polygon2D& parPolygon,
 
 void PolygonRandomGenerator::GenerateRandomPoints(const std::vector<Triangle2D>& parPolygonTriangulation,
       const RandomPolygonGenerationParameters& parGenerationParameters,
-      std::vector<glm::vec2>& parOutRandomPoints)
+      std::vector<vec2>& parOutRandomPoints)
 {
     // 1- Sort triangles by area
     std::vector<std::pair<float, u32>> trianglesArea;
@@ -57,7 +57,7 @@ void PolygonRandomGenerator::GenerateRandomPoints(const std::vector<Triangle2D>&
     forrange(i, 0, parGenerationParameters.NumberOfPoints) { parOutRandomPoints.push_back(GenerateOneRandomPoint(parPolygonTriangulation, trianglesArea)); }
 }
 
-glm::vec2 PolygonRandomGenerator::GenerateOneRandomPoint(const std::vector<Triangle2D>& parPolygonTriangulation, const std::vector<std::pair<float, u32>>& parDistribution)
+vec2 PolygonRandomGenerator::GenerateOneRandomPoint(const std::vector<Triangle2D>& parPolygonTriangulation, const std::vector<std::pair<float, u32>>& parDistribution)
 {
     // 2- Generate a random float and pick the triangle
     const float randomNumber = RandomNumbers::NextFloat();
@@ -75,7 +75,7 @@ glm::vec2 PolygonRandomGenerator::GenerateOneRandomPoint(const std::vector<Trian
 
     // 3 - Generate 2 random floats and generate the point from the triangle
     const Triangle2D& triangle = parPolygonTriangulation[pickedTriangle];
-    glm::vec2 randomPoint(0.0f);
+    vec2 randomPoint(0.0f);
     do
     {
         const float randomU = RandomNumbers::NextFloat();

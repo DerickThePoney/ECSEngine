@@ -57,19 +57,19 @@ void SaveLoad<SavingSystem::SaveChunk, float, true>(SavingSystem::SaveChunk& par
 }
 
 template<>
-void SaveLoad<SavingSystem::SaveChunk, glm::vec3, true>(SavingSystem::SaveChunk& parChunk, glm::vec3& parValue)
+void SaveLoad<SavingSystem::SaveChunk, vec3, true>(SavingSystem::SaveChunk& parChunk, vec3& parValue)
 {
-    u32 id = typeid(glm::vec3).hash_code();
-    u32 size = sizeof(glm::vec3);
+    u32 id = typeid(vec3).hash_code();
+    u32 size = sizeof(vec3);
     u8* data = reinterpret_cast<u8*>(&parValue);
     parChunk.GetBuffer().WriteData(id, size, data);
 }
 
 template<>
-void SaveLoad<SavingSystem::SaveChunk, glm::quat, true>(SavingSystem::SaveChunk& parChunk, glm::quat& parValue)
+void SaveLoad<SavingSystem::SaveChunk, quat, true>(SavingSystem::SaveChunk& parChunk, quat& parValue)
 {
-    u32 id = typeid(glm::quat).hash_code();
-    u32 size = sizeof(glm::quat);
+    u32 id = typeid(quat).hash_code();
+    u32 size = sizeof(quat);
     u8* data = reinterpret_cast<u8*>(&parValue);
     parChunk.GetBuffer().WriteData(id, size, data);
 }
@@ -145,17 +145,17 @@ void SaveLoad<SavingSystem::ReadChunk, float, false>(SavingSystem::ReadChunk& pa
 }
 
 template<>
-void SaveLoad<SavingSystem::ReadChunk, glm::vec3, false>(SavingSystem::ReadChunk& parChunk, glm::vec3& parValue)
+void SaveLoad<SavingSystem::ReadChunk, vec3, false>(SavingSystem::ReadChunk& parChunk, vec3& parValue)
 {
     u8* data = reinterpret_cast<u8*>(&parValue);
-    GenericLoad(parChunk, data, typeid(glm::vec3).hash_code(), sizeof(glm::vec3));
+    GenericLoad(parChunk, data, typeid(vec3).hash_code(), sizeof(vec3));
 }
 
 template<>
-void SaveLoad<SavingSystem::ReadChunk, glm::quat, false>(SavingSystem::ReadChunk& parChunk, glm::quat& parValue)
+void SaveLoad<SavingSystem::ReadChunk, quat, false>(SavingSystem::ReadChunk& parChunk, quat& parValue)
 {
     u8* data = reinterpret_cast<u8*>(&parValue);
-    GenericLoad(parChunk, data, typeid(glm::quat).hash_code(), sizeof(glm::quat));
+    GenericLoad(parChunk, data, typeid(quat).hash_code(), sizeof(quat));
 }
 
 template<>

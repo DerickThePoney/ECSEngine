@@ -88,9 +88,9 @@ void SceneActionCreateMainCamera::VirtualInitialise(const SceneScenario* parScen
     if (item == nullptr)
         return;
 
-    const glm::vec3 eulerAngles = item->GetEulerAngles();
-    const glm::mat4 localToWorld = glm::translate(item->GetPosition()) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
-    const glm::mat4 worldViewMatrix = glm::inverse(localToWorld);
+    const vec3 eulerAngles = item->GetEulerAngles();
+    const mat4 localToWorld = Translation(item->GetPosition()) * EulerAnglesXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+    const mat4 worldViewMatrix = Invert(localToWorld);
 
     const u32 camId = CameraManager::Instance().CreateCameraIFN(FCameraName);
     Camera* cam = CameraManager::Instance().GetCamera(camId);
@@ -122,12 +122,12 @@ bool SceneActionCreateMainCamera::VirtualDrawInSceneEditor(Rendering::DrawComman
     parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
-    const glm::mat4 perspectiveMatrix = glm::perspective(FFov, aspectRatio, FNearPlane, FFarPlane);
+    const mat4 perspectiveMatrix = Perspective(FFov, aspectRatio, FNearPlane, FFarPlane);
     const BaseSceneItem* item = GetSceneItem();
     if (item != nullptr)
     {
-        const glm::vec3 eulerAngles = item->GetEulerAngles();
-        const glm::mat4 localToWorld = glm::translate(item->GetPosition()) * glm::eulerAngleXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+        const vec3 eulerAngles = item->GetEulerAngles();
+        const mat4 localToWorld = Translation(item->GetPosition()) * EulerAnglesXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
 
         parCommandBuffer.DrawFrustum(parMaterial, localToWorld, perspectiveMatrix, true, 0xFF00FF00, 0xFF0000FF);
         return true;
@@ -143,7 +143,7 @@ IMPLEMENT_SCENE_ACTION(SceneActionPolygonalPattern);
 SceneActionPolygonalPattern::SceneActionPolygonalPattern(const std::string& parFName /*= "Dummy"*/)
     : parent_type(parFName)
 {
-    FPolygon.append(std::vector<glm::vec2>({ glm::vec2(0.f, 0.f), glm::vec2(1.f, 0.f), glm::vec2(0.f, 1.f) }));
+    FPolygon.append(std::vector<vec2>({ vec2(0.f, 0.f), vec2(1.f, 0.f), vec2(0.f, 1.f) }));
 }
 
 SceneActionPolygonalPattern::~SceneActionPolygonalPattern()
@@ -173,7 +173,7 @@ void SceneActionPolygonalPattern::VirtualDrawEditor()
             ComputeTriangulation();
         }
 
-        EDITOR_PROPERTY_VECTOR(glm::vec2, "Polygon points", FPolygon.data(), false);
+        EDITOR_PROPERTY_VECTOR(vec2, "Polygon points", FPolygon.data(), false);
 
         if (ImGui::CollapsingHeader("Polygon holes"))
         {
@@ -181,9 +181,9 @@ void SceneActionPolygonalPattern::VirtualDrawEditor()
             if (ImGui::Button("Add hole"))
             {
                 Polygon2D p;
-                p.push_back(glm::vec2(0.f));
-                p.push_back(glm::vec2(0.f));
-                p.push_back(glm::vec2(0.f));
+                p.push_back(vec2(0.f));
+                p.push_back(vec2(0.f));
+                p.push_back(vec2(0.f));
                 FPolygonHoles.push_back(p);
             }
             std::vector<Polygon2D>::iterator itToErase = FPolygonHoles.end();
@@ -210,7 +210,7 @@ void SceneActionPolygonalPattern::VirtualDrawEditor()
                     action = 2;
                 }
                 ImGui::SameLine();
-                EDITOR_PROPERTY_VECTOR(glm::vec2, fmt::format("Hole {} points", i + 1), FPolygonHoles[i].data(), false);
+                EDITOR_PROPERTY_VECTOR(vec2, fmt::format("Hole {} points", i + 1), FPolygonHoles[i].data(), false);
                 ImGui::PopID();
                 ++i;
             }
@@ -251,14 +251,14 @@ bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawComman
 {
     parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
 
-    const glm::vec3 offset = (GetSceneItem() == nullptr) ? glm::vec3(0.f) : GetSceneItem()->GetPosition();
+    const vec3 offset = (GetSceneItem() == nullptr) ? vec3(0.f) : GetSceneItem()->GetPosition();
     vertices.clear();
 
     const Polygon2D& polygonToShow = (FShowExtentedPolygon) ? FExtendedPolygon : FPolygon;
     forrange(i, 0, polygonToShow.size())
     {
-        const glm::vec2& currentVertex = polygonToShow[i];
-        vertices.push_back(glm::vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
+        const vec2& currentVertex = polygonToShow[i];
+        vertices.push_back(vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
     }
 
     parCommandBuffer.DrawLines(parMaterial, vertices.data(), (u32)vertices.size(), 0xFF00FF00, true);
@@ -268,13 +268,13 @@ bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawComman
         holesVertices.clear();
         forrange(i, 0, FPolygonHoles.size())
         {
-            std::vector<glm::vec3> verts;
+            std::vector<vec3> verts;
             verts.reserve(FPolygonHoles[i].size());
 
             forrange(j, 0, FPolygonHoles[i].size())
             {
-                const glm::vec2& currentVertex = FPolygonHoles[i][j];
-                verts.push_back(glm::vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
+                const vec2& currentVertex = FPolygonHoles[i][j];
+                verts.push_back(vec3(currentVertex.x, 0.f, currentVertex.y) + offset);
             }
 
             holesVertices.push_back(verts);

@@ -5,7 +5,7 @@
 #include "Application/PropertyDrawer.h"
 #include "Common/Camera.h"
 #include "Common/CameraManager.h"
-#include "Common/GLMHelpers.h"
+//#include "Common/GLMHelpers.h"
 #include "Common/InputManager.h"
 #include "Common/Logger.h"
 #include "Common/TimeManager.h"
@@ -15,7 +15,7 @@ namespace ECSEngine
 
 EditorCamera::EditorCamera()
     : FCameraId(-1)
-    , FViewWorldMatrix(glm::identity<glm::mat4>())
+    , FViewWorldMatrix(mat4::Identity())
 {
     FForward.FKeyboardKey = InputKeyNames::INPUT_KEY_W;
     FForward.FInputType = EInputType::REPEATED;
@@ -47,17 +47,17 @@ EditorCamera::~EditorCamera()
 
 void EditorCamera::Initialise()
 {
-    const glm::vec3 at = { 0.0f, 0.0f, 0.0f };
-    const glm::vec3 eye = { 0.0f, 10.0f, -10.0f };
+    const vec3 at(0.0f, 0.0f, 0.0f);
+    const vec3 eye(0.0f, 10.0f, -10.0f);
 
-    glm::mat4 worldWiewMatrix = glm::lookAt(eye, at, glm::vec3(0, 1.0f, 0.0f));
-    FViewWorldMatrix = glm::inverse(worldWiewMatrix);
+    mat4 worldWiewMatrix = lookAt(eye, at, vec3(0, 1.0f, 0.0f));
+    FViewWorldMatrix = Invert(worldWiewMatrix);
 
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
     AssertRelease(FCameraId != -1);
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
-    camera->Init(worldWiewMatrix, glm::radians(60.0f), 1.f, 500.0f);
+    camera->Init(worldWiewMatrix, Radians(60.0f), 1.f, 500.0f);
 }
 
 void EditorCamera::Update()
@@ -71,24 +71,25 @@ void EditorCamera::Update()
     const float speedFactor = (slowMo) ? 0.2f : 1.0f;
 
     bool overrideWorldViewMatrix = false;
-    glm::vec3 movementCommand = glm::vec3(0.0f);
-    glm::vec2 rotationScreenDirection = glm::vec2(0.0f);
+    vec3 movementCommand = vec3(0.0f);
+    vec2 rotationScreenDirection = vec2(0.0f);
 
     rotationScreenDirection = Input::GetMousePositionDelta();
 
     if (FMiddleMouseRotation.Evaluate())
     {
-        if (rotationScreenDirection != glm::vec2(0.0f))
+        if (rotationScreenDirection != vec2(0.0f))
         {
-            rotationScreenDirection = glm::normalize(rotationScreenDirection);
+            rotationScreenDirection = Normalize(rotationScreenDirection);
 
-            AssertRelease(!glm::isNan(rotationScreenDirection));
+            AssertRelease(!isNan(rotationScreenDirection));
 
-            const glm::mat4 positionMatrix = glm::translate(glm::vec3(FViewWorldMatrix[3]));
-            const float rotationSpeed = glm::radians(speedFactor * FRotationSpeed);
-            glm::mat4 newWorldViewNoTranslation = glm::inverse(positionMatrix) * FViewWorldMatrix;
-            newWorldViewNoTranslation = glm::rotate(rotationScreenDirection.x * rotationSpeed * deltaTime, glm::vec3(0.f, 1.f, 0.f)) * newWorldViewNoTranslation;
-            newWorldViewNoTranslation = glm::rotate(rotationScreenDirection.y * rotationSpeed * deltaTime, glm::vec3(newWorldViewNoTranslation[0])) * newWorldViewNoTranslation;
+            const mat4 positionMatrix = Translation(vec3(FViewWorldMatrix.Column(3).xyz()));
+            const float rotationSpeed = Radians(speedFactor * FRotationSpeed);
+            mat4 newWorldViewNoTranslation = Invert(positionMatrix) * FViewWorldMatrix;
+            newWorldViewNoTranslation = rotate(rotationScreenDirection.x * rotationSpeed * deltaTime, vec3(0.f, 1.f, 0.f)) * newWorldViewNoTranslation;
+            newWorldViewNoTranslation = rotate(rotationScreenDirection.y * rotationSpeed * deltaTime, vec3(newWorldViewNoTranslation.Column(1).xyz())) *
+                  newWorldViewNoTranslation;
 
             FViewWorldMatrix = positionMatrix * newWorldViewNoTranslation;
             overrideWorldViewMatrix = true;
@@ -113,15 +114,15 @@ void EditorCamera::Update()
     if (FDown.Evaluate())
         movementCommand.y -= speedFactor;
 
-    if (movementCommand != glm::vec3(.0f))
+    if (movementCommand != vec3(.0f))
     {
         const float incrementFactor = FLateralSpeed * speedFactor * deltaTime;
-        FViewWorldMatrix = FViewWorldMatrix * glm::translate(movementCommand * incrementFactor);
+        FViewWorldMatrix = FViewWorldMatrix * Translation(movementCommand * incrementFactor);
         overrideWorldViewMatrix = true;
     }
 
     if (overrideWorldViewMatrix)
-        camera->SetWorldViewMatrix(glm::inverse(FViewWorldMatrix));
+        camera->SetWorldViewMatrix(inverse(FViewWorldMatrix));
 }
 
 void EditorCamera::Shutdown()

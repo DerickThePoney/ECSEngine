@@ -10,8 +10,8 @@ bool Polygon2D::IsClockWise() const
     float sum = 0;
     forrange(i, 0, FPoints.size())
     {
-        const glm::vec2 pi = FPoints[i];
-        const glm::vec2 pi_1 = FPoints[(i + 1) % FPoints.size()];
+        const vec2 pi = FPoints[i];
+        const vec2 pi_1 = FPoints[(i + 1) % FPoints.size()];
         sum += (pi_1.x - pi.x) * (pi_1.y + pi.y);
     }
 
@@ -40,7 +40,7 @@ float Polygon2D::Area2Signed() const
     const bool isClosed = FPoints.front() == FPoints.back();
     const u32 endIndex = (isClosed) ? FPoints.size() - 2 : FPoints.size() - 1;
 
-    const glm::vec2& pivotPoint = FPoints[0];
+    const vec2& pivotPoint = FPoints[0];
     u32 idx = 2;
     do
     {
@@ -58,7 +58,7 @@ float Polygon2D::AreaSigned() const
 
 float Polygon2D::Area2() const
 {
-    return glm::abs(Area2Signed());
+    return abs(Area2Signed());
 }
 
 float Polygon2D::Area() const

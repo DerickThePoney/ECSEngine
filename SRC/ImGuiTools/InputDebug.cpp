@@ -12,9 +12,9 @@ namespace ImGUITools
 void InputDebug(bool* shouldBeOpen)
 {
     ImGui::Begin("Input Debug", shouldBeOpen);
-    glm::vec2 mousePos = Input::GetMousePosition();
-    glm::vec2 mousePosDelta = Input::GetMousePositionDelta();
-    glm::vec2 mouseScroll = Input::GetMouseScrollDelta();
+    vec2 mousePos = Input::GetMousePosition();
+    vec2 mousePosDelta = Input::GetMousePositionDelta();
+    vec2 mouseScroll = Input::GetMouseScrollDelta();
 
     ImGui::InputFloat2("Mouse position", (float*)&mousePos, 3, ImGuiInputTextFlags_ReadOnly);
     ImGui::InputFloat2("Mouse delta", (float*)&mousePosDelta, 3, ImGuiInputTextFlags_ReadOnly);

@@ -1,5 +1,6 @@
 #pragma once
 #include "MatrixTypes.h"
+#include "VectorTypes.h"
 
 namespace ECSEngine
 {
@@ -26,4 +27,9 @@ mat4 Sub(const mat4& parA, const mat4& parB);
 float Determinant(const mat4& parA);
 mat4 Invert(const mat4& parA);
 mat4 Transpose(const mat4& parA);
+
+mat4 Translation(const vec3& parT);
+mat4 Perspective(float fovy, float aspect, float zNear, float zFar);
+mat4 EulerAnglesXYZ(const float X, const float Y, const float Z);
+vec3 ExtractEulerAnglesXYZ(const mat4& m);
 }

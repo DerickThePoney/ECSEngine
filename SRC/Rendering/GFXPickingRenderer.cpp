@@ -35,7 +35,7 @@ void GFXPickingRenderer::Initialise()
 
     FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_PASS);
 
-    FPickFramebuffer = new Rendering::FramebufferInstance(Rendering::FramebufferSizeType::CUSTOM, glm::uvec2(PickTextureSize, PickTextureSize));
+    FPickFramebuffer = new Rendering::FramebufferInstance(Rendering::FramebufferSizeType::CUSTOM, uvec2(PickTextureSize, PickTextureSize));
     FPickFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
           0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
     FPickFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::D24S8,
@@ -72,12 +72,12 @@ void GFXPickingRenderer::BeginSelectionPass(const u32 parCamera)
     bgfx::setViewFrameBuffer(Rendering::RenderPassId::SELECTION_PASS, FPickFramebuffer->GetHandle());
     bgfx::setViewRect(Rendering::RenderPassId::SELECTION_PASS, 0, 0, PickTextureSize, PickTextureSize);
 
-    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
     Ray ray = GetCameraRayFromMouseInput(*c, aspectRatio, windowSize, Input::GetMousePosition());
 
-    const glm::mat4 pickView = glm::lookAt(ray.FOrigin, ray.FOrigin + ray.FDirection, glm::vec3(0.0f, 1.0f, 0.0f));
-    const glm::mat4 pickProj = glm::perspective(glm::radians(FSelectionFoV), 1.0f, c->Near(), c->Far());
+    const mat4 pickView = lookAt(ray.FOrigin, ray.FOrigin + ray.FDirection, vec3(0.0f, 1.0f, 0.0f));
+    const mat4 pickProj = Perspective(Radians(FSelectionFoV), 1.0f, c->Near(), c->Far());
 
     FDrawCommandBuffer->SetViewTranform(pickView, pickProj);
 }
@@ -100,7 +100,7 @@ void GFXPickingRenderer::PushGFXForSelectionPass(const GFXRepresentation* parGFX
 
     const u32 gfxId = (parGFX->Id() + 1);
     const u32 id = 0xFF000000 | (gfxId & 0x00FFFFFF);
-    const glm::vec4 color = ColorUtils::ConvertToFVEC4(id);
+    const vec4 color = ColorUtils::ConvertToFVEC4(id);
     FDrawCommandBuffer->SetVec4Uniform("u_PickingId", color);
     if (visualModel->HasMultipassMaterial())
         FDrawCommandBuffer->DrawMesh(visualModel->GetMeshHandle(), visualModel->GetMultiPassMaterialInstanceHandle(), carrier->LocalToWorld());

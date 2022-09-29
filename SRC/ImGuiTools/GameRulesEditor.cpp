@@ -30,9 +30,10 @@ private:
 
 void GameRulesEditor::DrawEditor(bool* parOpen, float parMenuBarHeight)
 {
-    glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    ImGui::SetNextWindowSize(windowSize * glm::vec2(1.0f, 1.0f - (parMenuBarHeight / windowSize.y)));
-    ImGui::SetNextWindowPos(glm::vec2(0.0f, parMenuBarHeight));
+    const uvec2 uwindowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const vec2 windowSize(uwindowSize.x, uwindowSize.y);
+    ImGui::SetNextWindowSize(windowSize * vec2(1.0f, 1.0f - (parMenuBarHeight / windowSize.y)));
+    ImGui::SetNextWindowPos(vec2(0.0f, parMenuBarHeight));
     ImGui::Begin("Game rules editor", parOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
     DrawGameRulesMenuBar();
 
@@ -85,8 +86,8 @@ void GameRulesEditor::DrawGameRulesMenuBar()
 
 void GameRulesEditor::DrawBuildingCostsEditor()
 {
-    const glm::vec2 currentWindowSize = ImGui::GetContentRegionAvail();
-    const glm::vec2 utilityPlace = currentWindowSize - 50.0f;
+    const vec2 currentWindowSize = ImGui::GetContentRegionAvail();
+    const vec2 utilityPlace = currentWindowSize - 50.0f;
     ImGui::SetCursorPosX(((currentWindowSize - utilityPlace) * 0.5f).x);
     ImGui::BeginChild(ImGui::GetID("Building cost editor"), utilityPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
@@ -97,8 +98,8 @@ void GameRulesEditor::DrawBuildingCostsEditor()
 
 void GameRulesEditor::DrawConstantsEditor()
 {
-    const glm::vec2 currentWindowSize = ImGui::GetContentRegionAvail();
-    const glm::vec2 utilityPlace = currentWindowSize - 50.0f;
+    const vec2 currentWindowSize = ImGui::GetContentRegionAvail();
+    const vec2 utilityPlace = currentWindowSize - 50.0f;
     ImGui::SetCursorPosX(((currentWindowSize - utilityPlace) * 0.5f).x);
     ImGui::BeginChild(ImGui::GetID("Game rules editor"), utilityPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
@@ -109,8 +110,8 @@ void GameRulesEditor::DrawConstantsEditor()
 
 void GameRulesEditor::DrawProductionRecipes()
 {
-    const glm::vec2 currentWindowSize = ImGui::GetContentRegionAvail();
-    const glm::vec2 utilityPlace = currentWindowSize - 50.0f;
+    const vec2 currentWindowSize = ImGui::GetContentRegionAvail();
+    const vec2 utilityPlace = currentWindowSize - 50.0f;
     ImGui::SetCursorPosX(((currentWindowSize - utilityPlace) * 0.5f).x);
     ImGui::BeginChild(ImGui::GetID("Production Recipes"), utilityPlace, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 

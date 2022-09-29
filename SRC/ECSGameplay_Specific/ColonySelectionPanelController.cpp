@@ -43,9 +43,9 @@ void ColonySelectionPanelController::VirtualUpdate()
 
     const float size_x = 0.2f, size_y = 0.4f;
     const float pos_x = 10.f, pos_y = 1.f;
-    glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     ImGui::SetNextWindowPos(ImVec2(windowSize.x - pos_x, windowSize.y * pos_y), ImGuiCond_Always, ImVec2(1.f, 1.f));
-    ImGui::SetNextWindowSize(glm::vec2(windowSize.x * size_x, windowSize.y * size_y));
+    ImGui::SetNextWindowSize(vec2(windowSize.x * size_x, windowSize.y * size_y));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));
     ImGui::Begin(colonyModule->Name().c_str(), NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
 

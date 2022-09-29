@@ -8,21 +8,21 @@
 namespace ECSEngine
 {
 
-void ConvexHullKeepOriginalArray(std::vector<glm::vec2>& parPoints, Polygon2D& outPolygon)
+void ConvexHullKeepOriginalArray(std::vector<vec2>& parPoints, Polygon2D& outPolygon)
 {
-    std::vector<glm::vec2> copy = parPoints;
+    std::vector<vec2> copy = parPoints;
     return ConvexHull(copy, outPolygon);
 }
 
 struct LexSort
 {
-    constexpr auto operator()(const glm::vec2& a, const glm::vec2& b) const { return a.x < b.x || ((a.x == b.x) && (a.y < b.y)); }
+    constexpr auto operator()(const vec2& a, const vec2& b) const { return a.x < b.x || ((a.x == b.x) && (a.y < b.y)); }
 };
 
-void ConvexHull(std::vector<glm::vec2>& parPoints, Polygon2D& outPolygon)
+void ConvexHull(std::vector<vec2>& parPoints, Polygon2D& outPolygon)
 {
     // 1- SortPoints lexicographically
-    InPlaceSorting<std::vector<glm::vec2>, glm::vec2>(parPoints, 0, parPoints.size() - 1, LexSort{});
+    InPlaceSorting<std::vector<vec2>, vec2>(parPoints, 0, parPoints.size() - 1, LexSort{});
 
     // 2- Lupper
     // 2.a- Push the first two points
@@ -40,8 +40,8 @@ void ConvexHull(std::vector<glm::vec2>& parPoints, Polygon2D& outPolygon)
             size_t idx1 = outPolygon.size() - 2;
             size_t idx2 = outPolygon.size() - 1;
 
-            glm::vec2 vec1 = outPolygon[idx1] - outPolygon[idx0];
-            glm::vec2 vec2 = outPolygon[idx2] - outPolygon[idx1];
+            vec2 vec1 = outPolygon[idx1] - outPolygon[idx0];
+            vec2 vec2 = outPolygon[idx2] - outPolygon[idx1];
 
             // if right turn terminate
             if ((vec1.x * vec2.y - vec1.y * vec2.x) > 0.f)
@@ -66,8 +66,8 @@ void ConvexHull(std::vector<glm::vec2>& parPoints, Polygon2D& outPolygon)
             size_t idx1 = outPolygon.size() - 2;
             size_t idx2 = outPolygon.size() - 1;
 
-            glm::vec2 vec1 = outPolygon[idx1] - outPolygon[idx0];
-            glm::vec2 vec2 = outPolygon[idx2] - outPolygon[idx1];
+            vec2 vec1 = outPolygon[idx1] - outPolygon[idx0];
+            vec2 vec2 = outPolygon[idx2] - outPolygon[idx1];
 
             // if right turn terminate
             if ((vec1.x * vec2.y - vec1.y * vec2.x) > 0.f)

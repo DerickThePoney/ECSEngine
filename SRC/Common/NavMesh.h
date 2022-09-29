@@ -14,7 +14,7 @@ struct NavMeshVertex
     DECLARE_POOL_ALLOCATED(NavMeshVertex);
 
 public:
-    glm::vec2 Position = glm::vec2(0.f);
+    vec2 Position = vec2(0.f);
     std::vector<NavMeshEdge*> Edge;
     u32 Id = 0;
 };
@@ -38,7 +38,7 @@ struct NavMeshFace
 public:
     NavMeshEdge* Edge = nullptr;
     Polygon2D FacePolygon;
-    glm::vec2 Center;
+    vec2 Center;
     u32 Id;
 };
 
@@ -65,7 +65,7 @@ public:
     u32 EdgesCount() const { return (u32)FEdges.size(); }
     u32 FacesCount() const { return (u32)FFaces.size(); }
 
-    const NavMeshFace* FindContainingFace(const glm::vec2 parPoint) const;
+    const NavMeshFace* FindContainingFace(const vec2 parPoint) const;
     const NeighbourVerticesSet& NeighbourVertices(const NavMeshVertex* parVertex) const;
 
     void NeighbourFaces(const NavMeshVertex* parVertex, NeighbourFacesSet& outFaces) const;
