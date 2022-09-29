@@ -37,9 +37,9 @@ bool EarTest(const u32 i_m1, const u32 i, const u32 i_1, const Polygon2D& parPol
 
 bool IsReflex(const u32 i_m1, const u32 i, const u32 i_1, const Polygon2D& parPolygon)
 {
-    glm::vec2 p1 = parPolygon[i_m1];
-    glm::vec2 p2 = parPolygon[i];
-    glm::vec2 p3 = parPolygon[i_1];
+    vec2 p1 = parPolygon[i_m1];
+    vec2 p2 = parPolygon[i];
+    vec2 p3 = parPolygon[i_1];
     float tmp = (p3.y - p1.y) * (p2.x - p1.x) - (p3.x - p1.x) * (p2.y - p1.y);
     return tmp < 0;
 }
@@ -97,7 +97,7 @@ void InsertHoleIntoPolygon(Polygon2D& parPolygon, const Polygon2D& parHole)
 
     // Find mutually visible edges
     // 1- Get the hole vertex M with max X coordinate
-    const std::vector<glm::vec2>& holeVertices = holeToUse.data();
+    const std::vector<vec2>& holeVertices = holeToUse.data();
     u32 maxXVertex = 0;
     float maxXCoord = holeVertices[0].x;
 
@@ -111,7 +111,7 @@ void InsertHoleIntoPolygon(Polygon2D& parPolygon, const Polygon2D& parHole)
     }
 
     // 2 - Intersect Ray(M, (1,0)) with the edges of the polygon
-    Ray2D ray = Ray2D(holeVertices[maxXVertex], glm::vec2(1.f, 0.f));
+    Ray2D ray = Ray2D(holeVertices[maxXVertex], vec2(1.f, 0.f));
     Intersection::LinearComponentIntersection intersectionResult;
     u32 closestPolygonEdgeIndex = -1;
     const bool intersect = Intersection::RayPolygonClosestIntersection2D(ray, parPolygon, true, intersectionResult, closestPolygonEdgeIndex);
@@ -138,7 +138,7 @@ void InsertHoleIntoPolygon(Polygon2D& parPolygon, const Polygon2D& parHole)
         PIndex = (parPolygon[closestPolygonEdgeIndex].x > parPolygon[nextIndex].x) ? closestPolygonEdgeIndex : nextIndex;
 
         // 5 - Search all polygon reflex vertices for those in triangle MIP, excluding P. If none, M and P are mutually visible, terminate.
-        Triangle2D mipTriangle = { holeVertices[maxXVertex], holeVertices[maxXVertex] + intersectionResult.Intersection1 * glm::vec2(1.f, 0.f), parPolygon[PIndex] };
+        Triangle2D mipTriangle = { holeVertices[maxXVertex], holeVertices[maxXVertex] + intersectionResult.Intersection1 * vec2(1.f, 0.f), parPolygon[PIndex] };
         std::vector<u32> reflexVerticesInMIP;
         reflexVerticesInMIP.reserve(parPolygon.size());
         forrange(idx, 0, parPolygon.size())
@@ -165,7 +165,7 @@ void InsertHoleIntoPolygon(Polygon2D& parPolygon, const Polygon2D& parHole)
             foreachitemconst(reflexVertex, reflexVerticesInMIP)
             {
                 Segment2D mr = Segment2D(holeVertices[maxXVertex], parPolygon[reflexVertex]);
-                const float dotRes = glm::dot(glm::vec2(1.f, 0.f), mr.DirectionNormalized());
+                const float dotRes = Dot(vec2(1.f, 0.f), mr.DirectionNormalized());
                 if (dotRes > maxDot)
                 {
                     maxDot = dotRes;
@@ -183,7 +183,7 @@ void InsertHoleIntoPolygon(Polygon2D& parPolygon, const Polygon2D& parHole)
     }
 
     // insert the hole into the polygon at the right place
-    std::vector<glm::vec2> newPoints;
+    std::vector<vec2> newPoints;
     newPoints.reserve(parPolygon.size() + parHole.size() + 2);
 
     // on rempli jusqu'a PIndex
@@ -314,7 +314,7 @@ struct PolygonSorter
         float maxXA = std::numeric_limits<float>::min();
         forrange(i, 0, parA.size())
         {
-            const glm::vec2& point = parA[i];
+            const vec2& point = parA[i];
             if (point.x > maxXA)
                 maxXA = point.x;
         }
@@ -322,7 +322,7 @@ struct PolygonSorter
         float maxXB = std::numeric_limits<float>::min();
         forrange(i, 0, parB.size())
         {
-            const glm::vec2& point = parB[i];
+            const vec2& point = parB[i];
             if (point.x > maxXB)
                 maxXB = point.x;
         }

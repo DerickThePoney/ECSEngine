@@ -15,7 +15,7 @@ void ConvertECSToTPPL(const Polygon2D& parPolygon, TPPLPoly& parTPPL)
     parTPPL.Init((long)parPolygon.size());
     forrange(i, 0, parPolygon.size())
     {
-        const glm::vec2& point = parPolygon[i];
+        const vec2& point = parPolygon[i];
         parTPPL[(long)i].x = point.x;
         parTPPL[(long)i].y = point.y;
     }
@@ -28,7 +28,7 @@ void ConvertTPPLToECS(const TPPLPoly& parTPPL, Polygon2D& parPolygon)
     forrange(i, 0, numPoints)
     {
         const TPPLPoint& point = parTPPL[(long)i];
-        parPolygon.push_back(glm::vec2(point.x, point.y));
+        parPolygon.push_back(vec2(point.x, point.y));
     }
 }
 } // namespace

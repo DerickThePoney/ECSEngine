@@ -81,7 +81,7 @@ private:
     std::string FEntityTemplateName = "Entity template name";
     const EntityTemplate* FTemplate = nullptr;
 
-    std::vector<glm::vec2> FRandomPoints;
+    std::vector<vec2> FRandomPoints;
 
     u32 FNumberOfEntities = 1000;
 
@@ -120,8 +120,8 @@ protected:
     void GenerateHull();
 
 private:
-    std::vector<glm::vec2> FRandomPoints;
-    std::vector<glm::vec3> FPolygonVertices;
+    std::vector<vec2> FRandomPoints;
+    std::vector<vec3> FPolygonVertices;
 
     u32 FNumberOfEntities = 1000;
 

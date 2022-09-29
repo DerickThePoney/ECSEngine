@@ -40,7 +40,7 @@ void SceneObjectsPickingRenderer::Initialise()
 
     FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::SELECTION_PASS);
 
-    FPickFramebuffer = new Rendering::FramebufferInstance(Rendering::FramebufferSizeType::CUSTOM, glm::uvec2(PickTextureSize, PickTextureSize));
+    FPickFramebuffer = new Rendering::FramebufferInstance(Rendering::FramebufferSizeType::CUSTOM, uvec2(PickTextureSize, PickTextureSize));
     FPickFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
           0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
     FPickFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::D24S8,
@@ -78,12 +78,12 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
     bgfx::setViewFrameBuffer(Rendering::RenderPassId::SELECTION_PASS, FPickFramebuffer->GetHandle());
     bgfx::setViewRect(Rendering::RenderPassId::SELECTION_PASS, 0, 0, PickTextureSize, PickTextureSize);
 
-    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
     Ray ray = GetCameraRayFromMouseInput(*c, aspectRatio, windowSize, Input::GetMousePosition());
 
-    const glm::mat4 pickView = glm::lookAt(ray.FOrigin, ray.FOrigin + ray.FDirection, glm::vec3(0.0f, 1.0f, 0.0f));
-    const glm::mat4 pickProj = glm::perspective(glm::radians(FSelectionFoV), 1.0f, 0.1f, 500.0f);
+    const mat4 pickView = lookAt(ray.FOrigin, ray.FOrigin + ray.FDirection, vec3(0.0f, 1.0f, 0.0f));
+    const mat4 pickProj = Perspective(Radians(FSelectionFoV), 1.0f, 0.1f, 500.0f);
 
     FDrawCommandBuffer->SetViewTranform(pickView, pickProj);
 
@@ -92,10 +92,10 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
 
     foreachitemconst(sceneItem, sceneItems)
     {
-        const glm::vec3& position = sceneItem.second->GetPosition();
+        const vec3& position = sceneItem.second->GetPosition();
         const u32 sceneItemID = (sceneItem.second->Id() + 1);
         const u32 color = 0xFF000000 | (sceneItemID & 0x00FFFFFF);
-        FDrawCommandBuffer->DrawAABBAsCube(FDrawIdMaterial, position - glm::vec3(1.0f), position + glm::vec3(1.0f), color);
+        FDrawCommandBuffer->DrawAABBAsCube(FDrawIdMaterial, position - vec3(1.0f), position + vec3(1.0f), color);
     }
 
     FDrawCommandBuffer->Submit();
@@ -136,7 +136,7 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
 
 void SceneObjectsPickingRenderer::DrawDebugData(bool* parOpen)
 {
-    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     ImGui::SetNextWindowPos(ImVec2(windowSize.x - windowSize.x / 5.0f - 10.0f, 10.0f), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(windowSize.x / 5.0f, windowSize.y / 2.0f), ImGuiCond_FirstUseEver);
     ImGui::Begin("Picking texture", parOpen, 0);

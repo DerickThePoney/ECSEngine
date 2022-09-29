@@ -59,22 +59,22 @@ Matrix2x2f Matrix2x2f::Identity()
     return result;
 }
 
-Matrix2x2f Matrix2x2f::operator*(const Matrix2x2f& parA)
+Matrix2x2f Matrix2x2f::operator*(const Matrix2x2f& parA) const
 {
     return Mul(*this, parA);
 }
 
-vec2 Matrix2x2f::operator*(const vec2& parA)
+vec2 Matrix2x2f::operator*(const vec2& parA) const
 {
     return vec2(Dot(Row(0), parA), Dot(Row(1), parA));
 }
 
-Matrix2x2f Matrix2x2f::operator+(const Matrix2x2f& parA)
+Matrix2x2f Matrix2x2f::operator+(const Matrix2x2f& parA) const
 {
     return Add(*this, parA);
 }
 
-Matrix2x2f Matrix2x2f::operator-(const Matrix2x2f& parA)
+Matrix2x2f Matrix2x2f::operator-(const Matrix2x2f& parA) const
 {
     return Sub(*this, parA);
 }
@@ -136,22 +136,22 @@ void Matrix3x3f::SetColumn(u32 idx, const vec3& column)
     FValues[2 * Size + idx] = column.z;
 }
 
-Matrix3x3f Matrix3x3f::operator*(const Matrix3x3f& parA)
+Matrix3x3f Matrix3x3f::operator*(const Matrix3x3f& parA) const
 {
     return Mul(*this, parA);
 }
 
-vec3 Matrix3x3f::operator*(const vec3& parA)
+vec3 Matrix3x3f::operator*(const vec3& parA) const
 {
     return vec3(Dot(Row(0), parA), Dot(Row(1), parA), Dot(Row(2), parA));
 }
 
-Matrix3x3f Matrix3x3f::operator+(const Matrix3x3f& parA)
+Matrix3x3f Matrix3x3f::operator+(const Matrix3x3f& parA) const
 {
     return Add(*this, parA);
 }
 
-Matrix3x3f Matrix3x3f::operator-(const Matrix3x3f& parA)
+Matrix3x3f Matrix3x3f::operator-(const Matrix3x3f& parA) const
 {
     return Sub(*this, parA);
 }
@@ -230,22 +230,22 @@ void Matrix4x4f::SetColumn(u32 idx, const vec4& column)
     FValues[3 * Size + idx] = column.w;
 }
 
-Matrix4x4f Matrix4x4f::operator*(const Matrix4x4f& parA)
+Matrix4x4f Matrix4x4f::operator*(const Matrix4x4f& parA) const
 {
     return Mul(*this, parA);
 }
 
-vec4 Matrix4x4f::operator*(const vec4& parA)
+vec4 Matrix4x4f::operator*(const vec4& parA) const
 {
     return vec4(Dot(Row(0), parA), Dot(Row(1), parA), Dot(Row(2), parA), Dot(Row(3), parA));
 }
 
-Matrix4x4f Matrix4x4f::operator+(const Matrix4x4f& parA)
+Matrix4x4f Matrix4x4f::operator+(const Matrix4x4f& parA) const
 {
     return Add(*this, parA);
 }
 
-Matrix4x4f Matrix4x4f::operator-(const Matrix4x4f& parA)
+Matrix4x4f Matrix4x4f::operator-(const Matrix4x4f& parA) const
 {
     return Sub(*this, parA);
 }

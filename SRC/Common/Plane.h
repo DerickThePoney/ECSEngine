@@ -4,7 +4,7 @@ namespace ECSEngine
 {
 struct Plane
 {
-    glm::vec3 Position;
-    glm::vec3 Normal;
+    vec3 Position;
+    vec3 Normal;
 };
 } // namespace ECSEngine

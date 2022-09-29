@@ -86,7 +86,7 @@ void StorageSlotSystem::ProcessMessages(const BuildingNeedsStorageMessage& parMe
         const PositionModule* positionModuleForStorage = parPositionModuleAccessor[storage.UnitId()];
         AssertRelease(positionModuleForStorage != nullptr);
         const float radiusSq = storage.RadiusOfEffect() * storage.RadiusOfEffect();
-        const float distanceSq = glm::length2(glm::xz(positionModuleForEntity->GetPosition3D() - positionModuleForStorage->GetPosition3D()));
+        const float distanceSq = LengthSq((positionModuleForEntity->GetPosition3D() - positionModuleForStorage->GetPosition3D()).xz());
         if (distanceSq <= radiusSq)
         {
             const bool success = storage.ReserveSlotsIFP(parMessage.FUnitId, MemoryView<const GameResource::Type>(resourcesToReserve.data(), resourcesToReserve.size()));
@@ -136,7 +136,7 @@ void StorageSlotSystem::TransfertResourcesFromProducersToStorage(ModuleAccessor<
                 const u32 maxFreeSpaceInStorage = storageSlotModule->GetFreeSpaceInSlot(recipeProducer.UnitId(), res.first);
                 if (maxFreeSpaceInStorage > 0)
                 {
-                    const u32 resRemoved = resStorage->RemoveResource(res.first, glm::min(resQ, maxFreeSpaceInStorage));
+                    const u32 resRemoved = resStorage->RemoveResource(res.first, Min(resQ, maxFreeSpaceInStorage));
                     storageSlotModule->AddResourceInSlot(recipeProducer.UnitId(), res.first, resRemoved);
                 }
             }
@@ -188,7 +188,7 @@ void StorageSlotSystem::TransfertResourcesFromStoragesToProducers(ModuleAccessor
                 StorageSlotModule* slotModule = parStorageSlotAccessor[storage];
                 AssertRelease(slotModule != nullptr);
                 const u32 quantityInSlots = slotModule->GetNbResources(inputResource.first);
-                const u32 qtyToGet = glm::min(quantityInSlots, resourcesToGet);
+                const u32 qtyToGet = Min(quantityInSlots, resourcesToGet);
 
                 ResourceManager::Instance().ConsumeFromStorage(inputResource.first, qtyToGet, slotModule);
                 resourcesToGet -= qtyToGet;

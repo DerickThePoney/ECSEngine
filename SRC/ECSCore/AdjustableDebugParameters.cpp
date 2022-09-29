@@ -198,7 +198,7 @@ protected:
     virtual void VirtualDrawAdjustableDebug() override
     {
         ImGui::InputDouble(fmt::format("##{}", Name()).c_str(), &FValue);
-        FValue = glm::clamp(FValue, FMin, FMax);
+        FValue = Clamp(FValue, FMin, FMax);
     }
 
 private:

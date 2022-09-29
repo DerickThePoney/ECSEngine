@@ -30,10 +30,10 @@ void RmlRenderer::FillVextexStream(VertexDataStream& parStream, Rml::Vertex* ver
 {
     forrange(i, 0, num_vertices)
     {
-        parStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, glm::vec3(vertices[i].position.x, vertices[i].position.y, 0.f));
+        parStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(vertices[i].position.x, vertices[i].position.y, 0.f));
         parStream.PushData(
               VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, ColorUtils::FromRGBA(vertices[i].colour.red, vertices[i].colour.green, vertices[i].colour.blue, vertices[i].colour.alpha));
-        parStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, glm::vec2(vertices[i].tex_coord.x, vertices[i].tex_coord.y));
+        parStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(vertices[i].tex_coord.x, vertices[i].tex_coord.y));
         parStream.Advance();
     }
 }
@@ -58,7 +58,7 @@ void RmlRenderer::RenderGeometry(Rml::Vertex* vertices, int num_vertices, int* i
     bx::memCopy(vertexBuffer.data, stream.GetData(), stream.GetByteSize());
     bx::memCopy(indexBuffer.data, indices, num_indices * sizeof(u32));
 
-    glm::mat4 mat = glm::translate(glm::vec3(translation.x, translation.y, 0.f)) * FCurrentMatrix;
+    mat4 mat = Translation(vec3(translation.x, translation.y, 0.f)) * FCurrentMatrix;
     bgfx::setTransform(&mat);
 
     RenderingState state(0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA));
@@ -101,7 +101,7 @@ Rml::CompiledGeometryHandle RmlRenderer::CompileGeometry(Rml::Vertex* vertices, 
 
 void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, const Rml::Vector2f& translation)
 {
-    glm::mat4 mat = glm::translate(glm::vec3(translation.x, translation.y, 0.f)) * FCurrentMatrix;
+    mat4 mat = Translation(vec3(translation.x, translation.y, 0.f)) * FCurrentMatrix;
     bgfx::setTransform(&mat);
 
     std::pair<MeshHandle, u32> p = { MeshHandle(), -1 };
@@ -173,7 +173,7 @@ void RmlRenderer::EnableScissorRegion(bool enable)
 {
     if (!enable)
     {
-        glm::uvec2 size = GLFWDisplayWindowHandler::Instance().GetSize();
+        uvec2 size = GLFWDisplayWindowHandler::Instance().GetSize();
         FScissorIdx = bgfx::setScissor(0, 0, size.x, size.y);
     }
     else
@@ -232,18 +232,18 @@ void RmlRenderer::ReleaseTexture(Rml::TextureHandle texture)
 void RmlRenderer::SetTransform(const Rml::Matrix4f* transform)
 {
     if (transform == nullptr)
-        FCurrentMatrix = glm::identity<glm::mat4>();
+        FCurrentMatrix = mat4::Identity();
 
     auto row0 = transform->GetRow(0);
-    glm::vec4 row0_glm(row0[0], row0[1], row0[2], row0[3]);
+    vec4 row0_glm(row0[0], row0[1], row0[2], row0[3]);
     auto row1 = transform->GetRow(1);
-    glm::vec4 row1_glm(row1[0], row1[1], row1[2], row1[3]);
+    vec4 row1_glm(row1[0], row1[1], row1[2], row1[3]);
     auto row2 = transform->GetRow(2);
-    glm::vec4 row2_glm(row2[0], row2[1], row2[2], row2[3]);
+    vec4 row2_glm(row2[0], row2[1], row2[2], row2[3]);
     auto row3 = transform->GetRow(3);
-    glm::vec4 row3_glm(row3[0], row3[1], row3[2], row3[3]);
+    vec4 row3_glm(row3[0], row3[1], row3[2], row3[3]);
 
-    FCurrentMatrix = glm::mat4(row0_glm, row1_glm, row2_glm, row3_glm);
+    FCurrentMatrix = mat4(row0_glm, row1_glm, row2_glm, row3_glm);
 }
 
 u16 RmlRenderer::GetTexture() const
@@ -253,7 +253,7 @@ u16 RmlRenderer::GetTexture() const
 
 void RmlRenderer::Initialise()
 {
-    const glm::vec2 size = GLFWDisplayWindowHandler::Instance().GetSize();
+    const uvec2 size = GLFWDisplayWindowHandler::Instance().GetSize();
     FFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, size);
     FFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::RGBA8,
           0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
@@ -289,8 +289,8 @@ void RmlRenderer::OnPreUpdate()
     FFramebuffer->ResizeIFN(size);
     bgfx::setViewFrameBuffer(renderPass, FFramebuffer->GetHandle());
 
-    FProjMat = glm::ortho(0.f, (float)size.x, (float)size.y, 0.f);
-    auto id = glm::identity<glm::mat4>();
+    FProjMat = ortho(0.f, (float)size.x, (float)size.y, 0.f);
+    auto id = mat4::Identity();
     bgfx::setViewTransform(renderPass, &id, &FProjMat);
     bgfx::setViewRect(renderPass, 0, 0, uint16_t(size.x), uint16_t(size.y));
 }

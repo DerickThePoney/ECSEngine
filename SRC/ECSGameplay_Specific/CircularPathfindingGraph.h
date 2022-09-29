@@ -26,12 +26,12 @@ public:
 
     void Debug(Rendering::DrawCommandBuffer& parBuffer, const Rendering::MaterialInstanceHandle& parMaterial) const;
 
-    NodeId GetClosestNode(const glm::vec3& parWorldPosition) const;
+    NodeId GetClosestNode(const vec3& parWorldPosition) const;
 
 private:
     struct Node
     {
-        glm::vec2 FPosition;
+        vec2 FPosition;
     };
     struct Edges
     {

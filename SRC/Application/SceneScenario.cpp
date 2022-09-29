@@ -33,8 +33,8 @@ void SceneScenario::AddSceneItem(const u32 parSceneItemTypeId)
     std::shared_ptr<BaseSceneItem> sceneItem = std::shared_ptr<BaseSceneItem>(new BaseSceneItem("New scene item", nextId));
 
     FSceneItems[nextId] = sceneItem;
-    sceneItem->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    sceneItem->SetEulerAngles(glm::vec3(0.0f));
+    sceneItem->SetPosition(vec3(0.0f, 0.0f, 0.0f));
+    sceneItem->SetEulerAngles(vec3(0.0f));
 }
 
 void SceneScenario::RemoveSceneItem(const SceneItemsContainer::iterator parWhere)

@@ -44,7 +44,7 @@ float STDSortArray(Container& parArray, Functor f = Functor{})
 
 struct LexSort
 {
-    constexpr auto operator()(const glm::vec2& a, const glm::vec2& b) const { return a.x < b.x || ((a.x == b.x) && (a.y < b.y)); }
+    constexpr auto operator()(const vec2& a, const vec2& b) const { return a.x < b.x || ((a.x == b.x) && (a.y < b.y)); }
 };
 
 void TestSorting()
@@ -112,14 +112,14 @@ void TestSorting()
     forrange(i, 0, 6)
     {
 
-        std::vector<glm::vec2> a;
+        std::vector<vec2> a;
         a.resize(size[i]);
         forrange(j, 0, size[i])
         {
             a[j].x = distrib(gen64);
             a[j].y = distrib(gen64);
         }
-        std::vector<glm::vec2> b;
+        std::vector<vec2> b;
         float accu = 0.f;
         float accunorecurse = 0.f;
         float accustd = 0.f;
@@ -128,7 +128,7 @@ void TestSorting()
         forrange(j, 0, retries)
         {
             b = a;
-            accu += SortArray<std::vector<glm::vec2>, glm::vec2, LexSort>(b);
+            accu += SortArray<std::vector<vec2>, vec2, LexSort>(b);
 
             if (j == 0)
             {
@@ -141,7 +141,7 @@ void TestSorting()
             }
 
             b = a;
-            accunorecurse += SortArrayNoRecursion<std::vector<glm::vec2>, glm::vec2, LexSort>(b);
+            accunorecurse += SortArrayNoRecursion<std::vector<vec2>, vec2, LexSort>(b);
 
             if (j == 0)
             {
@@ -154,7 +154,7 @@ void TestSorting()
             }
 
             b = a;
-            accustd += STDSortArray<std::vector<glm::vec2>, glm::vec2, LexSort>(b);
+            accustd += STDSortArray<std::vector<vec2>, vec2, LexSort>(b);
         }
 
         std::cout << "RECURSE: Size " << size[i] << "\tRetries=" << retries << "\ttime total = " << accu << " ms\ttime average=" << accu / retries << " ms\n";

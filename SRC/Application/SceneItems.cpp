@@ -11,8 +11,8 @@ IMPLEMENT_POOL_ALLOCATED(BaseSceneItem);
 
 BaseSceneItem::BaseSceneItem()
     : FName("Scene Item")
-    , FPosition(glm::vec3(0.f))
-    , FEulerAngles(glm::vec3(0.f))
+    , FPosition(vec3(0.f))
+    , FEulerAngles(vec3(0.f))
     , FId(-1)
     , FShowItem(false)
     , FItemHovered(false)
@@ -25,8 +25,8 @@ BaseSceneItem::BaseSceneItem()
 
 BaseSceneItem::BaseSceneItem(const std::string& parName, const u32 parId)
     : FName(parName)
-    , FPosition(glm::vec3(0.f))
-    , FEulerAngles(glm::vec3(0.f))
+    , FPosition(vec3(0.f))
+    , FEulerAngles(vec3(0.f))
     , FId(parId)
     , FShowItem(false)
     , FItemHovered(false)
@@ -66,9 +66,9 @@ bool BaseSceneItem::VirtualDrawEditor()
 
         EDITOR_PROPERTY_SIMPLE("Position", FPosition);
 
-        glm::vec3 eulerDegrees = glm::degrees(FEulerAngles);
+        vec3 eulerDegrees = Degree(FEulerAngles);
         EDITOR_PROPERTY_SIMPLE("Euler angles", eulerDegrees);
-        FEulerAngles = glm::radians(eulerDegrees);
+        FEulerAngles = Radians(eulerDegrees);
 
         ImGui::Separator();
     }

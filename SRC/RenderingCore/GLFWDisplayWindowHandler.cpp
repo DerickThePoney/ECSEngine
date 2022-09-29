@@ -37,7 +37,7 @@ void WindowScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
         io.MouseWheel += (float)yoffset;
     }
 
-    Input::SetMouseScrollDelta(glm::vec2((float)xoffset, (float)yoffset));
+    Input::SetMouseScrollDelta(vec2((float)xoffset, (float)yoffset));
 }
 
 void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -83,7 +83,7 @@ void WindowCharCallback(GLFWwindow* window, unsigned int c)
 
 void WindowMousePosCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    Input::SetMousePosition(glm::vec2((float)xpos, (float)ypos));
+    Input::SetMousePosition(vec2((float)xpos, (float)ypos));
 }
 
 void WindowMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -197,7 +197,7 @@ void GLFWDisplayWindowHandler::Init()
     double mouse_x, mouse_y;
     glfwGetCursorPos(FWindow, &mouse_x, &mouse_y);
 
-    Input::Initialise(InputKeyNames::INPUT_KEY_LAST, glm::vec2((float)mouse_x, (float)mouse_y), MouseButtons::MOUSE_BUTTON_LAST);
+    Input::Initialise(InputKeyNames::INPUT_KEY_LAST, vec2((float)mouse_x, (float)mouse_y), MouseButtons::MOUSE_BUTTON_LAST);
 
     InitJoysticks();
 }

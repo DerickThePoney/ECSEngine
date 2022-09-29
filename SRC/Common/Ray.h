@@ -14,8 +14,8 @@ struct Ray
     T FDirection = T(1.f);
 };
 
-using Ray2D = Ray<glm::vec2>;
-using Ray3D = Ray<glm::vec3>;
+using Ray2D = Ray<vec2>;
+using Ray3D = Ray<vec3>;
 
 static_assert(std::is_trivially_copyable<Ray2D>(), "Ray2D must trivially copyable");
 static_assert(std::is_trivially_copyable<Ray3D>(), "Ray3D must trivially copyable");

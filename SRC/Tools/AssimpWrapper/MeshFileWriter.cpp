@@ -238,7 +238,7 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
         const u32 nameLength = node.Name.size();
         FOutputStream.write((c8*)&nameLength, sizeof(u32));
         FOutputStream.write((c8*)node.Name.c_str(), nameLength);
-        FOutputStream.write((c8*)&node.InverseLocalTransform, sizeof(glm::mat4));
+        FOutputStream.write((c8*)&node.InverseLocalTransform, sizeof(mat4));
     }
 }
 

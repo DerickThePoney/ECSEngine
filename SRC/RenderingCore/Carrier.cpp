@@ -8,7 +8,7 @@ namespace Rendering
 {
 IMPLEMENT_POOL_ALLOCATED(Carrier);
 
-void Carrier::Init(const glm::vec3& parInitialPosition, const glm::quat& parIntialOrientation, const float parInitialTime)
+void Carrier::Init(const vec3& parInitialPosition, const quat& parIntialOrientation, const float parInitialTime)
 {
     FPosition.Init(parInitialPosition, parInitialTime);
     FOrientation.Init(parIntialOrientation, parInitialTime);
@@ -19,21 +19,21 @@ void Carrier::Update(const float parCurrentTime)
     FPosition.Update(parCurrentTime);
     FOrientation.Update(parCurrentTime);
 
-    FLocalToWorld = glm::translate(FPosition.GetCurrentValue()) * (glm::mat4)FOrientation.GetCurrentValue();
+    FLocalToWorld = Translation(FPosition.GetCurrentValue()) * (mat4)FOrientation.GetCurrentValue();
 }
 
-void Carrier::PushNewFullKeyframe(const glm::vec3& parNewPosition, const glm::quat& parNewOrientation, const float parTime)
+void Carrier::PushNewFullKeyframe(const vec3& parNewPosition, const quat& parNewOrientation, const float parTime)
 {
     FPosition.AddNewKeyframe(parNewPosition, parTime);
     FOrientation.AddNewKeyframe(parNewOrientation, parTime);
 }
 
-void Carrier::PushNewPositionKeyframe(const glm::vec3& parNewPosition, const float parTime)
+void Carrier::PushNewPositionKeyframe(const vec3& parNewPosition, const float parTime)
 {
     FPosition.AddNewKeyframe(parNewPosition, parTime);
 }
 
-void Carrier::PushNewRotationKeyframe(const glm::quat& parNewOrientation, const float parTime)
+void Carrier::PushNewRotationKeyframe(const quat& parNewOrientation, const float parTime)
 {
     FOrientation.AddNewKeyframe(parNewOrientation, parTime);
 }

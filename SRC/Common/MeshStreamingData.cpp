@@ -219,7 +219,7 @@ void VertexDataStream::InitOffsetData()
     if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION))
     {
         TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0 };
-        OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec3) };
+        OffsetByteSizePair o = { currentOffset, (u32)sizeof(vec3) };
         currentOffset += o.second;
         FOffsetMap[p] = o;
     }
@@ -248,7 +248,7 @@ void VertexDataStream::InitOffsetData()
         forrange(i, 0, nbUvs)
         {
             TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_UVS, (u32)i };
-            OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec2) };
+            OffsetByteSizePair o = { currentOffset, (u32)sizeof(vec2) };
             currentOffset += o.second;
             FOffsetMap[p] = o;
         }
@@ -258,7 +258,7 @@ void VertexDataStream::InitOffsetData()
     if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_NORMALS))
     {
         TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_NORMALS, 0 };
-        OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec3) };
+        OffsetByteSizePair o = { currentOffset, (u32)sizeof(vec3) };
         currentOffset += o.second;
         FOffsetMap[p] = o;
     }
@@ -267,7 +267,7 @@ void VertexDataStream::InitOffsetData()
     if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_TANGENTS))
     {
         TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_TANGENTS, 0 };
-        OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec3) };
+        OffsetByteSizePair o = { currentOffset, (u32)sizeof(vec3) };
         currentOffset += o.second;
         FOffsetMap[p] = o;
     }
@@ -276,7 +276,7 @@ void VertexDataStream::InitOffsetData()
     if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_BINORMALS))
     {
         TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_BINORMALS, 0 };
-        OffsetByteSizePair o = { currentOffset, (u32)sizeof(glm::vec3) };
+        OffsetByteSizePair o = { currentOffset, (u32)sizeof(vec3) };
         currentOffset += o.second;
         FOffsetMap[p] = o;
     }

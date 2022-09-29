@@ -39,7 +39,7 @@ public:
 private:
     void ProcessInput();
     bool ProcessMouse(u32 parKeyMods);
-    bool SetMousePositionHasChanged(glm::vec2 parPos, u32 parKeyMods) const;
+    bool SetMousePositionHasChanged(vec2 parPos, u32 parKeyMods) const;
     bool SetMouseButtons(u32 parKeyMods) const;
     bool SetKeyboardButtons(u32 parKeyMods) const;
     void SetTextInput() const;

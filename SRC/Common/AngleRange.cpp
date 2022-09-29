@@ -11,7 +11,7 @@ float AngleDifference(const float parA, const float parB)
     float realB = parB;
     if (realB < parA)
     {
-        static const float tau = 2.0f * glm::pi<float>();
+        static const float tau = 2.0f * Pi();
         realB += tau;
     }
     return realB - parA;
@@ -29,8 +29,8 @@ AngleRange::AngleRange(std::pair<float, float> parRange)
 
 bool AngleRange::Contains(const float parAngle) const
 {
-    AssertRelease(parAngle >= 0.f && parAngle <= 2.0f * glm::pi<float>());
-    static const float tau = 2.0f * glm::pi<float>();
+    AssertRelease(parAngle >= 0.f && parAngle <= 2.0f * Pi());
+    static const float tau = 2.0f * Pi();
     if (FRange.first < 0.f && FRange.second >= 0.f)
     {
         if (parAngle >= FRange.first + tau)

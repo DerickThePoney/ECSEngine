@@ -13,7 +13,7 @@ namespace Colony
 {
 extern float ColonyInitialRange;
 extern float ColonyRangeFeedbackThickness;
-extern glm::vec4 ColonyRangeFeedbackColor;
+extern vec4 ColonyRangeFeedbackColor;
 } // namespace Colony
 namespace CircularBuildingGrid
 {
@@ -24,13 +24,13 @@ extern float GridChunkWidth;
 extern float NavigationNodesDistance;
 extern float GridChunkFeedbackThickness;
 extern u32 StartingGridChunkNumber;
-extern glm::vec4 GridFeedbackColor;
+extern vec4 GridFeedbackColor;
 } // namespace CircularBuildingGrid
 
 namespace Storage
 {
-extern glm::vec4 HighlightedColor;
-extern glm::vec4 SelectedColor;
+extern vec4 HighlightedColor;
+extern vec4 SelectedColor;
 extern float CircleThickness;
 } // namespace Storage
 
@@ -50,7 +50,7 @@ public:
 
         PROPERTYFIELD(ColonyInitialRange, 20.f);
         PROPERTYFIELD(ColonyRangeFeedbackThickness, 1.f);
-        PROPERTYFIELD(ColonyRangeFeedbackColor, glm::vec4(0.f));
+        PROPERTYFIELD(ColonyRangeFeedbackColor, vec4(0.f));
 
         // CircularBuildingGrid
         PROPERTYFIELD(WantedArcLength, 2.0f);
@@ -60,11 +60,11 @@ public:
         PROPERTYFIELD(NavigationNodesDistance, 0.5f);
         PROPERTYFIELD(GridChunkFeedbackThickness, 0.1f);
         PROPERTYFIELD(StartingGridChunkNumber, 2);
-        PROPERTYFIELD(GridFeedbackColor, glm::vec4(0.f));
+        PROPERTYFIELD(GridFeedbackColor, vec4(0.f));
 
         // Storage
-        PROPERTYFIELD(HighlightedColor, glm::vec4(1.f));
-        PROPERTYFIELD(SelectedColor, glm::vec4(1.f));
+        PROPERTYFIELD(HighlightedColor, vec4(1.f));
+        PROPERTYFIELD(SelectedColor, vec4(1.f));
         PROPERTYFIELD(CircleThickness, 0.1f);
 
         // Energy
@@ -84,7 +84,7 @@ private:
     // Colony
     float FColonyInitialRange = 20.f;
     float FColonyRangeFeedbackThickness = 1.f;
-    glm::vec4 FColonyRangeFeedbackColor = glm::vec4(0.f);
+    vec4 FColonyRangeFeedbackColor = vec4(0.f);
 
     // CircularBuildingGrid
     float FWantedArcLength = 2.0f;
@@ -94,11 +94,11 @@ private:
     float FNavigationNodesDistance = 0.5f;
     float FGridChunkFeedbackThickness = 0.1f;
     u32 FStartingGridChunkNumber = 2;
-    glm::vec4 FGridFeedbackColor = glm::vec4(0.f);
+    vec4 FGridFeedbackColor = vec4(0.f);
 
     // Storage
-    glm::vec4 FHighlightedColor = glm::vec4(1.f);
-    glm::vec4 FSelectedColor = glm::vec4(1.f);
+    vec4 FHighlightedColor = vec4(1.f);
+    vec4 FSelectedColor = vec4(1.f);
     float FCircleThickness = 0.1f;
 
     // energy efficiency

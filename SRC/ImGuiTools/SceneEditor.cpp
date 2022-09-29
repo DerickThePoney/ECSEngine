@@ -34,7 +34,7 @@ namespace ImGUITools
 {
 namespace
 {
-void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene& parOutIOScene)
+void MainMenuBar(WindowsToShow& options, vec2& parOutMenuBarHeight, IOScene& parOutIOScene)
 {
     ImGui::BeginMainMenuBar();
     parOutMenuBarHeight = ImGui::GetWindowSize();
@@ -102,13 +102,14 @@ void MainMenuBar(WindowsToShow& options, glm::vec2& parOutMenuBarHeight, IOScene
     ImGui::EndMainMenuBar();
 }
 
-void SceneItemsWindow(SceneScenario* parScene, WindowsToShow& options, const glm::vec2& menuBarHeight)
+void SceneItemsWindow(SceneScenario* parScene, WindowsToShow& options, const vec2& menuBarHeight)
 {
-    const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    const float menuBarProportion = menuBarHeight.y / (float)windowSize.y;
-    const glm::vec2 sceneItemsSize = windowSize * glm::vec2(0.25f, 1.f - menuBarProportion);
+    const uvec2 uwindowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const vec2 windowSize(uwindowSize.x, uwindowSize.y);
+    const float menuBarProportion = menuBarHeight.y / windowSize.y;
+    const vec2 sceneItemsSize = windowSize * vec2(0.25f, 1.f - menuBarProportion);
     ImGui::SetNextWindowSize(sceneItemsSize);
-    ImGui::SetNextWindowPos(glm::vec2(0.0f, menuBarHeight.y));
+    ImGui::SetNextWindowPos(vec2(0.0f, menuBarHeight.y));
     ImGui::Begin("Scene items", &options.showSceneItemsList, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     if (parScene != nullptr)
@@ -122,8 +123,8 @@ void SceneItemsWindow(SceneScenario* parScene, WindowsToShow& options, const glm
             parScene->AddSceneItem(SceneItemTraits<BaseSceneItem>::GetSceneItemTypeId());
         }
 
-        const glm::vec2 contentRegion = ImGui::GetContentRegionAvail();
-        const glm::vec2 listSize = contentRegion - glm::vec2(10.0f, 0.0f);
+        const vec2 contentRegion = ImGui::GetContentRegionAvail();
+        const vec2 listSize = contentRegion - vec2(10.0f, 0.0f);
         const float xCursor = ((contentRegion - listSize) * 0.5f).x;
 
         ImGui::SetCursorPosX(xCursor);
@@ -156,13 +157,14 @@ void SceneItemsWindow(SceneScenario* parScene, WindowsToShow& options, const glm
     ImGui::End();
 }
 
-void SceneActionsWindow(SceneScenario* parScene, WindowsToShow& options, const glm::vec2& menuBarHeight)
+void SceneActionsWindow(SceneScenario* parScene, WindowsToShow& options, const vec2& menuBarHeight)
 {
-    const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
-    const float menuBarProportion = menuBarHeight.y / (float)windowSize.y;
-    const glm::vec2 sceneActionsSize = windowSize * glm::vec2(0.25f, 1.f - menuBarProportion);
+    const uvec2 uwindowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const vec2 windowSize(uwindowSize.x, uwindowSize.y);
+    const float menuBarProportion = menuBarHeight.y / windowSize.y;
+    const vec2 sceneActionsSize = windowSize * vec2(0.25f, 1.f - menuBarProportion);
     ImGui::SetNextWindowSize(sceneActionsSize);
-    ImGui::SetNextWindowPos(glm::vec2(windowSize.x - sceneActionsSize.x, menuBarHeight.y));
+    ImGui::SetNextWindowPos(vec2(windowSize.x - sceneActionsSize.x, menuBarHeight.y));
     ImGui::Begin("Scene actions", &options.showActionManager, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     if (parScene != nullptr)
     {
@@ -316,7 +318,7 @@ void UIStyleEditor(bool* parOpen)
 void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindowsToShow, IOScene& parOutIOScene)
 {
 
-    glm::vec2 menuBarHeight;
+    vec2 menuBarHeight;
     MainMenuBar(parOutWindowsToShow, menuBarHeight, parOutIOScene);
 
     if (parOutWindowsToShow.showSceneItemsList)
@@ -373,9 +375,10 @@ void DrawPlayScenarioWindow(bool& parOutPlayScenario)
     AssertRelease(playHandle.IsValid());
     AssertRelease(pauseHandle.IsValid());
 
-    const glm::vec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const uvec2 uwindowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const vec2 windowSize(uwindowSize.x, uwindowSize.y);
 
-    glm::vec2 menuBarHeight(0.f);
+    vec2 menuBarHeight(0.f);
     if (!parOutPlayScenario)
     {
         ImGui::BeginMainMenuBar();
@@ -385,15 +388,15 @@ void DrawPlayScenarioWindow(bool& parOutPlayScenario)
 
     ImGui::Begin("PlayButton", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground);
     const float thisWindowSize = ImGui::GetWindowWidth();
-    ImGui::SetWindowPos(glm::vec2((windowSize.x - thisWindowSize) * 0.5f, menuBarHeight.y));
+    ImGui::SetWindowPos(vec2((windowSize.x - thisWindowSize) * 0.5f, menuBarHeight.y));
     if (parOutPlayScenario)
     {
-        if (ImGui::ImageButton((ImTextureID)&pauseHandle, glm::vec2(64, 64)))
+        if (ImGui::ImageButton((ImTextureID)&pauseHandle, vec2(64, 64)))
             parOutPlayScenario = false;
     }
     else
     {
-        if (ImGui::ImageButton((ImTextureID)&playHandle, glm::vec2(64, 64)))
+        if (ImGui::ImageButton((ImTextureID)&playHandle, vec2(64, 64)))
             parOutPlayScenario = true;
     }
     ImGui::End();

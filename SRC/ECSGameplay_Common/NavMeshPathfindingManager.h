@@ -8,14 +8,14 @@ class Polygon2D;
 struct PathfindingRequest
 {
     EntityId UnitId;
-    glm::vec2 Start;
-    glm::vec2 End;
+    vec2 Start;
+    vec2 End;
 };
 
 struct PathfindingResult
 {
     EntityId UnitId;
-    std::vector<glm::vec2> Waypoints;
+    std::vector<vec2> Waypoints;
 };
 
 namespace Rendering

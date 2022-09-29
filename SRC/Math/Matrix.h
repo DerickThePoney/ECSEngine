@@ -30,10 +30,10 @@ struct alignas(16) Matrix2x2f
         result.FValues[3] = parA * FValues[3];
         return result;
     }
-    Matrix2x2f operator*(const Matrix2x2f& parA);
-    vec2 operator*(const vec2& parA);
-    Matrix2x2f operator+(const Matrix2x2f& parA);
-    Matrix2x2f operator-(const Matrix2x2f& parA);
+    Matrix2x2f operator*(const Matrix2x2f& parA) const;
+    vec2 operator*(const vec2& parA) const;
+    Matrix2x2f operator+(const Matrix2x2f& parA) const;
+    Matrix2x2f operator-(const Matrix2x2f& parA) const;
 
     inline void operator-=(const Matrix2x2f& parA)
     {
@@ -121,10 +121,10 @@ struct alignas(16) Matrix3x3f
         result.FValues[8] = parA * FValues[8];
         return result;
     }
-    Matrix3x3f operator*(const Matrix3x3f& parA);
-    vec3 operator*(const vec3& parA);
-    Matrix3x3f operator+(const Matrix3x3f& parA);
-    Matrix3x3f operator-(const Matrix3x3f& parA);
+    Matrix3x3f operator*(const Matrix3x3f& parA) const;
+    vec3 operator*(const vec3& parA) const;
+    Matrix3x3f operator+(const Matrix3x3f& parA) const;
+    Matrix3x3f operator-(const Matrix3x3f& parA) const;
 
     inline void operator-=(const Matrix3x3f& parA)
     {
@@ -223,17 +223,17 @@ struct alignas(16) Matrix4x4f
     void SetRow(u32 idx, const vec4& row);
     void SetColumn(u32 idx, const vec4& column);
 
-    inline Matrix4x4f operator*(const float parA)
+    inline Matrix4x4f operator*(const float parA) const
     {
         Matrix4x4f result;
         for (u32 i = 0; i < Matrix4x4f::Size * Matrix4x4f::Size; ++i)
             result.FValues[i] = parA * FValues[i];
         return result;
     }
-    Matrix4x4f operator*(const Matrix4x4f& parA);
-    vec4 operator*(const vec4& parA);
-    Matrix4x4f operator+(const Matrix4x4f& parA);
-    Matrix4x4f operator-(const Matrix4x4f& parA);
+    Matrix4x4f operator*(const Matrix4x4f& parA) const;
+    vec4 operator*(const vec4& parA) const;
+    Matrix4x4f operator+(const Matrix4x4f& parA) const;
+    Matrix4x4f operator-(const Matrix4x4f& parA) const;
 
     inline void operator-=(const Matrix4x4f& parA)
     {
@@ -278,11 +278,17 @@ inline Matrix4x4f operator*(const float parA, const Matrix4x4f& parB)
     return result;
 }
 
-inline Matrix4x4f operator*(const Matrix4x4f& parA, const Matrix4x4f& parB)
-{
-    Matrix4x4f result = parA;
-    result *= parB;
-    return result;
-}
+//inline Matrix4x4f operator*(const Matrix4x4f& parA, const Matrix4x4f& parB)
+//{
+//    Matrix4x4f result = parA;
+//    result *= parB;
+//    return result;
+//}
+
+//inline vec4 operator*(const Matrix4x4f& parA, const vec4& parB)
+//{
+//    vec4 result = parA.operator *(parB);
+//    return result;
+//}
 
 } // namespace ECSEngine

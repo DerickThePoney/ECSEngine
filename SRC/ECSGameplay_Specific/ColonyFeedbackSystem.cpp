@@ -29,24 +29,24 @@ void ColonyFeedbackSystem::VirtualUpdate()
     {
         u32 FCameraId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
         Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
-        const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+        const uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
         const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
 
         bool foundPos = false;
-        glm::vec3 mouseWorldPosition = GetWorldPositionFromScreenPosition(*camera, aspectRatio, windowSize, Input::GetMousePosition(), foundPos);
+        vec3 mouseWorldPosition = GetWorldPositionFromScreenPosition(*camera, aspectRatio, windowSize, Input::GetMousePosition(), foundPos);
         CircularGridAccessor accessor = CircularBuildingGrid::Instance().GetAccessorForWorldPosition(mouseWorldPosition);
 
         CircularBuildingGrid::Instance().DrawFeedback();
 
         if (accessor.Valid())
         {
-            GameplayFeedbackDrawer::Instance().AddAABB(accessor.CellPosition() + glm::vec3(-0.1f), accessor.CellPosition() + glm::vec3(0.1f),
-                  (accessor.IsFree(1)) ? 0xFF00FF00 : 0xFF0000FF, glm::identity<glm::mat4>(), true);
-            GameplayFeedbackDrawer::Instance().AddAABB(mouseWorldPosition + glm::vec3(-0.1f), mouseWorldPosition + glm::vec3(0.1f), 0xFF00FFFF, glm::identity<glm::mat4>(), true);
+            GameplayFeedbackDrawer::Instance().AddAABB(accessor.CellPosition() + vec3(-0.1f), accessor.CellPosition() + vec3(0.1f),
+                  (accessor.IsFree(1)) ? 0xFF00FF00 : 0xFF0000FF, mat4::Identity(), true);
+            GameplayFeedbackDrawer::Instance().AddAABB(mouseWorldPosition + vec3(-0.1f), mouseWorldPosition + vec3(0.1f), 0xFF00FFFF, mat4::Identity(), true);
         }
         else
         {
-            GameplayFeedbackDrawer::Instance().AddAABB(mouseWorldPosition + glm::vec3(-0.1f), mouseWorldPosition + glm::vec3(0.1f), 0xFF0000FF, glm::identity<glm::mat4>(), true);
+            GameplayFeedbackDrawer::Instance().AddAABB(mouseWorldPosition + vec3(-0.1f), mouseWorldPosition + vec3(0.1f), 0xFF0000FF, mat4::Identity(), true);
         }
     }
 }

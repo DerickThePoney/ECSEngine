@@ -32,7 +32,7 @@ void OutlineRenderer::Initialise()
     bgfx::setViewName(RenderPassId::OUTLINE_VERTICAL, "Outline Vertical");
     bgfx::setViewClear(RenderPassId::OUTLINE_VERTICAL, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);*/
 
-    const glm::vec2 windowSize = GLFWDisplayWindowHandler::Instance().GetSize();
+    const uvec2 windowSize = GLFWDisplayWindowHandler::Instance().GetSize();
     // initial framebuffer
     FInitialFramebuffer = new FramebufferInstance(FramebufferSizeType::SCREEN, windowSize);
     FInitialFramebuffer->AddAttachement(false, 1, bgfx::TextureFormat::A8,
@@ -74,8 +74,8 @@ void OutlineRenderer::RenderOutline(MemoryView<const GFXRepresentation*> parSele
 
     const auto windowSize = GLFWDisplayWindowHandler::Instance().GetSize();
     const float aspectRatio = GLFWDisplayWindowHandler::Instance().AspectRatio();
-    glm::mat4 view = c->GetWorldViewMatrix();
-    glm::mat4 proj = c->GetProjectionMatrix(aspectRatio);
+    mat4 view = c->GetWorldViewMatrix();
+    mat4 proj = c->GetProjectionMatrix(aspectRatio);
 
     FInitialFramebuffer->ResizeIFN(windowSize);
     FIntermediaryFramebuffer->ResizeIFN(windowSize);
@@ -134,7 +134,7 @@ void OutlineRenderer::AddGFXForOutline(const GFXRepresentation* parRepresentatio
     AssertRelease(visualModel != nullptr);
 
     const u32 colorU32 = parSelected ? 0xFF0000FF : 0x7F00007F;
-    const glm::vec4 color = ColorUtils::ConvertToFVEC4(colorU32);
+    const vec4 color = ColorUtils::ConvertToFVEC4(colorU32);
     FDrawBuffer->SetVec4Uniform("u_PickingId", color);
 
     if (visualModel->HasMultipassMaterial())

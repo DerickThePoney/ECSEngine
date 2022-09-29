@@ -4,10 +4,10 @@
 namespace ECSEngine
 {
 class Camera;
-Ray3D GetCameraRayFromMouseInput(const Camera& parCamera, const float parAspectRatio, const glm::uvec2 parWindowSize, const glm::vec2 parMousePosition);
-glm::vec3 GetWorldPositionFromScreenPosition(const Camera& parCamera,
+Ray3D GetCameraRayFromMouseInput(const Camera& parCamera, const float parAspectRatio, const uvec2 parWindowSize, const vec2 parMousePosition);
+vec3 GetWorldPositionFromScreenPosition(const Camera& parCamera,
       const float parAspectRatio,
-      const glm::uvec2 parWindowSize,
-      const glm::vec2 parMousePosition,
+      const uvec2 parWindowSize,
+      const vec2 parMousePosition,
       bool& outInWorld);
 } // namespace ECSEngine

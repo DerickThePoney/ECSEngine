@@ -73,7 +73,7 @@ const ModuleTemplate* EntityTemplate::GetModuleTemplate(const u32 parId) const
 
 void EntityTemplate::DrawEditor()
 {
-    ImGui::TextColored(glm::vec4(0.8f, 0.8f, 0.8f, 1.0f), "Entity template name:");
+    ImGui::TextColored(vec4(0.8f, 0.8f, 0.8f, 1.0f), "Entity template name:");
     ImGui::SameLine(0.0f, 5.0f);
 
     char text[256];

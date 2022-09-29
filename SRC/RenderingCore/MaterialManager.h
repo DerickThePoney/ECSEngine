@@ -22,10 +22,10 @@ const MultiPassMaterialInstance* GetMultiPassMaterialInstance(const MultiPassMat
 void SetSamplerUniform_IKNOWWHATIMDOING(const std::string& parUniformName, const u16& parTextureHandle, const u32 parSlot);
 void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parTextureHandle, const u32 parSlot);
 void SetFreeFormSamplerUniform(const std::string& parUniformName, const u32 parTextureHandle, const u32 parSlot);
-void SetVec4Uniform(const std::string& parUniformName, const glm::vec4& parUniformValue);
-void SetMat3Uniform(const std::string& parUniformName, const glm::mat3& parUniformValue);
-void SetMat4Uniform(const std::string& parUniformName, const glm::mat4& parUniformValue);
-void SetMat4Uniforms(const std::string& parUniformName, const glm::mat4* parUniformValue, const u8 parNumber);
+void SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue);
+void SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue);
+void SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue);
+void SetMat4Uniforms(const std::string& parUniformName, const mat4* parUniformValue, const u8 parNumber);
 
 std::vector<MultiPassProgramDescriptor*>& GetProgramsForEditor();
 std::vector<MultiPassMaterialDescriptor*>& GetMaterialsForEditor();

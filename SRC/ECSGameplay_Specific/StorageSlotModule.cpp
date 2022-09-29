@@ -180,7 +180,7 @@ u32 StorageSlotModule::RemoveResourceInSlot(const GameResource::Type parResource
     {
         if (slot.Resource != parResource)
             continue;
-        const u32 resourceToRemove = glm::min(slot.Quantity, toRemove);
+        const u32 resourceToRemove = Min(slot.Quantity, toRemove);
         slot.Quantity -= resourceToRemove;
         currentlyRemoved += resourceToRemove;
         toRemove -= resourceToRemove;

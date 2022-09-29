@@ -50,7 +50,7 @@ void NavMesh::Cleanup()
     FConnectedComponents.clear();
 }
 
-const NavMeshFace* NavMesh::FindContainingFace(const glm::vec2 parPoint) const
+const NavMeshFace* NavMesh::FindContainingFace(const vec2 parPoint) const
 {
     foreachitemconst(face, FFaces)
     {

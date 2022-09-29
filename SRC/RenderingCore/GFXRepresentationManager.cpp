@@ -106,8 +106,8 @@ void GFXRepresentationManager::PushMessage(const u32& parId, u32 parKey, const T
     FGFXRepresentations[parId]->GetCurrentQueueForPushingMessage().PushMessage(parKey, parData, parTime);
 }
 
-template void GFXRepresentationManager::PushMessage<glm::vec3>(const u32& parId, u32 parKey, const glm::vec3& parData, const float parTime);
-template void GFXRepresentationManager::PushMessage<glm::quat>(const u32& parId, u32 parKey, const glm::quat& parData, const float parTime);
+template void GFXRepresentationManager::PushMessage<vec3>(const u32& parId, u32 parKey, const vec3& parData, const float parTime);
+template void GFXRepresentationManager::PushMessage<quat>(const u32& parId, u32 parKey, const quat& parData, const float parTime);
 template void GFXRepresentationManager::PushMessage<bool>(const u32& parId, u32 parKey, const bool& parData, const float parTime);
 
 } // namespace Rendering

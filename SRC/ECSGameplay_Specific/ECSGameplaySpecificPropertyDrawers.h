@@ -29,7 +29,7 @@ public:
             ImGui::SameLine();
         }
 
-        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
         if (ImGui::BeginCombo(fmt::format("##{}", FPropertyName).c_str(), GameResource::GetName(*FProperty)))
         {
@@ -77,7 +77,7 @@ public:
             ImGui::SameLine();
         }
 
-        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
         if (ImGui::BeginCombo(fmt::format("##{}", FPropertyName).c_str(), BuildingCategory::AsString(*FProperty)))
         {
@@ -116,7 +116,7 @@ public:
 
     void ShowProperty()
     {
-        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
 
         EDITOR_PROPERTY_GAME_RESOURCES("Resource", FProperty->first, false);
@@ -155,7 +155,7 @@ public:
             ImGui::SameLine();
         }
 
-        const glm::vec2 availableSize = ImGui::GetContentRegionAvail();
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
         if (ImGui::BeginCombo(fmt::format("##{}", FPropertyName).c_str(), FNameProperty->c_str()))
         {

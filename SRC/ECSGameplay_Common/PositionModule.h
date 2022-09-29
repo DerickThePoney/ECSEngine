@@ -36,13 +36,13 @@ public:
     {
     }
 
-    const glm::vec3& GetPosition3D() const { return FPosition; }
-    void SetPosition3D(const glm::vec3& parPosition) { FPosition = parPosition; }
+    const vec3& GetPosition3D() const { return FPosition; }
+    void SetPosition3D(const vec3& parPosition) { FPosition = parPosition; }
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
 private:
-    glm::vec3 FPosition;
+    vec3 FPosition;
 };
 } // namespace ECSEngine

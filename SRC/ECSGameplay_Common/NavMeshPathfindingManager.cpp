@@ -115,7 +115,7 @@ void NavMeshPathfindingManager::Debug(Rendering::DrawCommandBuffer& parBuffer, c
     if (!showPathfindingDebug || FNavMesh.FacesCount() == 0)
         return;
 
-    const glm::vec2* mainPolygon = FNavMesh.MainPolygon().data().data();
+    const vec2* mainPolygon = FNavMesh.MainPolygon().data().data();
     parBuffer.DrawLines(parMaterial, mainPolygon, (u32)FNavMesh.MainPolygon().size(), 0.0f, 0xFF00FF00, true);
 
     MemoryView<const Polygon2D> memView = FNavMesh.Holes();

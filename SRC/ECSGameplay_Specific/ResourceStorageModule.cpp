@@ -110,7 +110,7 @@ u32 ResourceStorageModule::GetRemainingStorageSpace() const
 u32 ResourceStorageModule::AddResource(const GameResource::Type parResource, const u32 parQuantity)
 {
     const u32 remainingStorageSpace = GetRemainingStorageSpace();
-    const u32 resourceToStore = glm::min(parQuantity, remainingStorageSpace);
+    const u32 resourceToStore = Min(parQuantity, remainingStorageSpace);
     bool found = false;
     foreachitem(resource, FCarriedResources)
     {
@@ -137,7 +137,7 @@ u32 ResourceStorageModule::RemoveResource(const GameResource::Type parResource, 
     {
         if (resource.first == parResource)
         {
-            u32 resRemoved = glm::min(parQuantity, resource.second);
+            u32 resRemoved = Min(parQuantity, resource.second);
             resource.second -= resRemoved;
             FResourceStatisticsManager.AddResourceChange(parResource, -((i32)parQuantity));
             return resRemoved;

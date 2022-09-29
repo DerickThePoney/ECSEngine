@@ -1,6 +1,7 @@
 #pragma once
 #include "Quaternion.h"
 #include "Vector.h"
+#include "Common/Serialization.h"
 
 namespace ECSEngine
 {

@@ -222,7 +222,7 @@ struct HierarchyNode
     u8 Idx = -1;
     u8 Parent = -1;
     std::string Name;
-    glm::mat4 InverseLocalTransform = glm::identity<glm::mat4>();
+    mat4 InverseLocalTransform = mat4::Identity();
 };
 
 union BlendIndices

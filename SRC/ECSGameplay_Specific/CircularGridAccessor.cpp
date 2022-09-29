@@ -22,7 +22,7 @@ CircularGridAccessor::CircularGridAccessor()
 {
 }
 
-CircularGridAccessor::CircularGridAccessor(const glm::vec3 parGridCellPosition, const u32 parChunkId, const u32 parCellId)
+CircularGridAccessor::CircularGridAccessor(const vec3 parGridCellPosition, const u32 parChunkId, const u32 parCellId)
     : FGridCellPosition(parGridCellPosition)
     , FChunkId(parChunkId)
     , FCellId(parCellId)

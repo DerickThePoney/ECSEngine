@@ -53,10 +53,10 @@ void CircularBuildingGrid::DrawFeedback() const
     }
 }
 
-CircularGridAccessor CircularBuildingGrid::GetAccessorForWorldPosition(const glm::vec3& parWorldPosition) const
+CircularGridAccessor CircularBuildingGrid::GetAccessorForWorldPosition(const vec3& parWorldPosition) const
 {
-    const glm::vec2 worldPos2D = glm::xz(parWorldPosition);
-    const float distanceToCenter = glm::length(worldPos2D);
+    const vec2 worldPos2D = parWorldPosition.xz();
+    const float distanceToCenter = Length(worldPos2D);
 
     // detect chunk
     foreachitemconst(chunk, FChunks)
@@ -75,9 +75,9 @@ CircularGridAccessor CircularBuildingGrid::GetAccessorForWorldPosition(const glm
 
         // We are in this circular chunk
         // now actually get the input angle
-        float inputAngle = glm::atan(worldPos2D.y, worldPos2D.x);
+        float inputAngle = atan(worldPos2D.y, worldPos2D.x);
         if (inputAngle < 0.f)
-            inputAngle += 2.f * glm::pi<float>();
+            inputAngle += 2.f * Pi();
 
         foreachitemconst(cell, chunk.GridCells)
         {
@@ -87,7 +87,7 @@ CircularGridAccessor CircularBuildingGrid::GetAccessorForWorldPosition(const glm
                 continue;
 
             const float centerAngle = GetCellCenterAngle(cell.Index, chunk.ActualArcAngle);
-            const glm::vec3 cellPosition = glm::vec3(radius * glm::cos(centerAngle), parWorldPosition.y, radius * glm::sin(centerAngle));
+            const vec3 cellPosition = vec3(radius * cos(centerAngle), parWorldPosition.y, radius * sin(centerAngle));
             return CircularGridAccessor(cellPosition, chunk.Index, cell.Index);
         }
         AssertNotReached();
@@ -151,9 +151,9 @@ Polygon2D CircularBuildingGrid::CreatePolygon(const CircularGridAccessor& parGri
     ADJUSTABLE_DEBUG_PARAMETER_SINGLE(freeColisionSpace, 0.1f, "Free colision space", "CircularBuildingGrid/Obstacles", 0.f, 0.5f);
     const float freeSpaceAngle = freeColisionSpace / radius;
     const float angleDiff = AngleHelpers::AngleDifference(startCellAngleRange.Left(), endCellAngleRange.Right()) - 2.f * freeSpaceAngle;
-    //-2.0f * glm::radians(1.5f);
+    //-2.0f * radians(1.5f);
     AlwaysCheckedAssert(angleDiff > 0.f);
-    const u32 wantedSubdiv = (u32)(angleDiff / glm::radians(5.f));
+    const u32 wantedSubdiv = (u32)(angleDiff / Radians(5.f));
     const float angleInterv = angleDiff / (wantedSubdiv - 1);
 
     // fill the polygon
@@ -161,14 +161,14 @@ Polygon2D CircularBuildingGrid::CreatePolygon(const CircularGridAccessor& parGri
     forrange(i, 0, wantedSubdiv)
     {
         const float angle = startCellAngleRange.Left() + freeSpaceAngle + i * angleInterv;
-        const glm::vec2 pos = minR * glm::vec2(glm::cos(angle), glm::sin(angle));
+        const vec2 pos = minR * vec2(cos(angle), sin(angle));
         res.push_back(pos);
     }
 
     reverseforrange(i, 0, wantedSubdiv)
     {
         const float angle = startCellAngleRange.Left() + freeSpaceAngle + i * angleInterv;
-        const glm::vec2 pos = maxR * glm::vec2(glm::cos(angle), glm::sin(angle));
+        const vec2 pos = maxR * vec2(cos(angle), sin(angle));
         res.push_back(pos);
     }
     return res;
@@ -185,14 +185,14 @@ void CircularBuildingGrid::CreateNewGridChunk()
 
     // compute subdivs using wanted angle
     const float wantedAngleSubdiv = wantedArcLength / gridChunkRadius;
-    const float nbSubdiv = 2.0f * glm::pi<float>() / wantedAngleSubdiv;
+    const float nbSubdiv = 2.0f * Pi() / wantedAngleSubdiv;
 
     FChunks.push_back(CircularGridChunk());
     CircularGridChunk& chunk = FChunks[gridChunkIndex];
 
     // round the cell number and compute the actual arclength using this number
     chunk.CellCount = (u32)std::roundf(nbSubdiv);
-    chunk.ActualArcAngle = 2.0f * glm::pi<float>() / chunk.CellCount;
+    chunk.ActualArcAngle = 2.0f * Pi() / chunk.CellCount;
 
     AssertRelease(chunk.CellCount != 0);
     AssertRelease(chunk.ActualArcAngle != 0);

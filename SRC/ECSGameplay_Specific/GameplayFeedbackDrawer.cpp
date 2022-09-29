@@ -25,13 +25,13 @@ void GameplayFeedbackDrawer::Shutdown()
 {
 }
 
-void GameplayFeedbackDrawer::AddCircle(const Rendering::CircleFeedbackParameters& parCircleParameters, const glm::mat4& parTransform)
+void GameplayFeedbackDrawer::AddCircle(const Rendering::CircleFeedbackParameters& parCircleParameters, const mat4& parTransform)
 {
     std::scoped_lock<std::mutex> lock(FMutex);
     FCircles.push_back({ parCircleParameters, parTransform });
 }
 
-void GameplayFeedbackDrawer::AddAABB(const glm::vec3& parMin, const glm::vec3& parMax, const u32 parColor, const glm::mat4& parTransform, bool parAsCubes)
+void GameplayFeedbackDrawer::AddAABB(const vec3& parMin, const vec3& parMax, const u32 parColor, const mat4& parTransform, bool parAsCubes)
 {
     std::scoped_lock<std::mutex> lock(FMutex);
     FAABB.push_back({ parMin, parMax, parColor, parTransform, parAsCubes });

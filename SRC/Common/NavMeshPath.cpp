@@ -12,7 +12,7 @@ bool NavMeshPath::isValid() const
     return FValid && FStart != FEnd;
 }
 
-void NavMeshPath::push_back(glm::vec2 parWaypoint)
+void NavMeshPath::push_back(vec2 parWaypoint)
 {
 #ifdef PERFORM_SECURITY_CHECKS
     AssertExistsAndNoDoublon(parWaypoint);
@@ -21,7 +21,7 @@ void NavMeshPath::push_back(glm::vec2 parWaypoint)
 }
 
 #ifdef PERFORM_SECURITY_CHECKS
-void NavMeshPath::AssertExistsAndNoDoublon(glm::vec2 parWaypoint) const
+void NavMeshPath::AssertExistsAndNoDoublon(vec2 parWaypoint) const
 {
     foreachitemconst(vertex, FWaypoints) { AssertRelease(parWaypoint != vertex); }
 }

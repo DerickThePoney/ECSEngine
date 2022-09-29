@@ -82,7 +82,7 @@ void GameRenderer::Initialise()
     FOutlineRenderer->Initialise();
 }
 
-void GameRenderer::SetViewFramebuffers(const glm::uvec2 parSize)
+void GameRenderer::SetViewFramebuffers(const uvec2 parSize)
 {
     bgfx::setViewFrameBuffer(RenderPassId::GEOMETRY_PASS, FGeometryFramebuffer->GetHandle());
     bgfx::setViewFrameBuffer(RenderPassId::FEEDBACK_PASS, FGeometryFramebuffer->GetHandle());
@@ -148,8 +148,8 @@ void GameRenderer::Render()
     Frustum frustum;
     frustum.InitFromCamera(*c, aspectRatio);
 
-    glm::mat4 view = c->GetWorldViewMatrix();
-    glm::mat4 proj = c->GetProjectionMatrix(aspectRatio);
+    mat4 view = c->GetWorldViewMatrix();
+    mat4 proj = c->GetProjectionMatrix(aspectRatio);
 
     {
         SCOPED_PROFILE(GameRenderer_Render_GeometryPassAndSelection);

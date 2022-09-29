@@ -5,7 +5,7 @@
 
 namespace ECSEngine
 {
-using PointerEventDelegate = Delegate<bool (*)(const glm::vec2&)>;
+using PointerEventDelegate = Delegate<bool (*)(const vec2&)>;
 
 namespace GamepadButtons
 {
@@ -57,12 +57,12 @@ const char* ToString(const Type parValue);
 
 namespace Input
 {
-void Initialise(const u32 parNbKeyboardKeys, const glm::vec2& parMousePosition, const u32 parNbMouseButtons);
+void Initialise(const u32 parNbKeyboardKeys, const vec2& parMousePosition, const u32 parNbMouseButtons);
 void EndFrame();
 void Shutdown();
 
-void SetMousePosition(const glm::vec2& parMousePosition);
-void SetMouseScrollDelta(const glm::vec2& parMouseScrollDelta);
+void SetMousePosition(const vec2& parMousePosition);
+void SetMouseScrollDelta(const vec2& parMouseScrollDelta);
 void SetMouseButtonState(int button, bool value);
 void SetKeyboardButtonState(int button, bool value, bool isShiftDown, bool isCtrlDown, bool isAltDown);
 
@@ -73,9 +73,9 @@ MemoryView<const u32> TextInput();
 void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed);
 void GetInputsAlreadyUsed(bool& parKeyboardInputUsed, bool& parMouseInputUsed);
 
-const glm::vec2 GetMousePosition();
-const glm::vec2 GetMousePositionDelta();
-const glm::vec2 GetMouseScrollDelta();
+const vec2 GetMousePosition();
+const vec2 GetMousePositionDelta();
+const vec2 GetMouseScrollDelta();
 bool GetMouseButtonState(int button);
 bool GetMouseButtonHasChanged(int button);
 

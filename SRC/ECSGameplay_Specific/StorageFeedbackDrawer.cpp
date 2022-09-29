@@ -23,7 +23,7 @@ void StorageFeedbackDrawer::DrawFeedback()
     storageSlotAccessor.LockIFN();
     positionAccessor.LockIFN();
 
-    auto DrawCicle = [](glm::vec4& color, float radius, const glm::mat4& position)
+    auto DrawCicle = [](vec4& color, float radius, const mat4& position)
     {
         Rendering::CircleFeedbackParameters param;
         param.Color = color;
@@ -45,7 +45,7 @@ void StorageFeedbackDrawer::DrawFeedback()
         const PositionModule* positionModule = positionAccessor[unit];
         AssertRelease(positionModule != nullptr);
 
-        const glm::mat4 positionMatrix = glm::translate(positionModule->GetPosition3D());
+        const mat4 positionMatrix = Translation(positionModule->GetPosition3D());
 
         DrawCicle(GameplayConstants::Storage::HighlightedColor, storageTemplate->RadiusOfEffect(), positionMatrix);
     }
@@ -62,7 +62,7 @@ void StorageFeedbackDrawer::DrawFeedback()
         const PositionModule* positionModule = positionAccessor[unit];
         AssertRelease(positionModule != nullptr);
 
-        const glm::mat4 positionMatrix = glm::translate(positionModule->GetPosition3D());
+        const mat4 positionMatrix = Translation(positionModule->GetPosition3D());
         DrawCicle(GameplayConstants::Storage::SelectedColor, storageTemplate->RadiusOfEffect(), positionMatrix);
     }
 

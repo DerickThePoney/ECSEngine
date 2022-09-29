@@ -61,7 +61,7 @@ void PlaceBuildingMousePolicy::VirtualActivate()
     FBuildingProxy = new Rendering::GFXRepresentationProxy();
     Rendering::GFXRepresentationInitialiser init;
     init.FPosition = GetMouseWorldPosition();
-    init.FOrientation = glm::quat(1.f, 0.f, 0.f, 0.f);
+    init.FOrientation = quat(1.f, 0.f, 0.f, 0.f);
     init.HasCarier = true;
     init.FCurrentTime = TimeManager::FrameStartTime();
     AssertRelease(!apparenceTemplate->GFXRepresentationDescriptorName().empty());
@@ -88,14 +88,14 @@ void PlaceBuildingMousePolicy::VirtualUpdate()
         // TODO CHECK RESOURCES !
 
         bool foundPos = false;
-        glm::vec3 mouseWorldPosition = GetMouseWorldPosition();
+        vec3 mouseWorldPosition = GetMouseWorldPosition();
 
         CircularGridAccessor accessor = CircularBuildingGrid::Instance().GetAccessorForWorldPosition(mouseWorldPosition);
 
         if (accessor.Valid() && accessor.IsFree(FCellOccupancy))
         {
             FBuildingProxy->PushMessage<bool>(GFXKeyHelper::Instance().Visible, true, TimeManager::FrameStartTime());
-            FBuildingProxy->PushMessage<glm::vec3>(GFXKeyHelper::Instance().Position, accessor.CellPosition(), TimeManager::FrameStartTime());
+            FBuildingProxy->PushMessage<vec3>(GFXKeyHelper::Instance().Position, accessor.CellPosition(), TimeManager::FrameStartTime());
 
             const bool validateNormal = FValidateInputCommand.Evaluate();
             const bool validateShifted = FShiftedValidationCommand.Evaluate();
@@ -118,11 +118,11 @@ void PlaceBuildingMousePolicy::VirtualUpdate()
     }
 }
 
-glm::vec3 PlaceBuildingMousePolicy::GetMouseWorldPosition() const
+vec3 PlaceBuildingMousePolicy::GetMouseWorldPosition() const
 {
     u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
     Camera* camera = CameraManager::Instance().GetCamera(camId);
-    const glm::uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+    const uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
     bool dummy = false;
     return GetWorldPositionFromScreenPosition(

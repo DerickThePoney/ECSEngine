@@ -7,15 +7,15 @@ namespace ECSEngine
 
 float Triangle2D::Area() const
 {
-    glm::vec2 ab = B - A;
-    glm::vec2 ac = C - A;
+    vec2 ab = B - A;
+    vec2 ac = C - A;
 
-    return 0.5f * glm::abs(ab.x * ac.y - ac.x * ab.y);
+    return 0.5f * abs(ab.x * ac.y - ac.x * ab.y);
 }
 
 bool Triangle2D::IsDegenerate() const
 {
-    return glm::abs(glm::dot(glm::normalize(B - A), glm::normalize(C - A))) > 0.99f;
+    return abs(Dot(Normalize(B - A), Normalize(C - A))) > 0.99f;
 }
 
 } // namespace ECSEngine

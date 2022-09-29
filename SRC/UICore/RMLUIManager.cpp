@@ -133,7 +133,7 @@ bool RmlUiManager::ProcessMouse(u32 parKeyMods)
     bool res = true;
 
     // mouse position
-    if (glm::length2(Input::GetMousePositionDelta()) > 0.f)
+    if (LengthSq(Input::GetMousePositionDelta()) > 0.f)
     {
         FMouseInput = SetMousePositionHasChanged(Input::GetMousePosition(), parKeyMods);
     }
@@ -144,8 +144,8 @@ bool RmlUiManager::ProcessMouse(u32 parKeyMods)
     res = res && thisRes;
 
     // mouse wheel
-    const glm::vec2 delta = Input::GetMouseScrollDelta();
-    if (glm::length2(delta) > 0.f)
+    const vec2 delta = Input::GetMouseScrollDelta();
+    if (LengthSq(delta) > 0.f)
     {
         bool mw = !FContext->ProcessMouseWheel(-delta.y, parKeyMods);
         res = res && mw;
@@ -153,7 +153,7 @@ bool RmlUiManager::ProcessMouse(u32 parKeyMods)
     return res;
 }
 
-bool RmlUiManager::SetMousePositionHasChanged(glm::vec2 parPos, u32 parKeyMods) const
+bool RmlUiManager::SetMousePositionHasChanged(vec2 parPos, u32 parKeyMods) const
 {
     if (FContext == nullptr)
         return true;

@@ -95,8 +95,8 @@ void GFXRepresentation::ProcessMessages()
 
     if (FCarrier != nullptr)
     {
-        auto newPositionKeyframe = currentMessages.GetValueIFP<glm::vec3>(GFXKeyHelper::Instance().Position);
-        auto newOrientationKeyframe = currentMessages.GetValueIFP<glm::quat>(GFXKeyHelper::Instance().Orientation);
+        auto newPositionKeyframe = currentMessages.GetValueIFP<vec3>(GFXKeyHelper::Instance().Position);
+        auto newOrientationKeyframe = currentMessages.GetValueIFP<quat>(GFXKeyHelper::Instance().Orientation);
 
         if (newPositionKeyframe.second != -1 && newOrientationKeyframe.second != -1)
         {

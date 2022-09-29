@@ -28,7 +28,7 @@ void PositionModule::VirtualInit(const EntityId& parUnitId, const ModuleParamete
 {
     parent_type::VirtualInit(parUnitId, parParameters);
 
-    FPosition = parParameters.Get_IFP<ModuleParameters::Position>(glm::vec3(0.0f));
+    FPosition = parParameters.Get_IFP<ModuleParameters::Position>(vec3(0.0f));
 }
 
 IMPLEMENT_SAVELOAD_ABILITIES(PositionModule);
