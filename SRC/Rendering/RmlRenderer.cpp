@@ -289,7 +289,7 @@ void RmlRenderer::OnPreUpdate()
     FFramebuffer->ResizeIFN(size);
     bgfx::setViewFrameBuffer(renderPass, FFramebuffer->GetHandle());
 
-    FProjMat = ortho(0.f, (float)size.x, (float)size.y, 0.f);
+    FProjMat = Orthographic(0.f, (float)size.x, (float)size.y, 0.f);
     auto id = mat4::Identity();
     bgfx::setViewTransform(renderPass, &id, &FProjMat);
     bgfx::setViewRect(renderPass, 0, 0, uint16_t(size.x), uint16_t(size.y));

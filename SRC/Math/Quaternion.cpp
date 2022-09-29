@@ -3,6 +3,7 @@
 #include "Matrix.h"
 #include "math.h"
 #include "Common/Assertions.h"
+#include "MathFunctions.h"
 
 namespace ECSEngine
 {

@@ -86,7 +86,7 @@ void GeneratorRotatorOperator::ApplyChangesOnMesh(const GFXMessage& parMessages,
     mat4* localPoses = parSkelettonPose->LocalPoses();
     AssertRelease(localPoses != nullptr);
     const float angle = FDescriptor->RotationSpeed() * TimeManager::FrameDeltaTime();
-    localPoses[FSkelettonJoint] = rotate(angle, vec3(0.f, 0.f, 1.f)) * localPoses[FSkelettonJoint];
+    localPoses[FSkelettonJoint] = Rotation(angle, vec3(0.f, 0.f, 1.f)) * localPoses[FSkelettonJoint];
     parSkelettonPose->SetDirty();
 }
 

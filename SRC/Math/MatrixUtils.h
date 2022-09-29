@@ -29,7 +29,13 @@ mat4 Invert(const mat4& parA);
 mat4 Transpose(const mat4& parA);
 
 mat4 Translation(const vec3& parT);
+mat4 Rotation(float angle, const vec3& v);
+
 mat4 Perspective(float fovy, float aspect, float zNear, float zFar);
+mat4 Orthographic(float left, float right, float bottom, float top);
+
 mat4 EulerAnglesXYZ(const float X, const float Y, const float Z);
 vec3 ExtractEulerAnglesXYZ(const mat4& m);
+
+mat4 LookAt(const vec3& parEye, const vec3& parCenter, const vec3& parUp);
 }

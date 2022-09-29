@@ -6,9 +6,9 @@ namespace ECSEngine
 /****************************
  * VECTOR2
  ****************************/
-
+#pragma pack(push, 1)
 template<typename T>
-struct alignas(16) Vector2
+struct alignas(4) Vector2
 {
 public:
     Vector2() = default;
@@ -102,7 +102,7 @@ MAKE_EXTERN_OP(*);
  ****************************/
 
 template<typename T>
-struct alignas(16) Vector3
+struct alignas(4) Vector3
 {
 public:
     Vector3() = default;
@@ -254,7 +254,7 @@ MAKE_EXTERN_OP(*);
  ****************************/
 
 template<typename T>
-struct alignas(16) Vector4
+struct alignas(4) Vector4
 {
 public:
     Vector4() = default;
@@ -449,4 +449,5 @@ MAKE_EXTERN_OP(/);
 MAKE_EXTERN_OP(*);
 
 #undef MAKE_EXTERN_OP
+#pragma pack(pop)
 }
