@@ -26,4 +26,9 @@ inline float Clamp(float a, float m, float M)
 {
     return Min(Max(a, m), M);
 }
+
+float Atan2(float x, float y);
+float Cos(float x);
+float Sin(float x);
+bool IsNan(float x);
 } // namespace ECSEngine

@@ -5,7 +5,7 @@
 
 namespace ECSEngine
 {
-struct alignas(16) Quaternionf
+struct alignas(4) Quaternionf
 {
     Quaternionf() = default;
     explicit constexpr Quaternionf(float parX, float parY, float parZ, float parW)
@@ -44,11 +44,4 @@ struct alignas(16) Quaternionf
     float z = 0.f;
     float w = 0.f;
 };
-
-inline quat operator*(const quat& parA, const quat& parB)
-{
-    quat res = parA;
-    res *= parB;
-    return res;
-}
 } // namespace ECSEngine

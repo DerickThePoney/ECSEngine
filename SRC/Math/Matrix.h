@@ -7,7 +7,7 @@ namespace ECSEngine
 /****************************
  * Matrix2x2f
  ****************************/
-struct alignas(16) Matrix2x2f
+struct alignas(4) Matrix2x2f
 {
     static constexpr u32 Size = 2;
 
@@ -93,7 +93,7 @@ inline Matrix2x2f operator*(const Matrix2x2f& parA, const Matrix2x2f& parB)
  * Matrix3x3f
  ****************************/
 
-struct alignas(16) Matrix3x3f
+struct alignas(4) Matrix3x3f
 {
     static constexpr u32 Size = 3;
 
@@ -209,7 +209,7 @@ inline Matrix3x3f operator*(const Matrix3x3f& parA, const Matrix3x3f& parB)
  * Matrix4x4f
  ****************************/
 
-struct alignas(16) Matrix4x4f
+struct alignas(4) Matrix4x4f
 {
     static constexpr u32 Size = 4;
 

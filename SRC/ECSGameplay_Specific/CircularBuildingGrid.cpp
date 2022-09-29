@@ -75,7 +75,7 @@ CircularGridAccessor CircularBuildingGrid::GetAccessorForWorldPosition(const vec
 
         // We are in this circular chunk
         // now actually get the input angle
-        float inputAngle = atan(worldPos2D.y, worldPos2D.x);
+        float inputAngle = Atan2(worldPos2D.y, worldPos2D.x);
         if (inputAngle < 0.f)
             inputAngle += 2.f * Pi();
 

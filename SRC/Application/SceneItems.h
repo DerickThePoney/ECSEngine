@@ -41,7 +41,7 @@ public:
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(PROPERTY(Name), PROPERTY(Id), PROPERTY(Position), PROPERTY(EulerAnglesXYZ));
+        ar(PROPERTY(Name), PROPERTY(Id), PROPERTY(Position), PROPERTY(EulerAngles));
     }
 
 protected:

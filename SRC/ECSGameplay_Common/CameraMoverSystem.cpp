@@ -70,15 +70,14 @@ void CameraMoverSystem::VirtualUpdate()
             if (rotationScreenDirection != vec2(0.0f))
             {
                 rotationScreenDirection = Normalize(rotationScreenDirection);
-
-                AssertRelease(!isNan(rotationScreenDirection));
+                AssertRelease(!IsNan(rotationScreenDirection));
 
                 const float rotationSpeed = speedFactor * Radians(moverTemplate->CameraRotationMaxSpeed());
                 moverModule.SetCurrentRotationSpeed(rotationSpeed);
 
                 const quat currentOrientation = orientationModule->GetOrientation();
-                quat newOrientation = angleAxis(rotationScreenDirection.x * rotationSpeed * deltaTime, vec3(0.f, 1.f, 0.f)) * currentOrientation;
-                newOrientation = angleAxis(rotationScreenDirection.y * rotationSpeed * deltaTime, ((mat4)newOrientation).Column(0).xyz()) * newOrientation;
+                quat newOrientation = quat(vec3(0.f, 1.f, 0.f), rotationScreenDirection.x * rotationSpeed * deltaTime) * currentOrientation;
+                newOrientation = quat(((mat4)newOrientation).Column(0).xyz(), rotationScreenDirection.y * rotationSpeed * deltaTime) * newOrientation;
 
                 orientationModule->SetOrientation(newOrientation);
                 overrideWorldViewMatrix = true;
@@ -115,7 +114,7 @@ void CameraMoverSystem::VirtualUpdate()
             const float incrementFactor = moverModule.CurrentSpeed() +
                   Clamp(moverTemplate->CameraAcceleration() * speedFactor * deltaTime, 0.f, moverTemplate->CameraMaxSpeed());
 
-            vec3 movement = vec3(mat4_cast(orientationModule->GetOrientation()) * incrementFactor * vec4(movementCommand, 1.0f));
+            vec3 movement = (((mat4)orientationModule->GetOrientation()) * incrementFactor * vec4(movementCommand, 1.0f)).xyz();
             positionModule->SetPosition3D(positionModule->GetPosition3D() + movement);
 
             overrideWorldViewMatrix = true;
@@ -124,7 +123,7 @@ void CameraMoverSystem::VirtualUpdate()
         if (overrideWorldViewMatrix)
         {
             Camera* camera = CameraManager::Instance().GetCamera(moverModule.CamId());
-            const mat4 worldview = Translation(positionModule->GetPosition3D()) * mat4_cast(orientationModule->GetOrientation());
+            const mat4 worldview = Translation(positionModule->GetPosition3D()) * ((mat4)orientationModule->GetOrientation());
             camera->SetWorldViewMatrix(Invert(worldview));
         }
     }

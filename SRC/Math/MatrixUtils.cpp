@@ -3,6 +3,7 @@
 #include "Vector.h"
 #include "VectorUtils.h"
 #include "Common/Assertions.h"
+#include "MathFunctions.h"
 #include <limits>
 
 namespace ECSEngine
@@ -262,6 +263,31 @@ mat4 Translation(const vec3& parT)
     return t;
 }
 
+mat4 Rotation(float angle, const vec3& v)
+{
+    const float a = angle;
+    const float c = Cos(a);
+    const float s = Sin(a);
+
+    vec3 axis(Normalize(v));
+    vec3 temp((1.f - c) * axis);
+
+    mat4 rotate;
+    rotate.FValues[0] = c + temp.x * axis.x;
+    rotate.FValues[4] = temp.x * axis.y + s * axis.z;
+    rotate.FValues[8] = temp.x * axis.z - s * axis.y;
+
+    rotate.FValues[1] = temp.y * axis.x - s * axis.z;
+    rotate.FValues[5] = c + temp.y * axis.y;
+    rotate.FValues[9] = temp.y * axis.z + s * axis.x;
+
+    rotate.FValues[2] = temp.z * axis.x + s * axis.y;
+    rotate.FValues[6] = temp.z * axis.y - s * axis.x;
+    rotate.FValues[10] = c + temp.z * axis.z;
+
+    return rotate;
+}
+
 mat4 Perspective(float fovy, float aspect, float zNear, float zFar)
 {
     AlwaysCheckedAssert(abs(aspect - std::numeric_limits<float>::epsilon()) > 0.f);
@@ -274,6 +300,17 @@ mat4 Perspective(float fovy, float aspect, float zNear, float zFar)
     Result.FValues[10] = zFar / (zFar - zNear);
     Result.FValues[14] = 1.f;
     Result.FValues[11] = -(zFar * zNear) / (zFar - zNear);
+    return Result;
+}
+
+mat4 Orthographic(float left, float right, float bottom, float top)
+{
+    mat4 Result = mat4::Identity();
+    Result.FValues[0] = 2.f / (right - left);
+    Result.FValues[5] = 2.f / (top - bottom);
+    Result.FValues[10] = -1.f;
+    Result.FValues[3] = -(right + left) / (right - left);
+    Result.FValues[7] = -(top + bottom) / (top - bottom);
     return Result;
 }
 
@@ -302,13 +339,26 @@ mat4 EulerAnglesXYZ(const float X, const float Y, const float Z)
 
 ECSEngine::vec3 ExtractEulerAnglesXYZ(const mat4& m)
 {
-    float T1 = atan2f(m.FValues[6], m.FValues[10]);
+    float T1 = Atan2(m.FValues[6], m.FValues[10]);
     float C2 = sqrtf(m.FValues[0] * m.FValues[0] + m.FValues[1] * m.FValues[1]);
-    float T2 = atan2f(-m.FValues[2], C2);
+    float T2 = Atan2(-m.FValues[2], C2);
     float S1 = sinf(T1);
     float C1 = cosf(T1);
-    float T3 = atan2f(S1 * m.FValues[8] - C1 * m.FValues[4], C1 * m.FValues[5] - S1 * m.FValues[9]);
+    float T3 = Atan2(S1 * m.FValues[8] - C1 * m.FValues[4], C1 * m.FValues[5] - S1 * m.FValues[9]);
     return vec3(-T1, -T2, -T3);
+}
+
+mat4 LookAt(const vec3& parEye, const vec3& parCenter, const vec3& parUp)
+{
+    const vec3 f = Normalize(parCenter - parEye);
+    const vec3 s = Normalize(Cross(f, parUp));
+    const vec3 u = Normalize(Cross(s, f));
+
+    mat4 res = mat4::Identity();
+    res.SetColumn(0, vec4(s, 0.f));
+    res.SetColumn(1, vec4(u, 0.f));
+    res.SetColumn(2, vec4(f, 0.f));
+    return res;
 }
 
 }

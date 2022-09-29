@@ -82,7 +82,7 @@ void SceneObjectsPickingRenderer::RenderScene(const SceneScenario* parScene)
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
     Ray ray = GetCameraRayFromMouseInput(*c, aspectRatio, windowSize, Input::GetMousePosition());
 
-    const mat4 pickView = lookAt(ray.FOrigin, ray.FOrigin + ray.FDirection, vec3(0.0f, 1.0f, 0.0f));
+    const mat4 pickView = LookAt(ray.FOrigin, ray.FOrigin + ray.FDirection, vec3(0.0f, 1.0f, 0.0f));
     const mat4 pickProj = Perspective(Radians(FSelectionFoV), 1.0f, 0.1f, 500.0f);
 
     FDrawCommandBuffer->SetViewTranform(pickView, pickProj);

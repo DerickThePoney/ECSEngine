@@ -57,4 +57,11 @@ inline __forceinline VecType<float> Lerp(const VecType<float>& A, const VecType<
 {
     return A * (1.f - t) + B * t;
 }
+
+bool IsNan(const vec2& A);
+
+bool IsNan(const vec3& A);
+
+bool IsNan(const vec4& A);
+
 }
