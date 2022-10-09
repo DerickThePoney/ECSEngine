@@ -58,6 +58,22 @@ public:
 #undef MAKESCALAROP
 #undef MAKEOP
 
+#define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
+    inline Vector2<T> OP() const                                                                                                                                                   \
+    {                                                                                                                                                                              \
+        return Vector2<T>(A, B);                                                                                                                                                   \
+    }
+
+    MAKE_SWIZZLE_OP_2(xx, x, x);
+    MAKE_SWIZZLE_OP_2(yy, y, y);
+    MAKE_SWIZZLE_OP_2(yx, y, x);
+    MAKE_SWIZZLE_OP_2(x0, x, T(0));
+    MAKE_SWIZZLE_OP_2(x1, x, T(1));
+    MAKE_SWIZZLE_OP_2(y0, y, T(0));
+    MAKE_SWIZZLE_OP_2(y1, y, T(1));
+
+#undef MAKE_SWIZZLE_OP_2
+
     inline bool operator==(const Vector2& parA) const
     {
         return parA.x == x && parA.y == y;
