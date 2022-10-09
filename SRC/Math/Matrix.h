@@ -82,12 +82,12 @@ inline Matrix2x2f operator*(const float parA, const Matrix2x2f& parB)
     return result;
 }
 
-inline Matrix2x2f operator*(const Matrix2x2f& parA, const Matrix2x2f& parB)
-{
-    Matrix2x2f result = parA;
-    result *= parB;
-    return result;
-}
+//inline Matrix2x2f operator*(const Matrix2x2f& parA, const Matrix2x2f& parB)
+//{
+//    Matrix2x2f result = parA;
+//    result *= parB;
+//    return result;
+//}
 
 /****************************
  * Matrix3x3f
@@ -198,12 +198,12 @@ inline Matrix3x3f operator*(const float parA, const Matrix3x3f& parB)
     return result;
 }
 
-inline Matrix3x3f operator*(const Matrix3x3f& parA, const Matrix3x3f& parB)
-{
-    Matrix3x3f result = parA;
-    result *= parB;
-    return result;
-}
+//inline Matrix3x3f operator*(const Matrix3x3f& parA, const Matrix3x3f& parB)
+//{
+//    Matrix3x3f result = parA;
+//    result *= parB;
+//    return result;
+//}
 
 /****************************
  * Matrix4x4f

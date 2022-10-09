@@ -22,12 +22,12 @@ mat2 Mul(const mat2& parA, const mat2& parB)
 mat3 Mul(const mat3& parA, const mat3& parB)
 {
     mat3 result;
-    for (u32 r = 0; r < mat3::Size; ++r)
+    for (u32 c = 0; c < Matrix4x4f::Size; ++c)
     {
-        for (u32 c = 0; c < mat3::Size; ++c)
+        for (u32 r = 0; r < Matrix4x4f::Size; ++r)    
         {
-            result.FValues[c * mat3::Size + r] = parA.FValues[c] * parB.FValues[r * mat3::Size] + parA.FValues[mat3::Size + c] * parB.FValues[r * mat3::Size + 1] +
-                  parA.FValues[2 * mat3::Size + c] * parB.FValues[r * mat3::Size + 2];
+            result.FValues[c * mat4::Size + r] = parA.FValues[r] * parB.FValues[c * mat4::Size] + parA.FValues[r + mat4::Size] * parB.FValues[c * mat4::Size + 1] +
+                  parA.FValues[2 * mat4::Size + r] * parB.FValues[c * mat4::Size + 2];
         }
     }
     return result;
@@ -36,12 +36,13 @@ mat3 Mul(const mat3& parA, const mat3& parB)
 mat4 Mul(const mat4& parA, const mat4& parB)
 {
     mat4 result;
-    for (u32 r = 0; r < Matrix4x4f::Size; ++r)
+    
+    for (u32 c = 0; c < Matrix4x4f::Size; ++c)
     {
-        for (u32 c = 0; c < Matrix4x4f::Size; ++c)
+        for (u32 r = 0; r < Matrix4x4f::Size; ++r)    
         {
-            result.FValues[c * mat4::Size + r] = parA.FValues[c] * parB.FValues[r * mat4::Size] + parA.FValues[mat4::Size + c] * parB.FValues[r * mat4::Size + 1] +
-                  parA.FValues[2 * mat4::Size + c] * parB.FValues[r * mat4::Size + 2] + parA.FValues[3 * mat4::Size + c] * parB.FValues[r * mat4::Size + 3];
+            result.FValues[c * mat4::Size + r] = parA.FValues[r] * parB.FValues[c * mat4::Size] + parA.FValues[r + mat4::Size] * parB.FValues[c * mat4::Size + 1] +
+                  parA.FValues[2 * mat4::Size + r] * parB.FValues[c * mat4::Size + 2] + parA.FValues[3 * mat4::Size + r] * parB.FValues[c * mat4::Size + 3];
         }
     }
     return result;
