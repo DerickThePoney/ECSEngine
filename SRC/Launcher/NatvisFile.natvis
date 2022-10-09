@@ -27,20 +27,45 @@
       <Item Name="w">w</Item>
     </Expand>
   </Type>
-  <Type Name="ECSEngine::Matrix4x4f">
-    <DisplayString>{{[{FValues[0]}, {FValues[1]}, {FValues[2]}, {FValues[3]}]}}</DisplayString>
+  <Type Name="ECSEngine::Matrix2x2f">
+    <DisplayString>{{[{FValues[0]}, {FValues[2]}]}}</DisplayString>
     <Expand>
       <Synthetic Name="r0">
-        <DisplayString>{{[{FValues[0]}, {FValues[1]}, {FValues[2]}, {FValues[3]}]}}</DisplayString>
+        <DisplayString>{{[{FValues[0]}, {FValues[2]}]}}</DisplayString>
       </Synthetic>
       <Synthetic Name="r1">
-        <DisplayString>{{[{FValues[4]}, {FValues[5]}, {FValues[6]}, {FValues[7]}]}}</DisplayString>
+        <DisplayString>{{[{FValues[1]}, {FValues[3]}]}}</DisplayString>
+      </Synthetic>
+    </Expand>
+  </Type>
+  <Type Name="ECSEngine::Matrix4x4f">
+    <DisplayString>{{[{FValues[0]}, {FValues[4]}, {FValues[8]}]}}</DisplayString>
+    <Expand>
+      <Synthetic Name="r0">
+        <DisplayString>{{[{FValues[0]}, {FValues[3]}, {FValues[6]}]}}</DisplayString>
+      </Synthetic>
+      <Synthetic Name="r1">
+        <DisplayString>{{[{FValues[1]}, {FValues[4]}, {FValues[7]}]}}</DisplayString>
       </Synthetic>
       <Synthetic Name="r2">
-        <DisplayString>{{[{FValues[8]}, {FValues[9]}, {FValues[10]}, {FValues[11]}]}}</DisplayString>
+        <DisplayString>{{[{FValues[2]}, {FValues[5]}, {FValues[8]}]}}</DisplayString>
+      </Synthetic>
+    </Expand>
+  </Type>
+  <Type Name="ECSEngine::Matrix4x4f">
+    <DisplayString>{{[{FValues[0]}, {FValues[4]}, {FValues[8]}, {FValues[12]}]}}</DisplayString>
+    <Expand>
+      <Synthetic Name="r0">
+        <DisplayString>{{[{FValues[0]}, {FValues[4]}, {FValues[8]}, {FValues[12]}]}}</DisplayString>
+      </Synthetic>
+      <Synthetic Name="r1">
+        <DisplayString>{{[{FValues[1]}, {FValues[5]}, {FValues[9]}, {FValues[13]}]}}</DisplayString>
+      </Synthetic>
+      <Synthetic Name="r2">
+        <DisplayString>{{[{FValues[2]}, {FValues[6]}, {FValues[10]}, {FValues[14]}]}}</DisplayString>
       </Synthetic>
       <Synthetic Name="r3">
-        <DisplayString>{{[{FValues[12]}, {FValues[13]}, {FValues[14]}, {FValues[15]}]}}</DisplayString>
+        <DisplayString>{{[{FValues[3]}, {FValues[7]}, {FValues[11]}, {FValues[15]}]}}</DisplayString>
       </Synthetic>
     </Expand>
   </Type>
