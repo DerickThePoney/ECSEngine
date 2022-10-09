@@ -71,39 +71,39 @@ TEST_SUITE("Test matrices")
         SUBCASE("Construction")
         {
             CHECK(t0.FValues[0] == 1.f);
-            CHECK(t0.FValues[1] == 2.f);
-            CHECK(t0.FValues[2] == 3.f);
-            CHECK(t0.FValues[3] == 0.f);
+            CHECK(t0.FValues[3] == 2.f);
+            CHECK(t0.FValues[6] == 3.f);
+            CHECK(t0.FValues[1] == 0.f);
             CHECK(t0.FValues[4] == 1.f);
-            CHECK(t0.FValues[5] == 4.f);
-            CHECK(t0.FValues[6] == 5.f);
-            CHECK(t0.FValues[7] == 6.f);
+            CHECK(t0.FValues[7] == 4.f);
+            CHECK(t0.FValues[2] == 5.f);
+            CHECK(t0.FValues[5] == 6.f);
             CHECK(t0.FValues[8] == 0.f);
         }
 
         SUBCASE("Inversion")
         {
             CHECK(t0_i.FValues[0] == -24.f);
-            CHECK(t0_i.FValues[1] == 18.f);
-            CHECK(t0_i.FValues[2] == 5.f);
-            CHECK(t0_i.FValues[3] == 20.f);
+            CHECK(t0_i.FValues[3] == 18.f);
+            CHECK(t0_i.FValues[6] == 5.f);
+            CHECK(t0_i.FValues[1] == 20.f);
             CHECK(t0_i.FValues[4] == -15.f);
-            CHECK(t0_i.FValues[5] == -4.f);
-            CHECK(t0_i.FValues[6] == -5.f);
-            CHECK(t0_i.FValues[7] == 4.f);
+            CHECK(t0_i.FValues[7] == -4.f);
+            CHECK(t0_i.FValues[2] == -5.f);
+            CHECK(t0_i.FValues[5] == 4.f);
             CHECK(t0_i.FValues[8] == 1.f);
         }
 
         SUBCASE("Multiplication")
         {
             CHECK(t1.FValues[0] == -24.f);
-            CHECK(t1.FValues[1] == 18.f);
-            CHECK(t1.FValues[2] == 5.f);
-            CHECK(t1.FValues[3] == 20.f);
+            CHECK(t1.FValues[3] == 18.f);
+            CHECK(t1.FValues[6] == 5.f);
+            CHECK(t1.FValues[1] == 20.f);
             CHECK(t1.FValues[4] == -15.f);
-            CHECK(t1.FValues[5] == -4.f);
-            CHECK(t1.FValues[6] == -5.f);
-            CHECK(t1.FValues[7] == 4.f);
+            CHECK(t1.FValues[7] == -4.f);
+            CHECK(t1.FValues[2] == -5.f);
+            CHECK(t1.FValues[5] == 4.f);
             CHECK(t1.FValues[8] == 1.f);
         }
     }
