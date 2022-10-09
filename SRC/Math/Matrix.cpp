@@ -20,31 +20,31 @@ Matrix2x2f::Matrix2x2f(float parValue)
 Matrix2x2f::Matrix2x2f(const vec2& A, const vec2& B)
 {
     FValues[0] = A.x;
-    FValues[1] = B.x;
-    FValues[2] = A.y;
+    FValues[1] = A.y;
+    FValues[2] = B.x;
     FValues[3] = B.y;
-}
-
-const vec2 Matrix2x2f::Row(u32 idx) const
-{
-    AssertRelease(idx < Size);
-    return vec2(FValues[idx * Size], FValues[idx * Size + 1]);
 }
 
 const vec2 Matrix2x2f::Column(u32 idx) const
 {
     AssertRelease(idx < Size);
+    return vec2(FValues[idx * Size], FValues[idx * Size + 1]);
+}
+
+const vec2 Matrix2x2f::Row(u32 idx) const
+{
+    AssertRelease(idx < Size);
     return vec2(FValues[idx], FValues[Size + idx]);
 }
 
-void Matrix2x2f::SetRow(u32 idx, const vec2& row)
+void Matrix2x2f::SetColumn(u32 idx, const vec2& row)
 {
     AssertRelease(idx < Size);
     FValues[idx * Size] = row.x;
     FValues[idx * Size + 1] = row.y;
 }
 
-void Matrix2x2f::SetColumn(u32 idx, const vec2& column)
+void Matrix2x2f::SetRow(u32 idx, const vec2& column)
 {
     AssertRelease(idx < Size);
     FValues[idx] = column.x;
@@ -66,7 +66,11 @@ Matrix2x2f Matrix2x2f::operator*(const Matrix2x2f& parA) const
 
 vec2 Matrix2x2f::operator*(const vec2& parA) const
 {
-    return vec2(Dot(Row(0), parA), Dot(Row(1), parA));
+    vec2 res;
+    res = Column(0) * parA.xx();
+    res += Column(1) * parA.yy();
+
+    return res;
 }
 
 Matrix2x2f Matrix2x2f::operator+(const Matrix2x2f& parA) const
@@ -98,29 +102,31 @@ Matrix3x3f::Matrix3x3f(float parValue)
  Matrix3x3f::Matrix3x3f(const vec3& A, const vec3& B, const vec3& C)
  {
      FValues[0] = A.x;
-     FValues[1] = B.x;
-     FValues[2] = C.x;
-     FValues[3] = A.y;
+     FValues[1] = A.y;
+     FValues[2] = A.z;
+
+     FValues[3] = B.x;
      FValues[4] = B.y;
-     FValues[5] = C.y;
-     FValues[6] = A.z;
-     FValues[7] = B.z;
+     FValues[5] = B.z;
+
+     FValues[6] = C.x;     
+     FValues[7] = C.y;
      FValues[8] = C.z;
  }
 
-const vec3 Matrix3x3f::Row(u32 idx) const
-{
+const vec3 Matrix3x3f::Column(u32 idx) const
+ {
     AssertRelease(idx < Size);
     return vec3(FValues[idx * Size], FValues[idx * Size + 1], FValues[idx * Size + 2]);
 }
 
-const vec3 Matrix3x3f::Column(u32 idx) const
+const vec3 Matrix3x3f::Row(u32 idx) const
 {
     AssertRelease(idx < Size);
     return vec3(FValues[idx], FValues[Size + idx], FValues[2 * Size + idx]);
 }
 
-void Matrix3x3f::SetRow(u32 idx, const vec3& row)
+void Matrix3x3f::SetColumn(u32 idx, const vec3& row)
 {
     AssertRelease(idx < Size);
     FValues[idx * Size] = row.x;
@@ -128,7 +134,7 @@ void Matrix3x3f::SetRow(u32 idx, const vec3& row)
     FValues[idx * Size + 2] = row.z;
 }
 
-void Matrix3x3f::SetColumn(u32 idx, const vec3& column)
+void Matrix3x3f::SetRow(u32 idx, const vec3& column)
 {
     AssertRelease(idx < Size);
     FValues[idx] = column.x;
@@ -143,7 +149,12 @@ Matrix3x3f Matrix3x3f::operator*(const Matrix3x3f& parA) const
 
 vec3 Matrix3x3f::operator*(const vec3& parA) const
 {
-    return vec3(Dot(Row(0), parA), Dot(Row(1), parA), Dot(Row(2), parA));
+    vec3 res;
+    res = Column(0) * parA.xxx();
+    res += Column(1) * parA.yyy();
+    res += Column(2) * parA.zzz();
+
+    return res;
 }
 
 Matrix3x3f Matrix3x3f::operator+(const Matrix3x3f& parA) const
@@ -180,39 +191,39 @@ Matrix4x4f::Matrix4x4f(float parValue)
 Matrix4x4f::Matrix4x4f(const vec4& A, const vec4& B, const vec4& C, const vec4& D)
 {
     FValues[0] = A.x;
-    FValues[1] = B.x;
-    FValues[2] = C.x;
-    FValues[3] = D.x;
+    FValues[4] = B.x;
+    FValues[8] = C.x;
+    FValues[12] = D.x;
 
-    FValues[4] = A.y;
+    FValues[1] = A.y;
     FValues[5] = B.y;
-    FValues[6] = C.y;
-    FValues[7] = D.y;
+    FValues[9] = C.y;
+    FValues[13] = D.y;
 
-    FValues[8] = A.z;
-    FValues[9] = B.z;
+    FValues[2] = A.z;
+    FValues[6] = B.z;
     FValues[10] = C.z;
-    FValues[11] = D.z;
+    FValues[14] = D.z;
 
-    FValues[12] = A.w;
-    FValues[13] = B.w;
-    FValues[14] = C.w;
+    FValues[3] = A.w;
+    FValues[7] = B.w;
+    FValues[11] = C.w;
     FValues[15] = D.w;
-}
-
-const vec4 Matrix4x4f::Row(u32 idx) const
-{
-    AssertRelease(idx < Size);
-    return vec4(FValues[idx * Size], FValues[idx * Size + 1], FValues[idx * Size + 2], FValues[idx * Size + 3]);
 }
 
 const vec4 Matrix4x4f::Column(u32 idx) const
 {
     AssertRelease(idx < Size);
+    return vec4(FValues[idx * Size], FValues[idx * Size + 1], FValues[idx * Size + 2], FValues[idx * Size + 3]);
+}
+
+const vec4 Matrix4x4f::Row(u32 idx) const
+{
+    AssertRelease(idx < Size);
     return vec4(FValues[idx], FValues[Size + idx], FValues[2 * Size + idx], FValues[3 * Size + idx]);
 }
 
-void Matrix4x4f::SetRow(u32 idx, const vec4& row)
+void Matrix4x4f::SetColumn(u32 idx, const vec4& row)
 {
     AssertRelease(idx < Size);
     FValues[idx * Size] = row.x;
@@ -221,7 +232,7 @@ void Matrix4x4f::SetRow(u32 idx, const vec4& row)
     FValues[idx * Size + 3] = row.w;
 }
 
-void Matrix4x4f::SetColumn(u32 idx, const vec4& column)
+void Matrix4x4f::SetRow(u32 idx, const vec4& column)
 {
     AssertRelease(idx < Size);
     FValues[idx] = column.x;
@@ -237,7 +248,14 @@ Matrix4x4f Matrix4x4f::operator*(const Matrix4x4f& parA) const
 
 vec4 Matrix4x4f::operator*(const vec4& parA) const
 {
-    return vec4(Dot(Row(0), parA), Dot(Row(1), parA), Dot(Row(2), parA), Dot(Row(3), parA));
+
+    vec4 res;
+    res = Column(0) * parA.xxxx();
+    res += Column(1) * parA.yyyy();
+    res += Column(2) * parA.zzzz();
+    res += Column(3) * parA.wwww();
+
+    return res;
 }
 
 Matrix4x4f Matrix4x4f::operator+(const Matrix4x4f& parA) const

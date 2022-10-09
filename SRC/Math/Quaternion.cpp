@@ -74,13 +74,13 @@ Quaternionf Quaternionf::FromMat4(const mat4& parMatrix)
     switch (biggestIndex)
     {
     case 0:
-        return quat((parMatrix.FValues[9] - parMatrix.FValues[6]) * mult, (parMatrix.FValues[2] - parMatrix.FValues[8]) * mult, (parMatrix.FValues[4] - parMatrix.FValues[1]) * mult, biggestVal);
+        return quat((parMatrix.FValues[6] - parMatrix.FValues[9]) * mult, (parMatrix.FValues[8] - parMatrix.FValues[2]) * mult, (parMatrix.FValues[1] - parMatrix.FValues[4]) * mult, biggestVal);
     case 1:
-        return quat(biggestVal, (parMatrix.FValues[4] + parMatrix.FValues[1]) * mult, (parMatrix.FValues[2] + parMatrix.FValues[8]) * mult, (parMatrix.FValues[9] - parMatrix.FValues[6]) * mult);
+        return quat(biggestVal, (parMatrix.FValues[1] + parMatrix.FValues[4]) * mult, (parMatrix.FValues[8] + parMatrix.FValues[2]) * mult, (parMatrix.FValues[6] - parMatrix.FValues[9]) * mult);
     case 2:
-        return quat((parMatrix.FValues[4] + parMatrix.FValues[1]) * mult, biggestVal, (parMatrix.FValues[9] + parMatrix.FValues[6]) * mult, (parMatrix.FValues[2] - parMatrix.FValues[8]) * mult);
+        return quat((parMatrix.FValues[1] + parMatrix.FValues[4]) * mult, biggestVal, (parMatrix.FValues[6] + parMatrix.FValues[9]) * mult, (parMatrix.FValues[8] - parMatrix.FValues[2]) * mult);
     case 3:
-        return quat((parMatrix.FValues[2] + parMatrix.FValues[8]) * mult, (parMatrix.FValues[9] + parMatrix.FValues[6]) * mult, biggestVal, (parMatrix.FValues[4] - parMatrix.FValues[1]) * mult);
+        return quat((parMatrix.FValues[8] + parMatrix.FValues[2]) * mult, (parMatrix.FValues[6] + parMatrix.FValues[9]) * mult, biggestVal, (parMatrix.FValues[1] - parMatrix.FValues[4]) * mult);
     default: 
         AssertNotReached();
         return quat(0, 0, 0, 1);
