@@ -51,6 +51,7 @@ void EditorCamera::Initialise()
     const vec3 eye(0.0f, 10.0f, -10.0f);
 
     mat4 worldWiewMatrix = LookAt(eye, at, vec3(0, 1.0f, 0.0f));
+
     FViewWorldMatrix = Invert(worldWiewMatrix);
 
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
@@ -84,11 +85,11 @@ void EditorCamera::Update()
 
             AssertRelease(!IsNan(rotationScreenDirection));
 
-            const mat4 positionMatrix = Translation(vec3(FViewWorldMatrix.Column(3).xyz()));
+            const mat4 positionMatrix = Translation(FViewWorldMatrix.Column(3).xyz());
             const float rotationSpeed = Radians(speedFactor * FRotationSpeed);
             mat4 newWorldViewNoTranslation = Invert(positionMatrix) * FViewWorldMatrix;
             newWorldViewNoTranslation = Rotation(rotationScreenDirection.x * rotationSpeed * deltaTime, vec3(0.f, 1.f, 0.f)) * newWorldViewNoTranslation;
-            newWorldViewNoTranslation = Rotation(rotationScreenDirection.y * rotationSpeed * deltaTime, vec3(newWorldViewNoTranslation.Column(1).xyz())) *
+            newWorldViewNoTranslation = Rotation(rotationScreenDirection.y * rotationSpeed * deltaTime, newWorldViewNoTranslation.Column(0).xyz()) *
                   newWorldViewNoTranslation;
 
             FViewWorldMatrix = positionMatrix * newWorldViewNoTranslation;
