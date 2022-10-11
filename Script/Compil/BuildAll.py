@@ -114,7 +114,12 @@ def BuildAll(config, MSBUILD, tools, samples):
     if res != 0:
         return res
 
-    return BuildEngine(config, MSBUILD)
+    res = BuildEngine(config, MSBUILD)
+
+    if res != 0:
+        return res
+
+    return BuildAndRunUnitTests(config, MSBUILD)
 
 
 def main():
