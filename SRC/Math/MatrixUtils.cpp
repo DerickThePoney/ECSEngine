@@ -1,9 +1,11 @@
 #include "MatrixUtils.h"
+
+#include "Common/Assertions.h"
+#include "MathFunctions.h"
 #include "Matrix.h"
 #include "Vector.h"
 #include "VectorUtils.h"
-#include "Common/Assertions.h"
-#include "MathFunctions.h"
+
 #include <limits>
 
 namespace ECSEngine
@@ -24,7 +26,7 @@ mat3 Mul(const mat3& parA, const mat3& parB)
     mat3 result;
     for (u32 c = 0; c < mat3::Size; ++c)
     {
-        for (u32 r = 0; r < mat3::Size; ++r)    
+        for (u32 r = 0; r < mat3::Size; ++r)
         {
             result.FValues[c * mat3::Size + r] = parA.FValues[r] * parB.FValues[c * mat3::Size] + parA.FValues[r + mat3::Size] * parB.FValues[c * mat3::Size + 1] +
                   parA.FValues[2 * mat3::Size + r] * parB.FValues[c * mat3::Size + 2];
@@ -36,10 +38,10 @@ mat3 Mul(const mat3& parA, const mat3& parB)
 mat4 Mul(const mat4& parA, const mat4& parB)
 {
     mat4 result;
-    
+
     for (u32 c = 0; c < Matrix4x4f::Size; ++c)
     {
-        for (u32 r = 0; r < Matrix4x4f::Size; ++r)    
+        for (u32 r = 0; r < Matrix4x4f::Size; ++r)
         {
             result.FValues[c * mat4::Size + r] = parA.FValues[r] * parB.FValues[c * mat4::Size] + parA.FValues[r + mat4::Size] * parB.FValues[c * mat4::Size + 1] +
                   parA.FValues[2 * mat4::Size + r] * parB.FValues[c * mat4::Size + 2] + parA.FValues[3 * mat4::Size + r] * parB.FValues[c * mat4::Size + 3];
@@ -165,7 +167,7 @@ mat3 Invert(const mat3& parA)
     if (deter == 0.f)
         return result;
 
-    const float ooDeter = 1.f / deter;          
+    const float ooDeter = 1.f / deter;
 
     result.FValues[0] = +(parA.FValues[4] * parA.FValues[8] - parA.FValues[5] * parA.FValues[7]) * ooDeter;
     result.FValues[1] = -(parA.FValues[1] * parA.FValues[8] - parA.FValues[2] * parA.FValues[7]) * ooDeter;
@@ -297,9 +299,9 @@ mat4 Perspective(float fovy, float aspect, float zNear, float zFar)
     mat4 Result;
     Result.FValues[0] = 1.f / (aspect * tanHalfFovy);
     Result.FValues[5] = 1.f / (tanHalfFovy);
-    Result.FValues[10] = zFar / (zFar - zNear);
+    Result.FValues[10] = (zFar + zNear) / (zFar - zNear);
     Result.FValues[11] = 1.f;
-    Result.FValues[14] = -(zFar * zNear) / (zFar - zNear);
+    Result.FValues[14] = -(2.f * zFar * zNear) / (zFar - zNear);
     return Result;
 }
 
@@ -325,8 +327,8 @@ mat4 EulerAnglesXYZ(const float X, const float Y, const float Z)
 
     mat4 Result;
     Result.FValues[0] = c2 * c3;
-    Result.FValues[2] = -c1 * s3 + s1 * s2 * c3;
-    Result.FValues[3] = s1 * s3 + c1 * s2 * c3;
+    Result.FValues[1] = -c1 * s3 + s1 * s2 * c3;
+    Result.FValues[2] = s1 * s3 + c1 * s2 * c3;
     Result.FValues[4] = c2 * s3;
     Result.FValues[5] = c1 * c3 + s1 * s2 * s3;
     Result.FValues[6] = -s1 * c3 + c1 * s2 * s3;
@@ -364,4 +366,4 @@ mat4 LookAt(const vec3& parEye, const vec3& parCenter, const vec3& parUp)
     return res;
 }
 
-}
+} // namespace ECSEngine
