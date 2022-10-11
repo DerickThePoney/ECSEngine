@@ -89,8 +89,7 @@ void EditorCamera::Update()
             const float rotationSpeed = Radians(speedFactor * FRotationSpeed);
             mat4 newWorldViewNoTranslation = Invert(positionMatrix) * FViewWorldMatrix;
             newWorldViewNoTranslation = Rotation(rotationScreenDirection.x * rotationSpeed * deltaTime, vec3(0.f, 1.f, 0.f)) * newWorldViewNoTranslation;
-            newWorldViewNoTranslation = Rotation(rotationScreenDirection.y * rotationSpeed * deltaTime, newWorldViewNoTranslation.Column(0).xyz()) *
-                  newWorldViewNoTranslation;
+            newWorldViewNoTranslation = Rotation(rotationScreenDirection.y * rotationSpeed * deltaTime, newWorldViewNoTranslation.Column(0).xyz()) * newWorldViewNoTranslation;
 
             FViewWorldMatrix = positionMatrix * newWorldViewNoTranslation;
             overrideWorldViewMatrix = true;

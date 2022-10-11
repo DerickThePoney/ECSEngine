@@ -1,9 +1,9 @@
 #include "Quaternion.h"
 
-#include "Matrix.h"
-#include "math.h"
 #include "Common/Assertions.h"
 #include "MathFunctions.h"
+#include "Matrix.h"
+#include "math.h"
 
 namespace ECSEngine
 {
@@ -21,18 +21,18 @@ Quaternionf::Quaternionf(const vec3& parAxis, const float parAngle)
 quat Quaternionf::operator*(const quat& parA) const
 {
     const float nw = w * parA.w - x * parA.x - y * parA.y - z * parA.z;
-    const float nx = z * parA.y - y * parA.z + x * parA.w + w * parA.x;
-    const float ny = x * parA.z - z * parA.x + y * parA.w + w * parA.y;
-    const float nz = y * parA.x - x * parA.y + z * parA.w + w * parA.z;
+    const float nx = w * parA.x + x * parA.w + y * parA.z - z * parA.y;
+    const float ny = w * parA.y + y * parA.w + z * parA.x - x * parA.z;
+    const float nz = w * parA.z + z * parA.w + x * parA.y - y * parA.x;
     return quat(nx, ny, nz, nw);
 }
 
 void Quaternionf::operator*=(const quat& parA)
 {
     w = w * parA.w - x * parA.x - y * parA.y - z * parA.z;
-    x = z * parA.y - y * parA.z + x * parA.w + w * parA.x;
-    y = x * parA.z - z * parA.x + y * parA.w + w * parA.y;
-    z = y * parA.x - x * parA.y + z * parA.w + w * parA.z;
+    x = w * parA.x + x * parA.w + y * parA.z - z * parA.y;
+    y = w * parA.y + y * parA.w + z * parA.x - x * parA.z;
+    z = w * parA.z + z * parA.w + x * parA.y - y * parA.x;
 }
 
 Quaternionf::operator mat4() const
@@ -44,7 +44,7 @@ Quaternionf::operator mat4() const
 
 Quaternionf Quaternionf::FromMat4(const mat4& parMatrix)
 {
-    //Source glm
+    // Source glm
     float fourXSquaredMinus1 = parMatrix.FValues[0] - parMatrix.FValues[5] - parMatrix.FValues[10];
     float fourYSquaredMinus1 = parMatrix.FValues[5] - parMatrix.FValues[0] - parMatrix.FValues[10];
     float fourZSquaredMinus1 = parMatrix.FValues[10] - parMatrix.FValues[0] - parMatrix.FValues[5];
@@ -74,14 +74,18 @@ Quaternionf Quaternionf::FromMat4(const mat4& parMatrix)
     switch (biggestIndex)
     {
     case 0:
-        return quat((parMatrix.FValues[6] - parMatrix.FValues[9]) * mult, (parMatrix.FValues[8] - parMatrix.FValues[2]) * mult, (parMatrix.FValues[1] - parMatrix.FValues[4]) * mult, biggestVal);
+        return quat((parMatrix.FValues[6] - parMatrix.FValues[9]) * mult, (parMatrix.FValues[8] - parMatrix.FValues[2]) * mult,
+              (parMatrix.FValues[1] - parMatrix.FValues[4]) * mult, biggestVal);
     case 1:
-        return quat(biggestVal, (parMatrix.FValues[1] + parMatrix.FValues[4]) * mult, (parMatrix.FValues[8] + parMatrix.FValues[2]) * mult, (parMatrix.FValues[6] - parMatrix.FValues[9]) * mult);
+        return quat(biggestVal, (parMatrix.FValues[1] + parMatrix.FValues[4]) * mult, (parMatrix.FValues[8] + parMatrix.FValues[2]) * mult,
+              (parMatrix.FValues[6] - parMatrix.FValues[9]) * mult);
     case 2:
-        return quat((parMatrix.FValues[1] + parMatrix.FValues[4]) * mult, biggestVal, (parMatrix.FValues[6] + parMatrix.FValues[9]) * mult, (parMatrix.FValues[8] - parMatrix.FValues[2]) * mult);
+        return quat((parMatrix.FValues[1] + parMatrix.FValues[4]) * mult, biggestVal, (parMatrix.FValues[6] + parMatrix.FValues[9]) * mult,
+              (parMatrix.FValues[8] - parMatrix.FValues[2]) * mult);
     case 3:
-        return quat((parMatrix.FValues[8] + parMatrix.FValues[2]) * mult, (parMatrix.FValues[6] + parMatrix.FValues[9]) * mult, biggestVal, (parMatrix.FValues[1] - parMatrix.FValues[4]) * mult);
-    default: 
+        return quat((parMatrix.FValues[8] + parMatrix.FValues[2]) * mult, (parMatrix.FValues[6] + parMatrix.FValues[9]) * mult, biggestVal,
+              (parMatrix.FValues[1] - parMatrix.FValues[4]) * mult);
+    default:
         AssertNotReached();
         return quat(0, 0, 0, 1);
     }
