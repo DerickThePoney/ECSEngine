@@ -30,29 +30,15 @@ void ReadHierarchy(const aiNode* parNode, const u8 parParentIdx, std::vector<Hie
     node.Name = parNode->mName.C_Str();
 
     const aiMatrix4x4& mat = parNode->mTransformation;
-    node.InverseLocalTransform[0][0] = mat.a1;
-    node.InverseLocalTransform[0][1] = mat.b1;
-    node.InverseLocalTransform[0][2] = mat.c1;
-    node.InverseLocalTransform[0][3] = mat.d1;
-
-    node.InverseLocalTransform[1][0] = mat.a2;
-    node.InverseLocalTransform[1][1] = mat.b2;
-    node.InverseLocalTransform[1][2] = mat.c2;
-    node.InverseLocalTransform[1][3] = mat.d2;
-
-    node.InverseLocalTransform[2][0] = mat.a3;
-    node.InverseLocalTransform[2][1] = mat.b3;
-    node.InverseLocalTransform[2][2] = mat.c3;
-    node.InverseLocalTransform[2][3] = mat.d3;
-
-    node.InverseLocalTransform[3][0] = mat.a4;
-    node.InverseLocalTransform[3][1] = mat.b4;
-    node.InverseLocalTransform[3][2] = mat.c4;
-    node.InverseLocalTransform[3][3] = mat.d4;
+    node.InverseLocalTransform = mat4(
+          vec4(mat.a1, mat.b1, mat.c1, mat.d1), vec4(mat.a2, mat.b2, mat.c2, mat.d2), vec4(mat.a3, mat.b3, mat.c3, mat.d3), vec4(mat.a4, mat.b4, mat.c4, mat.d4));
 
     const u8 parent = node.Idx;
     parHierarchy.push_back(node);
-    forrange(i, 0, parNode->mNumChildren) { ReadHierarchy(parNode->mChildren[i], parent, parHierarchy); }
+    forrange(i, 0, parNode->mNumChildren)
+    {
+        ReadHierarchy(parNode->mChildren[i], parent, parHierarchy);
+    }
 }
 
 void WriteMeshHierarchy(const aiScene* parScene,
@@ -224,7 +210,10 @@ void MeshFileWriter::operator<<(const aiScene* parMeshData)
         {
 
             const aiFace& face = mesh->mFaces[i];
-            forrange(k, 0, face.mNumIndices) { indices.push_back(face.mIndices[k] + vertexOffset); }
+            forrange(k, 0, face.mNumIndices)
+            {
+                indices.push_back(face.mIndices[k] + vertexOffset);
+            }
         }
         vertexOffset += mesh->mNumVertices;
     }
