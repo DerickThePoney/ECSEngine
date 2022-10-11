@@ -1,7 +1,8 @@
 #include "MathFunctions.h"
-#include "Vector.h"
-#include <cmath>
 
+#include "Vector.h"
+
+#include <cmath>
 
 namespace ECSEngine
 {
@@ -28,7 +29,7 @@ vec3 Degree(const vec3& parV)
 
 float Atan2(float x, float y)
 {
-    return atan2f(y, x);
+    return atan2f(x, y);
 }
 
 float Cos(float x)
@@ -46,5 +47,4 @@ bool IsNan(float x)
     return isnan(x);
 }
 
-}
-
+} // namespace ECSEngine
