@@ -83,18 +83,21 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
     const u32 maxCpus = std::thread::hardware_concurrency() - 1;
     threads.reserve(maxCpus);
 
-    const u32 numberOfFilesPerThreads = max((u32)meshToRecompute.size() / maxCpus, 10u);
+    const u32 numberOfFilesPerThreads = Max((u32)meshToRecompute.size() / maxCpus, 10u);
 
     u32 currentFileStart = 0;
     u32 currentThread = 0;
     while (currentFileStart < meshToRecompute.size() && currentThread < maxCpus)
     {
-        const u32 thisEnd = min(currentFileStart + numberOfFilesPerThreads, (u32)meshToRecompute.size());
+        const u32 thisEnd = Min(currentFileStart + numberOfFilesPerThreads, (u32)meshToRecompute.size());
         threads.push_back(std::move(std::thread(
               [&meshToRecompute, currentFileStart, thisEnd]
               {
                   std::cout << "Cooking mesh thread start" << std::endl;
-                  forrange(i, currentFileStart, thisEnd) { MeshCooking::CookMesh(meshToRecompute[i]); }
+                  forrange(i, currentFileStart, thisEnd)
+                  {
+                      MeshCooking::CookMesh(meshToRecompute[i]);
+                  }
               })));
         currentFileStart += numberOfFilesPerThreads;
         currentThread++;
