@@ -71,8 +71,8 @@ void ApparenceModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
     parent_type::VirtualInit(parUnitId, parParameters);
 
     vec3 pos = parParameters.Get_IFP<ModuleParameters::Position>(vec3(0.0f));
-    quat orient(1.0f, 0.0f, 0.0f, 0.0f);
-    
+    quat orient(0.0f, 0.0f, 0.0f, 1.0f);
+
     if (parParameters.HasParameter<ModuleParameters::EulerAnglesXYZ>())
     {
         const vec3 euler = parParameters.Get_IFP<ModuleParameters::EulerAnglesXYZ>(vec3(0.0f));
