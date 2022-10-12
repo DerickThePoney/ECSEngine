@@ -31,7 +31,7 @@ void ProcessMessage(const ConstructBuildingMessage& parMessage)
     LOG_GAMEPLAY(parMessage.FTemplateName.c_str());
     ModuleParameters::ParameterContainer container;
     container.Set<ModuleParameters::Position>(parMessage.FPosition);
-    container.Set<ModuleParameters::Orientation>(quat(1.0f, 0.f, 0.f, 0.f));
+    container.Set<ModuleParameters::Orientation>(quat(0.0f, 0.f, 0.f, 1.f));
     CircularGridAccessor accessor = CircularBuildingGrid::Instance().GetAccessorForWorldPosition(parMessage.FPosition);
     AlwaysCheckedAssert(accessor.Valid());
     container.Set<ModuleParameters::GridAccessor>(accessor);
