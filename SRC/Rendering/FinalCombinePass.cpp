@@ -16,6 +16,7 @@ void FinalCombinePass::Initialise()
 {
     FCommandBuffer = BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::FINAL_COMBINE_PASS);
     bgfx::setViewClear(RenderPassId::FINAL_COMBINE_PASS, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+    bgfx::setViewName(RenderPassId::FINAL_COMBINE_PASS, "Final combine pass");
 }
 
 void FinalCombinePass::Shutdown()
