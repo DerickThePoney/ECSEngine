@@ -16,17 +16,13 @@
 #include <chrono>
 // clang-format on
 
-#include "GLMIncludes.h"
-#include "Config.h"
-#include "Macros.h"
-#include "Profiling.h"
-
-#include "Serialization.h"
-#include <fmt/format.h>
-
-
-
 #include "Assertions.h"
+#include "Config.h"
 #include "Delegate.h"
-//#include "GLMSerialization.h"
+#include "Macros.h"
+#include "MathIncludes.h"
+#include "Profiling.h"
+#include "Serialization.h"
 #include "Types.h"
+
+#include <fmt/format.h>
