@@ -61,7 +61,7 @@ void PlaceBuildingMousePolicy::VirtualActivate()
     FBuildingProxy = new Rendering::GFXRepresentationProxy();
     Rendering::GFXRepresentationInitialiser init;
     init.FPosition = GetMouseWorldPosition();
-    init.FOrientation = quat(1.f, 0.f, 0.f, 0.f);
+    init.FOrientation = quat(0.f, 0.f, 0.f, 1.f);
     init.HasCarier = true;
     init.FCurrentTime = TimeManager::FrameStartTime();
     AssertRelease(!apparenceTemplate->GFXRepresentationDescriptorName().empty());
