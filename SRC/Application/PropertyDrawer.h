@@ -565,4 +565,134 @@ private:
         drawer.ShowProperty();                                                                                                                                                     \
     }
 
+template<typename T>
+class PropertyDrawerComplexArray
+{
+public:
+    using DrawPropertyFunction = void (*)(std::string&, T&);
+    PropertyDrawerComplexArray(const std::string& parPropertyName, std::vector<T>* parProperty, DrawPropertyFunction parDrawProperty, bool parCollapsingHeader = false, bool parFixedSize = false)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FPropertyDrawer(parDrawProperty)
+        , FCollapsingHeader(parCollapsingHeader)
+        , FFixedSize(parFixedSize)
+    {
+    }
+
+    void ShowProperty()
+    {
+        if (FProperty == nullptr)
+            return;
+
+        if (FFixedSize)
+            ShowFixedSize();
+        else
+            ShowVariableSize();
+    }
+
+private:
+    void ShowFixedSize()
+    {
+        bool show = true;
+        if (FCollapsingHeader)
+            show = ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
+
+        if (show)
+        {
+            ImGui::PushID(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
+            forrange(i, 0, FProperty->size())
+            {
+                FPropertyDrawer(fmt::format("Item_{}", i), (*FProperty)[i]);
+            }
+            ImGui::PopID();
+        }
+    }
+
+    void ShowVariableSize()
+    {
+        bool show = true;
+        if (FCollapsingHeader)
+            show = ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
+            
+        if (show)
+        {
+            ImGui::PushID(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
+            ImGui::Indent();
+            auto itToErase = FProperty->end();
+            u32 i = 0;
+            u32 action = -1; // 0 erase / 1 up / 2 down
+            for (auto element = FProperty->begin(); element != FProperty->end(); ++element, ++i)
+            {
+                ImGui::PushID(i);
+                if (ImGui::Button("X"))
+                {
+                    itToErase = element;
+                    action = 0;
+                }
+                ImGui::SameLine();
+                if (i > 0 && ImGui::Button("UP"))
+                {
+                    itToErase = element;
+                    action = 1;
+                }
+                ImGui::SameLine();
+                if (i < ((u32)FProperty->size() - 1) && ImGui::Button("DOWN"))
+                {
+                    itToErase = element;
+                    action = 2;
+                }
+                ImGui::SameLine();
+                FPropertyDrawer(fmt::format("Item_{}", i), (*FProperty)[i]);
+                ImGui::PopID();
+            }
+            ImGui::Unindent();
+
+            if (itToErase != FProperty->end())
+            {
+                switch (action)
+                {
+                case 0:
+                {
+                    FProperty->erase(itToErase);
+                    break;
+                }
+                case 1:
+                {
+                    auto previousIt = itToErase - 1;
+                    std::iter_swap(itToErase, previousIt);
+                    break;
+                }
+                case 2:
+                {
+                    auto nextIt = itToErase + 1;
+                    std::iter_swap(itToErase, nextIt);
+                    break;
+                }
+                default:
+                    AssertNotReached();
+                }
+            }
+
+            if (ImGui::Button(fmt::format("Add {}", FName).c_str()))
+            {
+                FProperty->push_back(T());
+            }
+            ImGui::PopID();
+        }
+    }
+
+private:
+    std::string FName;
+    std::vector<T>* FProperty = nullptr;
+    DrawPropertyFunction FPropertyDrawer;
+    bool FFixedSize;
+    bool FCollapsingHeader;
+};
+
+#define EDITOR_PROPERTY_COMPLEXVECTOR(TYPE, NAME, PROPERTY, FIXED_SIZE, PROPERTYDRAWER, COLLAPSINGHEADER)                                                                                            \
+    {                                                                                                                                                                              \
+        PropertyDrawerComplexArray<TYPE> drawer(NAME, &PROPERTY, PROPERTYDRAWER, COLLAPSINGHEADER, FIXED_SIZE);                                                                                                     \
+        drawer.ShowProperty();                                                                                                                                                     \
+    }
+
 } // namespace ECSEngine

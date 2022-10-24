@@ -53,22 +53,25 @@ void BuildingCostDescriptor::DrawEditor()
     EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED("##Template", et, FBuildingTemplateName, EEntityWorlds::BUILDINGS);
     EDITOR_PROPERTY_BUILDING_CATEGORY("##Category", FBuildingType);
     ImGui::NextColumn();
-    ImGui::BeginChild(ImGui::GetID(this), ImVec2(ImGui::GetContentRegionAvailWidth(), 100.f));
+    ImGui::BeginChild(ImGui::GetID(this), ImVec2(ImGui::GetContentRegionAvailWidth(), 200.f));
     ImGui::Columns(2);
     ImGui::Separator();
     DrawEditorHeader();
     ImGui::Separator();
-    foreachitem(buildingCost, FCosts)
+
+    auto drawCost = [](std::string& parName, BuildingResourceCost& parValue) 
     {
-        ImGui::PushID(ImGui::GetID(&buildingCost));
-        EDITOR_PROPERTY_GAME_RESOURCES("", buildingCost.first, true);
+        ImGui::PushID(ImGui::GetID(&parValue));
+        EDITOR_PROPERTY_GAME_RESOURCES("", parValue.first, true);
         ImGui::NextColumn();
-        EDITOR_PROPERTY_WITH_LIMITS("##Cost", buildingCost.second, 0u, 10000u);
-        if (buildingCost.first == GameResource::LENGTH)
-            buildingCost.second = 0;
+        EDITOR_PROPERTY_WITH_LIMITS("##Cost", parValue.second, 0u, 10000u);
+        if (parValue.first == GameResource::LENGTH)
+            parValue.second = 0;
         ImGui::NextColumn();
         ImGui::PopID();
-    }
+    };
+    EDITOR_PROPERTY_COMPLEXVECTOR(BuildingResourceCost, "##Costs", FCosts, false, drawCost, false);
+
     ImGui::Columns(1);
     ImGui::EndChild();
     ImGui::NextColumn();
