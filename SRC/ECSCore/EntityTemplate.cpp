@@ -41,6 +41,15 @@ void EntityTemplate::Initialise()
 #endif
 }
 
+void EntityTemplate::CopyModuleTemplatesMapTo(EntityTemplate* parOther) const
+{
+    parOther->SetWorldId_IKnowWhatImDoing(FWorld);
+    foreachitemconst(modTemp, FModuleTemplates)
+    {
+        parOther->AddModule(modTemp.first);
+    }
+}
+
 void EntityTemplate::AddModule(const u32 parId)
 {
     auto itFind = FModuleTemplates.find(parId);

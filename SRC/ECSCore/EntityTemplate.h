@@ -33,6 +33,8 @@ public:
 
     void Initialise();
 
+    void CopyModuleTemplatesMapTo(EntityTemplate* parOther) const;
+
     void AddModule(const u32 parId);
 
     const EEntityWorlds& GetWorldId() const { return FWorld; }

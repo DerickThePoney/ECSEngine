@@ -16,7 +16,7 @@ namespace ECSEngine
 {
 namespace ImGUITools
 {
-void DrawEditorMenu(EEntityWorlds parWorldFilter)
+void DrawEditorMenu(EEntityWorlds parWorldFilter, int parSelected)
 {
     if (ImGui::BeginMenuBar())
     {
@@ -27,6 +27,13 @@ void DrawEditorMenu(EEntityWorlds parWorldFilter)
             {
                 EntityTemplate* newTemplate = EntityTemplateManager::Instance().CreateNewEntityTemplate();
                 newTemplate->SetWorldId_IKnowWhatImDoing(parWorldFilter);
+            }
+
+            if (ImGui::MenuItem("Add template and set modules as selected", "Ctrl+C", nullptr, parSelected != -1))
+            {
+                const EntityTemplate* etToClone = EntityTemplateManager::Instance().GetEntityTemplate(parSelected);
+                EntityTemplate* newTemplate = EntityTemplateManager::Instance().CreateNewEntityTemplate();
+                etToClone->CopyModuleTemplatesMapTo(newTemplate);
             }
 
             ImGui::Separator();
@@ -58,7 +65,6 @@ void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/, const float parMen
     ImGui::SetNextWindowPos(vec2(0.0f, parMenuBarHeight));
 
     ImGui::Begin("Entity templates editor", parOutOpen, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
-    DrawEditorMenu(worldIdFilter);
     const vec2 currentWindowSize = ImGui::GetContentRegionAvail();
     const vec2 utilityPlace = currentWindowSize - 50.0f;
     const float listProportion = 0.30f;
@@ -157,6 +163,7 @@ void DrawEntityTemplatesEditor(bool* parOutOpen /*=nullptr*/, const float parMen
     }
 
     ImGui::EndChild();
+    DrawEditorMenu(worldIdFilter, selected);
     ImGui::End();
 }
 
