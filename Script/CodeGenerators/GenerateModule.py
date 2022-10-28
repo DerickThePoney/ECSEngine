@@ -39,6 +39,8 @@ class {modulename} : public Module
 {{
     DECLARE_MODULE({modulename});
 
+    DECLARE_SAVELOAD_ABILITIES();
+
 public:
     {modulename}();
     ~{modulename}();
@@ -52,7 +54,8 @@ Module_CPP_Code = """
 
 #include "{modulename}.h"
 
-#include "ECSCore/EntityTemplateManager.h"
+#include "Common/SavingSystemImplementation.h"
+#include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::{modulename}Template);
@@ -69,6 +72,13 @@ Module* {modulename}Template::CreateInstance(const EntityId& parUnitId, const Mo
 
 void {modulename}Template::VirtualDrawEditor()
 {{
+}}
+
+IMPLEMENT_SAVELOAD_ABILITIES({modulename});
+template<typename Chunk, bool isWriting>
+void {modulename}::SaveLoad(Chunk& parChunk)
+{{
+    parent_type::SaveLoad(parChunk);
 }}
 
 {modulename}::{modulename}()
