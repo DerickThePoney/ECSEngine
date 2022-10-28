@@ -135,6 +135,36 @@ EntityId EntityWorld::CreateEntityFromTemplateReturnEntityId(const EntityTemplat
     return newID;
 }
 
+EntityId EntityWorld::CreateNewEntityId()
+{
+    return FEntityIdGenerator.GetNextEntityId();
+}
+
+void EntityWorld::CreateEntityFromTemplateUsingEntityId(const EntityId& parUnitId,
+      const EntityTemplate* parTemplate,
+      const ModuleParameters::ParameterContainer& parParameterContainer)
+{
+    AssertRelease(FAllocatedEntities.find(parUnitId.GetSequentialId()) == FAllocatedEntities.end());
+
+    Entity newEntity(parUnitId, parTemplate);
+
+    if (parUnitId.GetSequentialId() >= FEntities.size())
+        FEntities.resize(FEntities.size() + ModulePoolSize);
+
+    FEntities[parUnitId.GetSequentialId()] = newEntity;
+    FAllocatedEntities.insert(parUnitId.GetSequentialId());
+
+    for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
+    {
+        if (parTemplate->HasModule(i))
+        {
+            const ModuleTemplate* modTemp = parTemplate->GetModuleTemplate(i);
+            AssertRelease(modTemp != nullptr);
+            modTemp->CreateInstance(parUnitId, parParameterContainer);
+        }
+    }
+}
+
 void EntityWorld::DestroyEntity(const EntityId& parId)
 {
     AssertRelease(parId.Valid());

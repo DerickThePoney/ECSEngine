@@ -32,7 +32,7 @@ EntityId CreateEntityInCircle(const float parMinRadius, const float parMaxRadius
     // spawn entity
     parContainer.Set<ModuleParameters::Position>(position);
 
-    return EntityFactory::CreateEntity(parTemplate, parContainer);
+    return EntityFactory::RequestCreateEntity(parTemplate, parContainer);
 }
 
 void CreateNEntityInCicle(const float parMinRadius,
@@ -59,14 +59,14 @@ void WorldBuilder::CreateWorld() const
     AssertRelease(colonyTemplate->GetWorldId() == EEntityWorlds::COLONY);
     ModuleParameters::ParameterContainer colonyContainer;
     colonyContainer.Set<ModuleParameters::Position>(vec3(0.f));
-    const EntityId colonyId = EntityFactory::CreateEntity(colonyTemplate, colonyContainer);
+    const EntityId colonyId = EntityFactory::RequestCreateEntity(colonyTemplate, colonyContainer);
 
     const EntityTemplate* firePlaceTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FGenerationParameters.FFirePlaceTemplateName);
     AssertRelease(firePlaceTemplate != nullptr);
     AssertRelease(firePlaceTemplate->GetWorldId() == EEntityWorlds::BUILDINGS);
     ModuleParameters::ParameterContainer firePlaceContainer;
     firePlaceContainer.Set<ModuleParameters::Position>(vec3(0.f));
-    const EntityId firePlaceId = EntityFactory::CreateEntity(firePlaceTemplate, firePlaceContainer);
+    const EntityId firePlaceId = EntityFactory::RequestCreateEntity(firePlaceTemplate, firePlaceContainer);
 }
 
 } // namespace ECSEngine

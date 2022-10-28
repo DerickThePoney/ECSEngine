@@ -2,6 +2,7 @@
 #include "Common/SavingSystemDeclaration.h"
 #include "Common/Singleton.h"
 #include "WorldIds_fwd.h"
+#include "ModuleParameters.h"
 
 namespace ECSEngine
 {
@@ -25,6 +26,7 @@ public:
     void AddEntityWorldStealOwnership(EEntityWorlds parType, EntityWorld* parWorld);
     void ProcessDestroyEntities();
     void DestroyAllRemainingEntities();
+    void ProcessWithEntitiesCreation();
 
     EntityWorld& GetWorld(EEntityWorlds parWorld);
     const EntityWorld& GetWorld(EEntityWorlds parWorld) const;
@@ -32,6 +34,7 @@ public:
     const EntityWorld* GetWorldIFP(EEntityWorlds parWorld) const;
 
     void MarkAsDead(const EntityId& parId);
+    void RequestCreateEntity(const EntityId parUnitId, const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer);
 
     const EntityTemplate* GetTemplateForEntityId(const EntityId& parUnitId) const;
 
@@ -41,6 +44,15 @@ public:
 private:
     std::vector<std::unique_ptr<EntityWorld>> FWorlds;
     std::set<EntityId> FDeadEntities;
+
+    struct EntityCreationMessage
+    {
+        const EntityId FUnitId;
+        const EntityTemplate* FTemplate;
+        ModuleParameters::ParameterContainer FParameterContainer;
+    };
+    std::vector<EntityCreationMessage> FEntitiesToCreate;
+
 
     std::vector<UnitDeathListener> FUnitDeathListeners;
 };

@@ -71,7 +71,7 @@ void SpawnEntitySceneAction::VirtualStart()
     container.Set<ModuleParameters::Position>(FSceneItem->GetPosition());
     container.Set<ModuleParameters::EulerAnglesXYZ>(FSceneItem->GetEulerAngles());
 
-    EntityFactory::CreateEntity(FTemplate, container);
+    EntityFactory::RequestCreateEntity(FTemplate, container);
 
     Finish();
 }
@@ -157,7 +157,7 @@ void SpawnEntitiesInPolygonalPatternSceneAction::VirtualStart()
         container.Set<ModuleParameters::Position>(position + vec3(FRandomPoints[i].x, 0.f, FRandomPoints[i].y));
         container.Set<ModuleParameters::EulerAnglesXYZ>(FSceneItem->GetEulerAngles());
 
-        EntityFactory::CreateEntity(FTemplate, container);
+        EntityFactory::RequestCreateEntity(FTemplate, container);
     }
 
     Finish();

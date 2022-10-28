@@ -181,6 +181,7 @@ void GameScenarioUpdater::GameplayUpdate()
         ResourceManager::Instance().Update();
 
         WorldManager::Instance().ProcessDestroyEntities();
+        WorldManager::Instance().ProcessWithEntitiesCreation();
     }
 
     {

@@ -32,6 +32,8 @@ public:
     IModuleController* GetControllerIFP();
 
     EntityId CreateEntityFromTemplateReturnEntityId(const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer);
+    EntityId CreateNewEntityId();
+    void CreateEntityFromTemplateUsingEntityId(const EntityId& parUnitId, const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer);
     void DestroyEntity(const EntityId& parId);
     void DestroyAllRemainingEntities();
 

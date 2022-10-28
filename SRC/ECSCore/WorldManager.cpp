@@ -5,6 +5,7 @@
 #include "Common/SavingSystemImplementation.h"
 #include "EntityWorld.h"
 #include "WorldIds.h"
+#include "EntityTemplate.h"
 
 namespace ECSEngine
 {
@@ -16,6 +17,7 @@ void WorldManager::SaveLoad(Chunk& parChunk)
     if (isWriting)
     {
         AlwaysCheckedAssertMsg(FDeadEntities.empty(), "Please do not save before have killed the entities, thank you !");
+        AlwaysCheckedAssertMsg(FEntitiesToCreate.empty(), "Please do not save before have created the entities, thank you !");
         u32 nonNullWorlds = 0;
         foreachitem(world, FWorlds)
         {
@@ -112,6 +114,19 @@ void WorldManager::DestroyAllRemainingEntities()
     }
 }
 
+void WorldManager::ProcessWithEntitiesCreation()
+{
+    foreachitemconst(entityToCreate, FEntitiesToCreate)
+    {
+        EntityWorld* world = GetWorldIFP(entityToCreate.FTemplate->GetWorldId());
+        AssertRelease(world != nullptr);
+
+        AssertRelease(entityToCreate.FUnitId.Valid());
+        world->CreateEntityFromTemplateUsingEntityId(entityToCreate.FUnitId, entityToCreate.FTemplate, entityToCreate.FParameterContainer);
+    }
+    FEntitiesToCreate.clear();
+}
+
 void WorldManager::MarkAsDead(const EntityId& parId)
 {
     AssertRelease(parId.Valid());
@@ -120,6 +135,11 @@ void WorldManager::MarkAsDead(const EntityId& parId)
     AssertRelease(world != nullptr);
 #endif
     FDeadEntities.insert(parId);
+}
+
+void WorldManager::RequestCreateEntity(const EntityId parUnitId, const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer)
+{
+    FEntitiesToCreate.push_back({ parUnitId, parTemplate, parParameterContainer });
 }
 
 const EntityTemplate* WorldManager::GetTemplateForEntityId(const EntityId& parUnitId) const

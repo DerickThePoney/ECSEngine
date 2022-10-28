@@ -11,13 +11,15 @@ namespace ECSEngine
 namespace EntityFactory
 {
 
-const EntityId CreateEntity(const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameters)
+const EntityId RequestCreateEntity(const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameters)
 {
     EntityWorld* world = WorldManager::Instance().GetWorldIFP(parTemplate->GetWorldId());
     AssertRelease(world != nullptr);
 
-    EntityId unitId = world->CreateEntityFromTemplateReturnEntityId(parTemplate, parParameters);
+    EntityId unitId = world->CreateNewEntityId();
     AssertRelease(unitId.Valid());
+
+    WorldManager::Instance().RequestCreateEntity(unitId, parTemplate, parParameters);
     return unitId;
 }
 

@@ -37,7 +37,7 @@ void ProcessMessage(const ConstructBuildingMessage& parMessage)
     container.Set<ModuleParameters::GridAccessor>(accessor);
 
     const EntityTemplate* temp = EntityTemplateManager::Instance().GetEntityTemplate(parMessage.FTemplateName);
-    EntityFactory::CreateEntity(temp, container);
+    EntityFactory::RequestCreateEntity(temp, container);
 }
 } // namespace
 
