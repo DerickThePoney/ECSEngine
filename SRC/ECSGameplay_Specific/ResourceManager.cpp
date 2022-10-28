@@ -94,4 +94,31 @@ void ResourceManager::ConsumeFromStorage(GameResource::Type parResource, u32 par
         itFind->second.second.erase(parStorageSlotModule->UnitId());
 }
 
+void ResourceManager::ConsumeFromAnyStorage(GameResource::Type parResource, u32 parQuantity)
+{
+    auto itFind = FResources.find(parResource);
+    AssertRelease(itFind != FResources.end());
+    AssertRelease(itFind->second.first >= parQuantity);
+
+    auto itStorage = itFind->second.second.begin();
+    ModuleAccessor<StorageSlotModule> storageSlotAccessor(EEntityWorlds::BUILDINGS);
+    std::vector<EntityId> emptyStorages;
+    while (parQuantity > 0 && itStorage != itFind->second.second.end())
+    {
+        StorageSlotModule* storageSlotModule = storageSlotAccessor[*itStorage];
+        const u32 resourceRemoved = storageSlotModule->RemoveResourceInSlot(parResource, parQuantity);
+        AssertRelease(resourceRemoved <= itFind->second.first);
+        itFind->second.first -= resourceRemoved;
+        parQuantity -= resourceRemoved;
+        if (storageSlotModule->GetNbResources(parResource) == 0)
+            emptyStorages.push_back(*itStorage);
+        ++itStorage;
+    }
+
+    reverseforeachitemconst(itToErase, emptyStorages)
+    {
+        itFind->second.second.erase(itToErase);
+    }
+}
+
 } // namespace ECSEngine

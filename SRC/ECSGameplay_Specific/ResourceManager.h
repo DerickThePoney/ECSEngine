@@ -21,6 +21,7 @@ public:
     u32 GetResourceQuantity(GameResource::Type parResource) const;
     const ResourceToStoragePair* GetStoragesForResourceIFP(GameResource::Type parResource) const;
     void ConsumeFromStorage(GameResource::Type parResource, u32 parQuantity, StorageSlotModule* parStorageSlotModule);
+    void ConsumeFromAnyStorage(GameResource::Type parResource, u32 parQuantity);
 
 protected:
     void VirtualUpdate() override;
