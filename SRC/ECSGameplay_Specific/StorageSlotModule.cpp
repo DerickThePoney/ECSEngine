@@ -7,6 +7,7 @@
 #include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleUtils.h"
+#include "ECSGameplaySpecificPropertyDrawers.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::StorageSlotModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::StorageSlotModuleTemplate);
@@ -25,6 +26,25 @@ void StorageSlotModuleTemplate::VirtualDrawEditor()
     EDITOR_PROPERTY_SIMPLE("Number of slots", FNumberOfSlots);
     EDITOR_PROPERTY_SIMPLE("Slot size", FSlotSize);
     EDITOR_PROPERTY_SIMPLE("Radius of effect", FRadiusOfEffect);
+
+    EDITOR_PROPERTY_BOOL("Has initial resources ?", FHasInitialResources);
+    if (FHasInitialResources)
+    {
+        auto drawStartingResource = [](std::string& parName, StartingResources& parValue)
+        {
+            ImGui::PushID(ImGui::GetID(&parValue));
+            EDITOR_PROPERTY_GAME_RESOURCES("Resource", parValue.first, false);
+            ImGui::SameLine();
+            EDITOR_PROPERTY_SIMPLE("Qty", parValue.second);
+            ImGui::PopID();
+        };
+        EDITOR_PROPERTY_COMPLEXVECTOR(StartingResources, "Starting resources", FStartingResources, false, drawStartingResource, true);
+
+        if (FStartingResources.size() > FSlotSize)
+        {
+            FStartingResources.resize(FSlotSize);
+        }
+    }
 }
 
 IMPLEMENT_SAVELOAD_ABILITIES(StorageSlot);
@@ -56,23 +76,17 @@ StorageSlotModule::~StorageSlotModule()
 
 u32 StorageSlotModule::NumberOfSlots() const
 {
-    const StorageSlotModuleTemplate* t = Template<StorageSlotModuleTemplate>();
-    AssertRelease(t != nullptr);
-    return t->NumberOfSlots();
+    return FSlots.size();
 }
 
 u32 StorageSlotModule::SlotSize() const
 {
-    const StorageSlotModuleTemplate* t = Template<StorageSlotModuleTemplate>();
-    AssertRelease(t != nullptr);
-    return t->SlotSize();
+    return FSlotSize;
 }
 
 float StorageSlotModule::RadiusOfEffect() const
 {
-    const StorageSlotModuleTemplate* t = Template<StorageSlotModuleTemplate>();
-    AssertRelease(t != nullptr);
-    return t->RadiusOfEffect();
+    return FRadiusOfEffect;
 }
 
 i32 StorageSlotModule::FreeSlots() const
@@ -204,9 +218,25 @@ void StorageSlotModule::VirtualInit(const EntityId& parUnitId, const ModuleParam
 {
     parent_type::VirtualInit(parUnitId, parParameters);
 
-    const u32 nbSlots = NumberOfSlots();
+    const StorageSlotModuleTemplate* t = Template<StorageSlotModuleTemplate>();
+    AssertRelease(t != nullptr);
+    const u32 nbSlots = t->NumberOfSlots();
     FSlots.resize(nbSlots);
     FFreeSlots = (i32)nbSlots;
+    FSlotSize = t->SlotSize();
+    FRadiusOfEffect = t->RadiusOfEffect();
+
+    if (t->HasInitialResources())
+    {
+        MemoryView<const StorageSlotModuleTemplate::StartingResources> startingRes = t->GetStartingResources();
+        foreachitemconst(startRes, startingRes)
+        {
+            bool res = ReserveSlotsIFP(parUnitId, MakeConstViewOnSingleItem(startRes.first));
+            AssertRelease(res);
+            const u32 resourceAdded = AddResourceInSlot(parUnitId, startRes.first, startRes.second);
+            AssertRelease(resourceAdded == startRes.second);
+        }
+    }
 }
 
 } // namespace ECSEngine

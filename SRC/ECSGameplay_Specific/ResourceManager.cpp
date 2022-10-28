@@ -28,6 +28,7 @@ void ResourceManager::VirtualUpdate()
     FResources.clear();
     foreachitemconst(storageSlotModule, storageSlotAccessor)
     {
+        const EntityId& unitId = storageSlotModule.UnitId();
         MemoryView<const StorageSlot> slots = storageSlotModule.StorageSlots();
         foreachitemconst(slot, slots)
         {
@@ -39,13 +40,13 @@ void ResourceManager::VirtualUpdate()
             {
                 ResourceToStoragePair pair;
                 pair.first = slot.Quantity;
-                pair.second.insert(storageSlotModule.UnitId());
+                pair.second.insert(unitId);
                 FResources.insert_or_assign(slot.Resource, pair);
             }
             else
             {
                 itFind->second.first += slot.Quantity;
-                itFind->second.second.insert(storageSlotModule.UnitId());
+                itFind->second.second.insert(unitId);
             }
         }
     }

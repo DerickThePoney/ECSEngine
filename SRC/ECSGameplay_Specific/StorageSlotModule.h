@@ -10,7 +10,8 @@ namespace ECSEngine
 class StorageSlotModuleTemplate : public ModuleTemplate
 {
     DECLARE_MODULE_TEMPLATE(StorageSlotModule, StorageSlotModuleTemplate);
-
+    
+    using StartingResources = std::pair<GameResource::Type, u32>;
 public:
     StorageSlotModuleTemplate()
         : ModuleTemplate()
@@ -20,13 +21,18 @@ public:
 
     Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
+    MemoryView<const StartingResources> GetStartingResources() const { return MemoryView<const StartingResources>(FStartingResources.data(), (u32)FStartingResources.size()); }
+
     SERIALIZE()
     {
+        PROPERTYFIELD(HasInitialResources, false);
         PROPERTYFIELD(NumberOfSlots, 0);
         PROPERTYFIELD(SlotSize, 0);
         PROPERTYFIELD(RadiusOfEffect, 0.f);
+        PROPERTYFIELD(StartingResources, std::vector<StartingResources>());
     }
 
+    bool HasInitialResources() const { return FHasInitialResources; }
     u32 NumberOfSlots() const { return FNumberOfSlots; }
     u32 SlotSize() const { return FSlotSize; }
     float RadiusOfEffect() const { return FRadiusOfEffect; }
@@ -35,9 +41,11 @@ protected:
     void VirtualDrawEditor() override;
 
 private:
+    bool FHasInitialResources = false;
     u32 FNumberOfSlots = 0;
     u32 FSlotSize = 0;
     float FRadiusOfEffect = 0.f;
+    std::vector<StartingResources> FStartingResources;
 };
 
 struct StorageSlot
@@ -58,7 +66,7 @@ class StorageSlotModule : public Module
 
 public:
     StorageSlotModule();
-    ~StorageSlotModule();
+    virtual ~StorageSlotModule();
 
     u32 NumberOfSlots() const;
     u32 SlotSize() const;
@@ -78,9 +86,11 @@ public:
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
-private:
+protected:
     std::vector<StorageSlot> FSlots;
     i32 FFreeSlots = 0;
+    u32 FSlotSize = 0;
+    float FRadiusOfEffect = 0.f;
 };
 
 } // namespace ECSEngine
