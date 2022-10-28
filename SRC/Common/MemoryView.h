@@ -148,4 +148,10 @@ private:
     T* FData;
     u32 FSize;
 };
+
+template<typename T>
+MemoryView<const T> MakeConstViewOnSingleItem(const T& parItem)
+{
+    return MemoryView(&parItem, 1u);
+}
 } // namespace ECSEngine
