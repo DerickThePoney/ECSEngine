@@ -34,3 +34,6 @@
 [submodule "External/Test/doctest"]
 	path = External/Test/doctest
 	url = https://github.com/doctest/doctest.git
+[submodule "External/miniaudio"]
+	path = External/miniaudio
+	url = https://github.com/mackron/miniaudio.git
