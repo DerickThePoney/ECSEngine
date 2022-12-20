@@ -17,6 +17,12 @@
   .Projects   = .RenderingProjects
 ]
 
+.SoundFolder =
+[
+  .Path       = 'Sound'
+  .Projects   = .SoundProjects
+]
+
 .GameplayFolder =
 [
   .Path       = 'Gameplay'
@@ -41,4 +47,4 @@
   .Projects   = .LauncherProjects
 ]
 
-.SolutionFolders = {.ExternalFolder, .CoreFolder, .RenderingFolder, .GameplayFolder, .ImGuiToolsFolder, .ToolsFolder, .LauncherFolder}
+.SolutionFolders = {.ExternalFolder, .CoreFolder, .RenderingFolder, .GameplayFolder, .ImGuiToolsFolder, .ToolsFolder, .SoundFolder, .LauncherFolder}

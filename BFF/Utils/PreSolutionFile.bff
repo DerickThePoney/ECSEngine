@@ -6,6 +6,8 @@
 
 .RenderingProjects = {}
 
+.SoundProjects = {}
+
 .GameplayProjects = {}
 
 .ImGuiToolsProjects = {}
