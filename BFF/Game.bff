@@ -44,6 +44,8 @@
 #include "Projects/ECSGameplay_Common.bff"
 #include "Projects/ECSGameplay_Specific.bff"
 
+#include "Projects/MiniaudioSoundEngine.bff"
+
 #include "Projects/Rendering.bff"
 
 #include "Projects/Launcher.bff"

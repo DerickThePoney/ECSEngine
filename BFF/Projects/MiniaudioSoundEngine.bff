@@ -1,8 +1,8 @@
 #once
 {
-    .ProjectName = 'SoundCore'
+    .ProjectName = 'MiniaudioSoundEngine'
     .ProjectPath = 'SRC'
-    .AdditionnalIncludePaths = {"SRC" }
+    .AdditionnalIncludePaths = {"SRC", "External/miniaudio/" }
 
     .SolutionFolder = 'Sound'
 
