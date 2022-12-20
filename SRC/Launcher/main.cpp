@@ -11,6 +11,7 @@
 #include "ECSGameplay_Common/ECSLoader.h"
 #include "ECSGameplay_Specific/GameplaySpecificLoader.h"
 #include "RenderingCore/RenderingLoader.h"
+#include "SoundCore/SoundLoader.h"
 
 #include <fstream>
 
@@ -42,8 +43,10 @@ int main(int argc, char** argv)
         catch (std::exception e)
         {
 #ifndef COMPILE_FINAL
+            AssertNotReached();
             app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>();
             app.AddNewLoader<ECSEngine::ECSLoader>("\\Configuration\\EntityTemplates.json");
+            app.AddNewLoader<ECSEngine::SoundLoader>();
             app.AddNewLoader<ECSEngine::RenderingLoader>("Base Application");
             app.AddNewLoader<ECSEngine::ECSGameplaySpecificLoader>("\\Configuration\\GameplayRules.json");
             app.SetGameplayUpdater_StealOwnership(new ECSEngine::ApplicationUpdaterWrapper());
