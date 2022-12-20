@@ -5,6 +5,7 @@ namespace ECSEngine
 struct MainOptions
 {
     bool IsUsingEditor = false;
+    bool NoSound = false;
 #ifndef COMPILE_FINAL
     bool NoDatapack = false;
 #endif

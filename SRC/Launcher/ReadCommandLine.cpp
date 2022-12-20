@@ -20,6 +20,10 @@ void ReadMainCommandLine(int argc, char** argv)
         {
             Options.NoDatapack = true;
         }
+        else if (strcmp(argv[i], "--nosound") == 0)
+        {
+            Options.NoSound = true;
+        }
 #endif
         ++i;
     }
