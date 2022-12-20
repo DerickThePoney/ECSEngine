@@ -67,12 +67,14 @@ bool RmlFileInterface::Seek(Rml::FileHandle file, long offset, int origin)
         if (offset < 0)
             return false;
         fh->FReadPtr = (u32)offset;
+        break;
     case SEEK_END:
         if (offset > fileSize)
             return false;
         if (offset > 0)
             return false;
         fh->FReadPtr = fileSize - (u32)offset;
+        break;
     case SEEK_CUR:
         long newReadPtr = offset + currentReadPtr;
         if (newReadPtr < 0)
@@ -80,6 +82,7 @@ bool RmlFileInterface::Seek(Rml::FileHandle file, long offset, int origin)
         if (newReadPtr > fileSize)
             return false;
         fh->FReadPtr = (u32)newReadPtr;
+        break;
     }
     return true;
 }
