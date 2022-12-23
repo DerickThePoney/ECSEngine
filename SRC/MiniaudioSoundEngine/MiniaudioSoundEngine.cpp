@@ -3,6 +3,8 @@
 #include "SoundCore/ISoundEngine.h"
 #include "SoundCore/SoundGroups.h"
 #include "SoundCore/SoundHandle.h"
+
+#define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
 namespace ECSEngine
@@ -61,10 +63,66 @@ MiniAudioSoundEngine::~MiniAudioSoundEngine()
 
 void MiniAudioSoundEngine::Initialize(bool bNoSound)
 {
+    ma_result result;
+
+    if (bNoSound)
+    {
+        ma_backend backends[] = { ma_backend_null };
+
+        result = ma_context_init(backends, 1, NULL, &FContext);
+    }
+    else
+    {
+        result = ma_context_init(NULL, 1, NULL, &FContext);
+    }
+
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, "Unable to init sound context...");
+    if (result != MA_SUCCESS)
+    {
+        return;
+    }
+
+    // init engine
+    ma_engine_config config = ma_engine_config_init();
+    config.pContext = &FContext;
+    // config.pResourceManagerVFS = &VFS;
+
+    result = ma_engine_init(&config, &FEngine);
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, "Unable to init sound engine...");
+    if (result != MA_SUCCESS)
+    {
+        return;
+    }
+
+    for (int i = 0; i < (int)ESoundGroup::LENGTH; ++i)
+    {
+        FSoundGroups[i] = new ma_sound_group();
+        ma_sound_group_init(&FEngine, 0, NULL, FSoundGroups[i]);
+    }
+
+    ma_engine_listener_set_position(&FEngine, 0, 0, 0, 0);
 }
 
 void MiniAudioSoundEngine::Shutdown()
 {
+    for (int i = 0; i < FSounds.size(); ++i)
+    {
+        ma_sound_uninit(FSounds[i]);
+        delete FSounds[i];
+    }
+
+    for (int i = 0; i < (int)ESoundGroup::LENGTH; ++i)
+    {
+        ma_sound_group_uninit(FSoundGroups[i]);
+        delete FSoundGroups[i];
+    }
+
+    ma_engine_uninit(&FEngine);
+
+    ma_context_uninit(&FContext);
+
+    // MA_CUSTOM_VFS::CloseVFS();
+
     FHasShutdown = true;
 }
 
