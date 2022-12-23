@@ -3,6 +3,7 @@
 #include "Application/BaseApplication.h"
 #include "Application/CommonLoaders.h"
 #include "ApplicationUpdater.h"
+#include "Common/CallStack.h"
 #include "Common/MainOptions.h"
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
@@ -15,6 +16,7 @@
 
 int main(int argc, char** argv)
 {
+    ECSEngine::CallStack::InitializeSymbols();
     ECSEngine::ReadMainCommandLine(argc, argv);
 
     ECSEngine::Profiling::StartProfiler();
@@ -66,6 +68,7 @@ int main(int argc, char** argv)
 
     ECSEngine::DestroyGlobalCache();
     ECSEngine::Profiling::EndProfiler();
+    ECSEngine::CallStack::CleanupSymbols();
 
     return 0;
 }

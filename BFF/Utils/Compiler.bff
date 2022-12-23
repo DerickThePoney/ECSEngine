@@ -178,6 +178,7 @@ Print( "Disabling Incremental Link")
     + ' odbc32.lib'
     + ' odbccp32.lib'
     + ' setupapi.lib'
+    + ' dbghelp.lib'
 
     .CompilerOptions = ' /EHs'  ; active le support des exceptions
     .PCHOptions = .CompilerOptions

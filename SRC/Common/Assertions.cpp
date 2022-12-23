@@ -9,7 +9,7 @@
 #include <dbghelp.h>
 // clang-format on
 
-#include <boost/stacktrace.hpp>
+#include "CallStackTrace.h"
 
 namespace ECSEngine
 {
@@ -23,11 +23,13 @@ AssertImplementation::AssertImplementation(const bool shouldLetGo, const char* m
 void AssertImplementation::Assert(const char* msg, const char* additionalMessage)
 {
     std::ostringstream sstr;
+    CallStackTrace trace;
 
     sstr << msg << "\n";
     if (additionalMessage != nullptr)
         sstr << additionalMessage << "\n";
-    sstr << boost::stacktrace::stacktrace() << "\n";
+
+    trace.PrintToStream(sstr);
 
     OutputDebugStringA(sstr.str().c_str());
     LOG_ERROR(sstr.str());

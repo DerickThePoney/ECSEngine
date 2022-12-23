@@ -17,6 +17,7 @@
     catch (std::runtime_error e)                                                                                                                                                   \
     {                                                                                                                                                                              \
         F##P = DEFAULT;                                                                                                                                                            \
+        AssertNotReached();                                                                                                                                                        \
     }
 #define NAMEDPROPERTYFIELD(N, P, DEFAULT)                                                                                                                                          \
     try                                                                                                                                                                            \
@@ -26,6 +27,7 @@
     catch (std::runtime_error e)                                                                                                                                                   \
     {                                                                                                                                                                              \
         P = DEFAULT;                                                                                                                                                               \
+        AssertNotReached();                                                                                                                                                        \
     }
 
 #define SERIALIZE()                                                                                                                                                                \

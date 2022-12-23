@@ -3,6 +3,7 @@
 #include "Application/BaseApplication.h"
 #include "Application/CommonLoaders.h"
 #include "AssetCookerUpdater.h"
+#include "Common/CallStack.h"
 #include "Common/MainOptions.h"
 
 namespace ECSEngine
@@ -12,6 +13,7 @@ MainOptions Options;
 
 int main(int argc, char** argv)
 {
+    ECSEngine::CallStack::InitializeSymbols();
 #ifndef COMPILE_FINAL
     ECSEngine::Options.NoDatapack = true;
 #endif
@@ -41,6 +43,8 @@ int main(int argc, char** argv)
 
     // destroy Resources
     ECSEngine::DestroyGlobalCache();
+
+    ECSEngine::CallStack::CleanupSymbols();
 
     return 0;
 }

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "Common/CallStack.h"
 #include "Common/MainOptions.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceFileDirectoryView.h"
@@ -13,6 +14,7 @@ MainOptions Options;
 
 int main(int argc, char** argv)
 {
+    ECSEngine::CallStack::InitializeSymbols();
 #ifndef COMPILE_FINAL
     ECSEngine::Options.NoDatapack = true;
 #endif
@@ -44,5 +46,6 @@ int main(int argc, char** argv)
 
     // destroy Resources
     ECSEngine::DestroyGlobalCache();
+    ECSEngine::CallStack::CleanupSymbols();
     return 0;
 }
