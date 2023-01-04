@@ -6,11 +6,33 @@
 #include "Common/ResourceFileDirectoryView.h"
 #include "DataPack/DataPackReader.h"
 #include "DataPack/DataPackWriter.h"
+#include "SoundCore/SoundResourceFileSystem.h"
 
 namespace ECSEngine
 {
 MainOptions Options;
 } // namespace ECSEngine
+
+void PackFiles(const char* parDirectory, const std::set<std::string>& parExtensions, ECSEngine::ResourceCache* parCache)
+{
+    AssertRelease(parCache != nullptr);
+    ECSEngine::DataPack::DataPackFile<ECSEngine::DataPack::Access::WRITE> packer;
+    packer.SetResourceCache(parCache);
+
+    foreachitemconst(extension, parExtensions)
+    {
+        std::vector<std::string> files;
+        parCache->GetFileSystem()->ListResourceFiles(extension, files);
+
+        foreachitemconst(file, files)
+        {
+            ECSEngine::Resource r(file);
+            packer.PushFile(&r);
+        }
+    }
+
+    packer.Finalize(std::string(parDirectory) + ".datapack");
+}
 
 int main(int argc, char** argv)
 {
@@ -18,34 +40,38 @@ int main(int argc, char** argv)
 #ifndef COMPILE_FINAL
     ECSEngine::Options.NoDatapack = true;
 #endif
-    // Global resources
-    if (!ECSEngine::InitialiseGlobalCache())
     {
+        // Global resources
+        if (!ECSEngine::InitialiseGlobalCache())
+        {
+            ECSEngine::DestroyGlobalCache();
+            return -1;
+        }
+
+        {
+            const std::set<std::string>& extensions = ECSEngine::DataPack::GetExtensionsToPack();
+            PackFiles(ECSEngine::Configuration::AssetsDatapackDirectory, extensions, ECSEngine::GlobalResourceCache::Instance().FCache);
+        }
+
         ECSEngine::DestroyGlobalCache();
-        return -1;
     }
 
     {
-        ECSEngine::DataPack::DataPackFile<ECSEngine::DataPack::Access::WRITE> packer;
-        const std::set<std::string>& extensions = ECSEngine::DataPack::GetExtensionsToPack();
-
-        foreachitemconst(extension, extensions)
+        if (!ECSEngine::SoundResources::InitializeCache())
         {
-            std::vector<std::string> files;
-            ECSEngine::GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles(extension, files);
-
-            foreachitemconst(file, files)
-            {
-                ECSEngine::Resource r(file);
-                packer.PushFile(&r);
-            }
+            ECSEngine::SoundResources::DestroyCache();
+            return -1;
         }
 
-        packer.Finalize(std::string(ECSEngine::Configuration::AssetsDatapackDirectory) + ".datapack");
+        {
+            const std::set<std::string>& extensions = ECSEngine::DataPack::GetSoundsExtensionsToPack();
+            PackFiles(ECSEngine::Configuration::SoundDatapackDirectory, extensions, ECSEngine::SoundResourceCache::Instance().FCache);
+        }
+        ECSEngine::SoundResources::DestroyCache();
     }
 
     // destroy Resources
-    ECSEngine::DestroyGlobalCache();
+
     ECSEngine::CallStack::CleanupSymbols();
     return 0;
 }

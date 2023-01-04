@@ -27,6 +27,7 @@ struct FileRecordHeader
 #pragma pack(pop, r1)
 
 const std::set<std::string>& GetExtensionsToPack();
+const std::set<std::string>& GetSoundsExtensionsToPack();
 
 } // namespace DataPack
 } // namespace ECSEngine
