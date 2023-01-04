@@ -12,7 +12,7 @@ class Resource;
 
 using ResourceHandleList = std::list<std::shared_ptr<ResourceHandle>>;
 using ResourceHandleMap = std::map<std::string, std::shared_ptr<ResourceHandle>>;
-using ResourceLoaders = std::list<std::shared_ptr<IResourceLoader>>;
+using ResourceLoaders = std::list<std::unique_ptr<IResourceLoader>>;
 class ResourceCache
 {
     friend class ResourceHandle;
@@ -22,7 +22,7 @@ public:
     ~ResourceCache();
 
     bool Initialize();
-    void RegisterLoader(std::shared_ptr<IResourceLoader> parLoader);
+    void RegisterLoader(std::unique_ptr<IResourceLoader>&& parLoader);
 
     void ReOpenFileSystem();
 

@@ -7,6 +7,8 @@ namespace ECSEngine
 namespace Configuration
 {
 const char* AssetsDirectory = "..\\Assets";
-const char* DatapackDirectory = "Assets";
+const char* SoundsDirectory = "..\\Assets\\Sounds";
+const char* AssetsDatapackDirectory = "Assets";
+const char* SoundDatapackDirectory = "Sounds";
 } // namespace Configuration
 } // namespace ECSEngine
