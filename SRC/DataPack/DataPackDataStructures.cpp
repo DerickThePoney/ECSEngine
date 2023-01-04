@@ -13,5 +13,12 @@ const std::set<std::string>& GetExtensionsToPack()
 {
     return ExtensionsToPack;
 }
+
+static const std::set<std::string> SoundsToPack = { "*.wav" };
+
+const std::set<std::string>& GetSoundsExtensionsToPack()
+{
+    return SoundsToPack;
+}
 } // namespace DataPack
 } // namespace ECSEngine

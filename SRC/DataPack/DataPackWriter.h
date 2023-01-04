@@ -22,10 +22,13 @@ public:
     {
     }
 
+    void SetResourceCache(ResourceCache* parCache) { FCache = parCache; }
+
     void PushFile(const Resource* parResource)
     {
+        AssertRelease(FCache != nullptr);
         AssertRelease(parResource != nullptr);
-        std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(parResource);
+        std::shared_ptr<ResourceHandle> handle = FCache->GetResourceHandle(parResource);
 
         if (handle == nullptr)
         {
@@ -76,6 +79,7 @@ private:
     DataPackHeader FHeader;
     std::vector<FileOffset> FFilesOffsets;
     FileOffset FCurrentOffset = 0;
+    ResourceCache* FCache = nullptr;
 };
 } // namespace DataPack
 } // namespace ECSEngine

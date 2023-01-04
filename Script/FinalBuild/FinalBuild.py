@@ -39,6 +39,7 @@ def Finalize():
 
         zipFile.write('bin/BuildingGame-x64-Final.exe','BuildingGame-x64-Final.exe')
         zipFile.write('bin/Assets.datapack','Assets.datapack')
+        zipFile.write('bin/Sounds.datapack','Sounds.datapack')
         zipFile.write('bin/glfw3.dll','glfw3.dll')
 
         zipFile.close()
@@ -62,8 +63,14 @@ def ProcessVersion():
         return ret
     os.chdir('..')
 
+    print('Build BGFX')
+    command = ['py', '-u', 'Script/Compil/BuildAll.py', '-b', '-c', 'Final']
+    ret = subprocess.run(command)
+    if ret.returncode != 0:
+        return ret.returncode
+
     print('Build all Final')
-    command = ['py', '-u', 'Script/Compil/BuildAll.py', '-a', '-c', 'Final']
+    command = ['py', '-u', 'Script/Compil/BuildAll.py', '-e', '-c', 'Final']
     ret = subprocess.run(command)
     if ret.returncode != 0:
         return ret.returncode
