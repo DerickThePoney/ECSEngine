@@ -41,20 +41,23 @@ bool ResourceCache::Initialize()
 
     if (FFileSystem->Open())
     {
-        RegisterLoader(std::shared_ptr<IResourceLoader>(new DefaultResourceLoader()));
+        RegisterLoader(std::unique_ptr<IResourceLoader>(new DefaultResourceLoader()));
         retValue = true;
     }
 
     return retValue;
 }
 
-void ResourceCache::RegisterLoader(std::shared_ptr<IResourceLoader> parLoader)
+void ResourceCache::RegisterLoader(std::unique_ptr<IResourceLoader>&& parLoader)
 {
 #ifdef PERFORM_SECURITY_CHECKS
-    foreachitemconst(loader, FResourceLoaders) { AlwaysCheckedAssertMsg(parLoader != loader, "Trying to register the same loader twice!!"); }
+    foreachitemconst(loader, FResourceLoaders)
+    {
+        AlwaysCheckedAssertMsg(parLoader != loader, "Trying to register the same loader twice!!");
+    }
 #endif
 
-    FResourceLoaders.push_front(parLoader);
+    FResourceLoaders.push_front(std::move(parLoader));
 }
 
 void ResourceCache::ReOpenFileSystem()
@@ -117,12 +120,13 @@ void ResourceCache::Update(std::shared_ptr<ResourceHandle> parHandle)
 std::shared_ptr<ResourceHandle> ResourceCache::Load(const Resource* parResource)
 {
     AssertRelease(FFileSystem != nullptr);
-    std::shared_ptr<IResourceLoader> loader;
+    IResourceLoader* loader = nullptr;
     std::shared_ptr<ResourceHandle> handle;
 
     for (auto it = FResourceLoaders.begin(); it != FResourceLoaders.end(); ++it)
     {
-        std::shared_ptr<IResourceLoader> testLoader = *it;
+        IResourceLoader* testLoader = it->get();
+        AssertRelease(testLoader != nullptr);
         if (StringUtilities::WildcardMatch(testLoader->GetPattern().c_str(), parResource->FName.c_str()))
         {
             loader = testLoader;
