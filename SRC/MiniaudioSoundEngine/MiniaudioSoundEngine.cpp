@@ -1,15 +1,28 @@
 #include "stdafx.h"
 
+#include "Common/PoolAllocator.h"
+#include "MACustomVFSMethods.h"
 #include "SoundCore/ISoundEngine.h"
 #include "SoundCore/SoundGroups.h"
 #include "SoundCore/SoundHandle.h"
 
 #define MINIAUDIO_IMPLEMENTATION
-#include "MACustomVFSMethods.h"
 #include "miniaudio.h"
 
 namespace ECSEngine
 {
+static constexpr u32 SoundWrapperPoolChunkSize = 128;
+struct MASoundWrapper
+{
+    DECLARE_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(MASoundWrapper, SoundWrapperPoolChunkSize);
+
+public:
+    ~MASoundWrapper() { ma_sound_uninit(&FSound); }
+    ma_sound FSound;
+};
+
+IMPLEMENT_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(MASoundWrapper, SoundWrapperPoolChunkSize);
+
 class MiniAudioSoundEngine final : public ISoundEngine
 {
 public:
@@ -35,7 +48,7 @@ public:
     void SetListenerCone(float InnerAngle, float OuterAngle, float OutGain) override;
 
 private:
-    ma_sound* GetNextSoundObject(SoundHandle& handle);
+    MASoundWrapper* GetNextSoundObject(SoundHandle& handle);
 
 private:
     struct ma_customVFS
@@ -50,7 +63,7 @@ private:
 
     ma_sound_group* FSoundGroups[(unsigned int)ESoundGroup::LENGTH];
 
-    std::vector<ma_sound*> FSounds; // TODO MAKE STRUCT THAT IS POOLALLOCATED
+    std::vector<MASoundWrapper*> FSounds;
     std::vector<SoundHandle> FHandles;
     bool FHasShutdown = false;
     bool FPaused = false;
@@ -121,7 +134,6 @@ void MiniAudioSoundEngine::Shutdown()
 {
     for (int i = 0; i < FSounds.size(); ++i)
     {
-        ma_sound_uninit(FSounds[i]);
         delete FSounds[i];
     }
 
@@ -142,10 +154,30 @@ void MiniAudioSoundEngine::Shutdown()
 
 void MiniAudioSoundEngine::TogglePause()
 {
+    if (FPaused)
+        ma_engine_start(&FEngine);
+    else
+        ma_engine_stop(&FEngine);
+
+    FPaused = !FPaused;
 }
 
 void MiniAudioSoundEngine::SetVolumeLinear(ESoundGroup parSoundGroup, float parVolume)
 {
+    switch (parSoundGroup)
+    {
+    case ESoundGroup::MUSICS:
+    case ESoundGroup::EFFECTS:
+    {
+        ma_sound_set_volume(FSoundGroups[(int)parSoundGroup], parVolume);
+        break;
+    }
+    case ESoundGroup::MASTER:
+    {
+        ma_engine_set_volume(&FEngine, parVolume);
+        break;
+    }
+    }
 }
 
 SoundHandle MiniAudioSoundEngine::PlaySoundFromDescriptor(const SoundDescriptor& parDescriptor)
@@ -196,9 +228,37 @@ void MiniAudioSoundEngine::SetListenerCone(float InnerAngle, float OuterAngle, f
 {
 }
 
-ma_sound* MiniAudioSoundEngine::GetNextSoundObject(SoundHandle& handle)
+MASoundWrapper* MiniAudioSoundEngine::GetNextSoundObject(SoundHandle& handle)
 {
-    return nullptr;
+    MASoundWrapper* Result = nullptr;
+
+    for (size_t i = 0; i < FSounds.size(); ++i)
+    {
+        MASoundWrapper*& SoundInUse = FSounds[i];
+        if (ma_sound_at_end(&SoundInUse->FSound))
+        {
+            Result = SoundInUse;
+            ma_sound_uninit(&Result->FSound);
+            FHandles[i].FSoundGeneration++;
+            handle = FHandles[i];
+            break;
+        }
+    }
+
+    if (Result == nullptr)
+    {
+        SoundHandle newHandle;
+        newHandle.FSoundID = (uint8_t)FHandles.size();
+        newHandle.FSoundGeneration = 0;
+        FHandles.emplace_back(std::move(newHandle));
+        handle = newHandle;
+
+        FSounds.push_back(new MASoundWrapper());
+        Result = FSounds.back();
+        printf("Creating new sound object\n");
+    }
+
+    return Result;
 }
 
 namespace SoundEngine
