@@ -5,6 +5,7 @@
 #include "SoundCore/SoundHandle.h"
 
 #define MINIAUDIO_IMPLEMENTATION
+#include "MACustomVFSMethods.h"
 #include "miniaudio.h"
 
 namespace ECSEngine
@@ -65,6 +66,8 @@ void MiniAudioSoundEngine::Initialize(bool bNoSound)
 {
     ma_result result;
 
+    MACustomVFSMethods::CreateVFS();
+
     if (bNoSound)
     {
         ma_backend backends[] = { ma_backend_null };
@@ -79,18 +82,29 @@ void MiniAudioSoundEngine::Initialize(bool bNoSound)
     AlwaysCheckedAssertMsg(result == MA_SUCCESS, "Unable to init sound context...");
     if (result != MA_SUCCESS)
     {
+        MACustomVFSMethods::CloseVFS();
         return;
     }
+
+    // init custom vfs
+    VFS.cb.onClose = MACustomVFSMethods::ma_vfs_close;
+    VFS.cb.onOpen = MACustomVFSMethods::ma_vfs_open;
+    VFS.cb.onRead = MACustomVFSMethods::ma_vfs_read;
+    VFS.cb.onSeek = MACustomVFSMethods::ma_vfs_seek;
+    VFS.cb.onTell = MACustomVFSMethods::ma_vfs_tell;
+    VFS.cb.onInfo = MACustomVFSMethods::ma_vfs_info;
 
     // init engine
     ma_engine_config config = ma_engine_config_init();
     config.pContext = &FContext;
-    // config.pResourceManagerVFS = &VFS;
+    config.pResourceManagerVFS = &VFS;
 
     result = ma_engine_init(&config, &FEngine);
     AlwaysCheckedAssertMsg(result == MA_SUCCESS, "Unable to init sound engine...");
     if (result != MA_SUCCESS)
     {
+        ma_context_uninit(&FContext);
+        MACustomVFSMethods::CloseVFS();
         return;
     }
 
@@ -121,7 +135,7 @@ void MiniAudioSoundEngine::Shutdown()
 
     ma_context_uninit(&FContext);
 
-    // MA_CUSTOM_VFS::CloseVFS();
+    MACustomVFSMethods::CloseVFS();
 
     FHasShutdown = true;
 }
