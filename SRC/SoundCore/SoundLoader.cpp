@@ -3,6 +3,7 @@
 #include "SoundLoader.h"
 
 #include "SoundEngineHelpers.h"
+#include "SoundResourceFileSystem.h"
 
 namespace ECSEngine
 {
@@ -10,6 +11,9 @@ namespace ECSEngine
 bool SoundLoader::VirtualInitialise()
 {
     ILoader::VirtualInitialise();
+
+    SoundResources::InitializeCache();
+
     SoundEngine::Initialize();
     return true;
 }
@@ -18,6 +22,7 @@ void SoundLoader::VirtualShutdown()
 {
     ILoader::VirtualShutdown();
     SoundEngine::Shutdown();
+    SoundResources::DestroyCache();
 }
 
 } // namespace ECSEngine
