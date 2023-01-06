@@ -3,10 +3,12 @@
 #include "Common/PoolAllocator.h"
 #include "MACustomVFSMethods.h"
 #include "SoundCore/ISoundEngine.h"
+#include "SoundCore/SoundDescriptor.h"
 #include "SoundCore/SoundGroups.h"
 #include "SoundCore/SoundHandle.h"
 
 #define MINIAUDIO_IMPLEMENTATION
+#include "Common/Logger.h"
 #include "miniaudio.h"
 
 namespace ECSEngine
@@ -95,6 +97,7 @@ void MiniAudioSoundEngine::Initialize(bool bNoSound)
     AlwaysCheckedAssertMsg(result == MA_SUCCESS, "Unable to init sound context...");
     if (result != MA_SUCCESS)
     {
+        LOG_SOUND("Unable to init sound context...");
         MACustomVFSMethods::CloseVFS();
         return;
     }
@@ -116,6 +119,7 @@ void MiniAudioSoundEngine::Initialize(bool bNoSound)
     AlwaysCheckedAssertMsg(result == MA_SUCCESS, "Unable to init sound engine...");
     if (result != MA_SUCCESS)
     {
+        LOG_SOUND("Unable to init sound engine...");
         ma_context_uninit(&FContext);
         MACustomVFSMethods::CloseVFS();
         return;
@@ -182,50 +186,129 @@ void MiniAudioSoundEngine::SetVolumeLinear(ESoundGroup parSoundGroup, float parV
 
 SoundHandle MiniAudioSoundEngine::PlaySoundFromDescriptor(const SoundDescriptor& parDescriptor)
 {
-    return SoundHandle();
+    ma_result result;
+
+    SoundHandle handle;
+    MASoundWrapper* Sound = GetNextSoundObject(handle);
+
+    int flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_ASYNC;
+    if (parDescriptor.bStream)
+        flags |= MA_SOUND_FLAG_STREAM;
+    if (!parDescriptor.bSpatialized)
+        flags |= MA_SOUND_FLAG_NO_SPATIALIZATION;
+    if (!parDescriptor.bAllowPitchChanges)
+        flags |= MA_SOUND_FLAG_NO_PITCH;
+
+    result = ma_sound_init_from_file(&FEngine, parDescriptor.FFilename.c_str(), flags, FSoundGroups[(unsigned int)parDescriptor.SoundGroup], NULL, &Sound->FSound);
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+    if (result != MA_SUCCESS)
+    {
+        LOG_SOUND(fmt::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+        return {};
+    }
+
+    ma_sound_set_looping(&Sound->FSound, parDescriptor.bLoop);
+
+    result = ma_sound_start(&Sound->FSound);
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to start sound {}", parDescriptor.FFilename.c_str()).c_str());
+    if (result != MA_SUCCESS)
+    {
+        LOG_SOUND(fmt::format("WARNING: Failed to start sound {}", parDescriptor.FFilename.c_str()).c_str());
+        return {};
+    }
+
+    return handle;
 }
 
 bool MiniAudioSoundEngine::IsPlaying(const SoundHandle& parSoundHandle) const
 {
-    return false;
+    if (parSoundHandle.FSoundGeneration != FHandles[parSoundHandle.FSoundID].FSoundGeneration)
+        return false;
+    return !ma_sound_at_end(&FSounds[parSoundHandle.FSoundID]->FSound);
 }
 
 float MiniAudioSoundEngine::GetSoundDuration(const SoundDescriptor& parDescriptor)
 {
-    return 0.f;
+    ma_sound Sound;
+    ma_result result;
+    result = ma_sound_init_from_file(&FEngine, parDescriptor.FFilename.c_str(), 0, NULL, NULL, &Sound);
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+    if (result != MA_SUCCESS)
+    {
+        LOG_SOUND(fmt::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+        return -1.f;
+    }
+
+    float res = 0.f;
+    result = ma_sound_get_length_in_seconds(&Sound, &res);
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to get length of sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+    if (result != MA_SUCCESS)
+    {
+        LOG_SOUND(fmt::format("WARNING: Failed to get length of sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+        return -1.f;
+    }
+
+    ma_sound_uninit(&Sound);
+
+    return res;
 }
 
 float MiniAudioSoundEngine::GetSoundDuration(const SoundHandle& parSoundHandle)
 {
-    return 0.f;
+    if (!parSoundHandle.IsValid() || (parSoundHandle.FSoundGeneration != FHandles[parSoundHandle.FSoundID].FSoundGeneration))
+        return -1.f;
+
+    float res = 0.f;
+    ma_result result = ma_sound_get_length_in_seconds(&FSounds[parSoundHandle.FSoundID]->FSound, &res);
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, "WARNING: Failed to get length of sound");
+    if (result != MA_SUCCESS)
+    {
+        LOG_SOUND("WARNING: Failed to get length of sound");
+        return -1.f;
+    }
+
+    return res;
 }
 
 void MiniAudioSoundEngine::SetSoundPosition(const SoundHandle& parSoundHandle, const vec3& parPosition)
 {
+    if (!parSoundHandle.IsValid() || (parSoundHandle.FSoundGeneration != FHandles[parSoundHandle.FSoundID].FSoundGeneration))
+        return;
+
+    ma_sound_set_position(&FSounds[parSoundHandle.FSoundID]->FSound, parPosition.x, parPosition.y, parPosition.z);
 }
 
 void MiniAudioSoundEngine::SetSoundVelocity(const SoundHandle& parSoundHandle, const vec3& parVelocity)
 {
+    if (!parSoundHandle.IsValid() || (parSoundHandle.FSoundGeneration != FHandles[parSoundHandle.FSoundID].FSoundGeneration))
+        return;
+
+    ma_sound_set_velocity(&FSounds[parSoundHandle.FSoundID]->FSound, parVelocity.x, parVelocity.y, parVelocity.z);
 }
 
 void MiniAudioSoundEngine::SetListenerPosition(const vec3& parPosition)
 {
+    ma_engine_listener_set_position(&FEngine, 0, parPosition.x, parPosition.y, parPosition.z);
 }
 
 void MiniAudioSoundEngine::SetListenerVelocity(const vec3& parVelocity)
 {
+    ma_engine_listener_set_velocity(&FEngine, 0, parVelocity.x, parVelocity.y, parVelocity.z);
 }
 
 void MiniAudioSoundEngine::SetListenerForwardDirection(const vec3& parForwardDirection)
 {
+    ma_engine_listener_set_direction(&FEngine, 0, parForwardDirection.x, parForwardDirection.y, parForwardDirection.z);
 }
 
 void MiniAudioSoundEngine::SetListenerUpDirection(const vec3& parUpDirection)
 {
+    ma_engine_listener_set_world_up(&FEngine, 0, parUpDirection.x, parUpDirection.y, parUpDirection.z);
 }
 
 void MiniAudioSoundEngine::SetListenerCone(float InnerAngle, float OuterAngle, float OutGain)
 {
+    ma_engine_listener_set_cone(&FEngine, 0, InnerAngle, OuterAngle, OutGain);
 }
 
 MASoundWrapper* MiniAudioSoundEngine::GetNextSoundObject(SoundHandle& handle)
