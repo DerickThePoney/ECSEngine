@@ -14,6 +14,7 @@ enum Type
     WARNING_MESSAGE,
     ERROR_MESSAGE,
     ASSET_COOKING,
+    SOUND,
     LENGTH
 };
 
@@ -51,6 +52,7 @@ const std::vector<MessageRecord>& GetLoggedMessages();
 #define LOG_WARNING(MSG) Logger::LogMessage(ELoggingCategory::WARNING_MESSAGE, MSG)
 #define LOG_ERROR(MSG) Logger::LogMessage(ELoggingCategory::ERROR_MESSAGE, MSG)
 #define LOG_COOKING(MSG) Logger::LogMessage(ELoggingCategory::ASSET_COOKING, MSG)
+#define LOG_SOUND(MSG) Logger::LogMessage(ELoggingCategory::SOUND, MSG)
 #else
 #define LOG_RENDERING(MSG)
 #define LOG_GAMEPLAY(MSG)
@@ -59,5 +61,6 @@ const std::vector<MessageRecord>& GetLoggedMessages();
 #define LOG_WARNING(MSG)
 #define LOG_ERROR(MSG)
 #define LOG_COOKING(MSG)
+#define LOG_SOUND(MSG)
 #endif
 } // namespace ECSEngine
