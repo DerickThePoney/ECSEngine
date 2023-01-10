@@ -1,9 +1,14 @@
 #pragma once
 
+#include "Common/Assertions.h"
+#include "Common/Macros.h"
+#include "Common/Types.h"
 #include "DataPackDataStructures.h"
 #include "DataPackFile.h"
 
 #include <fstream>
+#include <map>
+#include <vector>
 
 namespace ECSEngine
 {
