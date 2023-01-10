@@ -1,5 +1,5 @@
 #pragma once
-#include "Application/ILoader.h"
+#include "Common/ILoader.h"
 
 namespace ECSEngine
 {
