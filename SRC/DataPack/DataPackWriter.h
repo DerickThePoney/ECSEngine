@@ -1,12 +1,18 @@
 #pragma once
 
+#include "Common/Assertions.h"
+#include "Common/Macros.h"
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
+#include "Common/Types.h"
 #include "DataPackDataStructures.h"
 #include "DataPackFile.h"
 
 #include <fstream>
+#include <map>
+#include <sstream>
+#include <vector>
 
 namespace ECSEngine
 {
