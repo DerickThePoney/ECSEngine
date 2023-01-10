@@ -192,14 +192,14 @@ SoundHandle MiniAudioSoundEngine::PlaySoundFromDescriptor(const SoundDescriptor&
     MASoundWrapper* Sound = GetNextSoundObject(handle);
 
     int flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_ASYNC;
-    if (parDescriptor.bStream)
+    if (parDescriptor.FStream)
         flags |= MA_SOUND_FLAG_STREAM;
-    if (!parDescriptor.bSpatialized)
+    if (!parDescriptor.FSpatialized)
         flags |= MA_SOUND_FLAG_NO_SPATIALIZATION;
-    if (!parDescriptor.bAllowPitchChanges)
+    if (!parDescriptor.FAllowPitchChanges)
         flags |= MA_SOUND_FLAG_NO_PITCH;
 
-    result = ma_sound_init_from_file(&FEngine, parDescriptor.FFilename.c_str(), flags, FSoundGroups[(unsigned int)parDescriptor.SoundGroup], NULL, &Sound->FSound);
+    result = ma_sound_init_from_file(&FEngine, parDescriptor.FFilename.c_str(), flags, FSoundGroups[(unsigned int)parDescriptor.FSoundGroup], NULL, &Sound->FSound);
     AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
     if (result != MA_SUCCESS)
     {
@@ -207,7 +207,7 @@ SoundHandle MiniAudioSoundEngine::PlaySoundFromDescriptor(const SoundDescriptor&
         return {};
     }
 
-    ma_sound_set_looping(&Sound->FSound, parDescriptor.bLoop);
+    ma_sound_set_looping(&Sound->FSound, parDescriptor.FbLoop);
 
     result = ma_sound_start(&Sound->FSound);
     AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to start sound {}", parDescriptor.FFilename.c_str()).c_str());

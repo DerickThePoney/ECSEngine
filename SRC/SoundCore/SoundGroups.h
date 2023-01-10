@@ -10,4 +10,9 @@ enum class ESoundGroup : u8
     LENGTH,
     MASTER
 };
+
+namespace SoundGroup
+{
+char* GetName(ESoundGroup parValue);
 }
+} // namespace ECSEngine

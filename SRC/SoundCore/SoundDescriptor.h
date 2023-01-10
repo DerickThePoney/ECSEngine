@@ -1,18 +1,32 @@
 #pragma once
+#include "Common/PoolAllocator.h"
 #include "SoundGroups.h"
-
-#include <string>
 
 namespace ECSEngine
 {
 struct SoundDescriptor
 {
-    std::string FFilename; // TODO - MAYBE SOMETHING ELSE
-    ESoundGroup SoundGroup = ESoundGroup::MUSICS;
+    DECLARE_POOL_ALLOCATED(SoundDescriptor);
 
-    bool bStream = false;
-    bool bSpatialized = false;
-    bool bAllowPitchChanges = false;
-    bool bLoop = false;
+public:
+    void DrawInEditor();
+
+    SERIALIZE()
+    {
+        PROPERTYFIELD(FFilename, "INVALID");
+        PROPERTYFIELD(FSoundGroup, ESoundGroup::MUSICS);
+        PROPERTYFIELD(FStream, false);
+        PROPERTYFIELD(FSpatialized, false);
+        PROPERTYFIELD(FAllowPitchChanges, false);
+        PROPERTYFIELD(FbLoop, false);
+    }
+
+    std::string FFilename = "INVALID";
+    ESoundGroup FSoundGroup = ESoundGroup::MUSICS;
+
+    bool FStream = false;
+    bool FSpatialized = false;
+    bool FAllowPitchChanges = false;
+    bool FbLoop = false;
 };
 } // namespace ECSEngine
