@@ -20,6 +20,7 @@ public:
 
     virtual SoundHandle PlaySoundFromDescriptor(const SoundDescriptor& parDescriptor) = 0;
     virtual bool IsPlaying(const SoundHandle& parSoundHandle) const = 0;
+    virtual void StopSound(const SoundHandle& parSoundHandle) = 0;
     virtual float GetSoundDuration(const SoundDescriptor& parDescriptor) = 0;
     virtual float GetSoundDuration(const SoundHandle& parSoundHandle) = 0;
 

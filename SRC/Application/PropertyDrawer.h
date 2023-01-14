@@ -27,19 +27,26 @@ public:
     {
     }
 
-    void ShowProperty(bool parIsFile, const char* parPattern = "")
+    void ShowProperty(bool parIsFile, const char* parPattern = "", const IResourceFile* parResourceFile = nullptr)
     {
         if (parIsFile)
-            ShowPropertyFile(parPattern);
+            ShowPropertyFile(parPattern, parResourceFile);
         else
             ShowPropertyStandard();
     }
 
 private:
-    void ShowPropertyFile(const char* parPattern)
+    void ShowPropertyFile(const char* parPattern, const IResourceFile* parResourceFile)
     {
         std::vector<std::string> fileList;
-        GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles(parPattern, fileList);
+        if (parResourceFile != nullptr)
+        {
+            parResourceFile->ListResourceFiles(FName, fileList);
+        }
+        else
+        {
+            GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles(parPattern, fileList);
+        }
 
         int selected = -1;
         forrange(i, 0, fileList.size())
@@ -381,9 +388,15 @@ void MakePropertyWithLimits(const std::string& parName, T* parProperty, const T&
         drawer.ShowProperty(IS_FILE, PATTERN);                                                                                                                                     \
     }
 
+#define EDITOR_PROPERTY_STRING_RESOURCE_FILE(NAME, PROPERTY, IS_FILE, PATTERN, RESOURCE_FILE)                                                                                      \
+    {                                                                                                                                                                              \
+        PropertyDrawer<std::string> drawer(NAME, &PROPERTY);                                                                                                                       \
+        drawer.ShowProperty(IS_FILE, PATTERN, RESOURCE_FILE);                                                                                                                      \
+    }
+
 #define EDITOR_PROPERTY_COLOR(NAME, PROPERTY)                                                                                                                                      \
     {                                                                                                                                                                              \
-        PropertyDrawer<vec4> drawer(NAME, &PROPERTY, false, vec4(-1), vec4(-1));                                                                                    \
+        PropertyDrawer<vec4> drawer(NAME, &PROPERTY, false, vec4(-1), vec4(-1));                                                                                                   \
         drawer.EditColor();                                                                                                                                                        \
     }
 
@@ -481,7 +494,10 @@ private:
     {
         if (ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str()))
         {
-            forrange(i, 0, FProperty->size()) { MakeSimpleProperty(fmt::format("Item_{}", i), &(*FProperty)[i]); }
+            forrange(i, 0, FProperty->size())
+            {
+                MakeSimpleProperty(fmt::format("Item_{}", i), &(*FProperty)[i]);
+            }
         }
     }
 
@@ -570,7 +586,11 @@ class PropertyDrawerComplexArray
 {
 public:
     using DrawPropertyFunction = void (*)(std::string&, T&);
-    PropertyDrawerComplexArray(const std::string& parPropertyName, std::vector<T>* parProperty, DrawPropertyFunction parDrawProperty, bool parCollapsingHeader = false, bool parFixedSize = false)
+    PropertyDrawerComplexArray(const std::string& parPropertyName,
+          std::vector<T>* parProperty,
+          DrawPropertyFunction parDrawProperty,
+          bool parCollapsingHeader = false,
+          bool parFixedSize = false)
         : FName(parPropertyName)
         , FProperty(parProperty)
         , FPropertyDrawer(parDrawProperty)
@@ -613,7 +633,7 @@ private:
         bool show = true;
         if (FCollapsingHeader)
             show = ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
-            
+
         if (show)
         {
             ImGui::PushID(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
@@ -689,9 +709,9 @@ private:
     bool FCollapsingHeader;
 };
 
-#define EDITOR_PROPERTY_COMPLEXVECTOR(TYPE, NAME, PROPERTY, FIXED_SIZE, PROPERTYDRAWER, COLLAPSINGHEADER)                                                                                            \
+#define EDITOR_PROPERTY_COMPLEXVECTOR(TYPE, NAME, PROPERTY, FIXED_SIZE, PROPERTYDRAWER, COLLAPSINGHEADER)                                                                          \
     {                                                                                                                                                                              \
-        PropertyDrawerComplexArray<TYPE> drawer(NAME, &PROPERTY, PROPERTYDRAWER, COLLAPSINGHEADER, FIXED_SIZE);                                                                                                     \
+        PropertyDrawerComplexArray<TYPE> drawer(NAME, &PROPERTY, PROPERTYDRAWER, COLLAPSINGHEADER, FIXED_SIZE);                                                                    \
         drawer.ShowProperty();                                                                                                                                                     \
     }
 

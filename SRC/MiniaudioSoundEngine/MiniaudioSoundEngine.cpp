@@ -37,6 +37,7 @@ public:
 
     SoundHandle PlaySoundFromDescriptor(const SoundDescriptor& parDescriptor) override;
     bool IsPlaying(const SoundHandle& parSoundHandle) const override;
+    void StopSound(const SoundHandle& parSoundHandle) override;
     float GetSoundDuration(const SoundDescriptor& parDescriptor) override;
     float GetSoundDuration(const SoundHandle& parSoundHandle) override;
 
@@ -227,6 +228,18 @@ bool MiniAudioSoundEngine::IsPlaying(const SoundHandle& parSoundHandle) const
     return !ma_sound_at_end(&FSounds[parSoundHandle.FSoundID]->FSound);
 }
 
+void MiniAudioSoundEngine::StopSound(const SoundHandle& parSoundHandle)
+{
+    if (IsPlaying(parSoundHandle))
+    {
+        if (parSoundHandle.FSoundGeneration == FHandles[parSoundHandle.FSoundID].FSoundGeneration)
+        {
+            ma_sound_stop(&FSounds[parSoundHandle.FSoundID]->FSound);
+            FHandles[parSoundHandle.FSoundID].FSoundGeneration++;
+        }
+    }
+}
+
 float MiniAudioSoundEngine::GetSoundDuration(const SoundDescriptor& parDescriptor)
 {
     ma_sound Sound;
@@ -318,7 +331,7 @@ MASoundWrapper* MiniAudioSoundEngine::GetNextSoundObject(SoundHandle& handle)
     for (size_t i = 0; i < FSounds.size(); ++i)
     {
         MASoundWrapper*& SoundInUse = FSounds[i];
-        if (ma_sound_at_end(&SoundInUse->FSound))
+        if (ma_sound_at_end(&SoundInUse->FSound) || !ma_sound_is_playing(&SoundInUse->FSound))
         {
             Result = SoundInUse;
             ma_sound_uninit(&Result->FSound);

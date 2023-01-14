@@ -10,9 +10,22 @@ IMPLEMENT_POOL_ALLOCATED(SoundDescriptor);
 
 void SoundDescriptor::DrawInEditor()
 {
-    EDITOR_PROPERTY_STRING("Sound filename", FFilename, true, "*.wav");
+    EDITOR_PROPERTY_STRING("Sound filename", FFilename, true, "*.wav", SoundResourceCache::Instance().FCache->GetFileSystem());
 
-    // todo enum
+    i32 selectedIdx = (i32)FSoundGroup;
+
+    if (ImGui::BeginCombo("Sound group", SoundGroup::GetName(FSoundGroup)))
+    {
+        forrange(i, 0, (i32)ESoundGroup::LENGTH)
+        {
+            if (ImGui::Selectable(SoundGroup::GetName((ESoundGroup)i), i == selectedIdx))
+            {
+                FSoundGroup = (ESoundGroup)i;
+                break;
+            }
+        }
+        ImGui::EndCombo();
+    }
 
     EDITOR_PROPERTY_BOOL("Stream sound", FStream);
     EDITOR_PROPERTY_BOOL("Spatialized", FSpatialized);
