@@ -30,8 +30,8 @@ private:
 
     u32 FCameraId;
 
-    float FForwardSpeed = 100.0f;
-    float FLateralSpeed = 50.0f;
+    float FForwardSpeed = 300.0f;
+    float FLateralSpeed = 150.0f;
     float FRotationSpeed = 200.0f;
 };
 } // namespace ECSEngine
