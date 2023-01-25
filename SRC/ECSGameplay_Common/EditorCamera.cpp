@@ -5,7 +5,6 @@
 #include "Application/PropertyDrawer.h"
 #include "Common/Camera.h"
 #include "Common/CameraManager.h"
-//#include "Common/GLMHelpers.h"
 #include "Common/InputManager.h"
 #include "Common/Logger.h"
 #include "Common/TimeManager.h"
@@ -58,7 +57,7 @@ void EditorCamera::Initialise()
     AssertRelease(FCameraId != -1);
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
-    camera->Init(worldWiewMatrix, Radians(60.0f), 1.f, 500.0f);
+    camera->Init(worldWiewMatrix, Radians(60.0f), 1.f, 1500.0f);
 }
 
 void EditorCamera::Update()
