@@ -2,6 +2,7 @@
 
 #include "IntersectionRoutines.h"
 
+#include "BoundingBox.h"
 #include "Frustum.h"
 #include "Polygon.h"
 #include "Triangle.h"
@@ -59,10 +60,7 @@ bool PointInPolygon2D(const Polygon2D& parPolygon, const vec2 parPoint, const bo
     return res;
 }
 
-bool LinearComponentIntersection2D(const vec2& parPointsDifference,
-      const vec2& parDirectionA,
-      const vec2& parDirectionB,
-      LinearComponentIntersection& outIntersection)
+bool LinearComponentIntersection2D(const vec2& parPointsDifference, const vec2& parDirectionA, const vec2& parDirectionB, LinearComponentIntersection& outIntersection)
 {
     const vec2 rayDirPerp = vec2(-parDirectionA.y, parDirectionA.x);
     const vec2 segDirPerp = vec2(-parDirectionB.y, parDirectionB.x);
@@ -252,5 +250,94 @@ bool FrustumSphereIntersect(const Frustum& parFrustum, const vec4& parSphere)
 
     return true;
 }
+
+// false if fully outside, true if inside or intersects
+// source https://iquilezles.org/articles/frustumcorrect/
+bool FrustumBoundingBoxIntersect(const Frustum& parFrustum, const FrustumCorners& parCorners, const BoundingBox<vec3>& parBox)
+{
+    MemoryView<const vec4> frustumPlane = parFrustum.GetPlanes();
+
+    const vec3 minB = parBox.Min();
+    const vec3 maxB = parBox.Max();
+    // check box outside/inside of frustum
+    forrange(i, 0, frustumPlane.size())
+    {
+        int out = 0;
+        out += ((Dot(frustumPlane[i], vec4(minB, 1.0f)) < 0.0f) ? 1 : 0);
+        out += ((Dot(frustumPlane[i], vec4(maxB.x, minB.y, minB.z, 1.0f)) < 0.0f) ? 1 : 0);
+        out += ((Dot(frustumPlane[i], vec4(minB.x, maxB.y, minB.z, 1.0f)) < 0.0f) ? 1 : 0);
+        out += ((Dot(frustumPlane[i], vec4(maxB.x, maxB.y, minB.z, 1.0f)) < 0.0f) ? 1 : 0);
+        out += ((Dot(frustumPlane[i], vec4(minB.x, minB.y, maxB.z, 1.0f)) < 0.0f) ? 1 : 0);
+        out += ((Dot(frustumPlane[i], vec4(maxB.x, minB.y, maxB.z, 1.0f)) < 0.0f) ? 1 : 0);
+        out += ((Dot(frustumPlane[i], vec4(minB.x, maxB.y, maxB.z, 1.0f)) < 0.0f) ? 1 : 0);
+        out += ((Dot(frustumPlane[i], vec4(maxB.x, maxB.y, maxB.z, 1.0f)) < 0.0f) ? 1 : 0);
+        if (out == 8)
+            return false;
+    }
+
+    // check frustum outside/inside box
+    MemoryView<const vec4> frustumCorners = parCorners.GetCorners();
+
+    int out;
+    out = 0;
+    for (int i = 0; i < 8; i++)
+        out += ((frustumCorners[i].x > maxB.x) ? 1 : 0);
+    if (out == 8)
+        return false;
+    out = 0;
+    for (int i = 0; i < 8; i++)
+        out += ((frustumCorners[i].x < minB.x) ? 1 : 0);
+    if (out == 8)
+        return false;
+    out = 0;
+    for (int i = 0; i < 8; i++)
+        out += ((frustumCorners[i].y > maxB.y) ? 1 : 0);
+    if (out == 8)
+        return false;
+    out = 0;
+    for (int i = 0; i < 8; i++)
+        out += ((frustumCorners[i].y < minB.y) ? 1 : 0);
+    if (out == 8)
+        return false;
+    out = 0;
+    for (int i = 0; i < 8; i++)
+        out += ((frustumCorners[i].z > maxB.z) ? 1 : 0);
+    if (out == 8)
+        return false;
+    out = 0;
+    for (int i = 0; i < 8; i++)
+        out += ((frustumCorners[i].z < minB.z) ? 1 : 0);
+    if (out == 8)
+        return false;
+
+    return true;
+}
+
+// Arvo's algorithm
+bool SphereBoundingBoxIntersect(const vec4& parSphere, const BoundingBox<vec3>& parBox)
+{
+    float dMin = 0.f;
+
+    if (parSphere.x < parBox.Min().x)
+        dMin += (parSphere.x - parBox.Min().x) * (parSphere.x - parBox.Min().x);
+    else if (parSphere.x > parBox.Max().x)
+        dMin += (parSphere.x - parBox.Max().x) * (parSphere.x - parBox.Max().x);
+
+    if (parSphere.y < parBox.Min().y)
+        dMin += (parSphere.y - parBox.Min().y) * (parSphere.y - parBox.Min().y);
+    else if (parSphere.y > parBox.Max().y)
+        dMin += (parSphere.y - parBox.Max().y) * (parSphere.y - parBox.Max().y);
+
+    if (parSphere.z < parBox.Min().z)
+        dMin += (parSphere.z - parBox.Min().z) * (parSphere.z - parBox.Min().z);
+    else if (parSphere.z > parBox.Max().z)
+        dMin += (parSphere.z - parBox.Max().z) * (parSphere.z - parBox.Max().z);
+
+    if (dMin <= (parSphere.w * parSphere.w))
+        return true;
+
+    return false;
+}
+
 } // namespace Intersection
 } // namespace ECSEngine

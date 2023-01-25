@@ -6,8 +6,12 @@
 namespace ECSEngine
 {
 class Frustum;
+class FrustumCorners;
 class Triangle2D;
 class Polygon2D;
+
+template<typename T>
+class BoundingBox;
 
 namespace Intersection
 {
@@ -37,5 +41,8 @@ bool RayPlaneIntersection3D(const Ray3D& parRay, const Plane& parPlane, float& o
 bool PointInTriangle2D(const Triangle2D& parTriangle, const vec2 parPoint, const bool parStrictlyInside = false);
 bool PointInPolygon2D(const Polygon2D& parPolygon, const vec2 parPoint, const bool parStrictlyInside = false);
 bool FrustumSphereIntersect(const Frustum& parFrustum, const vec4& parSphere);
+bool FrustumBoundingBoxIntersect(const Frustum& parFrustum, const FrustumCorners& parCorners, const BoundingBox<vec3>& parBox);
+
+bool SphereBoundingBoxIntersect(const vec4& parSphere, const BoundingBox<vec3>& parBox);
 } // namespace Intersection
 } // namespace ECSEngine
