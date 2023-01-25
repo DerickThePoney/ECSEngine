@@ -11,13 +11,13 @@ public:
 
     void Init(const mat4& parWorldViewMatrix, const float parFov, const float parNearPlane, const float parFarPlane);
 
-    const vec4& Position() const { return FWorldViewMatrix.Column(3); }
+    const vec4 ViewPosition() const { return FWorldViewMatrix.Column(3); }
     const float Fov() const { return FFov; }
     const float Near() const { return FNearPlane; }
     const float Far() const { return FFarPlane; }
-    const vec4& Forward() const { return FWorldViewMatrix.Column(2); }
-    const vec4& Right() const { return FWorldViewMatrix.Column(0); }
-    const vec4& Up() const { return FWorldViewMatrix.Column(1); }
+    const vec4 ViewForward() const { return FWorldViewMatrix.Column(2); }
+    const vec4 ViewRight() const { return FWorldViewMatrix.Column(0); }
+    const vec4 ViewUp() const { return FWorldViewMatrix.Column(1); }
 
     void SetPosition(const vec4& parPosition) { FWorldViewMatrix.SetColumn(3, parPosition); }
     void SetFov(const float parFov) { FFov = parFov; }
@@ -30,6 +30,7 @@ public:
 
     mat4 GetProjectionMatrix(const float parAspectRatio) const;
     mat4 GetWorldViewMatrix() const;
+    mat4 GetViewWorldMatrix() const;
 
 private:
     mat4 FWorldViewMatrix;

@@ -49,4 +49,9 @@ mat4 Camera::GetWorldViewMatrix() const
     return FWorldViewMatrix;
 }
 
+mat4 Camera::GetViewWorldMatrix() const
+{
+    return Invert(FWorldViewMatrix);
+}
+
 } // namespace ECSEngine
