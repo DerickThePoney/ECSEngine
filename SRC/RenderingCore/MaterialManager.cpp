@@ -100,6 +100,31 @@ void MaterialManagerSingleton::Initialise()
 
         FFileToMultiPassProgramDescriptor[programDescFile] = FFileToMultiPassProgramDescriptor.size();
 
+        auto uniforms = programDesc->GetUniformsAndTypes();
+        foreachitemconst(uniform, uniforms)
+        {
+            auto itFind = FUniformMap.find(uniform.first);
+            if (itFind != FUniformMap.end())
+            {
+#ifdef PERFORM_SECURITY_CHECKS
+                if (itFind->second.second != uniform.second)
+                {
+                    const std::string message = fmt::format("A uniform named {} was already created with type {} and we are trying to create another one with type {}",
+                          uniform.first, itFind->second.second, uniform.second);
+
+                    AssertNotReachedMsg(message.c_str());
+                }
+#endif
+                continue;
+            }
+            else
+            {
+                bgfx::UniformHandle uniHandle = bgfx::createUniform(uniform.first.c_str(), uniform.second);
+                AssertRelease(bgfx::isValid(uniHandle));
+                FUniformMap[uniform.first] = { uniHandle, uniform.second };
+            }
+        }
+
         LOG_RENDERING(fmt::format("Loading Multi Pass Program {}...    SUCCESS", programDescFile));
     }
 
@@ -211,24 +236,48 @@ void MaterialManagerSingleton::Shutdown()
 {
     LOG_RENDERING("Finalizing materials");
 
-    foreachitem(uniform, FUniformMap) { bgfx::destroy(uniform.second.first); }
+    foreachitem(uniform, FUniformMap)
+    {
+        bgfx::destroy(uniform.second.first);
+    }
 
-    foreachitem(materialInstance, FMaterialInstances) { delete materialInstance.second; }
+    foreachitem(materialInstance, FMaterialInstances)
+    {
+        delete materialInstance.second;
+    }
     FMaterialInstances.clear();
 
-    foreachitem(program, FMultiPassPrograms) { delete program; }
-    foreachitem(program, FMultiPassProgramDescriptors) { delete program; }
+    foreachitem(program, FMultiPassPrograms)
+    {
+        delete program;
+    }
+    foreachitem(program, FMultiPassProgramDescriptors)
+    {
+        delete program;
+    }
     FMultiPassPrograms.clear();
     FMultiPassProgramDescriptors.clear();
 
-    foreachitem(program, FPrograms) { delete program; }
-    foreachitem(program, FProgramDescriptors) { delete program; }
+    foreachitem(program, FPrograms)
+    {
+        delete program;
+    }
+    foreachitem(program, FProgramDescriptors)
+    {
+        delete program;
+    }
     FPrograms.clear();
     FProgramDescriptors.clear();
     FFileToProgramDescriptor.clear();
 
-    foreachitem(material, FMaterialDescriptors) { delete material; }
-    foreachitem(material, FMultiPassMaterialDescriptors) { delete material; }
+    foreachitem(material, FMaterialDescriptors)
+    {
+        delete material;
+    }
+    foreachitem(material, FMultiPassMaterialDescriptors)
+    {
+        delete material;
+    }
     FMaterialDescriptors.clear();
     FMultiPassMaterialDescriptors.clear();
     FFileToMaterialDescriptor.clear();
