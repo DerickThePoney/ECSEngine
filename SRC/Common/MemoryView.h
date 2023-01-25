@@ -144,6 +144,12 @@ public:
         return *(FData + parIndex);
     }
 
+    T& operator[](const u32 parIndex)
+    {
+        AssertRelease(parIndex < FSize);
+        return *(FData + parIndex);
+    }
+
 private:
     T* FData;
     u32 FSize;
