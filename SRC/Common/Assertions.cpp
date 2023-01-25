@@ -33,6 +33,7 @@ void AssertImplementation::Assert(const char* msg, const char* additionalMessage
 
     OutputDebugStringA(sstr.str().c_str());
     LOG_ERROR(sstr.str());
+    std::cout << sstr.str() << "\n";
 
     __debugbreak();
 }
