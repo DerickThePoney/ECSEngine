@@ -10,8 +10,9 @@ struct TerrainDescriptor
 {
     u32 MeshVerticesSize = 16;
     float TerrainSize = 1000.f;
-    u32 NumberLoDLevels = 6;
-    std::vector<float> LoDDistances = { 800.f, 400.f, 200.f, 100.f, 50.f };
+    u32 NumberLoDLevels = 10;
+    float MinLodDistance = 15.f;
+    std::vector<float> LoDDistances;
 };
 
 class TerrainRenderer

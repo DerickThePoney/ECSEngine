@@ -4,6 +4,9 @@
 namespace ECSEngine
 {
 class Camera;
+class Frustum;
+class FrustumCorners;
+
 namespace Rendering
 {
 struct TerrainDescriptor;
@@ -21,6 +24,13 @@ class TerrainQuadTree
 public:
     void Initialize(const TerrainDescriptor* parDescriptor);
     void FillRegionsToRender(const Camera& parCamera, std::vector<QuadTreeNode>& outNodesToRender);
+
+private:
+    bool SelectLod(const u32 parQuadTreeNodeIndex,
+          const Frustum& parFrustum,
+          const FrustumCorners& parFrustumCorners,
+          vec4& parCameraSphere,
+          std::vector<QuadTreeNode>& outNodesToRender) const;
 
 private:
     const TerrainDescriptor* FDescriptor = nullptr;
