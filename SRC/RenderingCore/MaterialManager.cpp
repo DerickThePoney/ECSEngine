@@ -37,6 +37,7 @@ public:
     void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parTextureHandle, const u32 parSlot) const;
     void SetFreeFormSamplerUniform(const std::string& parUniformName, const u32& parTextureHandle, const u32 parSlot) const;
     void SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue) const;
+    void SetVec4Uniforms(const std::string& parUniformName, const vec4* parUniformValue, const u16 parNumber) const;
     void SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue) const;
     void SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue) const;
     void SetMat4Uniforms(const std::string& parUniformName, const mat4* parUniformValue, const u8 parNumber) const;
@@ -410,6 +411,13 @@ void MaterialManagerSingleton::SetVec4Uniform(const std::string& parUniformName,
     bgfx::setUniform(handle, &parUniformValue);
 }
 
+void MaterialManagerSingleton::SetVec4Uniforms(const std::string& parUniformName, const vec4* parUniformValue, const u16 parNumber) const
+{
+    const bgfx::UniformHandle& handle = MaterialManagerSingleton::Instance().GetUniform(parUniformName, bgfx::UniformType::Vec4);
+    AssertRelease(bgfx::isValid(handle));
+    bgfx::setUniform(handle, parUniformValue, parNumber);
+}
+
 void MaterialManagerSingleton::SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue) const
 {
     const bgfx::UniformHandle& handle = GetUniform(parUniformName, bgfx::UniformType::Mat3);
@@ -506,6 +514,12 @@ void SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformVal
 {
     AssertRelease(MaterialManagerSingleton::HasInstance());
     MaterialManagerSingleton::Instance().SetVec4Uniform(parUniformName, parUniformValue);
+}
+
+void SetVec4Uniforms(const std::string& parUniformName, const vec4* parUniformValue, const u16 parNumber)
+{
+    AssertRelease(MaterialManagerSingleton::HasInstance());
+    MaterialManagerSingleton::Instance().SetVec4Uniforms(parUniformName, parUniformValue, parNumber);
 }
 
 void SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue)

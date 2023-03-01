@@ -50,6 +50,11 @@ void TerrainRenderer::Initialize()
 
     CreateTerrainMesh();
 
+    for (int i = 0; i < FTerrainDescriptor.NumberLoDLevels; i++)
+    {
+        FTerrainDescriptor.LoDDistances.push_back(FTerrainDescriptor.MinLodDistance * powf(2.f, i));
+    }
+
     FQuadTree.Initialize(&FTerrainDescriptor);
 }
 
@@ -72,6 +77,14 @@ void TerrainRenderer::Render()
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
 
+    const vec3 at(500.0f, 0.0f, 500.0f);
+    const vec3 eye(0.0f, 100.0f, -10.0f);
+
+    mat4 worldWiewMatrix = LookAt(eye, at, vec3(0, 1.0f, 0.0f));
+
+    Camera c;
+    c.Init(worldWiewMatrix, Radians(60.0f), 1.f, 1500.0f);
+
     std::vector<QuadTreeNode> nodesToRender;
     FQuadTree.FillRegionsToRender(*camera, nodesToRender);
 
@@ -81,10 +94,31 @@ void TerrainRenderer::Render()
 
     MultiPassMaterialInstanceHandle handle = MaterialManager::CreateMultiPassMaterialInstanceIFN("materials\\terrain.materialv2");
 
+    std::vector<vec4> LoDs;
+    u32 nbLods = FTerrainDescriptor.LoDDistances.size();
+    for (u32 i = 0; i < nbLods; i += 4)
+    {
+        vec4 res;
+        res.x = FTerrainDescriptor.LoDDistances[i];
+        if ((i + 1) < nbLods)
+            res.y = FTerrainDescriptor.LoDDistances[i + 1];
+        if ((i + 2) < nbLods)
+            res.z = FTerrainDescriptor.LoDDistances[i + 2];
+        if ((i + 3) < nbLods)
+            res.w = FTerrainDescriptor.LoDDistances[i + 3];
+
+        LoDs.push_back(res);
+    }
+
+    MaterialManager::SetVec4Uniforms("u_LoDDistances", LoDs.data(), (u32)LoDs.size());
+    CommandBuffer->SetVec4Uniform("u_gridDim", vec4(FTerrainDescriptor.MeshVerticesSize, FTerrainDescriptor.MeshVerticesSize, 0.f, 0.f));
+    /*CommandBuffer->SetMat4Uniform("u_debugViewMat", c.GetWorldViewMatrix());*/
+
     forrange(i, 0, nodesToRender.size())
     {
         CommandBuffer->SetVec4Uniform("u_bboxMinAndMaxXY", vec4(nodesToRender[i].BBox.Min().xz(), nodesToRender[i].BBox.Max().xz()));
         CommandBuffer->SetVec4Uniform("u_LoDColor", GetLoDColor(nodesToRender[i].LoDLevel));
+        CommandBuffer->SetVec4Uniform("u_currentLoD", vec4(nodesToRender[i].LoDLevel));
         CommandBuffer->DrawMesh(FTerrainMesh, handle);
     }
 

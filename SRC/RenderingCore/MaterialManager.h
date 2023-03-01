@@ -23,6 +23,7 @@ void SetSamplerUniform_IKNOWWHATIMDOING(const std::string& parUniformName, const
 void SetSamplerUniform(const std::string& parUniformName, const TextureHandle& parTextureHandle, const u32 parSlot);
 void SetFreeFormSamplerUniform(const std::string& parUniformName, const u32 parTextureHandle, const u32 parSlot);
 void SetVec4Uniform(const std::string& parUniformName, const vec4& parUniformValue);
+void SetVec4Uniforms(const std::string& parUniformName, const vec4* parUniformValue, const u16 parNumber);
 void SetMat3Uniform(const std::string& parUniformName, const mat3& parUniformValue);
 void SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue);
 void SetMat4Uniforms(const std::string& parUniformName, const mat4* parUniformValue, const u8 parNumber);

@@ -86,13 +86,14 @@ void TerrainQuadTree::Initialize(const TerrainDescriptor* parDescriptor)
     }
 
     // Create the nodes
+    u32 currentLoD = FDescriptor->NumberLoDLevels - 1;
+
     FNodes.resize(numberOfNodes);
     FNodes[0].BBox.SetMin(vec3(0.f));
     FNodes[0].BBox.SetMax(vec3(FDescriptor->TerrainSize, 0.f, FDescriptor->TerrainSize));
-    FNodes[0].LoDLevel = 0;
+    FNodes[0].LoDLevel = currentLoD--;
     FNodes[0].NodeIdx = 0;
 
-    u32 currentLoD = 1;
     u32 currentStartIdx = 0;
     u32 currentEndIdx = 1;
     u32 previousLoDNumberOfNodes = 1;
@@ -108,7 +109,7 @@ void TerrainQuadTree::Initialize(const TerrainDescriptor* parDescriptor)
         currentStartIdx = currentEndIdx;
         currentEndIdx = currentStartIdx + previousLoDNumberOfNodes;
 
-        currentLoD++;
+        currentLoD--;
     }
 }
 
@@ -141,14 +142,14 @@ void TerrainQuadTree::FillRegionsToRender(const Camera& parCamera, std::vector<Q
         }
 
         // last level, just push out to render
-        if (currentNode.LoDLevel == FDescriptor->NumberLoDLevels - 1)
+        if (currentNode.LoDLevel == 0)
         {
             outNodesToRender.push_back(currentNode);
             continue;
         }
 
         // check if in range LoD + 1
-        cameraSphereForLoDTesting.w = FDescriptor->LoDDistances[currentNode.LoDLevel];
+        cameraSphereForLoDTesting.w = FDescriptor->LoDDistances[currentNode.LoDLevel - 1];
         if (!Intersection::SphereBoundingBoxIntersect(cameraSphereForLoDTesting, currentNode.BBox))
         {
             // we aren't, stop the algorithm here.
@@ -181,6 +182,77 @@ void TerrainQuadTree::FillRegionsToRender(const Camera& parCamera, std::vector<Q
         }
     }
 }
+
+// void TerrainQuadTree::FillRegionsToRender(const Camera& parCamera, std::vector<QuadTreeNode>& outNodesToRender)
+//{
+//     // build a stack of nodes and push the root node index onto it
+//     mat4 viewWorldMatrix = parCamera.GetViewWorldMatrix();
+//     vec4 cameraSphereForLoDTesting = viewWorldMatrix.Column(3);
+//
+//     FrustumCorners frustumCorners;
+//     frustumCorners.InitFromCamera(parCamera, GLFWDisplayWindowHandler::Instance().AspectRatio());
+//
+//     Frustum frustum;
+//     frustum.InitFromCorners(frustumCorners);
+//
+//     SelectLod(0, frustum, frustumCorners, cameraSphereForLoDTesting, outNodesToRender);
+// }
+//
+// bool TerrainQuadTree::SelectLod(const u32 parQuadTreeNodeIndex,
+//       const Frustum& parFrustum,
+//       const FrustumCorners& parFrustumCorners,
+//       vec4& parCameraSphere,
+//       std::vector<QuadTreeNode>& outNodesToRender) const
+//{
+//     const QuadTreeNode& currentNode = FNodes[parQuadTreeNodeIndex];
+//
+//     if (currentNode.LoDLevel < FDescriptor->NumberLoDLevels - 1)
+//     {
+//         parCameraSphere.w = FDescriptor->LoDDistances[currentNode.LoDLevel];
+//         if (!Intersection::SphereBoundingBoxIntersect(parCameraSphere, currentNode.BBox))
+//         {
+//             // Skip nodes node not intersecting current lodrange.
+//             return false;
+//         }
+//     }
+//
+//     if (!Intersection::FrustumBoundingBoxIntersect(parFrustum, parFrustumCorners, currentNode.BBox))
+//     {
+//         return true;
+//     }
+//
+//     if (currentNode.LoDLevel == 0)
+//     {
+//         outNodesToRender.push_back(currentNode);
+//         return true;
+//     }
+//     else
+//     {
+//         parCameraSphere.w = FDescriptor->LoDDistances[currentNode.LoDLevel - 1];
+//         if (!Intersection::SphereBoundingBoxIntersect(parCameraSphere, currentNode.BBox))
+//         {
+//             // We now know this node is only covering one lodrange.
+//             // Add node to draw list.
+//             outNodesToRender.push_back(currentNode);
+//         }
+//         else
+//         {
+//
+//             // If node is within LOD and also within range of LOD - 1
+//
+//             // we add children of node that only covers LOD and skip
+//             // children that covers LOD - 1
+//             for (u32 child : currentNode.ChildrenIdx)
+//             {
+//                 if (!SelectLod(child, parFrustum, parFrustumCorners, parCameraSphere, outNodesToRender))
+//                 {
+//                     outNodesToRender.push_back(FNodes[child]);
+//                 }
+//             }
+//         }
+//     }
+//     return true;
+//}
 
 } // namespace Rendering
 } // namespace ECSEngine
