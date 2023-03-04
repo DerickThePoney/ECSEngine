@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Common/RenderingHandles.h"
+#include "TerrainRenderer.h"
 
 namespace ECSEngine
 {
@@ -23,6 +24,7 @@ public:
 private:
     Rendering::MeshHandle FHandleMesh;
     Rendering::MaterialInstanceHandle FHandleMaterial;
+    Rendering::TerrainRenderer FTest;
     Rendering::DrawCommandBuffer* FDrawCommandBuffer;
     u32 FCameraId;
 };

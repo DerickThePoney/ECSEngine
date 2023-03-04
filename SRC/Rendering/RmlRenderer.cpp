@@ -30,7 +30,7 @@ void RmlRenderer::FillVextexStream(VertexDataStream& parStream, Rml::Vertex* ver
 {
     forrange(i, 0, num_vertices)
     {
-        parStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(vertices[i].position.x, vertices[i].position.y, 0.f));
+        parStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(vertices[i].position.x, vertices[i].position.y, 0.f));
         parStream.PushData(
               VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, ColorUtils::FromRGBA(vertices[i].colour.red, vertices[i].colour.green, vertices[i].colour.blue, vertices[i].colour.alpha));
         parStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(vertices[i].tex_coord.x, vertices[i].tex_coord.y));

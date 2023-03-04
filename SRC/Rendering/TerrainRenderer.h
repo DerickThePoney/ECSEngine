@@ -6,6 +6,7 @@ namespace ECSEngine
 {
 namespace Rendering
 {
+struct DynamicVertexBuffer;
 struct TerrainDescriptor
 {
     u32 MeshVerticesSize = 16;
@@ -18,6 +19,9 @@ struct TerrainDescriptor
 class TerrainRenderer
 {
 public:
+    TerrainRenderer();
+    ~TerrainRenderer();
+
     void Initialize();
     void Shutdown();
 
@@ -32,6 +36,8 @@ private:
     TerrainQuadTree FQuadTree;
     TerrainDescriptor FTerrainDescriptor;
     MeshHandle FTerrainMesh;
+
+    std::unique_ptr<DynamicVertexBuffer> FInstanceBuffer;
 };
 } // namespace Rendering
 } // namespace ECSEngine

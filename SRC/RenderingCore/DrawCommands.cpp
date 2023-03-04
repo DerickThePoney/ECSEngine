@@ -140,7 +140,7 @@ void DrawAABBCommand::SubmitCommand() const
     bgfx::TransientIndexBuffer indexBuffer;
 
     VertexLayoutHash hash;
-    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
     hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
     hash.SetColorsNb(1);
 
@@ -153,35 +153,35 @@ void DrawAABBCommand::SubmitCommand() const
 
     VertexDataStream stream(8, hash.GetByteSize(), hash);
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FMin);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, FMin);
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMax.x, FMin.y, FMin.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(FMax.x, FMin.y, FMin.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMax.x, FMin.y, FMax.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(FMax.x, FMin.y, FMax.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMin.x, FMin.y, FMax.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(FMin.x, FMin.y, FMax.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMin.x, FMax.y, FMin.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(FMin.x, FMax.y, FMin.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMax.x, FMax.y, FMin.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(FMax.x, FMax.y, FMin.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FMax);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, FMax);
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(FMin.x, FMax.y, FMax.z));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(FMin.x, FMax.y, FMax.z));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
@@ -349,7 +349,7 @@ void DrawLines3DCommand::SubmitCommand() const
     bgfx::TransientIndexBuffer indexBuffer;
 
     VertexLayoutHash hash;
-    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
     hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
     hash.SetColorsNb(1);
 
@@ -364,7 +364,7 @@ void DrawLines3DCommand::SubmitCommand() const
 
     forrange(i, 0, FVerticesSize)
     {
-        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FVertices[i]);
+        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, FVertices[i]);
         stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
         stream.Advance();
     }
@@ -464,7 +464,7 @@ void DrawLines2DCommand::SubmitCommand() const
     bgfx::TransientIndexBuffer indexBuffer;
 
     VertexLayoutHash hash;
-    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
     hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
     hash.SetColorsNb(1);
 
@@ -479,7 +479,7 @@ void DrawLines2DCommand::SubmitCommand() const
 
     forrange(i, 0, FVerticesSize)
     {
-        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(Vertices()[i].x, FHeight, Vertices()[i].y));
+        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(Vertices()[i].x, FHeight, Vertices()[i].y));
         stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
         stream.Advance();
     }
@@ -564,11 +564,11 @@ namespace
 {
 void PushNormalVertices(const vec3 vertex, const vec3 normal, const u32 color, VertexDataStream& stream)
 {
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vertex);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vertex);
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vertex + normal);
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vertex + normal);
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 }
@@ -626,7 +626,7 @@ void DrawFrustumCommand::SubmitCommand() const
     bgfx::TransientIndexBuffer indexBuffer;
 
     VertexLayoutHash hash;
-    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
     hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
     hash.SetColorsNb(1);
 
@@ -647,35 +647,35 @@ void DrawFrustumCommand::SubmitCommand() const
 
     VertexDataStream stream(wantedVertices, hash.GetByteSize(), hash);
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::NEAR_BOTTOM_LEFT]).xyz());
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, (corners[FrustumCorner::NEAR_BOTTOM_LEFT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::NEAR_BOTTOM_RIGHT]).xyz());
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, (corners[FrustumCorner::NEAR_BOTTOM_RIGHT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::FAR_BOTTOM_RIGHT]).xyz());
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, (corners[FrustumCorner::FAR_BOTTOM_RIGHT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::FAR_BOTTOM_LEFT]).xyz());
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, (corners[FrustumCorner::FAR_BOTTOM_LEFT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::NEAR_TOP_LEFT]).xyz());
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, (corners[FrustumCorner::NEAR_TOP_LEFT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::NEAR_TOP_RIGHT]).xyz());
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, (corners[FrustumCorner::NEAR_TOP_RIGHT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::FAR_TOP_RIGHT]).xyz());
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, (corners[FrustumCorner::FAR_TOP_RIGHT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (corners[FrustumCorner::FAR_TOP_LEFT]).xyz());
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, (corners[FrustumCorner::FAR_TOP_LEFT]).xyz());
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
     stream.Advance();
 
@@ -687,7 +687,7 @@ void DrawFrustumCommand::SubmitCommand() const
 
         // NearPlane
         const vec4 nearPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_LEFT] +
-                                               corners[FrustumCorner::NEAR_TOP_RIGHT]) /
+                                          corners[FrustumCorner::NEAR_TOP_RIGHT]) /
               4.f;
         PushNormalVertices(nearPlanePoint.xyz(), (planes[FrustumPlane::NEAR_PLANE]).xyz(), FNormalsColor, stream);
 
@@ -705,7 +705,7 @@ void DrawFrustumCommand::SubmitCommand() const
 
         // RightPlane
         const vec4 rightPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::NEAR_TOP_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_RIGHT] +
-                                                corners[FrustumCorner::FAR_TOP_RIGHT]) /
+                                           corners[FrustumCorner::FAR_TOP_RIGHT]) /
               4.f;
         PushNormalVertices(rightPlanePoint.xyz(), (planes[FrustumPlane::RIGHT_PLANE]).xyz(), FNormalsColor, stream);
 
@@ -716,7 +716,7 @@ void DrawFrustumCommand::SubmitCommand() const
 
         // BottomPlane
         const vec4 bottomPlanePoint = (corners[FrustumCorner::NEAR_BOTTOM_LEFT] + corners[FrustumCorner::NEAR_BOTTOM_RIGHT] + corners[FrustumCorner::FAR_BOTTOM_LEFT] +
-                                                 corners[FrustumCorner::FAR_BOTTOM_RIGHT]) /
+                                            corners[FrustumCorner::FAR_BOTTOM_RIGHT]) /
               4.f;
         PushNormalVertices(bottomPlanePoint.xyz(), (planes[FrustumPlane::BOTTOM_PLANE]).xyz(), FNormalsColor, stream);
     }
@@ -946,7 +946,7 @@ void DrawVerticesCommand::SubmitCommand() const
     bgfx::TransientIndexBuffer indexBuffer;
 
     VertexLayoutHash hash;
-    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
     hash.SetColorsNb(1);
 
     bgfx::VertexLayout layout = GetVertexLayout(hash);
@@ -962,7 +962,7 @@ void DrawVerticesCommand::SubmitCommand() const
 
     forrange(i, 0, FVerticesSize)
     {
-        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, FVertices[i]);
+        stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, FVertices[i]);
         stream.Advance();
     }
 
@@ -1027,7 +1027,7 @@ void DrawCircleCommand::SubmitCommand() const
     bgfx::TransientIndexBuffer indexBuffer;
 
     VertexLayoutHash hash;
-    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
     hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
     hash.SetColorsNb(1);
 
@@ -1049,19 +1049,19 @@ void DrawCircleCommand::SubmitCommand() const
     const float effectiveRange = FParams.Range * 1.1f;
 
     VertexDataStream stream(4, hash.GetByteSize(), hash);
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(-effectiveRange, 0.01f, -effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(effectiveRange, 0.01f, -effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(effectiveRange, 0.01f, effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(-effectiveRange, 0.01f, effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, color);
     stream.Advance();
 
@@ -1140,7 +1140,7 @@ void DrawCircularChunkCommand::SubmitCommand() const
     bgfx::TransientIndexBuffer indexBuffer;
 
     VertexLayoutHash hash;
-    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
     hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
     hash.SetColorsNb(1);
 
@@ -1156,19 +1156,19 @@ void DrawCircularChunkCommand::SubmitCommand() const
     const float effectiveRange = FParameters.OuterCircleRadius * 1.1f;
 
     VertexDataStream stream(4, hash.GetByteSize(), hash);
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(-effectiveRange, 0.01f, -effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FParameters.Color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(effectiveRange, 0.01f, -effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(effectiveRange, 0.01f, -effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FParameters.Color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(effectiveRange, 0.01f, effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FParameters.Color);
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-effectiveRange, 0.01f, effectiveRange));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(-effectiveRange, 0.01f, effectiveRange));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FParameters.Color);
     stream.Advance();
 
@@ -1239,7 +1239,7 @@ void BlitWithMaterialCommand::SubmitCommand() const
     bgfx::TransientIndexBuffer indexBuffer;
 
     VertexLayoutHash hash;
-    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
     hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_UVS, true);
     hash.SetUVsNb(1);
 
@@ -1253,19 +1253,19 @@ void BlitWithMaterialCommand::SubmitCommand() const
     bgfx::allocTransientBuffers(&vertexBuffer, layout, 4, &indexBuffer, 6);
 
     VertexDataStream stream(4, hash.GetByteSize(), hash);
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-1.f, -1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(-1.f, -1.f, 0.f));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(0.f, 1.f));
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(1.f, -1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(1.f, -1.f, 0.f));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(1.f, 1.f));
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(1.f, 1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(1.f, 1.f, 0.f));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(1.f, 0.f));
     stream.Advance();
 
-    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, vec3(-1.f, 1.f, 0.f));
+    stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, vec3(-1.f, 1.f, 0.f));
     stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, vec2(0.f, 0.f));
     stream.Advance();
 
@@ -1508,9 +1508,7 @@ void DrawCommandBuffer::DrawVertices(const vec3* parVertices,
           std::unique_ptr<IDrawCommand>(new DrawVerticesCommand(FViewId, parVertices, parVerticesSize, parIndices, parIndicesSize, parMaterialInstanceHandle, parTransform)));
 }
 
-void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
-      const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const mat4& parTransform /*= mat4::Identity()*/)
+void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle, const MaterialInstanceHandle& parMaterialInstanceHandle, const mat4& parTransform /*= mat4::Identity()*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(
           new DrawMeshCommand(FViewId, parMeshHandle, parMaterialInstanceHandle, Rendering::MultiPassMaterialInstanceHandle(), nullptr, parTransform)));
@@ -1525,9 +1523,7 @@ void DrawCommandBuffer::DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
           new DrawMeshCommand(FViewId, parMeshHandle, parMaterialInstanceHandle, Rendering::MultiPassMaterialInstanceHandle(), parSkelettonPose, parTransform)));
 }
 
-void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle,
-      const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle,
-      const mat4& parTransform /*= mat4::Identity()*/)
+void DrawCommandBuffer::DrawMesh(const MeshHandle& parMeshHandle, const MultiPassMaterialInstanceHandle& parMaterialInstanceHandle, const mat4& parTransform /*= mat4::Identity()*/)
 {
     FCommandVector.push_back(
           std::unique_ptr<IDrawCommand>(new DrawMeshCommand(FViewId, parMeshHandle, Rendering::MaterialInstanceHandle(), parMaterialInstanceHandle, nullptr, parTransform)));
@@ -1547,10 +1543,7 @@ void DrawCommandBuffer::DrawAABB(const MaterialInstanceHandle& parMaterialInstan
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, false, parColor)));
 }
 
-void DrawCommandBuffer::DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle,
-      const vec3& parMin,
-      const vec3& parMax,
-      const u32 parColor /*= 0xFFFFFFFF*/)
+void DrawCommandBuffer::DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parMin, const vec3& parMax, const u32 parColor /*= 0xFFFFFFFF*/)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, true, parColor)));
 }
@@ -1643,7 +1636,10 @@ void DrawCommandBuffer::SetMat4Uniform(const std::string& parUniformName, const 
 
 void DrawCommandBuffer::Submit()
 {
-    foreachitem(command, FCommandVector) { command->SubmitCommand(); }
+    foreachitem(command, FCommandVector)
+    {
+        command->SubmitCommand();
+    }
 }
 
 } // namespace Rendering

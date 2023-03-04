@@ -9,8 +9,8 @@ namespace VERTEX_LAYOUT_PARAMS
 // BINORMALS | TANGENTS | NORMALS | NB_UVS(3bits) | HAS_UVS | NB_COLORS(3bits) | HAS_COLORS | POSITIONS
 enum Type
 {
-    HAS_POSTION = 0,
-    HAS_COLORS = HAS_POSTION + 1, // 1 bit pour has colors et 3 pour le nombre
+    HAS_POSITION = 0,
+    HAS_COLORS = HAS_POSITION + 1, // 1 bit pour has colors et 3 pour le nombre
     HAS_UVS = HAS_COLORS + 4, // 1 bit pour has uv et 3 pour le nombre (max 4 couleurs)
     HAS_NORMALS = HAS_UVS + 5, // 1 bit pour has uv et 4 pour le nombre (max 8 uvs)
     HAS_TANGENTS = HAS_NORMALS + 1,
