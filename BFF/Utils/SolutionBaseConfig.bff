@@ -31,7 +31,7 @@ Print(.VisualStudioFBuildTarget)
     .ProjectRebuildCommand  = '$VisualStudioFBuildCommand$ -clean $VSBuildOptions$ $VisualStudioFBuildTarget$  $SolutionName$'
     .ProjectCleanCommand    = '$VisualStudioFBuildCommand$ -clean $VisualStudioFBuildPurgeTarget$'
 
-    .LocalDebuggerCommand = '..\$OutputDir$\$ExeName$-^$(Platform)-^$(Configuration).exe'
+    .LocalDebuggerCommand = '^$(SolutionDir)\..\$OutputDir$\$ExeName$-^$(Platform)-^$(Configuration).exe'
     .LocalDebuggerCommandArguments = '--editor --nodatapack'
     .LocalDebuggerWorkingDirectory = '^$(SolutionDir)'
 
