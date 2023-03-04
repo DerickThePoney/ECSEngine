@@ -12,7 +12,7 @@ bgfx::VertexLayout GetVertexLayout(const VertexLayoutHash& parVertexLayoutHash)
 {
     bgfx::VertexLayout pcvDecl;
     pcvDecl.begin();
-    if (parVertexLayoutHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION))
+    if (parVertexLayoutHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION))
         pcvDecl.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
 
     if (parVertexLayoutHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS))

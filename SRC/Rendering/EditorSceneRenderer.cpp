@@ -14,6 +14,7 @@
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
 #include "RenderingCore/RenderPass.h"
+#include "TerrainRenderer.h"
 
 namespace ECSEngine
 {
@@ -36,6 +37,8 @@ void EditorSceneRenderer::Initialise(const std::string& parHandleFileName, const
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
 
     FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::EDITOR_PASS);
+
+    FTest.Initialize();
 }
 
 void EditorSceneRenderer::Shutdown()
@@ -90,7 +93,10 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
     }
 
     std::vector<std::shared_ptr<ISceneAction>> sceneActions = parScene->GetSceneActions();
-    foreachitem(sceneAction, sceneActions) { sceneAction->DrawInSceneEditor(*FDrawCommandBuffer, FHandleMaterial); }
+    foreachitem(sceneAction, sceneActions)
+    {
+        sceneAction->DrawInSceneEditor(*FDrawCommandBuffer, FHandleMaterial);
+    }
 
     bool foundPos = false;
     vec3 mouseWorldPosition = GetWorldPositionFromScreenPosition(*camera, aspectRatio, windowSize, Input::GetMousePosition(), foundPos);
@@ -101,6 +107,8 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
     }
 
     FDrawCommandBuffer->Submit();
+
+    FTest.Render();
 }
 
 } // namespace ECSEngine

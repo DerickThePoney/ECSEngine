@@ -17,7 +17,7 @@ VertexLayoutHash::VertexLayoutHash()
 VertexLayoutHash::VertexLayoutHash(const MeshLayoutDescription& parMeshLayoutDescription)
     : hash(0)
 {
-    SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, parMeshLayoutDescription.HasPositions);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, parMeshLayoutDescription.HasPositions);
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, parMeshLayoutDescription.HasColors);
     SetColorsNb(parMeshLayoutDescription.NbColorChannels);
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_UVS, parMeshLayoutDescription.HasUVs);
@@ -31,7 +31,7 @@ VertexLayoutHash::VertexLayoutHash(const MeshLayoutDescription& parMeshLayoutDes
 VertexLayoutHash::VertexLayoutHash(bool parPosition, u32 parNbColors, u32 parNbUvs, bool parNormals, bool parTangents, bool parBinormals, bool parBones)
     : hash(0)
 {
-    SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION, parPosition);
+    SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, parPosition);
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, parNbColors > 0);
     SetColorsNb(parNbColors);
     SetValue(VERTEX_LAYOUT_PARAMS::HAS_UVS, parNbUvs > 0);
@@ -116,11 +116,11 @@ void VertexLayoutHash::SetUVsNb(const u32 parNbUVs)
 u32 VertexLayoutHash::GetByteSize() const
 {
     u32 byteSize = 0;
-    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION))
+    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION))
         byteSize += 3 * sizeof(float);
     if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS))
         byteSize += GetColorsNb() * sizeof(u32);
-    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION))
+    if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_UVS))
         byteSize += GetUVsNb() * 2 * sizeof(float);
     if (GetValue(VERTEX_LAYOUT_PARAMS::HAS_NORMALS))
         byteSize += 3 * sizeof(float);
@@ -216,9 +216,9 @@ void VertexDataStream::InitOffsetData()
     u32 currentOffset = 0;
 
     // position
-    if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSTION))
+    if (FHash.GetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION))
     {
-        TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0 };
+        TypeChannelIdPair p = { VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0 };
         OffsetByteSizePair o = { currentOffset, (u32)sizeof(vec3) };
         currentOffset += o.second;
         FOffsetMap[p] = o;

@@ -10,6 +10,7 @@
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
+#include "RenderingCore/VertexBuffer.h"
 
 namespace ECSEngine
 {
@@ -30,18 +31,44 @@ vec4 GetLoDColor(u32 LoDLevel)
         return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(255, 255, 0, 255));
         break;
     case 3:
-        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(0, 0, 255, 255));
+        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(0, 255, 255, 255));
         break;
     case 4:
-        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(0, 255, 0, 255));
+        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(0, 0, 255, 255));
         break;
     case 5:
+        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(0, 255, 0, 255));
+        break;
+    case 6:
         return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(255, 0, 0, 255));
         break;
+    case 7:
+        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(150, 150, 150, 255));
+        break;
+    case 8:
+        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(150, 0, 150, 255));
+        break;
+    case 9:
+        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(150, 150, 0, 255));
+        break;
+    case 10:
+        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(0, 150, 150, 255));
+        break;
+    case 11:
+        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(60, 60, 60, 255));
+        break;
     default:
-        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(255, 255, 255, 255));
+        return ColorUtils::ConvertToFVEC4(ColorUtils::FromRGBA(255, 10, 255, 255));
         break;
     }
+}
+
+TerrainRenderer::TerrainRenderer()
+{
+}
+
+TerrainRenderer::~TerrainRenderer()
+{
 }
 
 void TerrainRenderer::Initialize()
@@ -77,16 +104,13 @@ void TerrainRenderer::Render()
     Camera* camera = CameraManager::Instance().GetCamera(FCameraId);
     AssertRelease(camera != nullptr);
 
-    const vec3 at(500.0f, 0.0f, 500.0f);
-    const vec3 eye(0.0f, 100.0f, -10.0f);
-
-    mat4 worldWiewMatrix = LookAt(eye, at, vec3(0, 1.0f, 0.0f));
-
-    Camera c;
-    c.Init(worldWiewMatrix, Radians(60.0f), 1.f, 1500.0f);
-
     std::vector<QuadTreeNode> nodesToRender;
     FQuadTree.FillRegionsToRender(*camera, nodesToRender);
+
+    if (nodesToRender.empty())
+    {
+        return;
+    }
 
     CommandBuffer->clear();
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
@@ -112,17 +136,31 @@ void TerrainRenderer::Render()
 
     MaterialManager::SetVec4Uniforms("u_LoDDistances", LoDs.data(), (u32)LoDs.size());
     CommandBuffer->SetVec4Uniform("u_gridDim", vec4(FTerrainDescriptor.MeshVerticesSize, FTerrainDescriptor.MeshVerticesSize, 0.f, 0.f));
-    /*CommandBuffer->SetMat4Uniform("u_debugViewMat", c.GetWorldViewMatrix());*/
 
-    forrange(i, 0, nodesToRender.size())
+    constexpr u32 stride = sizeof(vec4) + sizeof(vec4) + sizeof(vec4);
+    const u32 nbNodes = (u32)nodesToRender.size();
+    // figure out how big of a buffer is available
+    if (nbNodes > 0)
     {
-        CommandBuffer->SetVec4Uniform("u_bboxMinAndMaxXY", vec4(nodesToRender[i].BBox.Min().xz(), nodesToRender[i].BBox.Max().xz()));
-        CommandBuffer->SetVec4Uniform("u_LoDColor", GetLoDColor(nodesToRender[i].LoDLevel));
-        CommandBuffer->SetVec4Uniform("u_currentLoD", vec4(nodesToRender[i].LoDLevel));
-        CommandBuffer->DrawMesh(FTerrainMesh, handle);
+        const u32 nodesToDrawInstanced = bgfx::getAvailInstanceDataBuffer(nbNodes, stride);
+        if (nodesToDrawInstanced)
+        {
+            bgfx::InstanceDataBuffer idb;
+            bgfx::allocInstanceDataBuffer(&idb, nbNodes, stride);
+            u8* data = idb.data;
+            forrange(i, 0, nodesToRender.size())
+            {
+                vec4* dataAsVec4 = reinterpret_cast<vec4*>(data);
+                dataAsVec4[0] = vec4(nodesToRender[i].BBox.Min().xz(), nodesToRender[i].BBox.Max().xz());
+                dataAsVec4[1] = GetLoDColor(nodesToRender[i].LoDLevel);
+                dataAsVec4[2] = vec4((float)nodesToRender[i].LoDLevel);
+                data += stride;
+            }
+            bgfx::setInstanceDataBuffer(&idb);
+            CommandBuffer->DrawMesh(FTerrainMesh, handle);
+            CommandBuffer->Submit();
+        }
     }
-
-    CommandBuffer->Submit();
 }
 
 void TerrainRenderer::CreateTerrainMesh()
@@ -141,7 +179,7 @@ void TerrainRenderer::CreateTerrainMesh()
         forrange(j, 0, FTerrainDescriptor.MeshVerticesSize)
         {
             const vec3 pos((float)i / (float)terrainSizeM1, 0.f, (float)j / (float)terrainSizeM1);
-            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, pos);
+            stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, pos);
             stream.PushData(VERTEX_LAYOUT_PARAMS::HAS_UVS, 0, pos.xz());
             stream.Advance();
         }

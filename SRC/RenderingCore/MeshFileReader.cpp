@@ -78,7 +78,10 @@ void ReadSkelettonImplementation(const MeshHandle parHandle, const MeshFileHeade
         }
 
         allGood = true;
-        forrange(i, 0, joints.size()) { allGood = allGood && computed[i]; }
+        forrange(i, 0, joints.size())
+        {
+            allGood = allGood && computed[i];
+        }
     }
 }
 
@@ -106,7 +109,7 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
             parStream.read((c8*)&data.y, 4);
             parStream.read((c8*)&data.z, 4);
             verticesGravityCenter += data;
-            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, data);
+            vertexDataStream.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, data);
         }
 
         forrange(j, 0, fileHeader.layout.NbColorChannels)
@@ -168,7 +171,7 @@ void ReadMeshImplementation(const MeshHandle parHandle, Mesh*& parMesh, std::ist
     {
         forrange(i, 0, fileHeader.NbVertices)
         {
-            const vec3 currentVertex = vertexDataStream.GetValue<vec3>(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSTION, 0, (u32)i);
+            const vec3 currentVertex = vertexDataStream.GetValue<vec3>(Rendering::VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, (u32)i);
             radius = std::max(radius, LengthSq(currentVertex - verticesGravityCenter));
         }
     }
