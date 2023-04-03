@@ -31,6 +31,7 @@ public:
     ~MaterialTextureInput();
 
     virtual void SetTexture() const;
+    const TextureHandle& Handle() const { return FHandle; }
 
 private:
     TextureHandle FHandle;

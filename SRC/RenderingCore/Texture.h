@@ -28,6 +28,7 @@ public:
     const bgfx::TextureInfo& Info() const { return FInfo; }
 
     const TextureDescriptor* Descriptor() const { return FTextureDescriptor; }
+    const std::string& TextureName() const { return FTextureName; }
 
 private:
     const TextureDescriptor* FTextureDescriptor;

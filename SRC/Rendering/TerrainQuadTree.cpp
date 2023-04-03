@@ -6,6 +6,7 @@
 #include "Common/Frustum.h"
 #include "Common/IntersectionRoutines.h"
 #include "Common/MemoryView.h"
+#include "HeightMap.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "TerrainRenderer.h"
 
@@ -73,6 +74,7 @@ void FillQuadTree(MemoryView<QuadTreeNode> parPreviousLoD, MemoryView<QuadTreeNo
 
 void TerrainQuadTree::Initialize(const TerrainDescriptor* parDescriptor)
 {
+    SCOPED_PROFILE_SIMPLE;
     FDescriptor = parDescriptor;
 
     // Count the number of nodes
@@ -111,10 +113,23 @@ void TerrainQuadTree::Initialize(const TerrainDescriptor* parDescriptor)
 
         currentLoD--;
     }
+
+    // update the height
+    for (QuadTreeNode& node : FNodes)
+    {
+        vec2 res = HeightMap::Instance().GetMinMaxHeightInBBox(node.BBox);
+        vec3 min = node.BBox.Min();
+        min.y = res.x;
+        vec3 max = node.BBox.Max();
+        max.y = res.y;
+        node.BBox.SetMin(min);
+        node.BBox.SetMax(max);
+    }
 }
 
 void TerrainQuadTree::FillRegionsToRender(const Camera& parCamera, std::vector<QuadTreeNode>& outNodesToRender)
 {
+    SCOPED_PROFILE_SIMPLE;
     // build a stack of nodes and push the root node index onto it
     std::queue<u32> nodesStack;
     nodesStack.push(0);

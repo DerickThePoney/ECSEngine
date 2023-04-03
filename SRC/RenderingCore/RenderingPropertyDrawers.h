@@ -123,7 +123,7 @@ public:
             ImGui::EndCombo();
         }
 
-        if (chosenBank || chosenTexture)
+        if (bankHasChanged || textureHasChanged)
         {
             *FProperty = Rendering::TextureName(textureBanks[chosenBank]->TextureBankName(), textureName);
         }

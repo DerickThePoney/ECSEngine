@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Common/MemoryView.h"
 #include "Common/MeshStreamingData.h"
 #include "Common/RefCountedObject.h"
 #include "Common/RenderingHandles.h"
@@ -33,7 +34,6 @@ private:
     const ProgramDescriptor* const FDescriptor;
     bgfx::ProgramHandle FHandle;
 };
-
 
 //----------------------------------------------------------------
 //          MultipassProgram
@@ -101,6 +101,7 @@ public:
 
     const MultiPassProgram* GetProgram() const { return FProgram; }
     const MultiPassMaterialDescriptor* GetMaterialDescriptor() const { return FMaterialDescriptor; }
+    const MemoryView<const MaterialTextureInput> GetTextureInputs() const { return MemoryView<const MaterialTextureInput>(FTextureInput.data(), FTextureInput.size()); }
 
     void SetTextures() const;
 
