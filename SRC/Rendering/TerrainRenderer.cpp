@@ -5,11 +5,21 @@
 #include "Common/CameraManager.h"
 #include "Common/ColorUtils.h"
 #include "Common/MeshStreamingData.h"
+#include "Common/RenderingHandles.h"
+#include "Common/Resource.h"
+#include "Common/ResourceCache.h"
+#include "Common/ResourceHandle.h"
+#include "HeightMap.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/Material.h"
+#include "RenderingCore/MaterialDescriptors.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/MeshManager.h"
+#include "RenderingCore/Texture.h"
+#include "RenderingCore/TextureDescriptor.h"
+#include "RenderingCore/TexturesManager.h"
 #include "RenderingCore/VertexBuffer.h"
 
 namespace ECSEngine
@@ -82,11 +92,21 @@ void TerrainRenderer::Initialize()
         FTerrainDescriptor.LoDDistances.push_back(FTerrainDescriptor.MinLodDistance * powf(2.f, i));
     }
 
+    MultiPassMaterialInstanceHandle handle = MaterialManager::CreateMultiPassMaterialInstanceIFN("materials\\terrain.materialv2");
+    const MultiPassMaterialInstance* materialInstance = MaterialManager::GetMultiPassMaterialInstance(handle);
+    const TextureHandle& heightMapHandle = materialInstance->GetTextureInputs()[0].Handle();
+
+    HeightMap::CreateIFP();
+    HeightMap::Instance().Initialise(FTerrainDescriptor, heightMapHandle);
+
     FQuadTree.Initialize(&FTerrainDescriptor);
 }
 
 void TerrainRenderer::Shutdown()
 {
+    HeightMap::Instance().Shutdown();
+    HeightMap::Destroy();
+
     // Release terrain mesh
     MeshManager::Instance().ReleaseMesh(FTerrainMesh);
 
@@ -135,7 +155,8 @@ void TerrainRenderer::Render()
     }
 
     MaterialManager::SetVec4Uniforms("u_LoDDistances", LoDs.data(), (u32)LoDs.size());
-    CommandBuffer->SetVec4Uniform("u_gridDim", vec4(FTerrainDescriptor.MeshVerticesSize, FTerrainDescriptor.MeshVerticesSize, 0.f, 0.f));
+    CommandBuffer->SetVec4Uniform(
+          "u_gridDim", vec4(FTerrainDescriptor.MeshVerticesSize, FTerrainDescriptor.MeshVerticesSize, FTerrainDescriptor.TerrainSize, FTerrainDescriptor.TerrainSize));
 
     constexpr u32 stride = sizeof(vec4) + sizeof(vec4) + sizeof(vec4);
     const u32 nbNodes = (u32)nodesToRender.size();
@@ -143,7 +164,7 @@ void TerrainRenderer::Render()
     if (nbNodes > 0)
     {
         const u32 nodesToDrawInstanced = bgfx::getAvailInstanceDataBuffer(nbNodes, stride);
-        if (nodesToDrawInstanced)
+        if (nodesToDrawInstanced > 0)
         {
             bgfx::InstanceDataBuffer idb;
             bgfx::allocInstanceDataBuffer(&idb, nbNodes, stride);

@@ -47,6 +47,7 @@ void Texture::Load()
     AssertRelease(handle != nullptr);
 
     FHandle = bgfx::createTexture(bgfx::copy(handle->Buffer(), handle->Size()), FTextureDescriptor->Flags(), (u8)0, &FInfo);
+    bgfx::setName(FHandle, FTextureName.c_str(), FTextureName.size());
     AssertRelease(Valid());
 }
 
@@ -58,6 +59,7 @@ void Texture::LoadFromTextureFile(u64 parFlags)
     AssertRelease(handle != nullptr);
 
     FHandle = bgfx::createTexture(bgfx::copy(handle->Buffer(), handle->Size()), parFlags, (u8)0, &FInfo);
+    bgfx::setName(FHandle, FTextureName.c_str(), FTextureName.size());
     AssertRelease(Valid());
 }
 

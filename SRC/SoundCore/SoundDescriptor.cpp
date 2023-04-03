@@ -2,6 +2,7 @@
 
 #include "SoundDescriptor.h"
 
+#include "SoundResourceFileSystem.h"
 #include "Application/PropertyDrawer.h"
 
 namespace ECSEngine
@@ -10,7 +11,7 @@ IMPLEMENT_POOL_ALLOCATED(SoundDescriptor);
 
 void SoundDescriptor::DrawInEditor()
 {
-    EDITOR_PROPERTY_STRING("Sound filename", FFilename, true, "*.wav", SoundResourceCache::Instance().FCache->GetFileSystem());
+    EDITOR_PROPERTY_STRING_RESOURCE_FILE("Sound filename", FFilename, true, "*.wav", SoundResourceCache::Instance().FCache->GetFileSystem());
 
     i32 selectedIdx = (i32)FSoundGroup;
 
