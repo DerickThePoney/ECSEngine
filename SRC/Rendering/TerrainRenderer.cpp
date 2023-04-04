@@ -9,6 +9,7 @@
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "HeightMap.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
@@ -181,6 +182,19 @@ void TerrainRenderer::Render()
             CommandBuffer->DrawMesh(FTerrainMesh, handle);
             CommandBuffer->Submit();
         }
+    }
+
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showNodesBoundingBoxes, false, "Show QuadTree bboxes", "TerrainRenderer");
+    if (showNodesBoundingBoxes)
+    {
+        auto vertexColorMaterial = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+        AssertRelease(vertexColorMaterial.IsValid());
+        CommandBuffer->clear();
+        foreachitemconst(node, nodesToRender)
+        {
+            CommandBuffer->DrawAABB(vertexColorMaterial, node.BBox.Min(), node.BBox.Max(), ColorUtils::ConvertToU32(GetLoDColor(node.LoDLevel)));
+        }
+        CommandBuffer->Submit();
     }
 }
 
