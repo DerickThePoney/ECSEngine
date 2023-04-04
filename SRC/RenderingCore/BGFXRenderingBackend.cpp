@@ -34,9 +34,9 @@ void BGFXRenderingBackend::Init()
     bgfxInit.resolution.width = window.GetSize().x;
     bgfxInit.resolution.height = window.GetSize().y;
     bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
-    //#ifdef PERFORM_SECURITY_CHECKS
-    //    bgfxInit.debug = true;
-    //#endif
+    // #ifdef PERFORM_SECURITY_CHECKS
+    //     bgfxInit.debug = true;
+    // #endif
     bgfx::init(bgfxInit);
 
 #ifdef ENABLE_BGFX_PROFILING
@@ -66,7 +66,10 @@ void BGFXRenderingBackend::RenderFrame()
     auto itObserversForThisFrame = FSpecificFrameObserver.find(FCurrentFrame);
     if (itObserversForThisFrame != FSpecificFrameObserver.end())
     {
-        foreachitem(observer, itObserversForThisFrame->second) { observer(); }
+        foreachitem(observer, itObserversForThisFrame->second)
+        {
+            observer();
+        }
         FSpecificFrameObserver.erase(FCurrentFrame);
     }
 }
