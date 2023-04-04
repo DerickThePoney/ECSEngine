@@ -8,8 +8,7 @@
 #include "RenderingCore/Texture.h"
 #include "RenderingCore/TextureDescriptor.h"
 #include "RenderingCore/TexturesManager.h"
-
-#include <bimg/bimg.h>
+#include "bimg/bimg.h "
 
 namespace ECSEngine
 {
@@ -38,7 +37,7 @@ vec2 HeightMap::GetMinMaxHeightInBBox(const BoundingBox<vec3>& parBBox)
 {
     // find coordinates
     vec2 minMaxLine(parBBox.Min().x, parBBox.Max().x);
-    minMaxLine = ((vec2(FTerrainDescriptor.TerrainSize) - minMaxLine) / FTerrainDescriptor.TerrainSize * FHeightMapSize.xx()).yx();
+    minMaxLine = minMaxLine / FTerrainDescriptor.TerrainSize * FHeightMapSize.xx();
     vec2 minMaxColumn = vec2(parBBox.Min().z, parBBox.Max().z);
     minMaxColumn = minMaxColumn / FTerrainDescriptor.TerrainSize * FHeightMapSize.yy();
 
@@ -93,10 +92,11 @@ void HeightMap::ReadHeigthMapTexture(const TextureHandle& parHeightMapTexture)
         {
             for (i32 column = 0; column < mip.m_width; ++column)
             {
-                const u32 idx = line * mip.m_width + column;
-                u32 value = mipData[idx] & 0xFF;
-                float valuef = (float)value / 255.f;
-                FHeightMapData[idx] = valuef * 50.f;
+                const u32 idxMap = line * mip.m_width + column;
+                const u32 idxMip = column * mip.m_height + line;
+                const u32 value = mipData[idxMip] & 0xFF;
+                const float valuef = (float)value / 255.f;
+                FHeightMapData[idxMap] = valuef * 50.f;
             }
         }
     }

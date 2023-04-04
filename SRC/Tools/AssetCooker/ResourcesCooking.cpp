@@ -130,9 +130,9 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
 
 namespace TextureCooking
 {
-void CookTexture(const std::string& parCookedTextureName, const std::string& parTextureDescriptor, PROCESS_INFORMATION& pi)
+void CookTexture(const std::string& parCookedTextureName, const ECSEngine::Rendering::TextureDescriptor& parTextureDescriptor, PROCESS_INFORMATION& pi)
 {
-    std::cout << "cooking " << parTextureDescriptor << std::endl;
+    std::cout << "cooking " << parTextureDescriptor.TextureFile() << std::endl;
 
     // additional information
     STARTUPINFO si;
@@ -144,7 +144,7 @@ void CookTexture(const std::string& parCookedTextureName, const std::string& par
 
     std::wstring wideString = L"..\\External\\BGFX\\ToolBinaries\\texturecRelease.exe -f ";
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    const std::string& file = parTextureDescriptor;
+    const std::string& file = parTextureDescriptor.TextureFile();
     std::wstring filename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + file);
 
     auto pos = file.find_last_of('\\');
@@ -156,6 +156,10 @@ void CookTexture(const std::string& parCookedTextureName, const std::string& par
 
     std::wstring cookedFilename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + path + parCookedTextureName);
     wideString += filename + L" -o " + cookedFilename + L".ktx";
+    if (parTextureDescriptor.Linear())
+    {
+        wideString += L" --linear";
+    }
 
     // start the program up
     if (!CreateProcess(NULL, // the path
@@ -177,6 +181,12 @@ void CookTexture(const std::string& parCookedTextureName, const std::string& par
 
 void CookTextureBank(const std::string& parTextureBankFile)
 {
+    bool forcedUpdate = false;
+    if (ResourceCheck::HasFileChanged(parTextureBankFile))
+    {
+        forcedUpdate = true;
+    }
+
     Resource bank(parTextureBankFile);
     std::shared_ptr<ResourceHandle> bankResource = GlobalResourceCache::Instance().FCache->GetResourceHandle(&bank);
 
@@ -194,10 +204,10 @@ void CookTextureBank(const std::string& parTextureBankFile)
     processes.reserve(textureBank.Descriptors().size());
     foreachitemconst(textureDesc, textureBank.Descriptors())
     {
-        if (!ResourceCheck::HasFileChanged(textureDesc.second.TextureFile()))
+        if (!forcedUpdate && !ResourceCheck::HasFileChanged(textureDesc.second.TextureFile()))
             continue;
         processes.push_back(PROCESS_INFORMATION());
-        CookTexture(textureDesc.first, textureDesc.second.TextureFile(), processes.back());
+        CookTexture(textureDesc.first, textureDesc.second, processes.back());
     }
 
     foreachitem(pi, processes)
@@ -230,6 +240,8 @@ void CookTextures(const std::vector<std::string>& parTexturesDescriptorFiles)
 
 void CookFreeFormTextures(const std::string& parFreeFormTextures)
 {
+    const bool forcedUpdate = ResourceCheck::HasFileChanged(parFreeFormTextures);
+
     Resource freeForm(parFreeFormTextures);
     std::shared_ptr<ResourceHandle> freeFormRH = GlobalResourceCache::Instance().FCache->GetResourceHandle(&freeForm);
     AssertRelease(freeFormRH != nullptr);
@@ -241,10 +253,11 @@ void CookFreeFormTextures(const std::string& parFreeFormTextures)
     {
         std::string file, name;
         istr >> file >> name;
-        if (!ResourceCheck::HasFileChanged(file))
+        if (!forcedUpdate && !ResourceCheck::HasFileChanged(file))
             continue;
         processes.emplace_back();
-        TextureCooking::CookTexture(name, file, processes.back());
+        Rendering::TextureDescriptor desc(file, 0, false, false);
+        TextureCooking::CookTexture(name, desc, processes.back());
     }
 
     foreachitem(pi, processes)

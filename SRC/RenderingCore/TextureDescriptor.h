@@ -41,12 +41,13 @@ class TextureDescriptor : public RefCountedObject
 
 public:
     TextureDescriptor();
-    TextureDescriptor(const std::string& parTextureFile, const u64 parFlags, const bool parMipMap);
+    TextureDescriptor(const std::string& parTextureFile, const u64 parFlags, const bool parMipMap, const bool parLinear);
     ~TextureDescriptor();
 
     const std::string& TextureFile() const { return FTextureFile; }
     u64 Flags() const { return FFlags; }
     bool MipMaps() const { return FMipMap; }
+    bool Linear() const { return FLinear; }
 
     LOAD()
     {
@@ -54,6 +55,8 @@ public:
 
         std::vector<std::string> textureFlags, samplerFlags;
         ar(NAMEDPROPERTY("TextureFlags", textureFlags), NAMEDPROPERTY("SamplerFlags", samplerFlags));
+
+        PROPERTYFIELD(Linear, false);
 
         FFlags = 0;
         FFlags |= TextureFlags::ConvertToTextureFlags(textureFlags);
@@ -69,6 +72,8 @@ public:
         SamplerFlags::ConvertToSamplerFlagsList(FFlags, samplerFlags);
 
         ar(NAMEDPROPERTY("TextureFlags", textureFlags), NAMEDPROPERTY("SamplerFlags", samplerFlags));
+
+        PROPERTYFIELD(Linear, false);
     }
 
 protected:
@@ -80,6 +85,7 @@ private:
     std::string FTextureFile;
     u64 FFlags;
     bool FMipMap;
+    bool FLinear = false;
 };
 } // namespace Rendering
 } // namespace ECSEngine

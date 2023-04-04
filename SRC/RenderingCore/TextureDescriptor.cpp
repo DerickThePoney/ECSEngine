@@ -157,14 +157,16 @@ TextureDescriptor::TextureDescriptor()
     , FTextureFile("")
     , FFlags(0)
     , FMipMap(false)
+    , FLinear(false)
 {
 }
 
-TextureDescriptor::TextureDescriptor(const std::string& parTextureFile, const u64 parFlags, const bool parMipMap)
+TextureDescriptor::TextureDescriptor(const std::string& parTextureFile, const u64 parFlags, const bool parMipMap, const bool parLinear)
     : RefCountedObject()
     , FTextureFile(parTextureFile)
     , FFlags(parFlags)
     , FMipMap(parMipMap)
+    , FLinear(parLinear)
 {
 }
 
