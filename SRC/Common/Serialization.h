@@ -17,7 +17,7 @@
     catch (std::runtime_error e)                                                                                                                                                   \
     {                                                                                                                                                                              \
         F##P = DEFAULT;                                                                                                                                                            \
-        AssertNotReached();                                                                                                                                                        \
+        AssertNotReachedMsg(e.what());                                                                                                                                             \
     }
 #define NAMEDPROPERTYFIELD(N, P, DEFAULT)                                                                                                                                          \
     try                                                                                                                                                                            \
@@ -27,7 +27,7 @@
     catch (std::runtime_error e)                                                                                                                                                   \
     {                                                                                                                                                                              \
         P = DEFAULT;                                                                                                                                                               \
-        AssertNotReached();                                                                                                                                                        \
+        AssertNotReachedMsg(e.what());                                                                                                                                             \
     }
 
 #define SERIALIZE()                                                                                                                                                                \

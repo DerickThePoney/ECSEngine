@@ -268,7 +268,7 @@ void UIStyleEditor(bool* parOpen)
             if (ImGui::MenuItem("Save"))
             {
                 const std::string& basePath = GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName();
-                const std::string filename = fmt::format("{}\\Styles\\Style_{}.style", basePath, Rendering::RenderPassId::GetName(passToEdit));
+                const std::string filename = fmt::format("{}\\Styles\\Style_{}.style", basePath, Rendering::RenderPassId::GetNameFromType(passToEdit));
                 bool isNewFile = false;
                 {
 
@@ -292,12 +292,12 @@ void UIStyleEditor(bool* parOpen)
         ImGui::EndMenuBar();
     }
 
-    if (ImGui::BeginCombo("ImGui context style to edit", Rendering::RenderPassId::GetName(passToEdit)))
+    if (ImGui::BeginCombo("ImGui context style to edit", Rendering::RenderPassId::GetNameFromType(passToEdit)))
     {
         for (u16 i = Rendering::RenderPassId::IMGUI_PASSES_START; i <= Rendering::RenderPassId::IMGUI_PASSES_END; ++i)
         {
             bool selected = i == passToEdit;
-            if (ImGui::Selectable(Rendering::RenderPassId::GetName((Rendering::RenderPassId::Type)i), selected))
+            if (ImGui::Selectable(Rendering::RenderPassId::GetNameFromType((Rendering::RenderPassId::Type)i), selected))
                 passToEdit = (Rendering::RenderPassId::Type)i;
 
             if (selected)
