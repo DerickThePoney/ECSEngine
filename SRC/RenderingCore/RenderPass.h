@@ -29,7 +29,9 @@ enum Type : u16
     IMGUI_PASSES_END = IMGUI_DEBUG_PASS,
     END_OF_GAME_PASSES = FINAL_COMBINE_PASS + 1
 };
-const char* GetName(Type parPass);
+
+const char* GetNameFromType(Type parPass);
+Type GetTypeFromName(const std::string& parName);
 Type ChooseInList(RenderPassId::Type parPreviouslyChosen);
 } // namespace RenderPassId
 
@@ -49,3 +51,27 @@ private:
 
 } // namespace Rendering
 } // namespace ECSEngine
+
+namespace cereal
+{
+template<class Archive>
+std::string save_minimal(const Archive& ar, const ECSEngine::Rendering::RenderPassId::Type& parPass)
+{
+    return ECSEngine::Rendering::RenderPassId::GetNameFromType(parPass);
+}
+
+template<class Archive>
+void load_minimal(const Archive& ar, ECSEngine::Rendering::RenderPassId::Type& parPass, const std::string& parValue)
+{
+    /*if (version > 0)
+    {
+        parPass = GetTypeFromName(parValue);
+    }
+    else
+    {*/
+    /*parPass = (ECSEngine::Rendering::RenderPassId::Type)atoi(parValue.c_str());*/
+    /*}*/
+
+    parPass = ECSEngine::Rendering::RenderPassId::GetTypeFromName(parValue);
+}
+} // namespace cereal
