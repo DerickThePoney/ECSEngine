@@ -82,9 +82,11 @@ TerrainRenderer::~TerrainRenderer()
 {
 }
 
-void TerrainRenderer::Initialize()
+void TerrainRenderer::Initialize(const TerrainDescriptor& parTerrainDescriptor, bool parIsEditor /*= false*/)
 {
-    CommandBuffer = BGFXRenderingBackend::Instance().CreateCommandBuffer(RenderPassId::EDITOR_PASS);
+    FTerrainDescriptor = parTerrainDescriptor;
+    CommandBuffer = BGFXRenderingBackend::Instance().CreateCommandBuffer((parIsEditor) ? RenderPassId::EDITOR_PASS : RenderPassId::GEOMETRY_PASS); // TODO -- NEED TO DEFINE ANOTHER
+                                                                                                                                                   // METHOD FOR RENDER PASSES
 
     CreateTerrainMesh();
 
@@ -101,6 +103,12 @@ void TerrainRenderer::Initialize()
     HeightMap::Instance().Initialise(FTerrainDescriptor, heightMapHandle);
 
     FQuadTree.Initialize(&FTerrainDescriptor);
+}
+
+void TerrainRenderer::Reinitialize(const TerrainDescriptor& parTerrainDescriptor, bool parIsEditor /*= false*/)
+{
+    Shutdown();
+    Initialize(parTerrainDescriptor, parIsEditor);
 }
 
 void TerrainRenderer::Shutdown()

@@ -4,6 +4,7 @@
 
 #include "ApplicationSceneActions.h"
 #include "Common/Singleton.h"
+#include "ECSGameplay_Specific/InitializeTerrainSceneAction.h"
 #include "ECSGameplay_Specific/SpecificGameplaySceneActions.h"
 
 namespace ECSEngine

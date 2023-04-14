@@ -37,8 +37,6 @@ void EditorSceneRenderer::Initialise(const std::string& parHandleFileName, const
     FCameraId = CameraManager::Instance().CreateCameraIFN("EditorCamera");
 
     FDrawCommandBuffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::EDITOR_PASS);
-
-    FTest.Initialize();
 }
 
 void EditorSceneRenderer::Shutdown()
@@ -107,8 +105,6 @@ void EditorSceneRenderer::RenderScene(const SceneScenario* parScene)
     }
 
     FDrawCommandBuffer->Submit();
-
-    FTest.Render();
 }
 
 } // namespace ECSEngine
