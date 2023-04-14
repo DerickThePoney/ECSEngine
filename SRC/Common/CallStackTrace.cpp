@@ -14,12 +14,13 @@ namespace ECSEngine
 
 CallStackTrace::CallStackTrace()
 {
+    // CallStack::InitializeSymbols();
     if (!CallStack::AreSymbolsInitialized())
     {
         return;
     }
 
-    HANDLE process = GetCurrentProcess();
+    HANDLE process = CallStack::GetCurrentProcessHandle();
 
     PVOID rawTrace[1024];
     USHORT frameNum = CaptureStackBackTrace(0, 1024, rawTrace, nullptr);
@@ -77,6 +78,11 @@ CallStackTrace::CallStackTrace()
             }
         }
     }
+}
+
+CallStackTrace::~CallStackTrace()
+{
+    // CallStack::CleanupSymbols();
 }
 
 void CallStackTrace::PrintToStream(std::ostringstream& oss)

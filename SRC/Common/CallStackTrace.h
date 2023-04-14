@@ -41,6 +41,7 @@ struct Frame
 struct CallStackTrace
 {
     CallStackTrace();
+    ~CallStackTrace();
 
     void PrintToStream(std::ostringstream& oss);
 
