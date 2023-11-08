@@ -45,10 +45,33 @@ bool HasFileChanged(const std::string& parFile)
         if (res == 0)
             return false;
     }
+    return true;
+}
+
+void PrintSha1File(const std::string& parFile)
+{
+    Resource resourceSha1(parFile + ".sha1");
+    c8 hexdigest[41];
+    Resource resource(parFile);
+    std::shared_ptr<ResourceHandle> resourceHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&resource);
+    AssertRelease(resourceHandle != nullptr);
+
+    i32 resSha1 = sha1digest(nullptr, &hexdigest[0], reinterpret_cast<const u8*>(resourceHandle->Buffer()), resourceHandle->Size());
+    AssertRelease(resSha1 == 0);
 
     std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + parFile + ".sha1", std::ofstream::binary);
     AssertRelease(ofstr.good());
     ofstr.write(&hexdigest[0], 41);
+}
+
+bool HasFileChanged_PrintSha1File(const std::string& parFile)
+{
+    if (!HasFileChanged(parFile))
+    {
+        return false;
+    }
+
+    PrintSha1File(parFile);
     return true;
 }
 } // namespace ResourceCheck
@@ -74,7 +97,7 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
     meshToRecompute.reserve(parMeshFiles.size());
     foreachitemconst(mesh, parMeshFiles)
     {
-        if (!ResourceCheck::HasFileChanged(mesh))
+        if (!ResourceCheck::HasFileChanged_PrintSha1File(mesh))
             continue;
         meshToRecompute.push_back(mesh);
     }
@@ -121,7 +144,7 @@ void CookMeshes(const std::vector<std::string>& parMeshFiles)
     foreachitemconst(meshFile, parMeshFiles)
     {
         LOG_COOKING("Cooking mesh " + meshFile);
-        if (!ResourceCheck::HasFileChanged(meshFile))
+        if (!ResourceCheck::HasFileChanged_PrintSha1File(meshFile))
             continue;
         MeshCooking::CookMesh(meshFile);
     }
@@ -182,7 +205,7 @@ void CookTexture(const std::string& parCookedTextureName, const ECSEngine::Rende
 void CookTextureBank(const std::string& parTextureBankFile)
 {
     bool forcedUpdate = false;
-    if (ResourceCheck::HasFileChanged(parTextureBankFile))
+    if (ResourceCheck::HasFileChanged_PrintSha1File(parTextureBankFile))
     {
         forcedUpdate = true;
     }
@@ -204,7 +227,7 @@ void CookTextureBank(const std::string& parTextureBankFile)
     processes.reserve(textureBank.Descriptors().size());
     foreachitemconst(textureDesc, textureBank.Descriptors())
     {
-        if (!forcedUpdate && !ResourceCheck::HasFileChanged(textureDesc.second.TextureFile()))
+        if (!forcedUpdate && !ResourceCheck::HasFileChanged_PrintSha1File(textureDesc.second.TextureFile()))
             continue;
         processes.push_back(PROCESS_INFORMATION());
         CookTexture(textureDesc.first, textureDesc.second, processes.back());
@@ -240,7 +263,7 @@ void CookTextures(const std::vector<std::string>& parTexturesDescriptorFiles)
 
 void CookFreeFormTextures(const std::string& parFreeFormTextures)
 {
-    const bool forcedUpdate = ResourceCheck::HasFileChanged(parFreeFormTextures);
+    const bool forcedUpdate = ResourceCheck::HasFileChanged_PrintSha1File(parFreeFormTextures);
 
     Resource freeForm(parFreeFormTextures);
     std::shared_ptr<ResourceHandle> freeFormRH = GlobalResourceCache::Instance().FCache->GetResourceHandle(&freeForm);
@@ -253,7 +276,7 @@ void CookFreeFormTextures(const std::string& parFreeFormTextures)
     {
         std::string file, name;
         istr >> file >> name;
-        if (!forcedUpdate && !ResourceCheck::HasFileChanged(file))
+        if (!forcedUpdate && !ResourceCheck::HasFileChanged_PrintSha1File(file))
             continue;
         processes.emplace_back();
         Rendering::TextureDescriptor desc(file, 0, false, false);
@@ -280,7 +303,7 @@ void CookFreeFormTextures(const std::string& parFreeFormTextures)
 
 namespace ShaderCompiling
 {
-void CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION& pi)
+bool CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION& pi)
 {
     std::cout << "Compiling " << parFileName << std::endl;
 
@@ -319,9 +342,9 @@ void CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION
           L" -i ..\\External\\BGFX\\bgfx\\src\\ --platform windows -O 3 -V --disasm ";
 
     if (type == 0)
-        wideString += L"-p vs_5_0 --type vertex";
+        wideString += L"-p s_5_0 --type vertex";
     else
-        wideString += L"-p ps_5_0 --type fragment";
+        wideString += L"-p s_5_0 --type fragment";
 
     // start the program up
     if (!CreateProcess(NULL, // the path
@@ -337,14 +360,21 @@ void CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION
               ))
     {
         printf("CreateProcess failed (%d).\n", GetLastError());
-        return;
+        return false;
     }
+
+    return true;
 }
 } // namespace ShaderCompiling
 
 void CompileShaders(const std::vector<std::string>& parShadersFiles)
 {
-    std::vector<PROCESS_INFORMATION> processes;
+    struct ProcessInfo
+    {
+        std::string File;
+        PROCESS_INFORMATION Info;
+    };
+    std::vector<ProcessInfo> processes;
     processes.reserve(parShadersFiles.size());
     foreachitemconst(file, parShadersFiles)
     {
@@ -369,25 +399,30 @@ void CompileShaders(const std::vector<std::string>& parShadersFiles)
         if (type == -1)
             continue;
 
-        processes.emplace_back();
-        ShaderCompiling::CompileShader(file, type, processes.back());
+        ProcessInfo& Info = processes.emplace_back();
+        Info.File = file;
+        ShaderCompiling::CompileShader(file, type, Info.Info);
     }
 
     foreachitem(pi, processes)
     { // Wait until child process exits.
-        WaitForSingleObject(pi.hProcess, INFINITE);
+        WaitForSingleObject(pi.Info.hProcess, INFINITE);
 
         // TODO GetExitCodeProcess().
 
         DWORD exitCode;
-        if (GetExitCodeProcess(pi.hProcess, &exitCode))
+        if (GetExitCodeProcess(pi.Info.hProcess, &exitCode))
         {
-            std::cout << exitCode << std::endl;
+            std::cout << pi.File << ": " << exitCode << std::endl;
+            if (exitCode == 0)
+            {
+                ResourceCheck::PrintSha1File(pi.File);
+            }
         }
 
         // Close process and thread handles.
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
+        CloseHandle(pi.Info.hProcess);
+        CloseHandle(pi.Info.hThread);
     }
 }
 
