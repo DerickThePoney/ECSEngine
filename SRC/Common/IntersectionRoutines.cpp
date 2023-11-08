@@ -243,7 +243,7 @@ bool FrustumSphereIntersect(const Frustum& parFrustum, const vec4& parSphere)
 
     foreachitem(plane, frustumPlane)
     {
-        const float dist = Dot(plane, vec4(parSphere.xyz(), 1.0f));
+        const float dist = Dot(plane, parSphere.xyz1());
         if (dist < -parSphere.w)
             return false;
     }

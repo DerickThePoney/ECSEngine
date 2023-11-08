@@ -1,6 +1,7 @@
 #pragma once
 #include "VectorTypes.h"
 
+// clang-format off
 namespace ECSEngine
 {
 /****************************
@@ -418,6 +419,8 @@ public:
         return Vector4(A, B, C, D);                                                                                                                                                   \
     }
 
+    MAKE_SWIZZLE_OP_4(xyz0, x, y, z, T(0));
+    MAKE_SWIZZLE_OP_4(xyz1, x, y, z, T(1));
     MAKE_SWIZZLE_OP_4(xxxx, x, x, x, x);
     MAKE_SWIZZLE_OP_4(yyyy, y, y, y, y);
     MAKE_SWIZZLE_OP_4(zzzz, z, z, z, z);
@@ -467,3 +470,5 @@ MAKE_EXTERN_OP(*);
 #undef MAKE_EXTERN_OP
 #pragma pack(pop)
 }
+
+// clang-format on
