@@ -292,7 +292,7 @@ mat4 Rotation(float angle, const vec3& v)
 
 mat4 Perspective(float fovy, float aspect, float zNear, float zFar)
 {
-    AlwaysCheckedAssert(abs(aspect - std::numeric_limits<float>::epsilon()) > 0.f);
+    AlwaysCheckedAssert(fabs(aspect - std::numeric_limits<float>::epsilon()) > 0.f);
 
     const float tanHalfFovy = tan(0.5f * fovy);
 
