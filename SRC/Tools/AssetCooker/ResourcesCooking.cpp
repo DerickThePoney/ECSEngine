@@ -179,6 +179,10 @@ void CookTexture(const std::string& parCookedTextureName, const ECSEngine::Rende
 
     std::wstring cookedFilename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + path + parCookedTextureName);
     wideString += filename + L" -o " + cookedFilename + L".ktx";
+    if (parTextureDescriptor.MipMaps())
+    {
+        wideString += L" -mips";
+    }
     if (parTextureDescriptor.Linear())
     {
         wideString += L" --linear";

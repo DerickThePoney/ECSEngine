@@ -145,6 +145,7 @@ void TerrainRenderer::Render()
     const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
     CommandBuffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(aspectRatio));
 
+    /*** MOVE TO INIT *************/
     MultiPassMaterialInstanceHandle handle = MaterialManager::CreateMultiPassMaterialInstanceIFN("materials\\terrain.materialv2");
 
     std::vector<vec4> LoDs;
@@ -166,6 +167,7 @@ void TerrainRenderer::Render()
     MaterialManager::SetVec4Uniforms("u_LoDDistances", LoDs.data(), (u32)LoDs.size());
     CommandBuffer->SetVec4Uniform(
           "u_gridDim", vec4(FTerrainDescriptor.MeshVerticesSize, FTerrainDescriptor.MeshVerticesSize, FTerrainDescriptor.TerrainSize, FTerrainDescriptor.TerrainSize));
+    /*** MOVE TO INIT *************/
 
     constexpr u32 stride = sizeof(vec4) + sizeof(vec4) + sizeof(vec4);
     const u32 nbNodes = (u32)nodesToRender.size();
