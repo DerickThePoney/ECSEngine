@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Common/Types.h"
 
 namespace ECSEngine
 {
@@ -6,7 +7,7 @@ namespace ECSEngine
 template<u32 BitSetSize>
 class BitSet
 {
-    static_assert(BitSetSize > 0, "Impossible de déclarer un bitset vide !");
+    static_assert(BitSetSize > 0, "Unable to declare an empty bitset !");
     using BitSetType = u32;
 
 public:
@@ -134,7 +135,10 @@ bool BitSet<BitSetSize>::operator!=(const BitSet<BitSetSize>& parOther) const
 {
     const u32 memSize = MEMORY_SIZE;
     bool res = true;
-    forrange(i, 0, memSize) { res = res && ((FBitSet[i] ^ parOther.FBitSet[i]) == 0); }
+    forrange(i, 0, memSize)
+    {
+        res = res && ((FBitSet[i] ^ parOther.FBitSet[i]) == 0);
+    }
     return !res;
 }
 
@@ -143,7 +147,10 @@ bool BitSet<BitSetSize>::operator==(const BitSet<BitSetSize>& parOther) const
 {
     const u32 memSize = MEMORY_SIZE;
     bool res = true;
-    forrange(i, 0, memSize) { res = res && ((FBitSet[i] ^ parOther.FBitSet[i]) == 0); }
+    forrange(i, 0, memSize)
+    {
+        res = res && ((FBitSet[i] ^ parOther.FBitSet[i]) == 0);
+    }
     return res;
 }
 

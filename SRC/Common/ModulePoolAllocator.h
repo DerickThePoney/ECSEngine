@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Common/Types.h"
 
 namespace ECSEngine
 {

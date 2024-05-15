@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "Common/Types.h"
+
 #include <list>
 namespace ECSEngine
 {
@@ -227,10 +229,22 @@ void PoolAllocator<T, ChunkSize>::GrowOneChunk()
 #define DECLARE_POOL_ALLOCATED_CUSTOM_CHUNK_SIZE(TYPE, CHUNK_SIZE)                                                                                                                 \
 public:                                                                                                                                                                            \
     static PoolAllocator<TYPE, CHUNK_SIZE> sPool##TYPE;                                                                                                                            \
-    static void* operator new(std::size_t count) { return TYPE::sPool##TYPE.Allocate((u32)(count / sizeof(TYPE))); }                                                               \
-    static void operator delete(void* ptr, std::size_t count) { TYPE::sPool##TYPE.Free(ptr, (u32)(count / sizeof(TYPE))); }                                                        \
-    static void* operator new[](std::size_t count) { return TYPE::sPool##TYPE.Allocate((u32)(count / sizeof(TYPE))); }                                                             \
-    static void operator delete[](void* ptr, std::size_t count) { TYPE::sPool##TYPE.Free(ptr, (u32)(count / sizeof(TYPE))); }                                                      \
+    static void* operator new(std::size_t count)                                                                                                                                   \
+    {                                                                                                                                                                              \
+        return TYPE::sPool##TYPE.Allocate((u32)(count / sizeof(TYPE)));                                                                                                            \
+    }                                                                                                                                                                              \
+    static void operator delete(void* ptr, std::size_t count)                                                                                                                      \
+    {                                                                                                                                                                              \
+        TYPE::sPool##TYPE.Free(ptr, (u32)(count / sizeof(TYPE)));                                                                                                                  \
+    }                                                                                                                                                                              \
+    static void* operator new[](std::size_t count)                                                                                                                                 \
+    {                                                                                                                                                                              \
+        return TYPE::sPool##TYPE.Allocate((u32)(count / sizeof(TYPE)));                                                                                                            \
+    }                                                                                                                                                                              \
+    static void operator delete[](void* ptr, std::size_t count)                                                                                                                    \
+    {                                                                                                                                                                              \
+        TYPE::sPool##TYPE.Free(ptr, (u32)(count / sizeof(TYPE)));                                                                                                                  \
+    }                                                                                                                                                                              \
                                                                                                                                                                                    \
 private:
 
@@ -238,10 +252,22 @@ private:
 public:                                                                                                                                                                            \
     using ThisType = TYPE<TEMPLATE>;                                                                                                                                               \
     static inline PoolAllocator<ThisType, CHUNK_SIZE> sPool##TYPE##TEMPLATE = PoolAllocator<ThisType, CHUNK_SIZE>();                                                               \
-    static void* operator new(std::size_t count) { return ThisType::sPool##TYPE##TEMPLATE.Allocate((u32)(count / sizeof(ThisType))); }                                             \
-    static void operator delete(void* ptr, std::size_t count) { ThisType::sPool##TYPE##TEMPLATE.Free(ptr, (u32)(count / sizeof(ThisType))); }                                      \
-    static void* operator new[](std::size_t count) { return ThisType::sPool##TYPE##TEMPLATE.Allocate((u32)(count / sizeof(ThisType))); }                                           \
-    static void operator delete[](void* ptr, std::size_t count) { ThisType::sPool##TYPE##TEMPLATE.Free(ptr, (u32)(count / sizeof(ThisType))); }                                    \
+    static void* operator new(std::size_t count)                                                                                                                                   \
+    {                                                                                                                                                                              \
+        return ThisType::sPool##TYPE##TEMPLATE.Allocate((u32)(count / sizeof(ThisType)));                                                                                          \
+    }                                                                                                                                                                              \
+    static void operator delete(void* ptr, std::size_t count)                                                                                                                      \
+    {                                                                                                                                                                              \
+        ThisType::sPool##TYPE##TEMPLATE.Free(ptr, (u32)(count / sizeof(ThisType)));                                                                                                \
+    }                                                                                                                                                                              \
+    static void* operator new[](std::size_t count)                                                                                                                                 \
+    {                                                                                                                                                                              \
+        return ThisType::sPool##TYPE##TEMPLATE.Allocate((u32)(count / sizeof(ThisType)));                                                                                          \
+    }                                                                                                                                                                              \
+    static void operator delete[](void* ptr, std::size_t count)                                                                                                                    \
+    {                                                                                                                                                                              \
+        ThisType::sPool##TYPE##TEMPLATE.Free(ptr, (u32)(count / sizeof(ThisType)));                                                                                                \
+    }                                                                                                                                                                              \
                                                                                                                                                                                    \
 private:
 

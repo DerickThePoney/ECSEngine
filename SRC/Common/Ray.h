@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Math/VectorTypes.h"
 namespace ECSEngine
 {
 template<typename T>
