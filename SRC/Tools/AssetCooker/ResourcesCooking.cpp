@@ -181,7 +181,7 @@ void CookTexture(const std::string& parCookedTextureName, const ECSEngine::Rende
     wideString += filename + L" -o " + cookedFilename + L".ktx";
     if (parTextureDescriptor.MipMaps())
     {
-        wideString += L" -mips";
+        wideString += L" --mips";
     }
     if (parTextureDescriptor.Linear())
     {
