@@ -187,6 +187,10 @@ void CookTexture(const std::string& parCookedTextureName, const ECSEngine::Rende
     {
         wideString += L" --linear";
     }
+    if (parTextureDescriptor.NormalMap())
+    {
+        wideString += L" --normalmap";
+    }
 
     // start the program up
     if (!CreateProcess(NULL, // the path

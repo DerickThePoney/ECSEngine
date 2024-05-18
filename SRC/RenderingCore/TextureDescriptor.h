@@ -48,6 +48,7 @@ public:
     u64 Flags() const { return FFlags; }
     bool MipMaps() const { return FMipMap; }
     bool Linear() const { return FLinear; }
+    bool NormalMap() const { return FNormalMap; }
 
     LOAD()
     {
@@ -57,6 +58,7 @@ public:
         ar(NAMEDPROPERTY("TextureFlags", textureFlags), NAMEDPROPERTY("SamplerFlags", samplerFlags));
 
         PROPERTYFIELD(Linear, false);
+        PROPERTYFIELD(NormalMap, false);
 
         FFlags = 0;
         FFlags |= TextureFlags::ConvertToTextureFlags(textureFlags);
@@ -74,6 +76,7 @@ public:
         ar(NAMEDPROPERTY("TextureFlags", textureFlags), NAMEDPROPERTY("SamplerFlags", samplerFlags));
 
         PROPERTYFIELD(Linear, false);
+        PROPERTYFIELD(NormalMap, false);
     }
 
 protected:
@@ -86,6 +89,7 @@ private:
     u64 FFlags;
     bool FMipMap;
     bool FLinear = false;
+    bool FNormalMap = false;
 };
 } // namespace Rendering
 } // namespace ECSEngine
