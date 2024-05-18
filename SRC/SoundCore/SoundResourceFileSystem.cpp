@@ -17,7 +17,7 @@ bool InitializeCache()
     SoundResourceCache::CreateIFP();
 
 #ifdef COMPILE_FINAL
-    SoundResourceCache::Instance().FCache = new ResourceCache(10, new DataPackDirectoryView(std::string(Configuration::SoundDatapackDirectory) + ".datapack"));
+    SoundResourceCache::Instance().FCache = new ResourceCache(100, new DataPackDirectoryView(std::string(Configuration::SoundDatapackDirectory) + ".datapack"));
 #else
     if (Options.NoDatapack)
         SoundResourceCache::Instance().FCache = new ResourceCache(100, new ResourceFileDirectoryView(Configuration::SoundsDirectory));
