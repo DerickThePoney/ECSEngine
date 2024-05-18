@@ -67,24 +67,28 @@ def ProcessVersion():
     command = ['py', '-u', 'Script/Compil/BuildAll.py', '-b', '-c', 'Final']
     ret = subprocess.run(command)
     if ret.returncode != 0:
+        print('Build BGFX failed')
         return ret.returncode
 
     print('Build all Final')
     command = ['py', '-u', 'Script/Compil/BuildAll.py', '-e', '-c', 'Final']
     ret = subprocess.run(command)
     if ret.returncode != 0:
+        print('Build Game failed')
         return ret.returncode
 
     print('Build engine tools')
     command = ['py', '-u', 'Script/Compil/BuildAll.py', '-et']
     ret = subprocess.run(command)
     if ret.returncode != 0:
+        print('Build Tools failed')
         return ret.returncode
 
     print('Generate all')
     command = ['py', '-u', 'Script/Generation/GenerateData.py']
     ret = subprocess.run(command)
     if ret.returncode != 0:
+        print('Generate data failed')
         return ret.returncode
 
     print('Datapack')
@@ -92,6 +96,7 @@ def ProcessVersion():
     command = ['./DataPacker-x64-Release.exe']
     ret = subprocess.run(command)
     if ret.returncode != 0:
+        print('Datapack failed')
         return ret.returncode
 
     os.chdir('..')

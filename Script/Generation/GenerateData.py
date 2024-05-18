@@ -26,6 +26,8 @@ def main():
             return 1
 
     result = subprocess.run('../bin/AssetCooker-x64-Release.exe')
+    if result.returncode != 0:
+        print('Asset cooking failed')
     return result.returncode
 
 if __name__ == "__main__":
