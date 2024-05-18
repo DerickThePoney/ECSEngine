@@ -95,7 +95,7 @@ void TerrainRenderer::Initialize(const TerrainDescriptor& parTerrainDescriptor, 
         FTerrainDescriptor.LoDDistances.push_back(FTerrainDescriptor.MinLodDistance * powf(2.f, i));
     }
 
-    MultiPassMaterialInstanceHandle handle = MaterialManager::CreateMultiPassMaterialInstanceIFN("materials\\terrain.materialv2");
+    MultiPassMaterialInstanceHandle handle = MaterialManager::CreateMultiPassMaterialInstanceIFN("materials\\terrainnormalmap.materialv2");
     const MultiPassMaterialInstance* materialInstance = MaterialManager::GetMultiPassMaterialInstance(handle);
     const TextureHandle& heightMapHandle = materialInstance->GetTextureInputs()[0].Handle();
 
@@ -146,7 +146,7 @@ void TerrainRenderer::Render()
     CommandBuffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(aspectRatio));
 
     /*** MOVE TO INIT *************/
-    MultiPassMaterialInstanceHandle handle = MaterialManager::CreateMultiPassMaterialInstanceIFN("materials\\terrain.materialv2");
+    MultiPassMaterialInstanceHandle handle = MaterialManager::CreateMultiPassMaterialInstanceIFN("materials\\terrainnormalmap.materialv2");
 
     std::vector<vec4> LoDs;
     u32 nbLods = FTerrainDescriptor.LoDDistances.size();
