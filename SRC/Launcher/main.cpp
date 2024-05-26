@@ -10,6 +10,7 @@
 #include "Common/ResourceHandle.h"
 #include "ECSGameplay_Common/ECSLoader.h"
 #include "ECSGameplay_Specific/GameplaySpecificLoader.h"
+#include "Physics/PhysicsLoader.h"
 #include "RenderingCore/RenderingLoader.h"
 #include "SoundCore/SoundLoader.h"
 
@@ -47,6 +48,7 @@ int main(int argc, char** argv)
             app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>();
             app.AddNewLoader<ECSEngine::ECSLoader>("\\Configuration\\EntityTemplates.json");
             app.AddNewLoader<ECSEngine::SoundLoader>();
+            app.AddNewLoader<ECSEngine::PhysicsLoader>();
             app.AddNewLoader<ECSEngine::RenderingLoader>("Base Application");
             app.AddNewLoader<ECSEngine::ECSGameplaySpecificLoader>("\\Configuration\\GameplayRules.json");
             app.SetGameplayUpdater_StealOwnership(new ECSEngine::ApplicationUpdaterWrapper());
