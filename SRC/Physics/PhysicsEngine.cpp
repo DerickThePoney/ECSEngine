@@ -118,8 +118,15 @@ bool PhysicsEngine::AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3
         return false;
     }
 
-    /*RigidBody& body = FRigidbodies[Handle.FId];
-    body.FPosition = Position;*/
+    RigidBody& body = FRigidbodies[Handle.FId];
+    if (bTreatAsVelocityChange)
+    {
+        body.FVelocity += Impulse;
+    }
+    else
+    {
+        body.FVelocity += Impulse / body.FMass;
+    }
     return false;
 }
 
