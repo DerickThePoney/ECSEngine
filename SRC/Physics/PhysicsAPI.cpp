@@ -63,22 +63,26 @@ const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const Physic
 
 bool SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position)
 {
-    return false;
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.SetBodyPosition(Handle, Position);
 }
 
 bool SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3& Velocity)
 {
-    return false;
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.SetBodyVelocity(Handle, Velocity);
 }
 
 bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration)
 {
-    return false;
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.AddForceToBody(Handle, Force, bTreatAsAcceleration);
 }
 
 bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange)
 {
-    return false;
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.AddImpulseToBody(Handle, Impulse, bTreatAsVelocityChange);
 }
 
 } // namespace Physics

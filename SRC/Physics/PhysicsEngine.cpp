@@ -39,6 +39,10 @@ const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transfor
     RigidBody newBody;
     newBody.FPosition = Transform.Column(3).xyz();
     newBody.FMass = BodyConfig.FMass;
+    newBody.FLinearDamping = BodyConfig.FLinearDamping;
+    newBody.FAngularDamping = BodyConfig.FAngularDamping;
+    if (!BodyConfig.FApplyGravity)
+        newBody.FGravityScale = 0.f;
 
     FRigidbodies.emplace_back(newBody);
 
