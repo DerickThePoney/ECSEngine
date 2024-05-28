@@ -5,6 +5,7 @@
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
+#include "Common/TimeManager.h"
 #include "PhysicsBodyConfig.h"
 #include "PhysicsBodyHandle.h"
 #include "PhysicsEngine.h"
@@ -50,9 +51,9 @@ void ShutdownPhysics()
     PhysicsEngine::Destroy();
 }
 
-void UpdatePhysics(float parDeltaTime)
+void UpdatePhysics()
 {
-    PhysicsEngine::Instance().UpdatePhysics(parDeltaTime);
+    PhysicsEngine::Instance().UpdatePhysics(TimeManager::FrameDeltaTime());
 }
 
 const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
@@ -71,6 +72,18 @@ bool SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3& Velocity)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
     return Engine.SetBodyVelocity(Handle, Velocity);
+}
+
+bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyPosition(Handle, Position);
+}
+
+bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyVelocity(Handle, Velocity);
 }
 
 bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration)

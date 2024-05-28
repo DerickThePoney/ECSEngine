@@ -84,6 +84,40 @@ bool PhysicsEngine::SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3&
     return true;
 }
 
+bool PhysicsEngine::GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position) const
+{
+    if (!Handle.IsValid())
+    {
+        return false;
+    }
+
+    if (Handle.FId > FRigidbodies.size())
+    {
+        return false;
+    }
+
+    const RigidBody& body = FRigidbodies[Handle.FId];
+    Position = body.FPosition;
+    return true;
+}
+
+bool PhysicsEngine::GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity) const
+{
+    if (!Handle.IsValid())
+    {
+        return false;
+    }
+
+    if (Handle.FId > FRigidbodies.size())
+    {
+        return false;
+    }
+
+    const RigidBody& body = FRigidbodies[Handle.FId];
+    Velocity = body.FVelocity;
+    return true;
+}
+
 bool PhysicsEngine::AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration)
 {
     if (!Handle.IsValid())
