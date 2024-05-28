@@ -9,6 +9,7 @@
 #include "ECSGameplay_Specific/StorageSlotSystem.h"
 #include "ECSGameplay_Specific/UserInterfaceSystem.h"
 #include "IScenarioUpdater.h"
+#include "PhysicsUpdateSystem.h"
 #include "SynchroWithRenderSystem.h"
 
 namespace ECSEngine
@@ -39,6 +40,8 @@ private:
 
     CameraMoverSystem FCameraMoverSystem;
     SynchroWithRenderSystem FRenderingSystem;
+
+    PhysicsUpdateSystem FPhysicsSystem;
 
     ColonyBuildingSystem FColonyBuildingSystem;
     ResourceProductionSystem FRawResourceProductionSystem;

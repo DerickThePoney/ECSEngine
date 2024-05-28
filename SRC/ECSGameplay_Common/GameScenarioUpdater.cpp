@@ -15,6 +15,7 @@
 #include "ECSGameplay_Specific/ResourceManager.h"
 #include "ImGuiTools/ResourceCacheDebug.h"
 #include "NavMeshPathfindingManager.h"
+#include "Physics/PhysicsAPI.h"
 #include "Rendering/FinalCombinePass.h"
 #include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
@@ -45,7 +46,7 @@ IMPLEMENT_SAVELOAD_ABILITIES(GameScenarioUpdater);
 template<typename Chunk, bool isWriting>
 void GameScenarioUpdater::SaveLoad(Chunk& parChunk)
 {
-    parChunk& FScenarioFileName;
+    parChunk & FScenarioFileName;
 
     if (!isWriting)
     {
@@ -102,6 +103,7 @@ void GameScenarioUpdater::Initialise()
     FColonyFeedbackSystem.Init();
     FColonyBuildingSystem.Init();
     FUserInterfaceSystem.Init();
+    FPhysicsSystem.Init();
 
     FScenario->Initialise();
 }
@@ -114,6 +116,7 @@ void GameScenarioUpdater::Destroy()
     delete FScenario;
     FScenario = nullptr;
 
+    FPhysicsSystem.Destroy();
     FUserInterfaceSystem.Destroy();
     FColonyBuildingSystem.Destroy();
     FColonyFeedbackSystem.Destroy();
@@ -179,6 +182,8 @@ void GameScenarioUpdater::GameplayUpdate()
         FColonyBuildingSystem.Update();
 
         ResourceManager::Instance().Update();
+
+        FPhysicsSystem.Update();
 
         WorldManager::Instance().ProcessDestroyEntities();
         WorldManager::Instance().ProcessWithEntitiesCreation();

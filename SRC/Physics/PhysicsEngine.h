@@ -30,6 +30,9 @@ public:
     // body manipulation
     bool SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position);
     bool SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3& Velocity);
+    bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position) const;
+    bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity) const;
+
     bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration);
     bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange);
 

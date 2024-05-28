@@ -12,7 +12,7 @@ void InitializePhysics(const std::string& ConfigurationFilename);
 void ShutdownPhysics();
 
 // Physics update
-void UpdatePhysics(float parDeltaTime);
+void UpdatePhysics();
 // TODO BACKWARD UPDATE
 
 // Body creation
@@ -21,6 +21,10 @@ const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const Physic
 // Body manipulation
 bool SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position);
 bool SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3& Velocity);
+
+bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position);
+bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity);
+
 bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration);
 bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange);
 } // namespace Physics
