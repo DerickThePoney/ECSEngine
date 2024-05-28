@@ -15,8 +15,9 @@ void ShutdownPhysics();
 void UpdatePhysics();
 // TODO BACKWARD UPDATE
 
-// Body creation
+// Body creation/destruction
 const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
+bool DestroyPhysicsBody(const PhysicsBodyHandle& Handle);
 
 // Body manipulation
 bool SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position);

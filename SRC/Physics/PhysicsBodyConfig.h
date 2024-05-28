@@ -21,6 +21,17 @@ struct PhysicsBodyConfig
     // - Collision channels
     // - Drag (angular and linear)
     // - MassComputation
+
+    SERIALIZE()
+    {
+        PROPERTYFIELD(ApplyGravity, true);
+        PROPERTYFIELD(AutoComputeMass, false);
+        PROPERTYFIELD(Mass, 0.f);
+        PROPERTYFIELD(LinearDamping, 0.1f);
+        PROPERTYFIELD(AngularDamping, 0.01f);
+    }
+
+    void DrawInEditor();
 };
 } // namespace Physics
 } // namespace ECSEngine

@@ -26,6 +26,7 @@ public:
     void SetConfig(const PhysicsEngineConfiguration& NewConfig) { FConfig = NewConfig; }
 
     const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
+    bool DestroyPhysicsBody(const PhysicsBodyHandle& Handle);
 
     // body manipulation
     bool SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position);

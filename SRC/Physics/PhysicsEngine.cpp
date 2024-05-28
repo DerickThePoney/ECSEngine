@@ -50,6 +50,22 @@ const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transfor
     return newHandle;
 }
 
+bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
+{
+    if (!Handle.IsValid())
+    {
+        return false;
+    }
+
+    if (Handle.FId > FRigidbodies.size())
+    {
+        return false;
+    }
+
+    // TODO IMPOSSIBLE ATM
+    return true;
+}
+
 bool PhysicsEngine::SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position)
 {
     if (!Handle.IsValid())
