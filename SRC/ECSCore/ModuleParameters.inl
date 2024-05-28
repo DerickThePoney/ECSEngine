@@ -13,6 +13,7 @@ namespace ModuleParameters
 #endif
 
 DECLARE_MODULE_PARAMETER(Position, vec3)
+DECLARE_MODULE_PARAMETER(Velocity, vec3)
 DECLARE_MODULE_PARAMETER(Orientation, quat)
 DECLARE_MODULE_PARAMETER(EulerAnglesXYZ, vec3)
 DECLARE_MODULE_PARAMETER(Mesh, Rendering::MeshHandle)
