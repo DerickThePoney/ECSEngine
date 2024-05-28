@@ -6,3 +6,4 @@ DECLARE_MODULE_AND_TEMPLATE(CameraMoverModule, CameraMoverModuleTemplate)
 DECLARE_MODULE_AND_TEMPLATE(LinkToOwnerModule, LinkToOwnerModuleTemplate)
 
 #include "ECSGameplay_Specific/ModuleList.inl"
+DECLARE_MODULE_AND_TEMPLATE(RigidbodyModule, RigidbodyModuleTemplate)

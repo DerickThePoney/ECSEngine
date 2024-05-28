@@ -7,6 +7,7 @@
 #include "ECSCore/EntityWorld.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSCore/WorldManager.h"
+#include "ECSGameplay_Common/RigidbodyModule.h"
 #include "ECSGameplay_Specific/BuildingGridOccupancyModule.h"
 #include "ECSGameplay_Specific/ColonyModule.h"
 #include "ECSGameplay_Specific/EnergyConsumerModule.h"
@@ -22,7 +23,7 @@
 
 namespace ECSEngine
 {
-using StandardControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule>;
+using StandardControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::RigidbodyModule>;
 
 using ResourceProducerControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule>;
 
