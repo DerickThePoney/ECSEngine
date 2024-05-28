@@ -62,6 +62,12 @@ const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const Physic
     return Engine.CreateNewPhysicsBody(Transform, BodyConfig);
 }
 
+bool DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.DestroyPhysicsBody(Handle);
+}
+
 bool SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
