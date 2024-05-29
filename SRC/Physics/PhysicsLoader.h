@@ -24,7 +24,7 @@ public:
     {
         ar(cereal::base_class<ILoader>(this));
 
-        PROPERTYFIELD(ConfigurationFilename, "\\Configuration\\PhysicsConfiguration.json");
+        PROPERTYFIELD(ConfigurationFilename, "Configuration\\PhysicsConfiguration.json");
     }
 
 protected:
@@ -33,7 +33,7 @@ protected:
     virtual void VirtualShutdown() override;
 
 private:
-    std::string FConfigurationFilename = "\\Configuration\\PhysicsConfiguration.json";
+    std::string FConfigurationFilename = "Configuration\\PhysicsConfiguration.json";
 };
 } // namespace ECSEngine
 CEREAL_REGISTER_TYPE(ECSEngine::PhysicsLoader);
