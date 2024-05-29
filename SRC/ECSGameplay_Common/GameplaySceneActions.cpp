@@ -107,13 +107,21 @@ bool SpawnEntitySceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuff
     AssertRelease(descriptor != nullptr);
 
     const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(descriptor->MeshFile());
-    const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(descriptor->MaterialName());
     if (meshHandle.IsValid())
     {
         const vec3 eulerAngles = item->GetEulerAngles();
         const mat4 mtx = Translation(item->GetPosition()) * EulerAnglesXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
 
-        parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial, mtx);
+        if (descriptor->IsMultiPassMaterial())
+        {
+            const Rendering::MultiPassMaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMultiPassMaterialInstanceIFN(descriptor->MaterialName());
+            parCommandBuffer.DrawMesh(meshHandle, instanceHandle, mtx);
+        }
+        else
+        {
+            const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(descriptor->MaterialName());
+            parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial, mtx);
+        }
     }
 
     return true;
