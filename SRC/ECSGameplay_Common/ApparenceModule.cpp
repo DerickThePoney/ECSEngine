@@ -121,7 +121,10 @@ void ApparenceModule::InitGFXProxy(const vec3& parPosition, const quat& parOrien
     AssertRelease(!Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName().empty());
     init.FRepresentationDescriptor = Template<ApparenceModuleTemplate>()->GFXRepresentationDescriptorName();
     init.HasVisuals = true;
-    init.FIsSelectable = { true, true };
+    if (Template<ApparenceModuleTemplate>()->IsSelectable())
+    {
+        init.FIsSelectable = { true, true };
+    }
 
     FProxy = new Rendering::GFXRepresentationProxy();
     FProxy->Initialise(init);
