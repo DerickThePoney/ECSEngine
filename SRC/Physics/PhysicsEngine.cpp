@@ -30,6 +30,22 @@ void PhysicsEngine::Cleanup()
 
 void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 {
+    // integrate velocity
+    foreachitem(body, FRigidbodies)
+    {
+        body.FVelocity += (body.FAcceleration + body.FGravityScale * FConfig.FGravityValue * vec3(0.f, -1.f, 0.f)) * parDeltaTime;
+
+        // damping
+        body.FVelocity *= 1.f / (1.f + parDeltaTime * body.FLinearDamping);
+
+        body.FAcceleration = vec3(0.f);
+    }
+
+    // integrate position
+    foreachitem(body, FRigidbodies)
+    {
+        body.FPosition += body.FVelocity * parDeltaTime;
+    }
 }
 
 const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
