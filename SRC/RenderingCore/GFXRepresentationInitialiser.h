@@ -12,7 +12,7 @@ struct GFXRepresentationInitialiser
 
     std::string FRepresentationDescriptor;
 
-    std::pair<bool, bool> FIsSelectable;
+    std::pair<bool, bool> FIsSelectable = { false, false };
 
     bool HasCarier = false;
     bool HasVisuals = false;
