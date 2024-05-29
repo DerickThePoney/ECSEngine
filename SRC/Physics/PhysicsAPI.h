@@ -6,9 +6,12 @@ namespace Physics
 {
 struct PhysicsBodyHandle;
 struct PhysicsBodyConfig;
+struct PhysicsEngineConfiguration;
 
 // Init and shutdown
 void InitializePhysics(const std::string& ConfigurationFilename);
+void SetConfig(const PhysicsEngineConfiguration& Config);
+const PhysicsEngineConfiguration& GetConfig();
 void ShutdownPhysics();
 
 // Physics update

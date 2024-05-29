@@ -45,6 +45,16 @@ void InitializePhysics(const std::string& ConfigurationFilename)
     PhysicsEngine::Instance().Initialize(config);
 }
 
+void SetConfig(const PhysicsEngineConfiguration& Config)
+{
+    PhysicsEngine::Instance().SetConfig(Config);
+}
+
+const PhysicsEngineConfiguration& GetConfig()
+{
+    return PhysicsEngine::Instance().Config();
+}
+
 void ShutdownPhysics()
 {
     PhysicsEngine::Instance().Cleanup();

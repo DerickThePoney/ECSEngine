@@ -22,6 +22,7 @@ struct WindowsToShow
     bool showGameplayRulesEditor = false;
     bool showResourceCache = false;
     bool showScenesManagerEditor = false;
+    bool showPhysicsConfigurationEditor = false;
 };
 
 struct IOScene
