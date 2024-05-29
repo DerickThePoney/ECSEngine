@@ -44,6 +44,8 @@ public:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
     void VirtualDeinit() override;
 
+    const Physics::PhysicsBodyHandle& BodyHandle() const { return FHandle; }
+
 private:
     Physics::PhysicsBodyHandle FHandle;
 };
