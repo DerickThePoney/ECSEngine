@@ -17,6 +17,7 @@
 #include "GameRulesEditor.h"
 #include "InputDebug.h"
 #include "LoggerGUI.h"
+#include "PhysicsConfigurationEditor.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
@@ -88,6 +89,11 @@ void MainMenuBar(WindowsToShow& options, vec2& parOutMenuBarHeight, IOScene& par
         {
             ImGui::MenuItem("Scene templates", NULL, &options.showEntityTemplateEditor);
             ImGui::MenuItem("Gameplay rules", NULL, &options.showGameplayRulesEditor);
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Physics"))
+        {
+            ImGui::MenuItem("Physics configuration", NULL, &options.showPhysicsConfigurationEditor);
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Rendering"))
@@ -362,6 +368,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showScenesManagerEditor)
         DrawScenesManagerEditor(&parOutWindowsToShow.showScenesManagerEditor);
+
+    if (parOutWindowsToShow.showPhysicsConfigurationEditor)
+        DrawPhysicsConfigurationEditor(&parOutWindowsToShow.showPhysicsConfigurationEditor, menuBarHeight.y);
 }
 
 void DrawPlayScenarioWindow(bool& parOutPlayScenario)
