@@ -7,11 +7,24 @@ namespace Physics
 {
 struct RigidBody
 {
+    // positional stuff
     vec3 FPosition;
     vec3 FVelocity;
-    vec3 FAcceleration;
+    vec3 FAccelerationDueToForces;
 
+    // angular stuff
+    quat FOrientation;
+    vec3 FRotationVelocity;
+    vec3 FTorque;
+
+    // COM
+    vec3 FCenterOfMass;
+
+    // Mass and inertia
+    mat3 FInertiaTensor;
+    mat3 FInverseInitiaTensor;
     float FMass = 0.f;
+    float FInvMass = 1.f;
 
     float FGravityScale = 1.f;
 
