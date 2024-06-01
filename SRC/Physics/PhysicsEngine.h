@@ -41,7 +41,7 @@ private:
     PhysicsEngineConfiguration FConfig;
 
     IdGenerator FHandleGenerator; // TODO MAKE PHYSICS HANDLE ID GENERATOR THAT SPECIALISES THIS
-    std::vector<RigidBody> FRigidbodies;
+    std::vector<std::unique_ptr<RigidBody>> FRigidbodies;
 };
 } // namespace Physics
 } // namespace ECSEngine
