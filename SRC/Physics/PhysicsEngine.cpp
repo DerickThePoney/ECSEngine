@@ -30,6 +30,8 @@ void PhysicsEngine::Cleanup()
 
 void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 {
+    // TODO Update COM in world coordinates and Inverse inertia tensor
+
     // integrate velocity
     foreachitem(body, FRigidbodies)
     {
@@ -39,9 +41,11 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         }
 
         body->FVelocity += (body->FAccelerationDueToForces + body->FGravityScale * FConfig.FGravityValue * vec3(0.f, -1.f, 0.f)) * parDeltaTime;
+        body->FRotationVelocity += body->FInverseInitiaTensor * body->FTorque * parDeltaTime;
 
         // damping
         body->FVelocity *= 1.f / (1.f + parDeltaTime * body->FLinearDamping);
+        body->FRotationVelocity *= 1.f / (1.f + parDeltaTime * body->FAngularDamping);
 
         body->FAccelerationDueToForces = vec3(0.f);
     }
@@ -55,6 +59,7 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         }
 
         body->FPosition += body->FVelocity * parDeltaTime;
+        body->FOrientation = AddVectorToQuaternion(body->FOrientation, body->FRotationVelocity * parDeltaTime);
     }
 }
 
@@ -63,12 +68,7 @@ const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transfor
     PhysicsBodyHandle newHandle;
 
     RigidBody* newBody = new RigidBody;
-    newBody->FPosition = Transform.Column(3).xyz();
-    newBody->FMass = BodyConfig.FMass;
-    newBody->FLinearDamping = BodyConfig.FLinearDamping;
-    newBody->FAngularDamping = BodyConfig.FAngularDamping;
-    if (!BodyConfig.FApplyGravity)
-        newBody->FGravityScale = 0.f;
+    InitializeBody(newBody, Transform, BodyConfig);
 
     newHandle.FId = FHandleGenerator.GetNextId();
 
@@ -146,6 +146,50 @@ bool PhysicsEngine::SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3&
     return true;
 }
 
+bool PhysicsEngine::SetBodyOrientation(const PhysicsBodyHandle& Handle, const quat& Orientation)
+{
+    if (!Handle.IsValid())
+    {
+        return false;
+    }
+
+    if (Handle.FId > FRigidbodies.size())
+    {
+        return false;
+    }
+
+    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    body->FOrientation = Orientation;
+    return true;
+}
+
+bool PhysicsEngine::SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, const vec3& RotationVelocity)
+{
+    if (!Handle.IsValid())
+    {
+        return false;
+    }
+
+    if (Handle.FId > FRigidbodies.size())
+    {
+        return false;
+    }
+
+    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    body->FRotationVelocity = RotationVelocity;
+    return true;
+}
+
 bool PhysicsEngine::GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position) const
 {
     if (!Handle.IsValid())
@@ -185,6 +229,48 @@ bool PhysicsEngine::GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Veloc
         return false;
     }
     Velocity = body->FVelocity;
+    return true;
+}
+
+bool PhysicsEngine::GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation) const
+{
+    if (!Handle.IsValid())
+    {
+        return false;
+    }
+
+    if (Handle.FId > FRigidbodies.size())
+    {
+        return false;
+    }
+
+    const std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+    Orientation = body->FOrientation;
+    return true;
+}
+
+bool PhysicsEngine::GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity) const
+{
+    if (!Handle.IsValid())
+    {
+        return false;
+    }
+
+    if (Handle.FId > FRigidbodies.size())
+    {
+        return false;
+    }
+
+    const std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+    RotationVelocity = body->FRotationVelocity;
     return true;
 }
 
@@ -245,6 +331,27 @@ bool PhysicsEngine::AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3
         body->FVelocity += Impulse * body->FInvMass;
     }
     return false;
+}
+
+void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
+{
+    AssertRelease(Body != nullptr);
+
+    // Init position and orientation
+    Body->FPosition = Transform.Column(3).xyz();
+    Body->FOrientation = quat::FromMat4(Transform);
+
+    // Init Mass and Inertia
+    Body->FMass = BodyConfig.FMass;
+    Body->FInvMass = (BodyConfig.FMass != 0.f) ? 1.f / BodyConfig.FMass : 1.f;
+    Body->FInertiaTensor = mat3::Identity();
+    Body->FInverseInitiaTensor = mat3::Identity();
+
+    // Init damping coefficients
+    Body->FLinearDamping = BodyConfig.FLinearDamping;
+    Body->FAngularDamping = BodyConfig.FAngularDamping;
+    if (!BodyConfig.FApplyGravity)
+        Body->FGravityScale = 0.f;
 }
 
 } // namespace Physics

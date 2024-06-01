@@ -25,9 +25,13 @@ bool DestroyPhysicsBody(const PhysicsBodyHandle& Handle);
 // Body manipulation
 bool SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position);
 bool SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3& Velocity);
+bool SetBodyOrientation(const PhysicsBodyHandle& Handle, const quat& Orientation);
+bool SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, const vec3& RotationVelocity);
 
 bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position);
 bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity);
+bool GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation);
+bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity);
 
 bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration);
 bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange);

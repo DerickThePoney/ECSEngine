@@ -90,6 +90,18 @@ bool SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3& Velocity)
     return Engine.SetBodyVelocity(Handle, Velocity);
 }
 
+bool SetBodyOrientation(const PhysicsBodyHandle& Handle, const quat& Orientation)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.SetBodyOrientation(Handle, Orientation);
+}
+
+bool SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, const vec3& RotationVelocity)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.SetBodyRotationVelocity(Handle, RotationVelocity);
+}
+
 bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
@@ -100,6 +112,18 @@ bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
     return Engine.GetBodyVelocity(Handle, Velocity);
+}
+
+bool GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyOrientation(Handle, Orientation);
+}
+
+bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyRotationVelocity(Handle, RotationVelocity);
 }
 
 bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration)
