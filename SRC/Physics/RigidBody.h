@@ -21,7 +21,8 @@ public:
     vec3 FTorque;
 
     // COM
-    vec3 FCenterOfMass;
+    vec3 FCenterOfMassLocal;
+    vec3 FCenterOfMassWorld;
 
     // Mass and inertia
     mat3 FInertiaTensor;
