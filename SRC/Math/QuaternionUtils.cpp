@@ -1,4 +1,5 @@
 #include "QuaternionUtils.h"
+
 #include "Quaternion.h"
 #include "math.h"
 
@@ -21,5 +22,14 @@ quat Lerp(const quat& A, const quat& B, const float t)
     return A * (1.f - t) + B * t;
 }
 
+quat AddVectorToQuaternion(const quat& inQuat, const vec3& ScaledVector)
+{
+    quat q(ScaledVector.x, ScaledVector.y, ScaledVector.z, 0);
+
+    q *= inQuat;
+    q *= 0.5f;
+
+    return inQuat + q;
 }
 
+} // namespace ECSEngine
