@@ -33,18 +33,28 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
     // integrate velocity
     foreachitem(body, FRigidbodies)
     {
-        body.FVelocity += (body.FAcceleration + body.FGravityScale * FConfig.FGravityValue * vec3(0.f, -1.f, 0.f)) * parDeltaTime;
+        if (body == nullptr)
+        {
+            continue;
+        }
+
+        body->FVelocity += (body->FAccelerationDueToForces + body->FGravityScale * FConfig.FGravityValue * vec3(0.f, -1.f, 0.f)) * parDeltaTime;
 
         // damping
-        body.FVelocity *= 1.f / (1.f + parDeltaTime * body.FLinearDamping);
+        body->FVelocity *= 1.f / (1.f + parDeltaTime * body->FLinearDamping);
 
-        body.FAcceleration = vec3(0.f);
+        body->FAccelerationDueToForces = vec3(0.f);
     }
 
     // integrate position
     foreachitem(body, FRigidbodies)
     {
-        body.FPosition += body.FVelocity * parDeltaTime;
+        if (body == nullptr)
+        {
+            continue;
+        }
+
+        body->FPosition += body->FVelocity * parDeltaTime;
     }
 }
 
@@ -52,17 +62,26 @@ const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transfor
 {
     PhysicsBodyHandle newHandle;
 
-    RigidBody newBody;
-    newBody.FPosition = Transform.Column(3).xyz();
-    newBody.FMass = BodyConfig.FMass;
-    newBody.FLinearDamping = BodyConfig.FLinearDamping;
-    newBody.FAngularDamping = BodyConfig.FAngularDamping;
+    RigidBody* newBody = new RigidBody;
+    newBody->FPosition = Transform.Column(3).xyz();
+    newBody->FMass = BodyConfig.FMass;
+    newBody->FLinearDamping = BodyConfig.FLinearDamping;
+    newBody->FAngularDamping = BodyConfig.FAngularDamping;
     if (!BodyConfig.FApplyGravity)
-        newBody.FGravityScale = 0.f;
-
-    FRigidbodies.emplace_back(newBody);
+        newBody->FGravityScale = 0.f;
 
     newHandle.FId = FHandleGenerator.GetNextId();
+
+    if (FRigidbodies.size() > newHandle.FId)
+    {
+        AlwaysCheckedAssert(FRigidbodies[newHandle.FId] == nullptr);
+        FRigidbodies[newHandle.FId].reset(newBody);
+    }
+    else
+    {
+        AssertRelease(FRigidbodies.size() == newHandle.FId);
+        FRigidbodies.emplace_back(newBody);
+    }
     return newHandle;
 }
 
@@ -78,7 +97,8 @@ bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
         return false;
     }
 
-    // TODO IMPOSSIBLE ATM
+    FRigidbodies[Handle.FId].reset(nullptr);
+
     return true;
 }
 
@@ -94,8 +114,13 @@ bool PhysicsEngine::SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3&
         return false;
     }
 
-    RigidBody& body = FRigidbodies[Handle.FId];
-    body.FPosition = Position;
+    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    body->FPosition = Position;
     return true;
 }
 
@@ -111,8 +136,13 @@ bool PhysicsEngine::SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3&
         return false;
     }
 
-    RigidBody& body = FRigidbodies[Handle.FId];
-    body.FPosition = Velocity;
+    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    body->FVelocity = Velocity;
     return true;
 }
 
@@ -128,8 +158,12 @@ bool PhysicsEngine::GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Posit
         return false;
     }
 
-    const RigidBody& body = FRigidbodies[Handle.FId];
-    Position = body.FPosition;
+    const std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+    Position = body->FPosition;
     return true;
 }
 
@@ -145,8 +179,12 @@ bool PhysicsEngine::GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Veloc
         return false;
     }
 
-    const RigidBody& body = FRigidbodies[Handle.FId];
-    Velocity = body.FVelocity;
+    const std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+    Velocity = body->FVelocity;
     return true;
 }
 
@@ -162,15 +200,19 @@ bool PhysicsEngine::AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& 
         return false;
     }
 
-    RigidBody& body = FRigidbodies[Handle.FId];
+    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
 
     if (bTreatAsAcceleration)
     {
-        body.FAcceleration += Force;
+        body->FAccelerationDueToForces += Force;
     }
     else
     {
-        body.FAcceleration += Force / body.FMass;
+        body->FAccelerationDueToForces += Force * body->FInvMass;
     }
 
     return true;
@@ -188,14 +230,19 @@ bool PhysicsEngine::AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3
         return false;
     }
 
-    RigidBody& body = FRigidbodies[Handle.FId];
+    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+
     if (bTreatAsVelocityChange)
     {
-        body.FVelocity += Impulse;
+        body->FVelocity += Impulse;
     }
     else
     {
-        body.FVelocity += Impulse / body.FMass;
+        body->FVelocity += Impulse * body->FInvMass;
     }
     return false;
 }
