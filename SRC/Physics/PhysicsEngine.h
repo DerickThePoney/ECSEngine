@@ -31,11 +31,20 @@ public:
     // body manipulation
     bool SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position);
     bool SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3& Velocity);
+    bool SetBodyOrientation(const PhysicsBodyHandle& Handle, const quat& Orientation);
+    bool SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, const vec3& RotationVelocity);
+
     bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position) const;
     bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity) const;
+    bool GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation) const;
+    bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity) const;
 
+    // body forces and torques
     bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration);
     bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange);
+
+private:
+    void InitializeBody(RigidBody* Body, const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
 
 private:
     PhysicsEngineConfiguration FConfig;

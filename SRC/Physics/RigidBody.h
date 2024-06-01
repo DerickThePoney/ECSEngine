@@ -22,7 +22,7 @@ public:
 
     // COM
     vec3 FCenterOfMassLocal;
-    vec3 FCenterOfMassWorld;
+    /*vec3 FCenterOfMassWorld;*/
 
     // Mass and inertia
     mat3 FInertiaTensor;
