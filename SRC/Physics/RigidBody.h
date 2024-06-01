@@ -7,6 +7,9 @@ namespace Physics
 {
 struct RigidBody
 {
+    DECLARE_POOL_ALLOCATED(RigidBody);
+
+public:
     // positional stuff
     vec3 FPosition;
     vec3 FVelocity;
