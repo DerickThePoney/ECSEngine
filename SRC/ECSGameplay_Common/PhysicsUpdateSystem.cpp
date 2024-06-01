@@ -39,16 +39,27 @@ void PhysicsUpdateSystem::VirtualUpdate()
     {
         const EntityId& UnitId = rigidbody.UnitId();
 
-        PositionModule* positionModule = PositionAccessor[UnitId];
-        if (positionModule == nullptr)
         {
-            continue;
+            PositionModule* positionModule = PositionAccessor[UnitId];
+            if (positionModule == nullptr)
+            {
+                continue;
+            }
+
+            vec3 newPosition;
+            if (Physics::GetBodyPosition(rigidbody.BodyHandle(), newPosition))
+            {
+                positionModule->SetPosition3D(newPosition);
+            }
         }
 
-        vec3 newPosition;
-        if (Physics::GetBodyPosition(rigidbody.BodyHandle(), newPosition))
         {
-            positionModule->SetPosition3D(newPosition);
+            OrientationModule* orientationModule = OrientationAccessor[UnitId];
+            quat newOrientation;
+            if (Physics::GetBodyOrientation(rigidbody.BodyHandle(), newOrientation))
+            {
+                orientationModule->SetOrientation(newOrientation);
+            }
         }
     }
 
