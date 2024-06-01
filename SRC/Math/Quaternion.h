@@ -32,6 +32,7 @@ struct alignas(4) Quaternionf
 
     inline quat operator*(const float parA) const { return quat(x * parA, y * parA, z * parA, w * parA); }
     quat operator*(const quat& parA) const;
+    void operator*=(const float parA);
     void operator*=(const quat& parA);
     inline quat operator+(const quat& parA) const { return quat(x + parA.x, y + parA.y, z + parA.z, w + parA.w); }
 

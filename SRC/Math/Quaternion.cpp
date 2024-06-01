@@ -35,6 +35,14 @@ void Quaternionf::operator*=(const quat& parA)
     z = w * parA.z + z * parA.w + x * parA.y - y * parA.x;
 }
 
+void Quaternionf::operator*=(const float parA)
+{
+    w *= parA;
+    x *= parA;
+    y *= parA;
+    z *= parA;
+}
+
 Quaternionf::operator mat4() const
 {
     const mat4 a = mat4(vec4(w, z, -y, -x), vec4(-z, w, x, -y), vec4(y, -x, w, -z), vec4(x, y, z, w));
