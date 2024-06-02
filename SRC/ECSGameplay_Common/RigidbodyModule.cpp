@@ -55,7 +55,7 @@ void RigidbodyModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
     if (parParameters.HasParameter<ModuleParameters::Position>())
     {
         vec3 Position = parParameters.Get<ModuleParameters::Position>();
-        worldMatrix.SetColumn(3, vec4::MakeHomogeneousVec4(Position));
+        worldMatrix.SetColumn(3, vec4::MakeHomogeneousPositionVec4(Position));
     }
 
     const RigidbodyModuleTemplate* temp = Template<RigidbodyModuleTemplate>();

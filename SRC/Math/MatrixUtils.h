@@ -38,4 +38,7 @@ mat4 EulerAnglesXYZ(const float X, const float Y, const float Z);
 vec3 ExtractEulerAnglesXYZ(const mat4& m);
 
 mat4 LookAt(const vec3& parEye, const vec3& parCenter, const vec3& parUp);
-}
+
+vec3 GetTranslation(const mat4& parMatrix);
+mat3 GetRotation(const mat4& parMatrix);
+} // namespace ECSEngine
