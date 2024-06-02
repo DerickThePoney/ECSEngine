@@ -1,7 +1,8 @@
 #include "stdafx.h"
-#include "doctest.h"
+
 #include "Math/Vector.h"
 #include "Math/VectorUtils.h"
+#include "doctest.h"
 
 template<typename VecType>
 void Vec2UnitTests()
@@ -138,7 +139,6 @@ void Vec2UnitTests()
         CHECK(length == 5.f);
     }
 }
-
 
 template<typename VecType>
 void Vec3UnitTests()
@@ -297,7 +297,6 @@ void Vec3UnitTests()
         CHECK(lengthSq == 12.f);
     }
 }
-
 
 template<typename VecType>
 void Vec4UnitTests()
@@ -464,9 +463,28 @@ void Vec4UnitTests()
 
         CHECK(lengthSq == 16.f);
     }
+
+    {
+        VecType test1(2.f, 2.f, 2.f, 2.f);
+        VecType HV2P = VecType::MakeHomogeneousPositionVec4(test1.xy());
+        VecType HV2D = VecType::MakeHomogeneousDirectionVec4(test1.xy());
+        VecType HV3P = VecType::MakeHomogeneousPositionVec4(test1.xyz());
+        VecType HV3D = VecType::MakeHomogeneousDirectionVec4(test1.xyz());
+        CHECK(HV2P.xy() == test1.xy());
+        CHECK(HV2P.z == 0);
+        CHECK(HV2P.w == 1);
+
+        CHECK(HV2D.xy() == test1.xy());
+        CHECK(HV2D.z == 0);
+        CHECK(HV2D.w == 0);
+
+        CHECK(HV3P.xyz() == test1.xyz());
+        CHECK(HV3P.w == 1);
+
+        CHECK(HV3D.xyz() == test1.xyz());
+        CHECK(HV3D.w == 0);
+    }
 }
-
-
 
 TEST_SUITE("Vector tests")
 {
@@ -479,8 +497,8 @@ TEST_SUITE("Vector tests")
 
         SUBCASE("Vec2 floats special")
         {
-            ECSEngine::vec2 a = ECSEngine::vec2(2.f, 2.f); 
-            ECSEngine::vec2 b = ECSEngine::vec2(2.f, 2.f); 
+            ECSEngine::vec2 a = ECSEngine::vec2(2.f, 2.f);
+            ECSEngine::vec2 b = ECSEngine::vec2(2.f, 2.f);
 
             const float dot_a_b = ECSEngine::Dot(a, b);
             CHECK(dot_a_b == 8.f);

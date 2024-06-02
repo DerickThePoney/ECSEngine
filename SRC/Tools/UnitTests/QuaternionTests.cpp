@@ -30,6 +30,12 @@ TEST_SUITE("Quaternion tests")
         CHECK(b.y == 2.f);
         CHECK(b.z == 2.f);
         CHECK(b.w == 2.f);
+
+        b *= 2.f;
+        CHECK(b.x == 4.f);
+        CHECK(b.y == 4.f);
+        CHECK(b.z == 4.f);
+        CHECK(b.w == 4.f);
     }
 
     TEST_CASE("Quaternion comparison")
