@@ -323,8 +323,8 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     // Init Mass and Inertia
     Body->FMass = BodyConfig.FMass;
     Body->FInvMass = (BodyConfig.FMass != 0.f) ? 1.f / BodyConfig.FMass : 1.f;
-    Body->FInertiaTensor = mat3::Identity();
-    Body->FInverseInertiaTensor = mat3::Identity();
+    Body->FInertiaTensor = mat3::Identity() * ((1.f / 6.f) * Body->FMass);
+    Body->FInverseInertiaTensor = Invert(Body->FInertiaTensor);
 
     // Init damping coefficients
     Body->FLinearDamping = BodyConfig.FLinearDamping;
