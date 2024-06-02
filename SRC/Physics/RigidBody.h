@@ -26,7 +26,8 @@ public:
 
     // Mass and inertia
     mat3 FInertiaTensor;
-    mat3 FInverseInitiaTensor;
+    mat3 FInverseInertiaTensor;
+    mat3 FInverseInertiaTensorWorld;
     float FMass = 0.f;
     float FInvMass = 1.f;
 
@@ -34,6 +35,12 @@ public:
 
     float FLinearDamping = 0.1f;
     float FAngularDamping = 0.01f;
+
+    // Helper functions
+    void AddForce(const vec3& Force, bool bTreatAsAcceleration);
+    void AddImpulse(const vec3& Impulse, bool bTreatAsVelocityChange);
+    void AddTorque(const vec3& Torque);
+    /*void AddRotationImpulse(const vec3& Force, bool bTreatAsAcceleration);*/
 };
 } // namespace Physics
 } // namespace ECSEngine

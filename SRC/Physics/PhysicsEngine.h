@@ -41,10 +41,13 @@ public:
 
     // body forces and torques
     bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration);
+    bool AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Force, const vec3& Point, bool bTreatPointAsLocal, bool bTreatAsAcceleration);
     bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange);
 
 private:
     void InitializeBody(RigidBody* Body, const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
+
+    void UpdateInertiaTransform(RigidBody* Body);
 
 private:
     PhysicsEngineConfiguration FConfig;
