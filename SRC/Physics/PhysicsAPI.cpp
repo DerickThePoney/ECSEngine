@@ -78,6 +78,7 @@ bool DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
     return Engine.DestroyPhysicsBody(Handle);
 }
 
+#pragma region GettersAndSetterForBodies
 bool SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
@@ -126,10 +127,25 @@ bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelo
     return Engine.GetBodyRotationVelocity(Handle, RotationVelocity);
 }
 
+#pragma endregion GettersAndSetterForBodies
+
+#pragma region ForcesTorquesAndImpulses
 bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
     return Engine.AddForceToBody(Handle, Force, bTreatAsAcceleration);
+}
+
+bool AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Force, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsAcceleration)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.AddForceAtPointToBody(Handle, Force, Point, bTreatPointAsLocalCoord, bTreatAsAcceleration);
+}
+
+bool AddTorqueToBody(const PhysicsBodyHandle& Handle, const vec3& Torque)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.AddTorqueToBody(Handle, Torque);
 }
 
 bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange)
@@ -137,6 +153,20 @@ bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool
     PhysicsEngine& Engine = PhysicsEngine::Instance();
     return Engine.AddImpulseToBody(Handle, Impulse, bTreatAsVelocityChange);
 }
+
+bool AddImpulseAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsVelocityChange)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.AddImpulseAtPointToBody(Handle, Impulse, Point, bTreatPointAsLocalCoord, bTreatAsVelocityChange);
+}
+
+bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& RotationImpulse, bool bTreatAsRotationVelocityChange)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.AddRotationImpulseToBody(Handle, RotationImpulse, bTreatAsRotationVelocityChange);
+}
+
+#pragma endregion ForcesTorquesAndImpulses
 
 } // namespace Physics
 } // namespace ECSEngine

@@ -34,6 +34,11 @@ bool GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation);
 bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity);
 
 bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration);
+bool AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Force, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsAcceleration);
+bool AddTorqueToBody(const PhysicsBodyHandle& Handle, const vec3& Torque);
+
 bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange);
+bool AddImpulseAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsVelocityChange);
+bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& RotationImpulse, bool bTreatAsRotationVelocityChange);
 } // namespace Physics
 } // namespace ECSEngine
