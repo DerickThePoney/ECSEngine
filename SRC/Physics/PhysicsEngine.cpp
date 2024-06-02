@@ -30,8 +30,6 @@ void PhysicsEngine::Cleanup()
 
 void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 {
-    // TODO Update COM in world coordinates and Inverse inertia tensor
-
     // integrate velocity
     foreachitem(body, FRigidbodies)
     {
@@ -41,7 +39,7 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         }
 
         body->FVelocity += (body->FAccelerationDueToForces + body->FGravityScale * FConfig.FGravityValue * vec3(0.f, -1.f, 0.f)) * parDeltaTime;
-        body->FRotationVelocity += body->FInverseInitiaTensor * body->FTorque * parDeltaTime;
+        body->FRotationVelocity += body->FInverseInertiaTensorWorld * body->FTorque * parDeltaTime;
 
         // damping
         body->FVelocity *= 1.f / (1.f + parDeltaTime * body->FLinearDamping);
@@ -60,6 +58,17 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 
         body->FPosition += body->FVelocity * parDeltaTime;
         body->FOrientation = AddVectorToQuaternion(body->FOrientation, body->FRotationVelocity * parDeltaTime);
+    }
+
+    // Update inertia tensor
+    foreachitem(body, FRigidbodies)
+    {
+        if (body == nullptr)
+        {
+            continue;
+        }
+
+        UpdateInertiaTransform(body.get());
     }
 }
 
@@ -292,14 +301,44 @@ bool PhysicsEngine::AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& 
         return false;
     }
 
-    if (bTreatAsAcceleration)
+    body->AddForce(Force, bTreatAsAcceleration);
+
+    return true;
+}
+
+// TODO MOVE ADD FORCES / IMPULSES / TORQUES TO RIGIDBODY STRUCT
+
+bool PhysicsEngine::AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Force, const vec3& Point, bool bTreatPointAsLocal, bool bTreatAsAcceleration)
+{
+    if (!Handle.IsValid())
     {
-        body->FAccelerationDueToForces += Force;
+        return false;
     }
-    else
+
+    if (Handle.FId > FRigidbodies.size())
     {
-        body->FAccelerationDueToForces += Force * body->FInvMass;
+        return false;
     }
+
+    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    vec3 PointToUse = Point;
+    if (bTreatPointAsLocal)
+    {
+        PointToUse = (Translation(body->FPosition) * (mat4)body->FOrientation * vec4::MakeHomogeneousPositionVec4(Point)).xyz();
+    }
+
+    PointToUse -= body->FPosition;
+
+    body->AddForce(Force, bTreatAsAcceleration);
+
+    vec3 TorqueToAdd = Cross(PointToUse, Force);
+
+    body->AddTorque(TorqueToAdd);
 
     return true;
 }
@@ -322,14 +361,7 @@ bool PhysicsEngine::AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3
         return false;
     }
 
-    if (bTreatAsVelocityChange)
-    {
-        body->FVelocity += Impulse;
-    }
-    else
-    {
-        body->FVelocity += Impulse * body->FInvMass;
-    }
+    body->AddImpulse(Impulse, bTreatAsVelocityChange);
     return false;
 }
 
@@ -345,13 +377,25 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     Body->FMass = BodyConfig.FMass;
     Body->FInvMass = (BodyConfig.FMass != 0.f) ? 1.f / BodyConfig.FMass : 1.f;
     Body->FInertiaTensor = mat3::Identity();
-    Body->FInverseInitiaTensor = mat3::Identity();
+    Body->FInverseInertiaTensor = mat3::Identity();
 
     // Init damping coefficients
     Body->FLinearDamping = BodyConfig.FLinearDamping;
     Body->FAngularDamping = BodyConfig.FAngularDamping;
     if (!BodyConfig.FApplyGravity)
         Body->FGravityScale = 0.f;
+}
+
+void PhysicsEngine::UpdateInertiaTransform(RigidBody* Body)
+{
+    AssertRelease(Body != nullptr);
+
+    // Normalize orientation
+    Body->FOrientation = Normalize(Body->FOrientation);
+
+    // recompute the inverse inertia tensor in world coordinate using Mt' = Mb * Mt * Mb^-1
+    mat3 worldRotation = GetRotation((mat4)Body->FOrientation);
+    Body->FInverseInertiaTensorWorld = worldRotation * Body->FInverseInertiaTensor * Transpose(worldRotation);
 }
 
 } // namespace Physics
