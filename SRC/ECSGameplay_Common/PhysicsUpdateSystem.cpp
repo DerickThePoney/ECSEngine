@@ -103,7 +103,7 @@ void PhysicsUpdateSystem::VirtualUpdate()
 
         if (value)
         {
-            Physics::AddForceAtPointToBody(rigidbody.BodyHandle(), vec3(0.f, 3000.f, 0.f), vec3(-0.5f, -0.5f, -0.5f), true, true);
+            Physics::AddForceAtPointToBody(rigidbody.BodyHandle(), vec3(0.f, 3000.f, 0.f), vec3(-0.5f, -0.5f, 0.f), false, true);
         }
     }
 #pragma endregion PhysicsTests
