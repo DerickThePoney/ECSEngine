@@ -46,6 +46,7 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         body->FRotationVelocity *= 1.f / (1.f + parDeltaTime * body->FAngularDamping);
 
         body->FAccelerationDueToForces = vec3(0.f);
+        body->FTorque = vec3(0.f);
     }
 
     // integrate position
@@ -111,19 +112,10 @@ bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
     return true;
 }
 
+#pragma region BodyGettersAndSetters
 bool PhysicsEngine::SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3& Position)
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
@@ -135,17 +127,7 @@ bool PhysicsEngine::SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3&
 
 bool PhysicsEngine::SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3& Velocity)
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
@@ -157,17 +139,7 @@ bool PhysicsEngine::SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3&
 
 bool PhysicsEngine::SetBodyOrientation(const PhysicsBodyHandle& Handle, const quat& Orientation)
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
@@ -179,17 +151,7 @@ bool PhysicsEngine::SetBodyOrientation(const PhysicsBodyHandle& Handle, const qu
 
 bool PhysicsEngine::SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, const vec3& RotationVelocity)
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
@@ -201,101 +163,57 @@ bool PhysicsEngine::SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, con
 
 bool PhysicsEngine::GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position) const
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    const std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    const RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
     }
+
     Position = body->FPosition;
     return true;
 }
 
 bool PhysicsEngine::GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity) const
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    const std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    const RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
     }
+
     Velocity = body->FVelocity;
     return true;
 }
 
 bool PhysicsEngine::GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation) const
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    const std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    const RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
     }
+
     Orientation = body->FOrientation;
     return true;
 }
 
 bool PhysicsEngine::GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity) const
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    const std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    const RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
     }
+
     RotationVelocity = body->FRotationVelocity;
     return true;
 }
 
+#pragma endregion BodyGettersAndSetters
+
 bool PhysicsEngine::AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration)
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
@@ -306,21 +224,9 @@ bool PhysicsEngine::AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& 
     return true;
 }
 
-// TODO MOVE ADD FORCES / IMPULSES / TORQUES TO RIGIDBODY STRUCT
-
 bool PhysicsEngine::AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Force, const vec3& Point, bool bTreatPointAsLocal, bool bTreatAsAcceleration)
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
@@ -343,19 +249,21 @@ bool PhysicsEngine::AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const
     return true;
 }
 
+bool PhysicsEngine::AddTorqueToBody(const PhysicsBodyHandle& Handle, const vec3& Torque)
+{
+    RigidBody* body = GetRigidBody(Handle);
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    body->AddTorque(Torque);
+    return true;
+}
+
 bool PhysicsEngine::AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange)
 {
-    if (!Handle.IsValid())
-    {
-        return false;
-    }
-
-    if (Handle.FId > FRigidbodies.size())
-    {
-        return false;
-    }
-
-    std::unique_ptr<RigidBody>& body = FRigidbodies[Handle.FId];
+    RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
     {
         return false;
@@ -396,6 +304,36 @@ void PhysicsEngine::UpdateInertiaTransform(RigidBody* Body)
     // recompute the inverse inertia tensor in world coordinate using Mt' = Mb * Mt * Mb^-1
     mat3 worldRotation = GetRotation((mat4)Body->FOrientation);
     Body->FInverseInertiaTensorWorld = worldRotation * Body->FInverseInertiaTensor * Transpose(worldRotation);
+}
+
+RigidBody* PhysicsEngine::GetRigidBody(const PhysicsBodyHandle& Handle)
+{
+    if (!Handle.IsValid())
+    {
+        return nullptr;
+    }
+
+    if (Handle.FId > FRigidbodies.size())
+    {
+        return nullptr;
+    }
+
+    return FRigidbodies[Handle.FId].get();
+}
+
+const RigidBody* PhysicsEngine::GetRigidBody(const PhysicsBodyHandle& Handle) const
+{
+    if (!Handle.IsValid())
+    {
+        return nullptr;
+    }
+
+    if (Handle.FId > FRigidbodies.size())
+    {
+        return nullptr;
+    }
+
+    return FRigidbodies[Handle.FId].get();
 }
 
 } // namespace Physics
