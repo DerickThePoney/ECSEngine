@@ -366,4 +366,14 @@ mat4 LookAt(const vec3& parEye, const vec3& parCenter, const vec3& parUp)
     return res;
 }
 
+vec3 GetTranslation(const mat4& parMatrix)
+{
+    return parMatrix.Column(3).xyz();
+}
+
+mat3 GetRotation(const mat4& parMatrix)
+{
+    return mat3(parMatrix.Column(0).xyz(), parMatrix.Column(1).xyz(), parMatrix.Column(2).xyz());
+}
+
 } // namespace ECSEngine

@@ -327,8 +327,10 @@ public:
     {
     }
 
-    static inline Vector4 MakeHomogeneousVec4(const Vector2<T>& parVec2) { return Vector4(parVec2.x, parVec2.y, T(0), T(1)); }
-    static inline Vector4 MakeHomogeneousVec4(const Vector3<T>& parVec3) { return Vector4(parVec3.x, parVec3.y, parVec3.z, T(1)); }
+    static inline Vector4 MakeHomogeneousPositionVec4(const Vector2<T>& parVec2) { return Vector4(parVec2.x, parVec2.y, T(0), T(1)); }
+    static inline Vector4 MakeHomogeneousDirectionVec4(const Vector2<T>& parVec2) { return Vector4(parVec2.x, parVec2.y, T(0), T(0)); }
+    static inline Vector4 MakeHomogeneousPositionVec4(const Vector3<T>& parVec3) { return Vector4(parVec3.x, parVec3.y, parVec3.z, T(1)); }
+    static inline Vector4 MakeHomogeneousDirectionVec4(const Vector3<T>& parVec3) { return Vector4(parVec3.x, parVec3.y, parVec3.z, T(0)); }
 
 #define MAKESCALAROP(OP)                                                                                                                                                           \
     inline Vector4 operator OP(const T parA) const                                                                                                                                 \
