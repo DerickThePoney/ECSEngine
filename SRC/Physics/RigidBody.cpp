@@ -20,6 +20,11 @@ void RigidBody::AddForce(const vec3& Force, bool bTreatAsAcceleration)
     }
 }
 
+void RigidBody::AddTorque(const vec3& Torque)
+{
+    FTorque += Torque;
+}
+
 void RigidBody::AddImpulse(const vec3& Impulse, bool bTreatAsVelocityChange)
 {
     if (bTreatAsVelocityChange)
@@ -32,9 +37,16 @@ void RigidBody::AddImpulse(const vec3& Impulse, bool bTreatAsVelocityChange)
     }
 }
 
-void RigidBody::AddTorque(const vec3& Torque)
+void RigidBody::AddRotationImpulse(const vec3& Impulse, bool bTreatAsRotationVelocityChange)
 {
-    FTorque += Torque;
+    if (bTreatAsRotationVelocityChange)
+    {
+        FRotationVelocity += Impulse;
+    }
+    else
+    {
+        FRotationVelocity += FInverseInertiaTensorWorld * Impulse;
+    }
 }
 
 } // namespace Physics

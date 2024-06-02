@@ -38,9 +38,10 @@ public:
 
     // Helper functions
     void AddForce(const vec3& Force, bool bTreatAsAcceleration);
-    void AddImpulse(const vec3& Impulse, bool bTreatAsVelocityChange);
     void AddTorque(const vec3& Torque);
-    /*void AddRotationImpulse(const vec3& Force, bool bTreatAsAcceleration);*/
+
+    void AddImpulse(const vec3& Impulse, bool bTreatAsVelocityChange);
+    void AddRotationImpulse(const vec3& Impulse, bool bTreatAsRotationVelocityChange);
 };
 } // namespace Physics
 } // namespace ECSEngine

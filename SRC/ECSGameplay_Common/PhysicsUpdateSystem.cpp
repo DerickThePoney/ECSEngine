@@ -2,6 +2,7 @@
 
 #include "PhysicsUpdateSystem.h"
 
+#include "Common/InputCommands.h"
 #include "Common/InputManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
@@ -63,6 +64,7 @@ void PhysicsUpdateSystem::VirtualUpdate()
         }
     }
 
+#pragma region PhysicsTests
     foreachitemconst(rigidbody, RigidBodyAccessor)
     {
         const EntityId& UnitId = rigidbody.UnitId();
@@ -86,6 +88,25 @@ void PhysicsUpdateSystem::VirtualUpdate()
             Physics::AddForceToBody(rigidbody.BodyHandle(), vec3(0.f, 1000.f, 0.f), true);
         }
     }
+
+    KeyboardCommand command;
+    command.FInputType = EInputType::REPEATED;
+    command.FKeyboardKey = InputKeyNames::INPUT_KEY_SPACE;
+
+    const bool value = command.Evaluate();
+
+    foreachitemconst(rigidbody, RigidBodyAccessor)
+    {
+        const EntityId& UnitId = rigidbody.UnitId();
+
+        Physics::AddTorqueToBody(rigidbody.BodyHandle(), vec3(0.f, 10.f, 0.f));
+
+        if (value)
+        {
+            Physics::AddForceAtPointToBody(rigidbody.BodyHandle(), vec3(0.f, 3000.f, 0.f), vec3(-0.5f, -0.5f, -0.5f), true, true);
+        }
+    }
+#pragma endregion PhysicsTests
 }
 
 } // namespace ECSEngine

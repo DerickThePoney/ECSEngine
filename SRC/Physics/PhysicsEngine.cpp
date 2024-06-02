@@ -211,6 +211,7 @@ bool PhysicsEngine::GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec
 
 #pragma endregion BodyGettersAndSetters
 
+#pragma region ForcesAndTorques
 bool PhysicsEngine::AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration)
 {
     RigidBody* body = GetRigidBody(Handle);
@@ -224,7 +225,7 @@ bool PhysicsEngine::AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& 
     return true;
 }
 
-bool PhysicsEngine::AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Force, const vec3& Point, bool bTreatPointAsLocal, bool bTreatAsAcceleration)
+bool PhysicsEngine::AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Force, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsAcceleration)
 {
     RigidBody* body = GetRigidBody(Handle);
     if (body == nullptr)
@@ -233,7 +234,7 @@ bool PhysicsEngine::AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const
     }
 
     vec3 PointToUse = Point;
-    if (bTreatPointAsLocal)
+    if (bTreatPointAsLocalCoord)
     {
         PointToUse = (Translation(body->FPosition) * (mat4)body->FOrientation * vec4::MakeHomogeneousPositionVec4(Point)).xyz();
     }
@@ -260,7 +261,9 @@ bool PhysicsEngine::AddTorqueToBody(const PhysicsBodyHandle& Handle, const vec3&
     body->AddTorque(Torque);
     return true;
 }
+#pragma endregion ForcesAndTorques
 
+#pragma region Impulses
 bool PhysicsEngine::AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange)
 {
     RigidBody* body = GetRigidBody(Handle);
@@ -270,8 +273,44 @@ bool PhysicsEngine::AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3
     }
 
     body->AddImpulse(Impulse, bTreatAsVelocityChange);
-    return false;
+    return true;
 }
+
+bool PhysicsEngine::AddImpulseAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsVelocityChange)
+{
+    RigidBody* body = GetRigidBody(Handle);
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    vec3 PointToUse = Point;
+    if (bTreatPointAsLocalCoord)
+    {
+        PointToUse = (Translation(body->FPosition) * (mat4)body->FOrientation * vec4::MakeHomogeneousPositionVec4(Point)).xyz();
+    }
+
+    PointToUse -= body->FPosition;
+    body->AddImpulse(Impulse, bTreatAsVelocityChange);
+
+    vec3 RotationImpulseToAdd = Cross(PointToUse, Impulse);
+    body->AddRotationImpulse(RotationImpulseToAdd, bTreatAsVelocityChange);
+    return true;
+}
+
+bool PhysicsEngine::AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& RotationImpulse, bool bTreatAsRotationVelocityChange)
+{
+    RigidBody* body = GetRigidBody(Handle);
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    body->AddRotationImpulse(RotationImpulse, bTreatAsRotationVelocityChange);
+    return true;
+}
+
+#pragma endregion Impulses
 
 void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
 {
