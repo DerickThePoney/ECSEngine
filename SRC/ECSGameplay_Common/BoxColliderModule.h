@@ -18,17 +18,14 @@ public:
 
     Module* CreateInstance(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) const override;
 
-    SERIALIZE()
-    {
-        PROPERTYFIELD(UseAABBIfPossible, true);
-        PROPERTYFIELD(Extents, vec3(1.f));
-    }
+    SERIALIZE() { PROPERTYFIELD(Extents, vec3(1.f)); }
+
+    vec3 Extents() const { return FExtents; }
 
 protected:
     void VirtualDrawEditor() override;
 
 private:
-    bool FUseAABBIfPossible = true;
     vec3 FExtents = vec3(1.f);
 };
 

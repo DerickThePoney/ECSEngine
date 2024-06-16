@@ -21,6 +21,7 @@ Module* BoxColliderModuleTemplate::CreateInstance(const EntityId& parUnitId, con
 
 void BoxColliderModuleTemplate::VirtualDrawEditor()
 {
+    EDITOR_PROPERTY_SIMPLE("Extents", FExtents);
 }
 
 IMPLEMENT_SAVELOAD_ABILITIES(BoxColliderModule);
@@ -42,6 +43,9 @@ BoxColliderModule::~BoxColliderModule()
 void BoxColliderModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
     parent_type::VirtualInit(parUnitId, parParameters);
+
+    const BoxColliderModuleTemplate* temp = Template<BoxColliderModuleTemplate>();
+    FExtents = temp->Extents();
 }
 
 void BoxColliderModule::VirtualOnLoaded()
