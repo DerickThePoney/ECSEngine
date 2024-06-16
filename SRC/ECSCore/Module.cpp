@@ -29,6 +29,19 @@ void Module::Init(const ModuleTemplate* parTemplate, const EntityId& parUnitId, 
 #endif
 }
 
+void Module::PostInit()
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    FVirtualPostInitCalled = false;
+#endif
+
+    VirtualPostInit();
+
+#ifdef PERFORM_SECURITY_CHECKS
+    AlwaysCheckedAssertMsg(FVirtualPostInitCalled, "You forgot to call the parent's VirtualPostInit, you naughtyboy !");
+#endif
+}
+
 void Module::Deinit()
 {
 #ifdef PERFORM_SECURITY_CHECKS
@@ -65,6 +78,13 @@ void Module::VirtualInit(const EntityId& parUnitId, const ModuleParameters::Para
 #endif
 }
 
+void Module::VirtualPostInit()
+{
+#ifdef PERFORM_SECURITY_CHECKS
+    FVirtualPostInitCalled = true;
+#endif
+}
+
 void Module::VirtualDeinit()
 {
 #ifdef PERFORM_SECURITY_CHECKS
@@ -83,20 +103,20 @@ IMPLEMENT_VIRTUAL_SAVELOAD_ABILITIES(Module);
 template<typename Chunk, bool isWriting>
 void Module::SaveLoad(Chunk& parChunk)
 {
-    parChunk& FUnitId;
+    parChunk & FUnitId;
 
     if (isWriting)
     {
         if (FTemplate != nullptr)
         {
             std::string templateName = FTemplate->GetTemplate()->GetName();
-            parChunk& templateName;
+            parChunk & templateName;
         }
     }
     else
     {
         std::string templateName;
-        parChunk& templateName;
+        parChunk & templateName;
 
         const EntityTemplate* entityTemplate = EntityTemplateManager::Instance().GetEntityTemplate(templateName);
         AssertRelease(entityTemplate != nullptr);
