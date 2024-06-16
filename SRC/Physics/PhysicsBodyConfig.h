@@ -1,4 +1,5 @@
 #pragma once
+#include "CollisionShape.h"
 
 namespace ECSEngine
 {
@@ -11,6 +12,8 @@ struct PhysicsBodyConfig
 
     bool FAutoComputeMass = false;
     float FMass = 0.f;
+    float FDensity = 1.f;
+    CollisionShape FShape;
 
     // Drag
     float FLinearDamping = 0.1f;
@@ -27,6 +30,8 @@ struct PhysicsBodyConfig
         PROPERTYFIELD(ApplyGravity, true);
         PROPERTYFIELD(AutoComputeMass, false);
         PROPERTYFIELD(Mass, 0.f);
+        PROPERTYFIELD(Density, 1.f);
+        PROPERTYFIELD(Shape, CollisionShape());
         PROPERTYFIELD(LinearDamping, 0.1f);
         PROPERTYFIELD(AngularDamping, 0.01f);
     }
