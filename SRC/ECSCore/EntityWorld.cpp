@@ -23,16 +23,16 @@ void EntityWorld::SaveLoad(Chunk& parChunk)
         DestroyAllRemainingEntities();
     }
 
-    parChunk& FSize;
+    parChunk & FSize;
     u32 worldId = (u32)FWorldID;
-    parChunk& worldId;
+    parChunk & worldId;
     if (!isWriting)
         FWorldID = (EEntityWorlds)worldId;
-    parChunk& FEntityIdGenerator;
-    parChunk& FAllocatedEntities;
+    parChunk & FEntityIdGenerator;
+    parChunk & FAllocatedEntities;
 
     u32 entitiesSize = FEntities.size();
-    parChunk& entitiesSize;
+    parChunk & entitiesSize;
 
     if (!isWriting)
     {
@@ -53,14 +53,14 @@ void EntityWorld::SaveLoad(Chunk& parChunk)
         }
     }
 
-    parChunk& nonNullControllers;
+    parChunk & nonNullControllers;
     if (isWriting)
     {
         forrange(i, 0, FControllers.size())
         {
             if (FControllers[i] == nullptr)
                 continue;
-            parChunk& i;
+            parChunk & i;
             parChunk& FControllers[i];
         }
     }
@@ -69,7 +69,7 @@ void EntityWorld::SaveLoad(Chunk& parChunk)
         forrange(i, 0, nonNullControllers)
         {
             size_t idx = -1;
-            parChunk& idx;
+            parChunk & idx;
             AssertRelease(idx != -1);
             AssertRelease(idx < FControllers.size());
             parChunk& FControllers[idx];
@@ -87,7 +87,10 @@ EntityWorld::EntityWorld(const EEntityWorlds parWorldId)
     FEntityIdGenerator.SetWorldId(FWorldID);
 
     FControllers.resize((std::size_t)EModuleId::Length);
-    forrange(i, 0, FSize) { FControllers[i] = nullptr; }
+    forrange(i, 0, FSize)
+    {
+        FControllers[i] = nullptr;
+    }
     FEntities.resize(ModulePoolSize);
 }
 
@@ -154,14 +157,22 @@ void EntityWorld::CreateEntityFromTemplateUsingEntityId(const EntityId& parUnitI
     FEntities[parUnitId.GetSequentialId()] = newEntity;
     FAllocatedEntities.insert(parUnitId.GetSequentialId());
 
+    std::vector<Module*> createdModules;
+
     for (u32 i = 0; i < (u32)EModuleId::Length; ++i)
     {
         if (parTemplate->HasModule(i))
         {
             const ModuleTemplate* modTemp = parTemplate->GetModuleTemplate(i);
             AssertRelease(modTemp != nullptr);
-            modTemp->CreateInstance(parUnitId, parParameterContainer);
+            Module* newMod = modTemp->CreateInstance(parUnitId, parParameterContainer);
+            createdModules.push_back(newMod);
         }
+    }
+
+    for (Module* mod : createdModules)
+    {
+        mod->PostInit();
     }
 }
 
@@ -208,7 +219,10 @@ void EntityWorld::DestroyAllRemainingEntities()
 
     AssertRelease(FAllocatedEntities.empty());
 #ifdef PERFORM_SECURITY_CHECKS
-    foreachitemconst(entity, FEntities) { AssertRelease(!entity.GetEntityId().Valid()); }
+    foreachitemconst(entity, FEntities)
+    {
+        AssertRelease(!entity.GetEntityId().Valid());
+    }
 #endif
 }
 

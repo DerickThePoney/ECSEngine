@@ -25,6 +25,7 @@ protected:
 
 public:
     void Init(const ModuleTemplate* parTemplate, const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
+    void PostInit();
     void Deinit();
     void OnLoaded();
 
@@ -41,6 +42,7 @@ public:
 
 protected:
     virtual void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);
+    virtual void VirtualPostInit();
     virtual void VirtualDeinit();
     virtual void VirtualOnLoaded();
 
@@ -48,6 +50,7 @@ private:
     EntityId FUnitId;
 #ifdef PERFORM_SECURITY_CHECKS
     bool FVirtualInitCalled = false;
+    bool FVirtualPostInitCalled = false;
     bool FVirtualDeinitCalled = false;
     bool FVirtualOnLoadedCalled = false;
 #endif
@@ -57,7 +60,10 @@ private:
 
 #define DECLARE_MODULE(TYPE)                                                                                                                                                       \
 public:                                                                                                                                                                            \
-    u32 GetModuleId() const override { return ModuleTraits<TYPE>::GetModuleId(); }                                                                                                 \
+    u32 GetModuleId() const override                                                                                                                                               \
+    {                                                                                                                                                                              \
+        return ModuleTraits<TYPE>::GetModuleId();                                                                                                                                  \
+    }                                                                                                                                                                              \
     using parent_type = Module;
 } // namespace ECSEngine
 
