@@ -23,6 +23,8 @@ public:
     static CollisionShape MakeBox(vec3 Center, vec3 Extents);
 
     float ComputeMass(float Density) const;
+    mat3 ComputeInertiaTensor(float Mass) const;
+    AABB3f ComputeAABB(const mat4& Transform) const;
 
     void DrawInEditor();
 

@@ -20,10 +20,27 @@ public:
 
     const VecType& Min() const { return FMin; }
     const VecType& Max() const { return FMax; }
+    VecType& Min() { return FMin; }
+    VecType& Max() { return FMax; }
 
     const VecType Center() const { return 0.5f * (FMin + FMax); }
+    const VecType Extent() const { return FMax - FMin; }
 
     bool IsZero() const { return length2(FMax - FMin) == 0.f; }
+
+    void Inflate(const float parValue)
+    {
+        FMin -= parValue;
+        FMax += parValue;
+    }
+
+    static BoundingBox Union(const BoundingBox& A, const BoundingBox& B)
+    {
+        BoundingBox res;
+        res.SetMax(VecMax(A.Max(), B.Max()));
+        res.SetMin(VecMin(A.Min(), B.Min()));
+        return res;
+    }
 
     SERIALIZE()
     {

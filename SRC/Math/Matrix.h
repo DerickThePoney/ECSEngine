@@ -82,12 +82,12 @@ inline Matrix2x2f operator*(const float parA, const Matrix2x2f& parB)
     return result;
 }
 
-//inline Matrix2x2f operator*(const Matrix2x2f& parA, const Matrix2x2f& parB)
+// inline Matrix2x2f operator*(const Matrix2x2f& parA, const Matrix2x2f& parB)
 //{
-//    Matrix2x2f result = parA;
-//    result *= parB;
-//    return result;
-//}
+//     Matrix2x2f result = parA;
+//     result *= parB;
+//     return result;
+// }
 
 /****************************
  * Matrix3x3f
@@ -176,6 +176,7 @@ struct alignas(4) Matrix3x3f
         FValues[6] = parA * FValues[6];
         FValues[7] = parA * FValues[7];
         FValues[8] = parA * FValues[8];
+        return *this;
     }
 
     static Matrix3x3f Identity();
@@ -198,12 +199,12 @@ inline Matrix3x3f operator*(const float parA, const Matrix3x3f& parB)
     return result;
 }
 
-//inline Matrix3x3f operator*(const Matrix3x3f& parA, const Matrix3x3f& parB)
+// inline Matrix3x3f operator*(const Matrix3x3f& parA, const Matrix3x3f& parB)
 //{
-//    Matrix3x3f result = parA;
-//    result *= parB;
-//    return result;
-//}
+//     Matrix3x3f result = parA;
+//     result *= parB;
+//     return result;
+// }
 
 /****************************
  * Matrix4x4f
@@ -278,17 +279,17 @@ inline Matrix4x4f operator*(const float parA, const Matrix4x4f& parB)
     return result;
 }
 
-//inline Matrix4x4f operator*(const Matrix4x4f& parA, const Matrix4x4f& parB)
+// inline Matrix4x4f operator*(const Matrix4x4f& parA, const Matrix4x4f& parB)
 //{
-//    Matrix4x4f result = parA;
-//    result *= parB;
-//    return result;
-//}
+//     Matrix4x4f result = parA;
+//     result *= parB;
+//     return result;
+// }
 
-//inline vec4 operator*(const Matrix4x4f& parA, const vec4& parB)
+// inline vec4 operator*(const Matrix4x4f& parA, const vec4& parB)
 //{
-//    vec4 result = parA.operator *(parB);
-//    return result;
-//}
+//     vec4 result = parA.operator *(parB);
+//     return result;
+// }
 
 } // namespace ECSEngine

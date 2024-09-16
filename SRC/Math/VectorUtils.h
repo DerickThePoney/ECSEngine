@@ -1,5 +1,6 @@
 #pragma once
 #include "VectorTypes.h"
+
 #include <math.h>
 
 namespace ECSEngine
@@ -58,10 +59,76 @@ inline __forceinline VecType<float> Lerp(const VecType<float>& A, const VecType<
     return A * (1.f - t) + B * t;
 }
 
+template<typename T>
+inline __forceinline Vector2<T> VecMax(const Vector2<T>& A, const Vector2<T>& B)
+{
+    Vector2<T> res;
+    res.x = Max(A.x, B.x);
+    res.y = Max(A.y, B.y);
+
+    return res;
+}
+
+template<typename T>
+inline __forceinline Vector3<T> VecMax(const Vector3<T>& A, const Vector3<T>& B)
+{
+    Vector3<T> res;
+    res.x = Max(A.x, B.x);
+    res.y = Max(A.y, B.y);
+    res.z = Max(A.z, B.z);
+
+    return res;
+}
+
+template<typename T>
+inline __forceinline Vector4<T> VecMax(const Vector4<T>& A, const Vector4<T>& B)
+{
+    Vector4<T> res;
+    res.x = Max(A.x, B.x);
+    res.y = Max(A.y, B.y);
+    res.z = Max(A.z, B.z);
+    res.w = Max(A.w, B.w);
+
+    return res;
+}
+
+template<typename T>
+inline __forceinline Vector2<T> VecMin(const Vector2<T>& A, const Vector2<T>& B)
+{
+    Vector2<T> res;
+    res.x = Min(A.x, B.x);
+    res.y = Min(A.y, B.y);
+
+    return res;
+}
+
+template<typename T>
+inline __forceinline Vector3<T> VecMin(const Vector3<T>& A, const Vector3<T>& B)
+{
+    Vector3<T> res;
+    res.x = Min(A.x, B.x);
+    res.y = Min(A.y, B.y);
+    res.z = Min(A.z, B.z);
+
+    return res;
+}
+
+template<typename T>
+inline __forceinline Vector4<T> VecMin(const Vector4<T>& A, const Vector4<T>& B)
+{
+    Vector4<T> res;
+    res.x = Min(A.x, B.x);
+    res.y = Min(A.y, B.y);
+    res.z = Min(A.z, B.z);
+    res.w = Min(A.w, B.w);
+
+    return res;
+}
+
 bool IsNan(const vec2& A);
 
 bool IsNan(const vec3& A);
 
 bool IsNan(const vec4& A);
 
-}
+} // namespace ECSEngine

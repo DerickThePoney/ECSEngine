@@ -3,6 +3,7 @@
 #include "CollisionShape.h"
 
 #include "Application/PropertyDrawer.h"
+#include "GeometryHelpers.h"
 
 namespace ECSEngine
 {
@@ -57,6 +58,49 @@ float CollisionShape::ComputeMass(float Density) const
     case ECollisionShape::SPHERE:
         return 2.f * Pi() * FShapeData.FSphereData.Radius * Density;
     }
+    return 0.f;
+}
+
+mat3 CollisionShape::ComputeInertiaTensor(float Mass) const
+{
+    mat3 inertiaTensor = mat3::Identity();
+    switch (FShapeType)
+    {
+    case ECollisionShape::BOX:
+    {
+        inertiaTensor.FValues[0] = 1 / 12.f * Mass *
+              (FShapeData.FBoxData.FExtents.y * FShapeData.FBoxData.FExtents.y + FShapeData.FBoxData.FExtents.z * FShapeData.FBoxData.FExtents.z);
+        inertiaTensor.FValues[4] = 1 / 12.f * Mass *
+              (FShapeData.FBoxData.FExtents.x * FShapeData.FBoxData.FExtents.x + FShapeData.FBoxData.FExtents.z * FShapeData.FBoxData.FExtents.z);
+        inertiaTensor.FValues[8] = 1 / 12.f * Mass *
+              (FShapeData.FBoxData.FExtents.x * FShapeData.FBoxData.FExtents.x + FShapeData.FBoxData.FExtents.y * FShapeData.FBoxData.FExtents.y);
+    }
+    case ECollisionShape::SPHERE:
+    {
+        inertiaTensor *= 2.f / 5.f * Mass * FShapeData.FSphereData.Radius;
+    }
+    }
+    return inertiaTensor;
+}
+
+AABB3f CollisionShape::ComputeAABB(const mat4& Transform) const
+{
+    mat3 inertiaTensor = mat3::Identity();
+    switch (FShapeType)
+    {
+    case ECollisionShape::BOX:
+    {
+        AABB3f OBB(FCenter - 0.5f * FShapeData.FBoxData.FExtents, FCenter + 0.5f * FShapeData.FBoxData.FExtents);
+        return GeometryHelpers::ComputeAABBFromOBB(OBB, Transform);
+    }
+    case ECollisionShape::SPHERE:
+    {
+        AABB3f OBB(FCenter - vec3(FShapeData.FSphereData.Radius), FCenter + vec3(FShapeData.FSphereData.Radius));
+        return GeometryHelpers::ComputeAABBFromOBB(OBB, Transform);
+    }
+    }
+
+    return AABB3f();
 }
 
 void CollisionShape::DrawInEditor()

@@ -1,4 +1,5 @@
 #pragma once
+#include "AABBTree.h"
 #include "Common/IdGenerator.h"
 #include "Common/Singleton.h"
 #include "PhysicsEngineConfiguration.h"
@@ -61,6 +62,8 @@ private:
 
     IdGenerator FHandleGenerator; // TODO MAKE PHYSICS HANDLE ID GENERATOR THAT SPECIALISES THIS
     std::vector<std::unique_ptr<RigidBody>> FRigidbodies;
+    std::vector<PhysicsBodyHandle> FMovedBodies;
+    AABBTree AccelerationTree;
 };
 } // namespace Physics
 } // namespace ECSEngine
