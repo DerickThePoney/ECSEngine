@@ -38,6 +38,16 @@ void PhysicsConfigurationEditor::DrawEditor(bool* parOpen, float parMenuBarHeigh
         bHasChanged = true;
     }
 
+    if (ImGui::InputFloat("AABB fattening value", &Config.FAABBFattenValue))
+    {
+        bHasChanged = true;
+    }
+
+    if (ImGui::InputFloat("AABB displacement multiplier", &Config.FAABBDisplacementMultiplier))
+    {
+        bHasChanged = true;
+    }
+
     if (bHasChanged)
     {
         Physics::SetConfig(Config);

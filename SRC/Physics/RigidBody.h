@@ -1,5 +1,7 @@
 #pragma once
+#include "CollisionShape.h"
 #include "Math/VectorTypes.h"
+#include "PhysicsBodyHandle.h"
 
 namespace ECSEngine
 {
@@ -10,6 +12,11 @@ struct RigidBody
     DECLARE_POOL_ALLOCATED(RigidBody);
 
 public:
+    PhysicsBodyHandle FHandle;
+
+    // Collision shape
+    CollisionShape FCollisionShape;
+
     // positional stuff
     vec3 FPosition;
     vec3 FVelocity;

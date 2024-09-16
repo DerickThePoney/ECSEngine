@@ -49,6 +49,14 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         body->FTorque = vec3(0.f);
     }
 
+    struct MovedBodies
+    {
+        RigidBody* Body = nullptr;
+        vec3 displacement;
+    };
+
+    std::vector<MovedBodies> MovedBodiesArray;
+
     // integrate position
     foreachitem(body, FRigidbodies)
     {
@@ -57,8 +65,11 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
             continue;
         }
 
-        body->FPosition += body->FVelocity * parDeltaTime;
+        const vec3 displacement = body->FVelocity * parDeltaTime;
+        body->FPosition += displacement;
         body->FOrientation = AddVectorToQuaternion(body->FOrientation, body->FRotationVelocity * parDeltaTime);
+
+        MovedBodiesArray.push_back({ body.get(), displacement });
     }
 
     // Update inertia tensor
@@ -71,6 +82,15 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 
         UpdateInertiaTransform(body.get());
     }
+
+    foreachitem(movedBody, MovedBodiesArray)
+    {
+        AccelerationTree.MoveBody(movedBody.Body, movedBody.displacement);
+    }
+
+#ifdef PERFORM_SECURITY_CHECKS
+    AccelerationTree.DebugTree();
+#endif
 }
 
 const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
@@ -81,6 +101,7 @@ const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transfor
     InitializeBody(newBody, Transform, BodyConfig);
 
     newHandle.FId = FHandleGenerator.GetNextId();
+    newBody->FHandle = newHandle;
 
     if (FRigidbodies.size() > newHandle.FId)
     {
@@ -92,6 +113,8 @@ const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transfor
         AssertRelease(FRigidbodies.size() == newHandle.FId);
         FRigidbodies.emplace_back(newBody);
     }
+
+    AccelerationTree.InsertBody(newBody);
     return newHandle;
 }
 
@@ -107,6 +130,7 @@ bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
         return false;
     }
 
+    AccelerationTree.RemoveBody(FRigidbodies[Handle.FId].get());
     FRigidbodies[Handle.FId].reset(nullptr);
 
     return true;
@@ -321,10 +345,20 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     Body->FOrientation = quat::FromMat4(Transform);
 
     // Init Mass and Inertia
-    Body->FMass = BodyConfig.FMass;
+    if (BodyConfig.FAutoComputeMass)
+    {
+        Body->FMass = BodyConfig.FShape.ComputeMass(BodyConfig.FDensity);
+    }
+    else
+    {
+        Body->FMass = BodyConfig.FMass;
+    }
+
     Body->FInvMass = (BodyConfig.FMass != 0.f) ? 1.f / BodyConfig.FMass : 1.f;
-    Body->FInertiaTensor = mat3::Identity() * ((1.f / 6.f) * Body->FMass);
+    Body->FInertiaTensor = BodyConfig.FShape.ComputeInertiaTensor(Body->FMass);
     Body->FInverseInertiaTensor = Invert(Body->FInertiaTensor);
+
+    Body->FCollisionShape = BodyConfig.FShape;
 
     // Init damping coefficients
     Body->FLinearDamping = BodyConfig.FLinearDamping;
