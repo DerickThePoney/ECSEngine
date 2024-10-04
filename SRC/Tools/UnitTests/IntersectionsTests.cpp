@@ -2,6 +2,7 @@
 
 #include "Common/BoundingBox.h"
 #include "Common/IntersectionRoutines.h"
+#include "Common/RandomGenerator.h"
 #include "Math/Vector.h"
 #include "doctest.h"
 
@@ -85,6 +86,29 @@ TEST_SUITE("Intersection tests")
                 sphereNotCentered.w = .5f;
                 CHECK(intersectionTest);
             }
+        }
+    }
+
+    TEST_CASE("Ray - AABB Intersection tests")
+    {
+        BoundingBox<vec3> aabbCentered(vec3(-1.f), vec3(1.f));
+
+        SUBCASE("Centered AABB Tests")
+        {
+            ECSEngine::RandomNumbers::InitRandomNumberGenerator(56);
+            for (int i = 0; i < 1000; ++i)
+            {
+                vec3 Origin(ECSEngine::RandomNumbers::NextFloat(), ECSEngine::RandomNumbers::NextFloat(), ECSEngine::RandomNumbers::NextFloat());
+                Ray3D ray(Origin, Normalize(vec3(0.f) - Origin));
+
+                const bool intersectionTest = Intersection::RayAABBIntersection(ray, aabbCentered);
+
+                CHECK(intersectionTest);
+            }
+
+            // TODO CHECK NON INTERSECTION TESTS
+
+            ECSEngine::RandomNumbers::DestroyRandomNumberGenerator();
         }
     }
 }
