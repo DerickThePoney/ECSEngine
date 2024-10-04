@@ -34,7 +34,7 @@ public:
 
     void MoveBody(const RigidBody* Body, vec3 parDisplacement);
 
-    void RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle> parLeafsHit);
+    void RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& parLeafsHit);
 
 #ifdef PERFORM_SECURITY_CHECKS
     void DebugTree();
