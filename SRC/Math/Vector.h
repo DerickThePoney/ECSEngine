@@ -104,7 +104,7 @@ public:
     template<typename T>                                                                                                                                                           \
     inline Vector2<T> operator OP(const T parB, const Vector2<T>& parA)                                                                                                            \
     {                                                                                                                                                                              \
-        return parA OP parB;                                                                                                                                                       \
+        return Vector2<T>(parB OP parA.x, parB OP parA.x);                                                                                                                                                       \
     }
 
 MAKE_EXTERN_OP(+);
@@ -255,7 +255,7 @@ public:
     template<typename T>                                                                                                                                                           \
     inline Vector3<T> operator OP(const T parB, const Vector3<T>& parA)                                                                                                            \
     {                                                                                                                                                                              \
-        return parA OP parB;                                                                                                                                                       \
+        return Vector3<T>(parB OP parA.x, parB OP parA.y, parB OP parA.z);                                                                                                                                                       \
     }
 
 MAKE_EXTERN_OP(+);
@@ -471,7 +471,7 @@ public:
     template<typename T>                                                                                                                                                           \
     inline Vector4<T> operator OP(const T parB, const Vector4<T>& parA)                                                                                                            \
     {                                                                                                                                                                              \
-        return parA OP parB;                                                                                         \
+        return Vector4<T>(parB OP parA.x, parB OP parA.y, parB OP parA.z, parB OP parA.w);                                                          \
     }
 
 MAKE_EXTERN_OP(+);
