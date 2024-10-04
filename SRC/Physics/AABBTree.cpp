@@ -164,6 +164,7 @@ void AABBTree::RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& 
 void AABBTree::DebugTree()
 {
     ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bShowAABBTreeAABBs, false, "Show AABB Tree", "Physics/AABBTree");
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bOnlyDrawLeaf, false, "Only show leafs", "Physics/AABBTree");
     ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bDebugAABBTreeRaycast, false, "Debug AABB Tree Raycast", "Physics/AABBTree");
     if (bShowAABBTreeAABBs)
     {
@@ -178,11 +179,22 @@ void AABBTree::DebugTree()
 
         foreachitemconst(node, FNodes)
         {
+            if (node == nullptr)
+            {
+                continue;
+            }
+
+            if (bOnlyDrawLeaf && !node->FbIsLeaf)
+            {
+                continue;
+            }
+
             u32 color = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 1.f, 1.f));
             if (node->FbIsLeaf)
                 color = LeafColor;
             if (node->FParentIndex == -1u)
                 color = RootColor;
+
             buffer->DrawAABB(handle, node->FAABB.Min(), node->FAABB.Max(), color);
         }
 
