@@ -2,14 +2,17 @@
 
 #include "AABBTree.h"
 
+#include "Common/IntersectionRoutines.h"
 #include "GeometryHelpers.h"
 #include "PhysicsAPI.h"
 #include "PhysicsEngineConfiguration.h"
 #include "RigidBody.h"
 
 #ifdef PERFORM_SECURITY_CHECKS
+#include "Common/CameraHelpers.h"
 #include "Common/CameraManager.h"
 #include "Common/ColorUtils.h"
+#include "Common/InputManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
@@ -119,10 +122,49 @@ void AABBTree::MoveBody(const RigidBody* Body, vec3 parDisplacement)
     InsertLeaf(nodeIndex);
 }
 
+void AABBTree::RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle> parLeafsHit)
+{
+    std::queue<u32> nodesQueue;
+
+    if (FRootIndex == -1u)
+    {
+        return;
+    }
+
+    nodesQueue.push(FRootIndex);
+    while (!nodesQueue.empty())
+    {
+        const u32 currentNodeIndex = nodesQueue.front();
+        nodesQueue.pop();
+        AssertRelease(currentNodeIndex != -1u);
+
+        AABBNode* currentNode = FNodes[currentNodeIndex];
+        AssertRelease(currentNode != nullptr);
+        if (!Intersection::RayAABBIntersection(parRay, currentNode->FAABB))
+        {
+            continue;
+        }
+
+        if (currentNode->FbIsLeaf)
+        {
+            parLeafsHit.push_back(currentNode->FBodyHandle);
+        }
+        else
+        {
+            if (currentNode->FChild1)
+                nodesQueue.push(currentNode->FChild1);
+
+            if (currentNode->FChild2)
+                nodesQueue.push(currentNode->FChild2);
+        }
+    }
+}
+
 #ifdef PERFORM_SECURITY_CHECKS
 void AABBTree::DebugTree()
 {
     ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bShowAABBTreeAABBs, false, "Show AABB Tree", "Physics/AABBTree");
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bDebugAABBTreeRaycast, false, "Debug AABB Tree Raycast", "Physics/AABBTree");
     if (bShowAABBTreeAABBs)
     {
         Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
@@ -145,6 +187,42 @@ void AABBTree::DebugTree()
         }
 
         buffer->Submit();
+        Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(buffer);
+    }
+
+    if (bDebugAABBTreeRaycast)
+    {
+        u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+        Camera* camera = CameraManager::Instance().GetCamera(camId);
+
+        const uvec2 windowSize = Rendering::GLFWDisplayWindowHandler::Instance().GetSize();
+        const float aspectRatio = Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio();
+        Ray ray = GetCameraRayFromMouseInput(*camera, aspectRatio, windowSize, Input::GetMousePosition());
+        std::vector<PhysicsBodyHandle> Hits;
+        RaycastTree(ray, Hits);
+
+        Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
+        buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(aspectRatio));
+        Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+
+        for (PhysicsBodyHandle& Handle : Hits)
+        {
+            auto itFind = FHandleToNodeMap.find(Handle);
+            if (itFind == FHandleToNodeMap.end())
+            {
+                continue;
+            }
+
+            AABBNode* HitNode = FNodes[itFind->second];
+            if (HitNode == nullptr)
+            {
+                continue;
+            }
+
+            buffer->DrawAABB(handle, HitNode->FAABB.Center() - vec3(0.5f), HitNode->FAABB.Center() + vec3(0.5f), ColorUtils::FromRGBA(255, 0, 0, 255));
+        }
+        buffer->Submit();
+        Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(buffer);
     }
 }
 #endif
