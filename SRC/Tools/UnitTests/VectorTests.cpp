@@ -552,6 +552,30 @@ TEST_SUITE("Vector tests")
             CHECK(f.z == -1.f);
         }
 
+        SUBCASE("Vec3 floats soustraction division")
+        {
+            float a = 3.f;
+            ECSEngine::vec3 test1(2.f, 2.f, 3.0f);
+
+            ECSEngine::vec3 soustraction = a - test1;
+            ECSEngine::vec3 soustraction2 = test1 - a;
+            CHECK(soustraction.x == 1.f);
+            CHECK(soustraction.y == 1.f);
+            CHECK(soustraction.z == 0.f);
+            CHECK(soustraction2.x == -1.f);
+            CHECK(soustraction2.y == -1.f);
+            CHECK(soustraction2.z == 0.f);
+
+            ECSEngine::vec3 div = a / test1;
+            ECSEngine::vec3 div2 = test1 / a;
+            CHECK(div.x == 3.f / 2.f);
+            CHECK(div.y == 3.f / 2.f);
+            CHECK(div.z == 1.f);
+            CHECK(div2.x == 2.f / 3.f);
+            CHECK(div2.y == 2.f / 3.f);
+            CHECK(div2.z == 1.f);
+        }
+
         SUBCASE("Vec3 int")
         {
             Vec3UnitTests<ECSEngine::ivec3>();
