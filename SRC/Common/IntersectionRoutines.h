@@ -44,5 +44,7 @@ bool FrustumSphereIntersect(const Frustum& parFrustum, const vec4& parSphere);
 bool FrustumBoundingBoxIntersect(const Frustum& parFrustum, const FrustumCorners& parCorners, const BoundingBox<vec3>& parBox);
 
 bool SphereBoundingBoxIntersect(const vec4& parSphere, const BoundingBox<vec3>& parBox);
+
+bool RayAABBIntersection(const Ray3D& parRay, const BoundingBox<vec3>& parAABB);
 } // namespace Intersection
 } // namespace ECSEngine
