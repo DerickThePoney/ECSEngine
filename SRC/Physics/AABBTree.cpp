@@ -122,7 +122,7 @@ void AABBTree::MoveBody(const RigidBody* Body, vec3 parDisplacement)
     InsertLeaf(nodeIndex);
 }
 
-void AABBTree::RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle> parLeafsHit)
+void AABBTree::RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& parLeafsHit)
 {
     std::queue<u32> nodesQueue;
 
@@ -219,7 +219,7 @@ void AABBTree::DebugTree()
                 continue;
             }
 
-            buffer->DrawAABB(handle, HitNode->FAABB.Center() - vec3(0.5f), HitNode->FAABB.Center() + vec3(0.5f), ColorUtils::FromRGBA(255, 0, 0, 255));
+            buffer->DrawAABB(handle, HitNode->FAABB.Min(), HitNode->FAABB.Max(), ColorUtils::FromRGBA(255, 0, 0, 255));
         }
         buffer->Submit();
         Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(buffer);
