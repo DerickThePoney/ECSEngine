@@ -339,5 +339,35 @@ bool SphereBoundingBoxIntersect(const vec4& parSphere, const BoundingBox<vec3>& 
     return false;
 }
 
+// source https://tavianator.com/2011/ray_box.html
+bool RayAABBIntersection(const Ray3D& parRay, const BoundingBox<vec3>& parAABB)
+{
+    float tmin = -std::numeric_limits<float>::max(), tmax = std::numeric_limits<float>::max();
+    vec3 rayInvDir = 1.f / parRay.FDirection;
+
+    // X
+    float t1 = (parAABB.Min().x - parRay.FOrigin.x) * rayInvDir.x;
+    float t2 = (parAABB.Max().x - parRay.FOrigin.x) * rayInvDir.x;
+
+    tmin = Max(tmin, Min(t1, t2));
+    tmax = Min(tmax, Max(t1, t2));
+
+    // Y
+    t1 = (parAABB.Min().y - parRay.FOrigin.y) * rayInvDir.y;
+    t2 = (parAABB.Max().y - parRay.FOrigin.y) * rayInvDir.y;
+
+    tmin = Max(tmin, Min(t1, t2));
+    tmax = Min(tmax, Max(t1, t2));
+
+    // Z
+    t1 = (parAABB.Min().z - parRay.FOrigin.z) * rayInvDir.z;
+    t2 = (parAABB.Max().z - parRay.FOrigin.z) * rayInvDir.z;
+
+    tmin = Max(tmin, Min(t1, t2));
+    tmax = Min(tmax, Max(t1, t2));
+
+    return tmax > Max(tmin, 0.f);
+}
+
 } // namespace Intersection
 } // namespace ECSEngine
