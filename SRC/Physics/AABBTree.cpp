@@ -151,10 +151,10 @@ void AABBTree::RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& 
         }
         else
         {
-            if (currentNode->FChild1)
+            if (currentNode->FChild1 != -1u)
                 nodesQueue.push(currentNode->FChild1);
 
-            if (currentNode->FChild2)
+            if (currentNode->FChild2 != -1u)
                 nodesQueue.push(currentNode->FChild2);
         }
     }
