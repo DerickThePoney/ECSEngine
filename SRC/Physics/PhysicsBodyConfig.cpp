@@ -6,10 +6,26 @@ namespace ECSEngine
 {
 namespace Physics
 {
-
 void PhysicsBodyConfig::DrawInEditor()
 {
     ImGui::PushID(this);
+
+    u32 lastIndex = EPhysicsMoveability::LENGTH;
+
+    std::string currentMoveability = EPhysicsMoveability::AsString(FMoveability);
+    if (ImGui::BeginCombo("##MOVEABILITY", currentMoveability.c_str()))
+    {
+        forrange(i, 0, lastIndex)
+        {
+            if (ImGui::Selectable(EPhysicsMoveability::AsString((EPhysicsMoveability::Type)i).c_str(), i == FMoveability))
+            {
+                FMoveability = (EPhysicsMoveability::Type)i;
+            }
+        }
+
+        ImGui::EndCombo();
+    }
+
     ImGui::Checkbox("Apply gravity", &FApplyGravity);
     ImGui::Checkbox("AutoCompute mass", &FAutoComputeMass);
     if (!FAutoComputeMass)

@@ -62,6 +62,9 @@ private:
 
     IdGenerator FHandleGenerator; // TODO MAKE PHYSICS HANDLE ID GENERATOR THAT SPECIALISES THIS
     std::vector<std::unique_ptr<RigidBody>> FRigidbodies;
+    std::set<PhysicsBodyHandle> FStaticRigidbodies;
+    std::set<PhysicsBodyHandle> FKinematicRigidbodies;
+    std::set<PhysicsBodyHandle> FPhysicsRigidbodies;
     std::vector<PhysicsBodyHandle> FMovedBodies;
     AABBTree AccelerationTree;
 };

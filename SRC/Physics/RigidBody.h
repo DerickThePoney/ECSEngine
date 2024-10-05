@@ -2,6 +2,7 @@
 #include "CollisionShape.h"
 #include "Math/VectorTypes.h"
 #include "PhysicsBodyHandle.h"
+#include "PhysicsMoveabilityEnum.h"
 
 namespace ECSEngine
 {
@@ -13,6 +14,9 @@ struct RigidBody
 
 public:
     PhysicsBodyHandle FHandle;
+
+    // Moveability
+    EPhysicsMoveability::Type FMoveabilityType = EPhysicsMoveability::STATIC;
 
     // Collision shape
     CollisionShape FCollisionShape;

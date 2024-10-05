@@ -1,5 +1,6 @@
 #pragma once
 #include "CollisionShape.h"
+#include "PhysicsMoveabilityEnum.h"
 
 namespace ECSEngine
 {
@@ -19,11 +20,16 @@ struct PhysicsBodyConfig
     float FLinearDamping = 0.1f;
     float FAngularDamping = 0.01f;
 
+    // Moveability
+    EPhysicsMoveability::Type FMoveability = EPhysicsMoveability::STATIC;
+
     // TO ADD:
     // - Colliders/PhysicsShapes
     // - Collision channels
     // - Drag (angular and linear)
     // - MassComputation
+    // - Proper CoM computation
+    // - Moveability
 
     SERIALIZE()
     {
@@ -34,6 +40,7 @@ struct PhysicsBodyConfig
         PROPERTYFIELD(Shape, CollisionShape());
         PROPERTYFIELD(LinearDamping, 0.1f);
         PROPERTYFIELD(AngularDamping, 0.01f);
+        PROPERTYFIELD(Moveability, EPhysicsMoveability::STATIC);
     }
 
     void DrawInEditor();
