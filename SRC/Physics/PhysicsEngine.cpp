@@ -30,6 +30,7 @@ void PhysicsEngine::Cleanup()
 
 void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 {
+    // TODO ONLY LOOP THIS ON PHYSICS BODIES + MAKE THE MOVED BODIES ARRAY A CLASS ONE
     // integrate velocity
     foreachitem(body, FRigidbodies)
     {
@@ -115,6 +116,22 @@ const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transfor
     }
 
     AccelerationTree.InsertBody(newBody);
+
+    switch (newBody->FMoveabilityType)
+    {
+    case EPhysicsMoveability::STATIC:
+        FStaticRigidbodies.insert(newHandle);
+        break;
+    case EPhysicsMoveability::KINEMATIC:
+        FKinematicRigidbodies.insert(newHandle);
+        break;
+    case EPhysicsMoveability::PHYICS_ENABLED:
+        FPhysicsRigidbodies.insert(newHandle);
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
     return newHandle;
 }
 
@@ -339,6 +356,9 @@ bool PhysicsEngine::AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, co
 void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
 {
     AssertRelease(Body != nullptr);
+
+    // Moveability
+    Body->FMoveabilityType = BodyConfig.FMoveability;
 
     // Init position and orientation
     Body->FPosition = Transform.Column(3).xyz();
