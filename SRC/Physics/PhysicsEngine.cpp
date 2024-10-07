@@ -30,10 +30,16 @@ void PhysicsEngine::Cleanup()
 
 void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 {
-    // TODO ONLY LOOP THIS ON PHYSICS BODIES + MAKE THE MOVED BODIES ARRAY A CLASS ONE
+    // MAKE THE MOVED BODIES ARRAY A CLASS ONE AND ALLOW KINEMATIC UPDATES
     // integrate velocity
-    foreachitem(body, FRigidbodies)
+    foreachitem(bodyHandle, FPhysicsRigidbodies)
     {
+        if (!bodyHandle.IsValid())
+        {
+            continue;
+        }
+
+        RigidBody* body = FRigidbodies[bodyHandle.FId].get();
         if (body == nullptr)
         {
             continue;
@@ -59,8 +65,14 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
     std::vector<MovedBodies> MovedBodiesArray;
 
     // integrate position
-    foreachitem(body, FRigidbodies)
+    foreachitem(bodyHandle, FPhysicsRigidbodies)
     {
+        if (!bodyHandle.IsValid())
+        {
+            continue;
+        }
+
+        RigidBody* body = FRigidbodies[bodyHandle.FId].get();
         if (body == nullptr)
         {
             continue;
@@ -70,18 +82,24 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         body->FPosition += displacement;
         body->FOrientation = AddVectorToQuaternion(body->FOrientation, body->FRotationVelocity * parDeltaTime);
 
-        MovedBodiesArray.push_back({ body.get(), displacement });
+        MovedBodiesArray.push_back({ body, displacement });
     }
 
     // Update inertia tensor
-    foreachitem(body, FRigidbodies)
+    foreachitem(bodyHandle, FPhysicsRigidbodies)
     {
+        if (!bodyHandle.IsValid())
+        {
+            continue;
+        }
+
+        RigidBody* body = FRigidbodies[bodyHandle.FId].get();
         if (body == nullptr)
         {
             continue;
         }
 
-        UpdateInertiaTransform(body.get());
+        UpdateInertiaTransform(body);
     }
 
     foreachitem(movedBody, MovedBodiesArray)
