@@ -104,11 +104,11 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 
     foreachitem(movedBody, MovedBodiesArray)
     {
-        AccelerationTree.MoveBody(movedBody.Body, movedBody.displacement);
+        FBroadPhase.MoveBody(movedBody.Body, movedBody.displacement);
     }
 
 #ifdef PERFORM_SECURITY_CHECKS
-    AccelerationTree.DebugTree();
+    FBroadPhase.DebugBroadPhase();
 #endif
 }
 
@@ -133,7 +133,7 @@ const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transfor
         FRigidbodies.emplace_back(newBody);
     }
 
-    AccelerationTree.InsertBody(newBody);
+    FBroadPhase.AddNewBody(newBody);
 
     switch (newBody->FMoveabilityType)
     {
@@ -165,7 +165,7 @@ bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
         return false;
     }
 
-    AccelerationTree.RemoveBody(FRigidbodies[Handle.FId].get());
+    FBroadPhase.RemoveBody(FRigidbodies[Handle.FId].get());
     FRigidbodies[Handle.FId].reset(nullptr);
 
     return true;
