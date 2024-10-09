@@ -1,5 +1,6 @@
 #pragma once
-#include "AABBTree.h"
+
+#include "BroadPhase.h"
 #include "Common/IdGenerator.h"
 #include "Common/Singleton.h"
 #include "PhysicsEngineConfiguration.h"
@@ -66,7 +67,7 @@ private:
     std::set<PhysicsBodyHandle> FKinematicRigidbodies;
     std::set<PhysicsBodyHandle> FPhysicsRigidbodies;
     std::vector<PhysicsBodyHandle> FMovedBodies;
-    AABBTree AccelerationTree;
+    BroadPhase FBroadPhase;
 };
 } // namespace Physics
 } // namespace ECSEngine
