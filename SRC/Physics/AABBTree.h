@@ -24,6 +24,8 @@ public:
     void Reset();
 };
 
+using FQueryCallback = Delegate<void(const PhysicsBodyHandle&)>;
+
 class AABBTree
 {
 public:
@@ -32,9 +34,15 @@ public:
     void InsertBody(const RigidBody* Body);
     void RemoveBody(const RigidBody* Body);
 
-    void MoveBody(const RigidBody* Body, vec3 parDisplacement);
+    bool MoveBody(const RigidBody* Body, vec3 parDisplacement);
+    bool WasMoved(const PhysicsBodyHandle& parHandle) const;
+    void ClearMoved(const PhysicsBodyHandle& parHandle);
 
     void RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& parLeafsHit);
+
+    void OverlapQuery(const AABB3f& parAABB, FQueryCallback& Callback);
+
+    AABB3f GetFatAABB3f(const PhysicsBodyHandle& parHandle) const;
 
 #ifdef PERFORM_SECURITY_CHECKS
     void DebugTree();
@@ -53,6 +61,7 @@ private:
     AABB3f ComputeAABB(const RigidBody* Body) const;
     AABB3f ComputeAABB(const RigidBody* Body, const mat4& Transform) const;
     u32 RetrieveNodeForBody(const RigidBody* Body) const;
+    u32 RetrieveNodeForHandle(const PhysicsBodyHandle& BodyHandle) const;
 
 private:
     std::vector<AABBNode*> FNodes;

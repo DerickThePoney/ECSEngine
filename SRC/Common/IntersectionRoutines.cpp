@@ -369,5 +369,14 @@ bool RayAABBIntersection(const Ray3D& parRay, const BoundingBox<vec3>& parAABB)
     return tmax > Max(tmin, 0.f);
 }
 
+bool AABBABBBIntersection(const BoundingBox<vec3>& parFirst, const BoundingBox<vec3>& parSecond)
+{
+    // clang-format off
+    return (parFirst.Min().x <= parSecond.Max().x && parFirst.Max().x >= parSecond.Min().x) && 
+           (parFirst.Min().y <= parSecond.Max().y && parFirst.Max().y >= parSecond.Min().y) &&
+           (parFirst.Min().z <= parSecond.Max().z && parFirst.Max().z >= parSecond.Min().z);
+    // clang-format on
+}
+
 } // namespace Intersection
 } // namespace ECSEngine
