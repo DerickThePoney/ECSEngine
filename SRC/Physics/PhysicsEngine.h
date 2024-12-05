@@ -3,6 +3,7 @@
 #include "BroadPhase.h"
 #include "Common/IdGenerator.h"
 #include "Common/Singleton.h"
+#include "ContactManager.h"
 #include "PhysicsEngineConfiguration.h"
 #include "RigidBody.h"
 
@@ -58,8 +59,6 @@ private:
     RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle);
     const RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle) const;
 
-    void UpdateOverlapingPairsCallback(const PhysicsBodyHandle& first, const PhysicsBodyConfig& second);
-
 private:
     PhysicsEngineConfiguration FConfig;
 
@@ -70,6 +69,7 @@ private:
     std::set<PhysicsBodyHandle> FPhysicsRigidbodies;
     std::vector<PhysicsBodyHandle> FMovedBodies;
     BroadPhase FBroadPhase;
+    ContactManager FContactManager;
 };
 } // namespace Physics
 } // namespace ECSEngine

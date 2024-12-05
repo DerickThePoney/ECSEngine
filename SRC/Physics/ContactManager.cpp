@@ -13,7 +13,12 @@ IMPLEMENT_POOL_ALLOCATED(Contact);
 
 void ContactManager::FindNewContacts(BroadPhase& parBroadPhase)
 {
-    parBroadPhase.UpdatePairs();
+    FOverlapingPairDelegate Del = DELEGATE(&ContactManager::UpdateOverlapingPairsCallback, *this);
+    parBroadPhase.UpdatePairs(Del);
+}
+
+void ContactManager::UpdateOverlapingPairsCallback(const PhysicsBodyHandle& first, const PhysicsBodyHandle& second)
+{
 }
 
 } // namespace Physics
