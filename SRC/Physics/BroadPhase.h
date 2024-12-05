@@ -16,20 +16,19 @@ using FOverlapingPairDelegate = Delegate<void(const PhysicsBodyHandle&, const Ph
 class BroadPhase
 {
 public:
-    void UpdatePairs();
+    void UpdatePairs(FOverlapingPairDelegate& parCallback);
 
     void AddNewBody(RigidBody* body);
     void RemoveBody(RigidBody* body);
 
     void MoveBody(RigidBody* body, vec3 displacement);
 
-    void UpdatePotentialOverlappingPairs(FOverlapingPairDelegate& parCallback);
-
 #ifdef PERFORM_SECURITY_CHECKS
     void DebugBroadPhase();
 #endif
 
 private:
+    void UpdatePotentialOverlappingPairs(FOverlapingPairDelegate& parCallback);
     void QueryCallback(const PhysicsBodyHandle& Handle);
 
 private:

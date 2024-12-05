@@ -9,8 +9,9 @@ namespace ECSEngine
 namespace Physics
 {
 
-void BroadPhase::UpdatePairs()
+void BroadPhase::UpdatePairs(FOverlapingPairDelegate& parCallback)
 {
+    UpdatePotentialOverlappingPairs(parCallback);
 }
 
 void BroadPhase::AddNewBody(RigidBody* body)

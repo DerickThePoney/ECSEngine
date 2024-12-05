@@ -26,6 +26,9 @@ class ContactManager
 {
 public:
     void FindNewContacts(BroadPhase& parBroadPhase);
+
+private:
+    void UpdateOverlapingPairsCallback(const PhysicsBodyHandle& first, const PhysicsBodyHandle& second);
 };
 } // namespace Physics
 } // namespace ECSEngine
