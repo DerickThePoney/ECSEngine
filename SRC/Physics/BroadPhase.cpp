@@ -2,6 +2,8 @@
 
 #include "BroadPhase.h"
 
+#include "RigidBody.h"
+
 namespace ECSEngine
 {
 namespace Physics
@@ -14,16 +16,69 @@ void BroadPhase::UpdatePairs()
 void BroadPhase::AddNewBody(RigidBody* body)
 {
     FTree.InsertBody(body);
+    FMovedBodies.insert(body->FHandle);
 }
 
 void BroadPhase::RemoveBody(RigidBody* body)
 {
     FTree.RemoveBody(body);
+    FMovedBodies.erase(body->FHandle);
 }
 
 void BroadPhase::MoveBody(RigidBody* body, vec3 displacement)
 {
-    FTree.MoveBody(body, displacement);
+    const bool bBufferMove = FTree.MoveBody(body, displacement);
+    if (bBufferMove)
+    {
+        FMovedBodies.insert(body->FHandle);
+    }
+}
+
+void BroadPhase::UpdatePotentialOverlappingPairs(FOverlapingPairDelegate& parCallback)
+{
+    // Query tree for each moved object - get add a call back to record the pairs
+    // Loop over overlapping pairs
+    // clear the moved flags.
+    FOverlapingBodies.clear(); // Necessary ?
+
+    foreachitemconst(bodyHandle, FMovedBodies)
+    {
+        FCurrentQuery = bodyHandle;
+        const AABB3f AABBToUse = FTree.GetFatAABB3f(bodyHandle);
+        FTree.OverlapQuery(AABBToUse, DELEGATE(&BroadPhase::QueryCallback, *this));
+    }
+
+    // Send data upstage
+    foreachitemconst(OverlapingBodies, FOverlapingBodies)
+    {
+        parCallback(OverlapingBodies.first, OverlapingBodies.second);
+    }
+
+    // clear moved flags and buffer
+    foreachitemconst(bodyHandle, FMovedBodies)
+    {
+        FTree.ClearMoved(bodyHandle);
+    }
+    FMovedBodies.clear();
+}
+
+void BroadPhase::QueryCallback(const PhysicsBodyHandle& Handle)
+{
+    if (FCurrentQuery == Handle)
+    {
+        return;
+    }
+
+    if (FTree.WasMoved(Handle) && Handle.FId > FCurrentQuery.FId)
+    {
+        return;
+    }
+
+    // Moved buffer
+    OverlapingBodiesPair newPair;
+    newPair.first = (FCurrentQuery.FId < Handle.FId) ? FCurrentQuery : Handle;
+    newPair.second = (FCurrentQuery.FId < Handle.FId) ? Handle : FCurrentQuery;
+    FOverlapingBodies.push_back(newPair);
 }
 
 #ifdef PERFORM_SECURITY_CHECKS

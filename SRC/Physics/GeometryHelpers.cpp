@@ -43,9 +43,9 @@ bool FirstAABBContainsSecond(const AABB3f& parFirst, const AABB3f& parSecond)
     res = res && parFirst.Min().y <= parSecond.Min().y;
     res = res && parFirst.Min().z <= parSecond.Min().z;
 
-    res = res && parFirst.Max().x <= parSecond.Max().x;
-    res = res && parFirst.Max().y <= parSecond.Max().y;
-    res = res && parFirst.Max().z <= parSecond.Max().z;
+    res = res && parFirst.Max().x >= parSecond.Max().x;
+    res = res && parFirst.Max().y >= parSecond.Max().y;
+    res = res && parFirst.Max().z >= parSecond.Max().z;
 
     return res;
 }

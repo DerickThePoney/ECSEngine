@@ -107,9 +107,16 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         FBroadPhase.MoveBody(movedBody.Body, movedBody.displacement);
     }
 
+    FOverlapingPairDelegate Del = DELEGATE(&PhysicsEngine::UpdateOverlapingPairsCallback, *this);
+    FBroadPhase.UpdatePotentialOverlappingPairs(Del);
+
 #ifdef PERFORM_SECURITY_CHECKS
     FBroadPhase.DebugBroadPhase();
 #endif
+}
+
+void PhysicsEngine::UpdateOverlapingPairsCallback(const PhysicsBodyHandle& first, const PhysicsBodyConfig& second)
+{
 }
 
 const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)

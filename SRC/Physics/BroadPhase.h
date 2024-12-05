@@ -5,6 +5,14 @@ namespace ECSEngine
 {
 namespace Physics
 {
+using OverlapingBodiesPair = std::pair<PhysicsBodyHandle, PhysicsBodyHandle>;
+struct MovedBodies
+{
+    PhysicsBodyHandle Handle;
+};
+
+using FOverlapingPairDelegate = Delegate<void(const PhysicsBodyHandle&, const PhysicsBodyHandle&)>;
+
 class BroadPhase
 {
 public:
@@ -15,12 +23,20 @@ public:
 
     void MoveBody(RigidBody* body, vec3 displacement);
 
+    void UpdatePotentialOverlappingPairs(FOverlapingPairDelegate& parCallback);
+
 #ifdef PERFORM_SECURITY_CHECKS
     void DebugBroadPhase();
 #endif
 
 private:
+    void QueryCallback(const PhysicsBodyHandle& Handle);
+
+private:
     AABBTree FTree;
+    std::set<PhysicsBodyHandle> FMovedBodies;
+    PhysicsBodyHandle FCurrentQuery;
+    std::vector<OverlapingBodiesPair> FOverlapingBodies;
 };
 } // namespace Physics
 } // namespace ECSEngine

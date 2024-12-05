@@ -58,6 +58,8 @@ private:
     RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle);
     const RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle) const;
 
+    void UpdateOverlapingPairsCallback(const PhysicsBodyHandle& first, const PhysicsBodyConfig& second);
+
 private:
     PhysicsEngineConfiguration FConfig;
 

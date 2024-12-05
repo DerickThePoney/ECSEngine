@@ -53,13 +53,13 @@ void AABBTree::RemoveBody(const RigidBody* Body)
     FreeNode(Index);
 }
 
-void AABBTree::MoveBody(const RigidBody* Body, vec3 parDisplacement)
+bool AABBTree::MoveBody(const RigidBody* Body, vec3 parDisplacement)
 {
     const u32 nodeIndex = RetrieveNodeForBody(Body);
     AlwaysCheckedAssert(nodeIndex != -1u);
     if (nodeIndex == -1u)
     {
-        return;
+        return false;
     }
 
     const PhysicsEngineConfiguration& Config = Physics::GetConfig();
@@ -110,7 +110,7 @@ void AABBTree::MoveBody(const RigidBody* Body, vec3 parDisplacement)
         hugeAABB.Inflate(fatteningValue * 4.f);
         if (GeometryHelpers::FirstAABBContainsSecond(hugeAABB, treeAABB))
         {
-            return;
+            return false;
         }
         // tree AABB is too big it needs to shrink
     }
@@ -120,6 +120,25 @@ void AABBTree::MoveBody(const RigidBody* Body, vec3 parDisplacement)
     FNodes[nodeIndex]->FAABB = fatAabb;
 
     InsertLeaf(nodeIndex);
+    FNodes[nodeIndex]->bWasMoved = true;
+
+    return true;
+}
+
+bool AABBTree::WasMoved(const PhysicsBodyHandle& parHandle) const
+{
+    const u32 Index = RetrieveNodeForHandle(parHandle);
+    AssertRelease(Index < FNodes.size());
+    AssertRelease(FNodes[Index] != nullptr);
+    return FNodes[Index]->bWasMoved;
+}
+
+void AABBTree::ClearMoved(const PhysicsBodyHandle& parHandle)
+{
+    const u32 Index = RetrieveNodeForHandle(parHandle);
+    AssertRelease(Index < FNodes.size());
+    AssertRelease(FNodes[Index] != nullptr);
+    FNodes[Index]->bWasMoved = false;
 }
 
 void AABBTree::RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& parLeafsHit)
@@ -158,6 +177,57 @@ void AABBTree::RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& 
                 nodesQueue.push(currentNode->FChild2);
         }
     }
+}
+
+void AABBTree::OverlapQuery(const AABB3f& parAABB, FQueryCallback& Callback)
+{
+    std::queue<u32> nodesQueue;
+
+    if (FRootIndex == -1u)
+    {
+        return;
+    }
+
+    nodesQueue.push(FRootIndex);
+    while (!nodesQueue.empty())
+    {
+        const u32 currentNodeIndex = nodesQueue.front();
+        AssertRelease(currentNodeIndex != -1u);
+        nodesQueue.pop();
+
+        AABBNode* currentNode = FNodes[currentNodeIndex];
+        AssertRelease(currentNode != nullptr);
+        if (!Intersection::AABBABBBIntersection(parAABB, currentNode->FAABB))
+        {
+            continue;
+        }
+
+        if (currentNode->FbIsLeaf)
+        {
+            Callback(currentNode->FBodyHandle);
+        }
+        else
+        {
+            if (currentNode->FChild1 != -1u)
+                nodesQueue.push(currentNode->FChild1);
+
+            if (currentNode->FChild2 != -1u)
+                nodesQueue.push(currentNode->FChild2);
+        }
+    }
+}
+
+AABB3f AABBTree::GetFatAABB3f(const PhysicsBodyHandle& parHandle) const
+{
+    AssertRelease(parHandle.IsValid());
+    auto itFind = FHandleToNodeMap.find(parHandle);
+    AssertRelease(itFind != FHandleToNodeMap.end());
+    AssertRelease(itFind->second < FNodes.size());
+
+    const AABBNode* const Node = FNodes[itFind->second];
+    AssertRelease(Node != nullptr);
+    AssertRelease(Node->FbIsLeaf);
+    return Node->FAABB;
 }
 
 #ifdef PERFORM_SECURITY_CHECKS
@@ -260,6 +330,7 @@ void AABBTree::InsertLeaf(const u32 Index)
     NewParentNode->FHeight = FNodes[bestSiblingToAddTo]->FHeight + 1;
     FNodes[bestSiblingToAddTo]->FParentIndex = newParentNodeIndex;
     FNodes[Index]->FParentIndex = newParentNodeIndex;
+    FNodes[Index]->bWasMoved = true;
 
     if (NewParentNode->FParentIndex == -1u)
     {
@@ -644,7 +715,12 @@ AABB3f AABBTree::ComputeAABB(const RigidBody* Body) const
 u32 AABBTree::RetrieveNodeForBody(const RigidBody* Body) const
 {
     AssertRelease(Body != nullptr);
-    auto itFind = FHandleToNodeMap.find(Body->FHandle);
+    return RetrieveNodeForHandle(Body->FHandle);
+}
+u32 AABBTree::RetrieveNodeForHandle(const PhysicsBodyHandle& BodyHandle) const
+{
+    AssertRelease(BodyHandle.IsValid());
+    auto itFind = FHandleToNodeMap.find(BodyHandle);
     if (itFind == FHandleToNodeMap.end())
     {
         return -1u;
