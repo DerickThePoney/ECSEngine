@@ -23,6 +23,10 @@ public:
 
     void MoveBody(RigidBody* body, vec3 displacement);
 
+    bool TestOverlap(const PhysicsBodyHandle& first, const PhysicsBodyHandle& second) const;
+
+    AABB3f GetFatAABB3f(const PhysicsBodyHandle& handle) const;
+
 #ifdef PERFORM_SECURITY_CHECKS
     void DebugBroadPhase();
 #endif
