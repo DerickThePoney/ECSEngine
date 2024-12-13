@@ -157,6 +157,7 @@ public:
     const u32 size() const { return Size; }
 
     const T* data() const { return FData; }
+    T* data() { return FData; }
 
 private:
     alignas(T) T FData[Size];
