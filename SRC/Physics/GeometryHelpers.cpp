@@ -11,20 +11,47 @@ namespace Physics
 {
 namespace GeometryHelpers
 {
+
+void ExtractAABBCorners(const AABB3f& OBB, MemoryView<vec4>& parView)
+{
+    AssertRelease(parView.size() >= 8);
+    const vec3& obbMin = OBB.Min();
+    const vec3& obbMax = OBB.Max();
+    parView[0] = vec4::MakeHomogeneousPositionVec4(obbMin);
+    parView[1] = vec4::MakeHomogeneousPositionVec4(vec3(obbMin.x, obbMin.y, obbMax.z));
+    parView[2] = vec4::MakeHomogeneousPositionVec4(vec3(obbMax.x, obbMin.y, obbMax.z));
+    parView[3] = vec4::MakeHomogeneousPositionVec4(vec3(obbMax.x, obbMin.y, obbMin.z));
+
+    parView[4] = vec4::MakeHomogeneousPositionVec4(obbMax);
+    parView[5] = vec4::MakeHomogeneousPositionVec4(vec3(obbMin.x, obbMax.y, obbMin.z));
+    parView[6] = vec4::MakeHomogeneousPositionVec4(vec3(obbMin.x, obbMax.y, obbMax.z));
+    parView[7] = vec4::MakeHomogeneousPositionVec4(vec3(obbMax.x, obbMax.y, obbMin.z));
+}
+
+void ExtractOBBCorners(const AABB3f& OBB, const mat4& Transform, MemoryView<vec4>& parView)
+{
+    ExtractAABBCorners(OBB, parView);
+    foreachitem(corner, parView)
+    {
+        corner = Transform * corner;
+    }
+}
+
+float ProjectBoxToAxis(const vec4& parAxis, const vec4& parCenter, MemoryView<vec4>& parView)
+{
+    float MaxAlongAxis = 0.f;
+    foreachitemconst(corner, parView)
+    {
+        MaxAlongAxis = Max(fabs(Dot(corner - parCenter, parAxis)), MaxAlongAxis);
+    }
+    return MaxAlongAxis;
+}
+
 AABB3f ComputeAABBFromOBB(const AABB3f& OBB, const mat4& Transform)
 {
     FixedSizedArrayInSitu<vec4, 8> Corners;
-    const vec3& obbMin = OBB.Min();
-    const vec3& obbMax = OBB.Max();
-    Corners[0] = vec4::MakeHomogeneousPositionVec4(obbMin);
-    Corners[1] = vec4::MakeHomogeneousPositionVec4(vec3(obbMin.x, obbMin.y, obbMax.z));
-    Corners[2] = vec4::MakeHomogeneousPositionVec4(vec3(obbMax.x, obbMin.y, obbMax.z));
-    Corners[3] = vec4::MakeHomogeneousPositionVec4(vec3(obbMax.x, obbMin.y, obbMin.z));
 
-    Corners[4] = vec4::MakeHomogeneousPositionVec4(obbMax);
-    Corners[5] = vec4::MakeHomogeneousPositionVec4(vec3(obbMin.x, obbMax.y, obbMin.z));
-    Corners[6] = vec4::MakeHomogeneousPositionVec4(vec3(obbMin.x, obbMax.y, obbMax.z));
-    Corners[7] = vec4::MakeHomogeneousPositionVec4(vec3(obbMax.x, obbMax.y, obbMin.z));
+    ExtractAABBCorners(OBB, MemoryView<vec4>(Corners.data(), Corners.size()));
 
     vec3 newMin(std::numeric_limits<float>::max()), newMax(-std::numeric_limits<float>::max());
     foreachitemconst(corner, Corners)
