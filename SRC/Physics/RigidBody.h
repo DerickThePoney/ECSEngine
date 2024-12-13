@@ -8,6 +8,7 @@ namespace ECSEngine
 {
 namespace Physics
 {
+struct ContactEdge;
 struct RigidBody
 {
     DECLARE_POOL_ALLOCATED(RigidBody);
@@ -46,6 +47,8 @@ public:
 
     float FLinearDamping = 0.1f;
     float FAngularDamping = 0.01f;
+
+    ContactEdge* FContactList = nullptr;
 
     // Helper functions
     void AddForce(const vec3& Force, bool bTreatAsAcceleration);
