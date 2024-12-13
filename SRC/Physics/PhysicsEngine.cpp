@@ -107,8 +107,13 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         FBroadPhase.MoveBody(movedBody.Body, movedBody.displacement);
     }
 
+    FContactManager.FindNewContacts(FBroadPhase);
+
+    FContactManager.CollideContacts(FBroadPhase);
+
 #ifdef PERFORM_SECURITY_CHECKS
     FBroadPhase.DebugBroadPhase();
+    FContactManager.DebugDrawContacts(FBroadPhase);
 #endif
 }
 

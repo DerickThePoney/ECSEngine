@@ -51,13 +51,13 @@ public:
     bool AddImpulseAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsVelocityChange);
     bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& RotationImpulse, bool bTreatAsRotationVelocityChange);
 
+    RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle);
+    const RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle) const;
+
 private:
     void InitializeBody(RigidBody* Body, const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
 
     void UpdateInertiaTransform(RigidBody* Body);
-
-    RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle);
-    const RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle) const;
 
 private:
     PhysicsEngineConfiguration FConfig;
