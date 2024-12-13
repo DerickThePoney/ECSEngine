@@ -2,6 +2,7 @@
 
 #include "BroadPhase.h"
 
+#include "Common/IntersectionRoutines.h"
 #include "RigidBody.h"
 
 namespace ECSEngine
@@ -33,6 +34,18 @@ void BroadPhase::MoveBody(RigidBody* body, vec3 displacement)
     {
         FMovedBodies.insert(body->FHandle);
     }
+}
+
+bool BroadPhase::TestOverlap(const PhysicsBodyHandle& first, const PhysicsBodyHandle& second) const
+{
+    const AABB3f FirstAABB = FTree.GetFatAABB3f(first);
+    const AABB3f SecondAABB = FTree.GetFatAABB3f(second);
+    return Intersection::AABBABBBIntersection(FirstAABB, SecondAABB);
+}
+
+AABB3f BroadPhase::GetFatAABB3f(const PhysicsBodyHandle& handle) const
+{
+    return FTree.GetFatAABB3f(handle);
 }
 
 void BroadPhase::UpdatePotentialOverlappingPairs(FOverlapingPairDelegate& parCallback)
