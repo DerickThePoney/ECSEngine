@@ -4,6 +4,7 @@
 
 #include "Common/FixedSizedArray.h"
 #include "Common/MemoryView.h"
+#include "Contact.h"
 #include "GeometryHelpers.h"
 
 namespace ECSEngine
@@ -25,7 +26,7 @@ float PenetrationOnAxis(const vec4& parAxis,
     return ProjectionOnBoxA + ProjectionOnBoxB - distance;
 }
 
-bool OBBIntersection(const mat4& parTransformA, const AABB3f& parBoundingBoxA, const mat4& parTransformB, const AABB3f& parBoundingBoxB)
+bool OBBIntersection(Contact* C, const mat4& parTransformA, const AABB3f& parBoundingBoxA, const mat4& parTransformB, const AABB3f& parBoundingBoxB)
 {
     vec4 CenterA = parTransformA * vec4::MakeHomogeneousPositionVec4(parBoundingBoxA.Center());
     vec4 CenterB = parTransformB * vec4::MakeHomogeneousPositionVec4(parBoundingBoxB.Center());
@@ -39,37 +40,77 @@ bool OBBIntersection(const mat4& parTransformA, const AABB3f& parBoundingBoxA, c
     MemoryView<vec4> CornersBView = MemoryView<vec4>(CornersB.data(), CornersB.size());
     GeometryHelpers::ExtractOBBCorners(parBoundingBoxB, parTransformB, CornersBView);
 
+    float MinPenetration = std::numeric_limits<float>::max();
+    i32 MinPenetrationIdx = -1;
+    i32 CurrentIndex = -1;
     // Box A Axes
+    CurrentIndex++;
     float res = PenetrationOnAxis(parTransformA.Column(0), BoxesCenterSeparation, CenterA, CenterB, CornersAView, CornersBView);
     if (res < 0.f)
         return false;
+    if (res < MinPenetration)
+    {
+        MinPenetration = res;
+        MinPenetrationIdx = CurrentIndex;
+    }
 
+    CurrentIndex++;
     res = PenetrationOnAxis(parTransformA.Column(1), BoxesCenterSeparation, CenterA, CenterB, CornersAView, CornersBView);
     if (res < 0.f)
         return false;
+    if (res < MinPenetration)
+    {
+        MinPenetration = res;
+        MinPenetrationIdx = CurrentIndex;
+    }
 
+    CurrentIndex++;
     res = PenetrationOnAxis(parTransformA.Column(2), BoxesCenterSeparation, CenterA, CenterB, CornersAView, CornersBView);
     if (res < 0.f)
         return false;
+    if (res < MinPenetration)
+    {
+        MinPenetration = res;
+        MinPenetrationIdx = CurrentIndex;
+    }
 
     // Box B Axes
+    CurrentIndex++;
     res = PenetrationOnAxis(parTransformB.Column(0), BoxesCenterSeparation, CenterA, CenterB, CornersAView, CornersBView);
     if (res < 0.f)
         return false;
+    if (res < MinPenetration)
+    {
+        MinPenetration = res;
+        MinPenetrationIdx = CurrentIndex;
+    }
 
+    CurrentIndex++;
     res = PenetrationOnAxis(parTransformB.Column(1), BoxesCenterSeparation, CenterA, CenterB, CornersAView, CornersBView);
     if (res < 0.f)
         return false;
+    if (res < MinPenetration)
+    {
+        MinPenetration = res;
+        MinPenetrationIdx = CurrentIndex;
+    }
 
+    CurrentIndex++;
     res = PenetrationOnAxis(parTransformB.Column(2), BoxesCenterSeparation, CenterA, CenterB, CornersAView, CornersBView);
     if (res < 0.f)
         return false;
+    if (res < MinPenetration)
+    {
+        MinPenetration = res;
+        MinPenetrationIdx = CurrentIndex;
+    }
 
     // Axes pairs
     forrange(i, 0, 3)
     {
         forrange(j, 0, 3)
         {
+            CurrentIndex++;
             const vec4 axis = vec4::MakeHomogeneousDirectionVec4(Cross(parTransformA.Column(i).xyz(), parTransformB.Column(j).xyz()));
 
             if (LengthSq(axis) < 0.00001f) // parallel axes
@@ -78,8 +119,15 @@ bool OBBIntersection(const mat4& parTransformA, const AABB3f& parBoundingBoxA, c
             res = PenetrationOnAxis(Normalize(axis), BoxesCenterSeparation, CenterA, CenterB, CornersAView, CornersBView);
             if (res < 0.f)
                 return false;
+            if (res < MinPenetration)
+            {
+                MinPenetration = res;
+                MinPenetrationIdx = CurrentIndex;
+            }
         }
     }
+
+    std::cout << "MinPenetration = " << MinPenetration << "MinPenetrationIdx = " << MinPenetrationIdx << "\n";
 
     return true;
 }

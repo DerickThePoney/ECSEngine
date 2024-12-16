@@ -4,6 +4,7 @@ namespace ECSEngine
 {
 namespace Physics
 {
-bool OBBIntersection(const mat4& parTransformA, const AABB3f& parBoundingBoxA, const mat4& parTransformB, const AABB3f& parBoundingBoxB);
-}
+struct Contact;
+bool OBBIntersection(Contact* C, const mat4& parTransformA, const AABB3f& parBoundingBoxA, const mat4& parTransformB, const AABB3f& parBoundingBoxB);
+} // namespace Physics
 } // namespace ECSEngine

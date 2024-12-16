@@ -27,6 +27,8 @@ public:
     AABB3f ComputeAABB(const mat4& Transform) const;
     AABB3f GetLocalAABB() const;
 
+    ECollisionShape GetShapeType() const { return FShapeType; }
+
     void DrawInEditor();
 
     SERIALIZE()
