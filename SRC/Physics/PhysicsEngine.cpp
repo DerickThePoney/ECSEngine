@@ -109,7 +109,7 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 
     FContactManager.FindNewContacts(FBroadPhase);
 
-    FContactManager.CollideContacts(FBroadPhase);
+    FContactManager.CollideContacts(this, FBroadPhase);
 
 #ifdef PERFORM_SECURITY_CHECKS
     FBroadPhase.DebugBroadPhase();

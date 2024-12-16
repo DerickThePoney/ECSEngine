@@ -56,6 +56,8 @@ public:
 
     void AddImpulse(const vec3& Impulse, bool bTreatAsVelocityChange);
     void AddRotationImpulse(const vec3& Impulse, bool bTreatAsRotationVelocityChange);
+
+    mat4 GetTransform() const;
 };
 } // namespace Physics
 } // namespace ECSEngine

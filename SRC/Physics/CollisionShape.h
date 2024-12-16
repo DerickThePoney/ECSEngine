@@ -25,6 +25,7 @@ public:
     float ComputeMass(float Density) const;
     mat3 ComputeInertiaTensor(float Mass) const;
     AABB3f ComputeAABB(const mat4& Transform) const;
+    AABB3f GetLocalAABB() const;
 
     void DrawInEditor();
 

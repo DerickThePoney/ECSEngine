@@ -698,7 +698,7 @@ float AABBTree::SurfaceArea(const AABB3f& Node) const
 
 mat4 AABBTree::ComputeBodyTransform(const RigidBody* Body) const
 {
-    return Translation(Body->FPosition) * (mat4)Body->FOrientation;
+    return Body->GetTransform();
 }
 
 AABB3f AABBTree::ComputeAABB(const RigidBody* Body, const mat4& Transform) const

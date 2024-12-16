@@ -49,5 +49,10 @@ void RigidBody::AddRotationImpulse(const vec3& Impulse, bool bTreatAsRotationVel
     }
 }
 
+mat4 RigidBody::GetTransform() const
+{
+    return Translation(FPosition) * (mat4)FOrientation;
+}
+
 } // namespace Physics
 } // namespace ECSEngine

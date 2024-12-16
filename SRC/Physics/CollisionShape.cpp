@@ -103,6 +103,18 @@ AABB3f CollisionShape::ComputeAABB(const mat4& Transform) const
     return AABB3f();
 }
 
+AABB3f CollisionShape::GetLocalAABB() const
+{
+    switch (FShapeType)
+    {
+    case ECollisionShape::BOX:
+        return AABB3f(FCenter - 0.5f * FShapeData.FBoxData.FExtents, FCenter + 0.5f * FShapeData.FBoxData.FExtents);
+    case ECollisionShape::SPHERE:
+        return AABB3f(FCenter - vec3(FShapeData.FSphereData.Radius), FCenter + vec3(FShapeData.FSphereData.Radius));
+    }
+    return AABB3f();
+}
+
 void CollisionShape::DrawInEditor()
 {
     if (ImGui::CollapsingHeader("CollisionShape"))
