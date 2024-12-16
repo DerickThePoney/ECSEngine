@@ -45,6 +45,10 @@ public:
     Contact* FPrev = nullptr;
 
     // NEEDS LOTS OF OTHER STUFFS
+    vec3 FContactNormal;
+    vec3 FContactPoint;
+    float FPenetration = 0.f;
+
     BitSet<EContactFlag::COUNT> FFlags;
 };
 } // namespace Physics
