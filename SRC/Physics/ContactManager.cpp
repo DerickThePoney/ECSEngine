@@ -4,6 +4,7 @@
 
 #include "AABBTree.h"
 #include "BroadPhase.h"
+#include "Contact.h"
 #include "PhysicsEngine.h"
 
 #ifdef PERFORM_SECURITY_CHECKS
@@ -22,8 +23,6 @@ namespace ECSEngine
 {
 namespace Physics
 {
-IMPLEMENT_POOL_ALLOCATED(Contact);
-
 ContactManager::~ContactManager()
 {
     Contact* Current = FContactList;
@@ -41,7 +40,7 @@ void ContactManager::FindNewContacts(BroadPhase& parBroadPhase)
     parBroadPhase.UpdatePairs(Del);
 }
 
-void ContactManager::CollideContacts(BroadPhase& parBroadPhase)
+void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroadPhase)
 {
     Contact* Current = FContactList;
     while (Current != nullptr)
@@ -58,6 +57,7 @@ void ContactManager::CollideContacts(BroadPhase& parBroadPhase)
         }
 
         // TODO EVALUATE CONTACT POINTS
+        Current->Evaluate();
 
         Current = Current->FNext;
     }
@@ -165,17 +165,17 @@ void ContactManager::DestroyContact(Contact* c)
     }
 
     // remove from second body
-    if (c->FFirstBodyEdge.FPrev != nullptr)
+    if (c->FSecondBodyEdge.FPrev != nullptr)
     {
-        c->FFirstBodyEdge.FPrev = c->FFirstBodyEdge.FNext;
+        c->FSecondBodyEdge.FPrev = c->FSecondBodyEdge.FNext;
     }
-    if (c->FFirstBodyEdge.FNext != nullptr)
+    if (c->FSecondBodyEdge.FNext != nullptr)
     {
-        c->FFirstBodyEdge.FNext = c->FFirstBodyEdge.FPrev;
+        c->FSecondBodyEdge.FNext = c->FSecondBodyEdge.FPrev;
     }
-    if (a->FContactList == &c->FFirstBodyEdge)
+    if (b->FContactList == &c->FSecondBodyEdge)
     {
-        a->FContactList = c->FFirstBodyEdge.FNext;
+        b->FContactList = c->FSecondBodyEdge.FNext;
     }
 
     delete c;
@@ -195,6 +195,7 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
         Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
 
         static const u32 PotentialContactColor = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 0.f, 1.f));
+        static const u32 TouchingContactColor = ColorUtils::ConvertToU32(vec4(0.f, 1.f, 0.f, 1.f));
 
         Contact* Current = FContactList;
         while (Current != nullptr)
@@ -202,8 +203,14 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
             AABB3f aabb1 = parBroadPhase.GetFatAABB3f(Current->FFirstBody);
             AABB3f aabb2 = parBroadPhase.GetFatAABB3f(Current->FSecondBody);
 
-            buffer->DrawAABB(handle, aabb1.Min(), aabb1.Max(), PotentialContactColor);
-            buffer->DrawAABB(handle, aabb2.Min(), aabb2.Max(), PotentialContactColor);
+            u32 Color = PotentialContactColor;
+            if (Current->FFlags.GetValue(EContactFlag::TOUCHING))
+            {
+                Color = TouchingContactColor;
+            }
+
+            buffer->DrawAABB(handle, aabb1.Min(), aabb1.Max(), Color);
+            buffer->DrawAABB(handle, aabb2.Min(), aabb2.Max(), Color);
             Current = Current->FNext;
         }
         buffer->Submit();
