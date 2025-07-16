@@ -10,6 +10,14 @@ namespace ECSEngine
 namespace Physics
 {
 
+void BroadPhase::Shutdown()
+{
+    FTree.Clear();
+    FMovedBodies.clear();
+    FCurrentQuery = PhysicsBodyHandle{};
+    FOverlapingBodies.clear();
+}
+
 void BroadPhase::UpdatePairs(FOverlapingPairDelegate& parCallback)
 {
     UpdatePotentialOverlappingPairs(parCallback);

@@ -25,6 +25,7 @@ void PhysicsEngine::Initialize(const PhysicsEngineConfiguration& PhysicsConfig)
 
 void PhysicsEngine::Cleanup()
 {
+    FContactManager.Shutdown();
     FRigidbodies.clear();
 }
 
@@ -110,11 +111,6 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
     FContactManager.FindNewContacts(FBroadPhase);
 
     FContactManager.CollideContacts(this, FBroadPhase);
-
-#ifdef PERFORM_SECURITY_CHECKS
-    FBroadPhase.DebugBroadPhase();
-    FContactManager.DebugDrawContacts(FBroadPhase);
-#endif
 }
 
 const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
@@ -170,6 +166,7 @@ bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
         return false;
     }
 
+    FContactManager.RemoveBody(Handle);
     FBroadPhase.RemoveBody(FRigidbodies[Handle.FId].get());
     FRigidbodies[Handle.FId].reset(nullptr);
 
@@ -451,6 +448,14 @@ const RigidBody* PhysicsEngine::GetRigidBody(const PhysicsBodyHandle& Handle) co
 
     return FRigidbodies[Handle.FId].get();
 }
+
+#ifdef PERFORM_SECURITY_CHECKS
+void PhysicsEngine::DrawDebug()
+{
+    FBroadPhase.DebugBroadPhase();
+    FContactManager.DebugDrawContacts(FBroadPhase);
+}
+#endif
 
 } // namespace Physics
 } // namespace ECSEngine

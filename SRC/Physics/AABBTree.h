@@ -31,6 +31,8 @@ class AABBTree
 public:
     ~AABBTree();
 
+    void Clear();
+
     void InsertBody(const RigidBody* Body);
     void RemoveBody(const RigidBody* Body);
 

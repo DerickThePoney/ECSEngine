@@ -298,6 +298,294 @@ void DrawAABBCommand::SubmitCommand() const
 IMPLEMENT_POOL_ALLOCATED(DrawAABBCommand);
 
 //----------------------------------------------------------------
+//          DrawDebugArrowCommand
+//----------------------------------------------------------------
+
+class DrawDebugArrowCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(DrawDebugArrowCommand);
+
+public:
+    DrawDebugArrowCommand(const u16 parViewId,
+          const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const vec3& parStart,
+          const vec3& parDirection,
+          const float parLength,
+          const u32 parColor);
+    virtual ~DrawDebugArrowCommand();
+
+    virtual void SubmitCommand() const override;
+
+private:
+    MaterialInstanceHandle FMaterialInstanceHandle;
+    vec3 FStart;
+    vec3 FDirection;
+    float FLength;
+    u32 FColor;
+};
+
+DrawDebugArrowCommand::DrawDebugArrowCommand(const u16 parViewId,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const vec3& parStart,
+      const vec3& parDirection,
+      const float parLength,
+      const u32 parColor)
+    : IDrawCommand(parViewId)
+    , FMaterialInstanceHandle(parMaterialInstanceHandle)
+    , FStart(parStart)
+    , FDirection(parDirection)
+    , FLength(parLength)
+    , FColor(parColor)
+{
+}
+
+DrawDebugArrowCommand::~DrawDebugArrowCommand()
+{
+}
+
+void DrawDebugArrowCommand::SubmitCommand() const
+{
+    bgfx::TransientVertexBuffer vertexBufferLine, vertexBufferTip;
+    bgfx::TransientIndexBuffer indexBufferLine, indexBufferTip;
+
+    VertexLayoutHash hash;
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
+    hash.SetColorsNb(1);
+
+    bgfx::VertexLayout layout = GetVertexLayout(hash);
+
+    u32 availableVertices = bgfx::getAvailTransientVertexBuffer(2, layout);
+    AlwaysCheckedAssert(availableVertices == 2);
+
+    bgfx::allocTransientVertexBuffer(&vertexBufferLine, 2, layout);
+
+    availableVertices = bgfx::getAvailTransientVertexBuffer(4, layout);
+    AlwaysCheckedAssert(availableVertices == 4);
+    bgfx::allocTransientVertexBuffer(&vertexBufferTip, 4, layout);
+
+    VertexDataStream streamLine(2, hash.GetByteSize(), hash);
+    VertexDataStream streamTip(4, hash.GetByteSize(), hash);
+
+    // Arrow Line
+    const vec3 EndPoint = FStart + FDirection * FLength;
+
+    streamLine.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, FStart);
+    streamLine.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    streamLine.Advance();
+    streamLine.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, EndPoint);
+    streamLine.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    streamLine.Advance();
+
+    std::vector<u16> indicesLine;
+    indicesLine.push_back(0);
+    indicesLine.push_back(1);
+
+    // Arrow Tip
+    const vec3 ArrowPoint1 = EndPoint - FDirection * 0.2f * FLength + vec3(0.f, 1.f, 0.f) * 0.2f * FLength;
+    const vec3 ArrowPoint3 = EndPoint - FDirection * 0.2f * FLength - vec3(0.f, 1.f, 0.f) * 0.2f * FLength;
+
+    streamTip.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, ArrowPoint1);
+    streamTip.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    streamTip.Advance();
+
+    streamTip.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, EndPoint);
+    streamTip.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    streamTip.Advance();
+
+    streamTip.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, ArrowPoint3);
+    streamTip.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    streamTip.Advance();
+
+    streamTip.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, ArrowPoint1);
+    streamTip.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+    streamTip.Advance();
+
+    std::vector<u16> indicesTip;
+    indicesTip.push_back(0);
+    indicesTip.push_back(1);
+    indicesTip.push_back(1);
+    indicesTip.push_back(2);
+    indicesTip.push_back(2);
+    indicesTip.push_back(3);
+    indicesTip.push_back(3);
+    indicesTip.push_back(0);
+
+    // fill in the buffers
+    u32 availableIndices = bgfx::getAvailTransientIndexBuffer((u32)indicesLine.size());
+    AlwaysCheckedAssert(availableIndices == (u32)indicesLine.size());
+    bgfx::allocTransientIndexBuffer(&indexBufferLine, (u32)indicesLine.size());
+
+    availableIndices = bgfx::getAvailTransientIndexBuffer((u32)indicesTip.size());
+    AlwaysCheckedAssert(availableIndices == (u32)indicesTip.size());
+    bgfx::allocTransientIndexBuffer(&indexBufferLine, (u32)indicesLine.size());
+    bgfx::allocTransientIndexBuffer(&indexBufferTip, (u32)indicesTip.size());
+    bx::memCopy(indexBufferLine.data, indicesLine.data(), (u32)indicesLine.size() * sizeof(u16));
+    bx::memCopy(indexBufferTip.data, indicesTip.data(), (u32)indicesTip.size() * sizeof(u16));
+    bx::memCopy(vertexBufferLine.data, streamLine.GetData(), streamLine.GetByteSize());
+    bx::memCopy(vertexBufferTip.data, streamTip.GetData(), streamTip.GetByteSize());
+
+    // rendering
+    RenderingState state;
+    state.PartiallyModifyState(BGFX_STATE_PT_LINES);
+    state.ApplyState();
+
+    bgfx::setVertexBuffer(0, &vertexBufferLine, 0, 2, vertexBufferLine.layoutHandle);
+    bgfx::setIndexBuffer(&indexBufferLine, 0, (u32)indicesLine.size());
+
+    mat4 transform = mat4::Identity();
+    bgfx::setTransform(&transform.FValues[0]);
+
+    const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
+    AssertRelease(instance != nullptr);
+
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+
+    state.PartiallyModifyState(BGFX_STATE_PT_LINES);
+    state.ApplyState();
+
+    bgfx::setTransform(&transform.FValues[0]);
+    bgfx::setVertexBuffer(0, &vertexBufferTip, 0, 3, vertexBufferTip.layoutHandle);
+    bgfx::setIndexBuffer(&indexBufferTip, 0, (u32)indicesTip.size());
+
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+}
+
+IMPLEMENT_POOL_ALLOCATED(DrawDebugArrowCommand);
+
+//----------------------------------------------------------------
+//          DrawDebugSphereCommand
+//----------------------------------------------------------------
+
+class DrawDebugSphereCommand : public IDrawCommand
+{
+    DECLARE_POOL_ALLOCATED(DrawDebugSphereCommand);
+
+public:
+    DrawDebugSphereCommand(const u16 parViewId, const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parCenter, const float radius, const u32 parColor);
+    virtual ~DrawDebugSphereCommand();
+
+    virtual void SubmitCommand() const override;
+
+private:
+    MaterialInstanceHandle FMaterialInstanceHandle;
+    vec3 FCenter;
+    float FRadius;
+    u32 FColor;
+};
+
+DrawDebugSphereCommand::DrawDebugSphereCommand(const u16 parViewId,
+      const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const vec3& parCenter,
+      const float radius,
+      const u32 parColor)
+    : IDrawCommand(parViewId)
+    , FMaterialInstanceHandle(parMaterialInstanceHandle)
+    , FCenter(parCenter)
+    , FRadius(radius)
+    , FColor(parColor)
+{
+}
+
+DrawDebugSphereCommand::~DrawDebugSphereCommand()
+{
+}
+
+void DrawDebugSphereCommand::SubmitCommand() const
+{
+    constexpr i32 CircleSize = 10;
+
+    bgfx::TransientVertexBuffer vertexBufferA, vertexBufferB;
+    bgfx::TransientIndexBuffer indexBufferA, indexBufferB;
+
+    VertexLayoutHash hash;
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_POSITION, true);
+    hash.SetValue(VERTEX_LAYOUT_PARAMS::HAS_COLORS, true);
+    hash.SetColorsNb(1);
+
+    bgfx::VertexLayout layout = GetVertexLayout(hash);
+
+    u32 availableVertices = bgfx::getAvailTransientVertexBuffer(CircleSize, layout);
+    AlwaysCheckedAssert(availableVertices == CircleSize);
+
+    bgfx::allocTransientVertexBuffer(&vertexBufferA, CircleSize, layout);
+
+    availableVertices = bgfx::getAvailTransientVertexBuffer(CircleSize, layout);
+    AlwaysCheckedAssert(availableVertices == CircleSize);
+    bgfx::allocTransientVertexBuffer(&vertexBufferB, CircleSize, layout);
+
+    VertexDataStream streamA(CircleSize, hash.GetByteSize(), hash);
+    VertexDataStream streamB(CircleSize, hash.GetByteSize(), hash);
+    mat4 RotationMatrixA = Rotation(2 * Pi() / CircleSize, vec3(0.f, 1.f, 0.f));
+    vec4 CurrentVectorA = vec4(FRadius, 0.f, 0.f, 0.f);
+    mat4 RotationMatrixB = Rotation(2 * Pi() / CircleSize, vec3(1.f, 0.f, 0.f));
+    vec4 CurrentVectorB = vec4(0.f, 0.f, FRadius, 0.f);
+    forrange(i, 0, CircleSize)
+    {
+        streamA.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, CurrentVectorA.xyz());
+        streamA.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+        streamA.Advance();
+
+        CurrentVectorA = RotationMatrixA * CurrentVectorA;
+
+        streamB.PushData(VERTEX_LAYOUT_PARAMS::HAS_POSITION, 0, CurrentVectorB.xyz());
+        streamB.PushData(VERTEX_LAYOUT_PARAMS::HAS_COLORS, 0, FColor);
+        streamB.Advance();
+
+        CurrentVectorB = RotationMatrixB * CurrentVectorB;
+    }
+
+    std::vector<u16> indices;
+    forrange(i, 0, CircleSize - 1)
+    {
+        indices.push_back((u16)i);
+        indices.push_back((u16)(i + 1));
+    }
+
+    indices.push_back((u16)(CircleSize - 1));
+    indices.push_back((u16)0);
+
+    u32 availableIndices = bgfx::getAvailTransientIndexBuffer((u32)indices.size());
+    AlwaysCheckedAssert(availableIndices == (u32)indices.size());
+    bgfx::allocTransientIndexBuffer(&indexBufferA, (u32)indices.size());
+
+    availableIndices = bgfx::getAvailTransientIndexBuffer((u32)indices.size());
+    AlwaysCheckedAssert(availableIndices == (u32)indices.size());
+    bgfx::allocTransientIndexBuffer(&indexBufferA, (u32)indices.size());
+    bgfx::allocTransientIndexBuffer(&indexBufferB, (u32)indices.size());
+    bx::memCopy(indexBufferA.data, indices.data(), (u32)indices.size() * sizeof(u16));
+    bx::memCopy(indexBufferB.data, indices.data(), (u32)indices.size() * sizeof(u16));
+    bx::memCopy(vertexBufferA.data, streamA.GetData(), streamA.GetByteSize());
+    bx::memCopy(vertexBufferB.data, streamB.GetData(), streamB.GetByteSize());
+
+    RenderingState state;
+    state.PartiallyModifyState(BGFX_STATE_PT_LINES);
+    state.ApplyState();
+
+    bgfx::setVertexBuffer(0, &vertexBufferA, 0, CircleSize, vertexBufferA.layoutHandle);
+    bgfx::setIndexBuffer(&indexBufferA, 0, (u32)indices.size());
+
+    mat4 transform = Translation(FCenter);
+    bgfx::setTransform(&transform.FValues[0]);
+
+    const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
+    AssertRelease(instance != nullptr);
+
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+
+    state.PartiallyModifyState(BGFX_STATE_PT_LINES);
+    state.ApplyState();
+
+    bgfx::setTransform(&transform.FValues[0]);
+    bgfx::setVertexBuffer(0, &vertexBufferB, 0, CircleSize, vertexBufferB.layoutHandle);
+    bgfx::setIndexBuffer(&indexBufferB, 0, (u32)indices.size());
+
+    bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
+}
+
+IMPLEMENT_POOL_ALLOCATED(DrawDebugSphereCommand);
+
+//----------------------------------------------------------------
 //          DrawLines3DCommand
 //----------------------------------------------------------------
 
@@ -1632,6 +1920,20 @@ void DrawCommandBuffer::SetMat3Uniform(const std::string& parUniformName, const 
 void DrawCommandBuffer::SetMat4Uniform(const std::string& parUniformName, const mat4& parUniformValue)
 {
     FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new SetMat4UniformCommand(FViewId, parUniformName, parUniformValue)));
+}
+
+void DrawCommandBuffer::DrawDebugSphere(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parCenter, const float radius, const u32 parColor /*= 0xFFFFFFFF*/)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawDebugSphereCommand(FViewId, parMaterialInstanceHandle, parCenter, radius, parColor)));
+}
+
+void DrawCommandBuffer::DrawDebugArrow(const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const vec3& parStart,
+      const vec3& parDirection,
+      const float parLength,
+      const u32 parColor /*= 0xFFFFFFFF*/)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawDebugArrowCommand(FViewId, parMaterialInstanceHandle, parStart, parDirection, parLength, parColor)));
 }
 
 void DrawCommandBuffer::Submit()

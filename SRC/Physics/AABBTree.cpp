@@ -28,6 +28,11 @@ IMPLEMENT_POOL_ALLOCATED(AABBNode);
 
 AABBTree::~AABBTree()
 {
+    Clear();
+}
+
+void AABBTree::Clear()
+{
     foreachitem(node, FNodes)
     {
         delete node;

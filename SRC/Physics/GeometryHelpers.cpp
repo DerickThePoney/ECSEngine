@@ -47,6 +47,12 @@ float ProjectBoxToAxis(const vec4& parAxis, const vec4& parCenter, MemoryView<ve
     return MaxAlongAxis;
 }
 
+float ProjectBoxToAxis(const vec4& parAxis, const mat4& parTransform, const AABB3f& parBBox)
+{
+    const vec3 Max = parBBox.Max();
+    return Max.x * fabs(Dot(parAxis, parTransform.Column(0))) + Max.y * fabs(Dot(parAxis, parTransform.Column(1))) + Max.z * fabs(Dot(parAxis, parTransform.Column(2)));
+}
+
 AABB3f ComputeAABBFromOBB(const AABB3f& OBB, const mat4& Transform)
 {
     FixedSizedArrayInSitu<vec4, 8> Corners;

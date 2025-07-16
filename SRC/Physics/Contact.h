@@ -22,6 +22,7 @@ enum EContactFlag
 {
     TOUCHING = 0x01,
     ISLAND = 0x02,
+    CONTACT_INFO = 0x04, // temp value
     COUNT
 };
 

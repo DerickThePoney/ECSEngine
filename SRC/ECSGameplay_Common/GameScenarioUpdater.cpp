@@ -16,6 +16,7 @@
 #include "ImGuiTools/ResourceCacheDebug.h"
 #include "NavMeshPathfindingManager.h"
 #include "Physics/PhysicsAPI.h"
+#include "Physics/PhysicsEngine.h"
 #include "Rendering/FinalCombinePass.h"
 #include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
@@ -252,6 +253,8 @@ void GameScenarioUpdater::DebugRender()
         buffer->Submit();
         buffer->clear();
         delete buffer;
+
+        Physics::DrawDebugs();
     }
 #endif
 }
