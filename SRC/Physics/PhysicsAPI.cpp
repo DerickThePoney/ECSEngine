@@ -63,7 +63,7 @@ void ShutdownPhysics()
 
 void UpdatePhysics()
 {
-    PhysicsEngine::Instance().UpdatePhysics(TimeManager::FrameDeltaTime());
+    PhysicsEngine::Instance().UpdatePhysics(TimeManager::GameplayDeltaTime());
 }
 
 const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
@@ -167,6 +167,11 @@ bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Rotat
 }
 
 #pragma endregion ForcesTorquesAndImpulses
+
+void DrawDebugs()
+{
+    PhysicsEngine::Instance().DrawDebug();
+}
 
 } // namespace Physics
 } // namespace ECSEngine

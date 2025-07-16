@@ -25,6 +25,25 @@ namespace Physics
 {
 ContactManager::~ContactManager()
 {
+    Shutdown();
+}
+
+void ContactManager::RemoveBody(const PhysicsBodyHandle& Handle)
+{
+    Contact* Current = FContactList;
+    while (Current != nullptr)
+    {
+        Contact* CurrentToLookIn = Current;
+        Current = Current->FNext;
+        if (CurrentToLookIn->FFirstBody == Handle || CurrentToLookIn->FSecondBody == Handle)
+        {
+            DestroyContact(CurrentToLookIn);
+        }
+    }
+}
+
+void ContactManager::Shutdown()
+{
     Contact* Current = FContactList;
     while (Current != nullptr)
     {
@@ -65,8 +84,6 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
 
 void ContactManager::AddPotentialContactPair(const PhysicsBodyHandle& first, const PhysicsBodyHandle& second)
 {
-    std::cout << "A: " << first.FId << "\tB: " << second.FId << "\n";
-
     // 1. check if contact doesn't exist or shouldn't happen
     // - bodies can't collide together
     // - shapes can't collide together
@@ -186,6 +203,7 @@ void ContactManager::DestroyContact(Contact* c)
 void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
 {
     ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bShowPotentialContacts, false, "Show potential contacts", "Physics/Contacts");
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bDrawContactInformation, false, "Draw Contact Information", "Physics/Contacts");
     if (bShowPotentialContacts)
     {
         Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
@@ -204,6 +222,7 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
             AABB3f aabb2 = parBroadPhase.GetFatAABB3f(Current->FSecondBody);
 
             u32 Color = PotentialContactColor;
+            const bool bTouching = Current->FFlags.GetValue(EContactFlag::TOUCHING);
             if (Current->FFlags.GetValue(EContactFlag::TOUCHING))
             {
                 Color = TouchingContactColor;
@@ -211,6 +230,23 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
 
             buffer->DrawAABB(handle, aabb1.Min(), aabb1.Max(), Color);
             buffer->DrawAABB(handle, aabb2.Min(), aabb2.Max(), Color);
+
+            if (bDrawContactInformation && bTouching && Current->FFlags.GetValue(EContactFlag::CONTACT_INFO))
+            {
+                buffer->DrawDebugSphere(handle, Current->FContactPoint, 0.2f, 0xFFFFFFFF);
+                buffer->DrawDebugArrow(handle, Current->FContactPoint, Current->FContactNormal, 0.5f, 0xFFFFFFFF);
+
+                RigidBody* firstBody = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);
+                RigidBody* secondBody = PhysicsEngine::Instance().GetRigidBody(Current->FSecondBody);
+                mat4 tr1 = firstBody->GetTransform();
+                mat4 tr2 = secondBody->GetTransform();
+                vec4 toCenter = tr2.Column(3) - tr1.Column(3);
+
+                buffer->DrawDebugArrow(handle, tr1.Column(3).xyz(), Normalize(toCenter.xyz()), Length(toCenter), 0xFF00FFFF);
+
+                // std::cout << "Contact Penetration: " << Current->FPenetration << "\n";
+            }
+
             Current = Current->FNext;
         }
         buffer->Submit();

@@ -13,6 +13,10 @@ class ContactManager
 {
 public:
     ~ContactManager();
+
+    void RemoveBody(const PhysicsBodyHandle& Handle);
+    void Shutdown();
+
     void FindNewContacts(BroadPhase& parBroadPhase);
 
     void CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroadPhase);

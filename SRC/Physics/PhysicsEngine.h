@@ -54,6 +54,10 @@ public:
     RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle);
     const RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle) const;
 
+#ifdef PERFORM_SECURITY_CHECKS
+    void DrawDebug();
+#endif
+
 private:
     void InitializeBody(RigidBody* Body, const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
 

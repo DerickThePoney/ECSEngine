@@ -125,6 +125,45 @@ inline __forceinline Vector4<T> VecMin(const Vector4<T>& A, const Vector4<T>& B)
     return res;
 }
 
+template<typename T>
+inline __forceinline Vector4<T> Invert(const Vector4<T>& A)
+{
+    return A * -1.f;
+}
+
+template<typename T>
+inline __forceinline Vector2<T> Abs(const Vector2<T>& A)
+{
+    Vector2<T> res;
+    res.x = fabs(A.x);
+    res.y = fabs(A.y);
+
+    return res;
+}
+
+template<typename T>
+inline __forceinline Vector3<T> Abs(const Vector3<T>& A)
+{
+    Vector3<T> res;
+    res.x = fabs(A.x);
+    res.y = fabs(A.y);
+    res.z = fabs(A.z);
+
+    return res;
+}
+
+template<typename T>
+inline __forceinline Vector4<T> Abs(const Vector4<T>& A)
+{
+    Vector4<T> res;
+    res.x = fabs(A.x);
+    res.y = fabs(A.y);
+    res.z = fabs(A.z);
+    res.w = fabs(A.w);
+
+    return res;
+}
+
 bool IsNan(const vec2& A);
 
 bool IsNan(const vec3& A);

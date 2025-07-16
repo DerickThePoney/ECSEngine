@@ -94,6 +94,13 @@ public:
 
     void DrawCircle(const MaterialInstanceHandle& parMaterialInstanceHandle, const CircleFeedbackParameters& parParams, const mat4& parTransform = mat4::Identity());
 
+    void DrawDebugSphere(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parCenter, const float radius, const u32 parColor = 0xFFFFFFFF);
+    void DrawDebugArrow(const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const vec3& parStart,
+          const vec3& parDirection,
+          const float parLength,
+          const u32 parColor = 0xFFFFFFFF);
+
     void DrawCircularChunk(const CircularGridChunkFeedbackParameters& parParameters,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
           const mat4 parTransform = mat4::Identity());

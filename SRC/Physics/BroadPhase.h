@@ -16,6 +16,7 @@ using FOverlapingPairDelegate = Delegate<void(const PhysicsBodyHandle&, const Ph
 class BroadPhase
 {
 public:
+    void Shutdown();
     void UpdatePairs(FOverlapingPairDelegate& parCallback);
 
     void AddNewBody(RigidBody* body);
