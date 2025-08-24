@@ -167,11 +167,12 @@ bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Rotat
 }
 
 #pragma endregion ForcesTorquesAndImpulses
-
+#ifdef WITH_VISUAL_DEBUG
 void DrawDebugs()
 {
     PhysicsEngine::Instance().DrawDebug();
 }
+#endif
 
 } // namespace Physics
 } // namespace ECSEngine
