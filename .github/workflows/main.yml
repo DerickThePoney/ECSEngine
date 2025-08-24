@@ -81,14 +81,14 @@ jobs:
         shell: bash
 
       - name: Upload BGFX release build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BGFX-Binaries-Release
           path: External/BGFX/bgfx/.build/win64_vs2022/bin/*Release.*
           if-no-files-found: error
 
       - name: Upload BGFX debug build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: BGFX-Binaries-Debug
           path: External/BGFX/bgfx/.build/win64_vs2022/bin/*Debug.*
@@ -131,7 +131,7 @@ jobs:
         shell: bash
 
       - name: Upload Release build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ECSEngine-Binaries-Release
           path: |
@@ -140,7 +140,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload AssetCooker Release build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: AssetCooker-Binaries-Release
           path: |
