@@ -41,7 +41,9 @@ bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool
 bool AddImpulseAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsVelocityChange);
 bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& RotationImpulse, bool bTreatAsRotationVelocityChange);
 
+#ifdef WITH_VISUAL_DEBUG
 // Debugs
 void DrawDebugs();
+#endif
 } // namespace Physics
 } // namespace ECSEngine
