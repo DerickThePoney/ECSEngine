@@ -101,6 +101,7 @@ Print( "Disabling Incremental Link")
     + ' /Zc:inline'         ; https://msdn.microsoft.com/fr-fr/library/dn642448.aspx
     + ' /Zc:rvalueCast'     ; https://msdn.microsoft.com/fr-fr/library/dn449507.aspx
     + ' /Zc:static_assert-'
+    + ' /Zc:preprocessor'
     + ' /std:c++17 /Zc:__cplusplus'
     + ' -c "%1"'
 
