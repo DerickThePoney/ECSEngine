@@ -24,40 +24,85 @@ public:
     {
     }
 
-#define MAKESCALAROP(OP)                                                                                                                                                           \
-    inline Vector2 operator OP(const T parA) const                                                                                                                                      \
-    {                                                                                                                                                                              \
-        return Vector2(x OP parA, y OP parA);                                                                                                                                      \
-    }                                                                                                                                                                              \
-    inline void operator OP=(const T parA)                                                                                                                                        \
-    {                                                                                                                                                                              \
-        x OP= parA;                                                                                                                                                                 \
-        y OP= parA;                                                                                                                                                                 \
+    // Operator +
+    inline Vector2 operator +(const T parA) const 
+    {
+        return Vector2(x + parA, y + parA);
+    }
+    inline void operator +=(const T parA)
+    {
+        x += parA;
+        y += parA;
+    }
+    inline Vector2 operator +(const Vector2& parA) const 
+    {
+        return Vector2(x + parA.x, y + parA.y);
+    }
+    inline void operator +=(const Vector2& parA)
+    {
+        x += parA.x;
+        y += parA.y;
     }
 
-#define MAKEVECOP(OP)                                                                                                                                                              \
-    inline Vector2 operator OP(const Vector2& parA) const                                                                                                                               \
-    {                                                                                                                                                                              \
-        return Vector2(x OP parA.x, y OP parA.y);                                                                                                                                  \
-    }                                                                                                                                                                              \
-    inline void operator OP=(const Vector2& parA)                                                                                                                                 \
-    {                                                                                                                                                                              \
-        x OP= parA.x;                                                                                                                                                               \
-        y OP= parA.y;                                                                                                                                                               \
+    // Operator -
+    inline Vector2 operator -(const T parA) const 
+    {
+        return Vector2(x - parA, y - parA);
+    }
+    inline void operator -=(const T parA)
+    {
+        x -= parA;
+        y -= parA;
+    }
+    inline Vector2 operator -(const Vector2& parA) const 
+    {
+        return Vector2(x - parA.x, y - parA.y);
+    }
+    inline void operator -=(const Vector2& parA)
+    {
+        x -= parA.x;
+        y -= parA.y;
     }
 
-#define MAKEOP(OP)                                                                                                                                                                 \
-    MAKEVECOP(OP);                                                                                                                                                                 \
-    MAKESCALAROP(OP);
+    // Operator *
+    inline Vector2 operator *(const T parA) const 
+    {
+        return Vector2(x * parA, y * parA);
+    }
+    inline void operator *=(const T parA)
+    {
+        x *= parA;
+        y *= parA;
+    }
+    inline Vector2 operator *(const Vector2& parA) const 
+    {
+        return Vector2(x * parA.x, y * parA.y);
+    }
+    inline void operator *=(const Vector2& parA)
+    {
+        x *= parA.x;
+        y *= parA.y;
+    }
 
-    MAKEOP(+);
-    MAKEOP(-);
-    MAKEOP(/);
-    MAKEOP(*);
-
-#undef MAKEVECOP
-#undef MAKESCALAROP
-#undef MAKEOP
+    // Operator /
+    inline Vector2 operator /(const T parA) const 
+    {
+        return Vector2(x / parA, y / parA);
+    }
+    inline void operator /=(const T parA)
+    {
+        x /= parA;
+        y /= parA;
+    }
+    inline Vector2 operator /(const Vector2& parA) const 
+    {
+        return Vector2(x / parA.x, y / parA.y);
+    }
+    inline void operator /=(const Vector2& parA)
+    {
+        x /= parA.x;
+        y /= parA.y;
+    }
 
 #define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
     inline Vector2<T> OP() const                                                                                                                                                   \
@@ -146,42 +191,77 @@ public:
     {
     }
 
-#define MAKESCALAROP(OP)                                                                                                                                                           \
-    inline Vector3 operator OP(const T parA) const                                                                                                                                      \
-    {                                                                                                                                                                              \
-        return Vector3(x OP parA, y OP parA, z OP parA);                                                                                                                                      \
-    }                                                                                                                                                                              \
-    inline void operator OP=(const T parA)                                                                                                                                        \
-    {                                                                                                                                                                              \
-        x OP= parA;                                                                                                                                                                 \
-        y OP= parA;                                                                                                                                                                 \
-        z OP= parA;                                                                                                                                                                 \
+    // Operator +
+    inline Vector3 operator +(const Vector3& parA) const 
+    {
+        return Vector3(x + parA.x, y + parA.y, z + parA.z);
     }
-
-#define MAKEVECOP(OP)                                                                                                                                                              \
-    inline Vector3 operator OP(const Vector3& parA) const                                                                                                                               \
-    {                                                                                                                                                                              \
-        return Vector3(x OP parA.x, y OP parA.y, z OP parA.z);                                                                                                                     \
-    }                                                                                                                                                                              \
-    inline void operator OP=(const Vector3& parA)                                                                                                                                \
-    {                                                                                                                                                                              \
-        x OP= parA.x;                                                                                                                                                               \
-        y OP= parA.y;                                                                                                                                                               \
-        z OP= parA.z;                                                                                                                                                               \
+    inline void operator +=(const Vector3& parA) 
+    {
+        x += parA.x; y += parA.y; z += parA.z;
     }
-
-#define MAKEOP(OP)                                                                                                                                                                 \
-    MAKEVECOP(OP);                                                                                                                                                                 \
-    MAKESCALAROP(OP);
-
-    MAKEOP(+);
-    MAKEOP(-);
-    MAKEOP(/);
-    MAKEOP(*);
-
-#undef MAKEVECOP
-#undef MAKESCALAROP
-#undef MAKEOP
+    inline Vector3 operator +(const T parA) const 
+    {
+        return Vector3(x + parA, y + parA, z + parA);
+    }
+    inline void operator +=(const T parA) 
+    {
+        x += parA; y += parA; z += parA;
+    }
+    
+    // Operator -
+    inline Vector3 operator -(const Vector3& parA) const 
+    {
+        return Vector3(x - parA.x, y - parA.y, z - parA.z);
+    }
+    inline void operator -=(const Vector3& parA) 
+    {
+        x -= parA.x; y -= parA.y; z -= parA.z;
+    }
+    inline Vector3 operator -(const T parA) const 
+    {
+        return Vector3(x - parA, y - parA, z - parA);
+    }
+    inline void operator -=(const T parA) 
+    {
+        x -= parA; y -= parA; z -= parA;
+    }
+    
+    // Operator /
+    inline Vector3 operator /(const Vector3& parA) const 
+    {
+        return Vector3(x / parA.x, y / parA.y, z / parA.z);
+    }
+    inline void operator /=(const Vector3& parA) 
+    {
+        x /= parA.x; y /= parA.y; z /= parA.z;
+    }
+    inline Vector3 operator /(const T parA) const 
+    {
+        return Vector3(x / parA, y / parA, z / parA);
+    }
+    inline void operator /=(const T parA) 
+    {
+        x /= parA; y /= parA; z /= parA;
+    }
+    
+    // Operator *
+    inline Vector3 operator *(const Vector3& parA) const 
+    {
+        return Vector3(x * parA.x, y * parA.y, z * parA.z);
+    }
+    inline void operator *=(const Vector3& parA) 
+    {
+        x *= parA.x; y *= parA.y; z *= parA.z;
+    }
+    inline Vector3 operator *(const T parA) const 
+    {
+        return Vector3(x * parA, y * parA, z * parA);
+    }
+    inline void operator *=(const T parA) 
+    {
+        x *= parA; y *= parA; z *= parA;
+    }
 
 #define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
     inline Vector2<T> OP() const                                                                                                                                                        \
@@ -332,44 +412,77 @@ public:
     static inline Vector4 MakeHomogeneousPositionVec4(const Vector3<T>& parVec3) { return Vector4(parVec3.x, parVec3.y, parVec3.z, T(1)); }
     static inline Vector4 MakeHomogeneousDirectionVec4(const Vector3<T>& parVec3) { return Vector4(parVec3.x, parVec3.y, parVec3.z, T(0)); }
 
-#define MAKESCALAROP(OP)                                                                                                                                                           \
-    inline Vector4 operator OP(const T parA) const                                                                                                                                 \
-    {                                                                                                                                                                              \
-        return Vector4(x OP parA, y OP parA, z OP parA, w OP parA);                                                                                                                                      \
-    }                                                                                                                                                                              \
-    inline void operator OP=(const T parA)                                                                                                                                        \
-    {                                                                                                                                                                              \
-        x OP= parA;                                                                                                                                                               \
-        y OP= parA;                                                                                                                                                               \
-        z OP= parA;                                                                                                                                                               \
-        w OP= parA;                                                                                                                                                               \
+    // Operator +
+    inline Vector4 operator +(const Vector4& parA) const 
+    {
+        return Vector4(x + parA.x, y + parA.y, z + parA.z, w + parA.w);
+    } 
+    inline void operator +=(const Vector4& parA) 
+    {
+        x += parA.x; y += parA.y; z += parA.z; w += parA.w;
+    }
+    inline Vector4 operator +(const T parA) const 
+    {
+        return Vector4(x + parA, y + parA, z + parA, w + parA);
+    }
+    inline void operator +=(const T parA) 
+    {
+        x += parA; y += parA; z += parA; w += parA;
     }
 
-#define MAKEVECOP(OP)                                                                                                                                                              \
-    inline Vector4 operator OP(const Vector4& parA) const                                                                                                                                \
-    {                                                                                                                                                                              \
-        return Vector4(x OP parA.x, y OP parA.y, z OP parA.z, w OP parA.w);                                                                                                                     \
-    }                                                                                                                                                                              \
-    inline void operator OP=(const Vector4& parA)                                                                                                                                 \
-    {                                                                                                                                                                              \
-        x OP= parA.x;                                                                                                                                                             \
-        y OP= parA.y;                                                                                                                                                             \
-        z OP= parA.z;                                                                                                                                                             \
-        w OP= parA.w;                                                                                                                                                             \
+    // Operator -
+    inline Vector4 operator -(const Vector4& parA) const 
+    {
+        return Vector4(x - parA.x, y - parA.y, z - parA.z, w - parA.w);
+    } 
+    inline void operator -=(const Vector4& parA)
+    {
+        x -= parA.x; y -= parA.y; z -= parA.z; w -= parA.w;
+    }
+    inline Vector4 operator -(const T parA) const 
+    {
+        return Vector4(x - parA, y - parA, z - parA, w - parA);
+    }
+    inline void operator -=(const T parA) 
+    {
+        x -= parA; y -= parA; z -= parA; w -= parA;
     }
 
-#define MAKEOP(OP)                                                                                                                                                                 \
-    MAKEVECOP(OP);                                                                                                                                                                 \
-    MAKESCALAROP(OP);
+    // Operator /
+    inline Vector4 operator /(const Vector4& parA) const 
+    {
+        return Vector4(x / parA.x, y / parA.y, z / parA.z, w / parA.w);
+    }
+    inline void operator /=(const Vector4& parA) 
+    {
+        x /= parA.x; y /= parA.y; z /= parA.z; w /= parA.w;
+    }
+    inline Vector4 operator /(const T parA) const 
+    {
+        return Vector4(x / parA, y / parA, z / parA, w / parA);
+    }
+    inline void operator /=(const T parA) 
+    {
+        x /= parA; y /= parA; z /= parA; w /= parA;
+    }
 
-    MAKEOP(+);
-    MAKEOP(-);
-    MAKEOP(/);
-    MAKEOP(*);
+    // Operator *
+    inline Vector4 operator *(const Vector4& parA) const 
+    {
+        return Vector4(x * parA.x, y * parA.y, z * parA.z, w * parA.w);
+    } 
+    inline void operator *=(const Vector4& parA) 
+    {
+        x *= parA.x; y *= parA.y; z *= parA.z; w *= parA.w;
+    }
+    inline Vector4 operator *(const T parA) const {
+        return Vector4(x * parA, y * parA, z * parA, w * parA);
+    } 
+    inline void operator *=(const T parA) 
+    {
+        x *= parA; y *= parA; z *= parA; w *= parA;
+    }
 
-#undef MAKEVECOP
-#undef MAKESCALAROP
-#undef MAKEOP
 
 #define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
     inline Vector2<T> OP() const                                                                                                                                                        \
