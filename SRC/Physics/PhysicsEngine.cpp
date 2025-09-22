@@ -111,6 +111,8 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
     FContactManager.FindNewContacts(FBroadPhase);
 
     FContactManager.CollideContacts(this, FBroadPhase);
+
+    FIslandManager.SolveIslands(this);
 }
 
 const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)

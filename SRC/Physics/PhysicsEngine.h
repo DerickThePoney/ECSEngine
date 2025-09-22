@@ -4,6 +4,7 @@
 #include "Common/IdGenerator.h"
 #include "Common/Singleton.h"
 #include "ContactManager.h"
+#include "IslandManager.h"
 #include "PhysicsEngineConfiguration.h"
 #include "RigidBody.h"
 
@@ -74,6 +75,9 @@ private:
     std::vector<PhysicsBodyHandle> FMovedBodies;
     BroadPhase FBroadPhase;
     ContactManager FContactManager;
+
+    friend class IslandManager;
+    IslandManager FIslandManager;
 };
 } // namespace Physics
 } // namespace ECSEngine
