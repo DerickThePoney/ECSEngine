@@ -296,12 +296,18 @@ void GameScenarioUpdater::EndUpdate()
     SaveLoadManager::Instance().HandleSaveLoad(this);
 }
 
-void GameScenarioUpdater::SetScenario(const std::string& parScenarioFile)
+void GameScenarioUpdater::SetScenario(const std::string& parScenarioFile, bool bForceReload /*= false*/)
 {
     FScenarioFileName = parScenarioFile;
     AssertRelease(FScenario == nullptr);
     Resource r(parScenarioFile);
     auto handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
+    if (bForceReload)
+    {
+        GlobalResourceCache::Instance().FCache->ForceReleaseResource(handle);
+        handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&r);
+    }
+
     ResourceBuffer buff = handle->GetResourceBuffer();
     std::istream istr(&buff, std::istream::in);
     cereal::JSONInputArchive ar(istr);

@@ -263,7 +263,7 @@ void ScenarioEditor::UpdateSceneEditorStatus()
                 FState = ScenarioEditorStatus::PLAYING_SCENARIO;
                 AssertRelease(FInGameScenarioPlayer == nullptr);
                 FInGameScenarioPlayer = new GameScenarioUpdater();
-                FInGameScenarioPlayer->SetScenario("Scenes/" + FCurrentScenario->GetName() + ".scene");
+                FInGameScenarioPlayer->SetScenario("Scenes/" + FCurrentScenario->GetName() + ".scene", true);
                 FInGameScenarioPlayer->Initialise();
             }
             else if (!isPlaying && FState != ScenarioEditorStatus::EDITING_SCENARIO)

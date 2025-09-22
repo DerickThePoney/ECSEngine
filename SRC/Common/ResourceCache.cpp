@@ -77,6 +77,11 @@ std::shared_ptr<ResourceHandle> ResourceCache::GetResourceHandle(const Resource*
     return handle;
 }
 
+void ResourceCache::ForceReleaseResource(std::shared_ptr<ResourceHandle>& parHandle)
+{
+    Free(parHandle);
+}
+
 bool ResourceCache::FileExists(Resource* parResource)
 {
     return FFileSystem->FileExists(parResource->FName);
