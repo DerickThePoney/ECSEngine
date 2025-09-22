@@ -31,4 +31,9 @@ float Atan2(float x, float y);
 float Cos(float x);
 float Sin(float x);
 bool IsNan(float x);
+
+inline float Sign(float a)
+{
+    return (a >= 0.f) ? 1.f : -1.f;
+}
 } // namespace ECSEngine

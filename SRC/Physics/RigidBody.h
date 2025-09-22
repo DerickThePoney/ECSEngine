@@ -1,5 +1,6 @@
 #pragma once
 #include "CollisionShape.h"
+#include "Common/BitSet.h"
 #include "Math/VectorTypes.h"
 #include "PhysicsBodyHandle.h"
 #include "PhysicsMoveabilityEnum.h"
@@ -8,6 +9,13 @@ namespace ECSEngine
 {
 namespace Physics
 {
+enum ERigidBodyFlag : u32
+{
+    RB_AWAKE,
+    RB_ISLAND,
+    RB_COUNT
+};
+
 struct ContactEdge;
 struct RigidBody
 {
@@ -58,6 +66,8 @@ public:
     void AddRotationImpulse(const vec3& Impulse, bool bTreatAsRotationVelocityChange);
 
     mat4 GetTransform() const;
+
+    BitSet<ERigidBodyFlag::RB_COUNT> FFlags;
 };
 } // namespace Physics
 } // namespace ECSEngine

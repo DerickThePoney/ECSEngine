@@ -16,6 +16,8 @@ void Contact::Evaluate()
     RigidBody* firstBody = PhysicsEngine::Instance().GetRigidBody(FFirstBody);
     RigidBody* secondBody = PhysicsEngine::Instance().GetRigidBody(FSecondBody);
 
+    FManifold.clear();
+
     bool bTouching = false;
     switch (firstBody->FCollisionShape.GetShapeType())
     {
@@ -41,7 +43,10 @@ void Contact::Evaluate()
     default:
         AssertNotReachedMsg("Collision method is not implemented !");
     }
-    FFlags.SetBit(EContactFlag::TOUCHING, bTouching);
+
+    const bool bWasTouching = FFlags.GetValue(EContactFlag::CT_TOUCHING);
+    FFlags.SetBit(EContactFlag::CT_WAS_TOUCHING, bWasTouching);
+    FFlags.SetBit(EContactFlag::CT_TOUCHING, bTouching);
 }
 
 } // namespace Physics

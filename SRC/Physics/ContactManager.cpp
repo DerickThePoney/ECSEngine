@@ -204,6 +204,7 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
 {
     ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bShowPotentialContacts, false, "Show potential contacts", "Physics/Contacts");
     ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bDrawContactInformation, false, "Draw Contact Information", "Physics/Contacts");
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bDebugBoxContact, false, "Debug Box Contact", "Physics/Contacts");
     if (bShowPotentialContacts)
     {
         Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
@@ -222,8 +223,8 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
             AABB3f aabb2 = parBroadPhase.GetFatAABB3f(Current->FSecondBody);
 
             u32 Color = PotentialContactColor;
-            const bool bTouching = Current->FFlags.GetValue(EContactFlag::TOUCHING);
-            if (Current->FFlags.GetValue(EContactFlag::TOUCHING))
+            const bool bTouching = Current->FFlags.GetValue(EContactFlag::CT_TOUCHING);
+            if (Current->FFlags.GetValue(EContactFlag::CT_TOUCHING))
             {
                 Color = TouchingContactColor;
             }
@@ -231,10 +232,14 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
             buffer->DrawAABB(handle, aabb1.Min(), aabb1.Max(), Color);
             buffer->DrawAABB(handle, aabb2.Min(), aabb2.Max(), Color);
 
-            if (bDrawContactInformation && bTouching && Current->FFlags.GetValue(EContactFlag::CONTACT_INFO))
+            if (bDrawContactInformation && bTouching && Current->FFlags.GetValue(EContactFlag::CT_CONTACT_INFO))
             {
-                buffer->DrawDebugSphere(handle, Current->FContactPoint, 0.2f, 0xFFFFFFFF);
-                buffer->DrawDebugArrow(handle, Current->FContactPoint, Current->FContactNormal, 0.5f, 0xFFFFFFFF);
+                for (const vec3& ContactPoint : Current->FManifold.FPositions)
+                {
+                    constexpr float Size = 0.05f;
+                    buffer->DrawAABB(handle, ContactPoint - Size, ContactPoint + Size, 0xFFFFFFFF);
+                    buffer->DrawDebugArrow(handle, ContactPoint, Current->FContactNormal, 0.5f, 0xFFFFFFFF);
+                }
 
                 RigidBody* firstBody = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);
                 RigidBody* secondBody = PhysicsEngine::Instance().GetRigidBody(Current->FSecondBody);
@@ -244,7 +249,11 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
 
                 buffer->DrawDebugArrow(handle, tr1.Column(3).xyz(), Normalize(toCenter.xyz()), Length(toCenter), 0xFF00FFFF);
 
-                // std::cout << "Contact Penetration: " << Current->FPenetration << "\n";
+                if (bDebugBoxContact)
+                {
+                    buffer->DrawDebugArrow(handle, tr1.Column(3).xyz(), Current->SeparationVector, Length(Current->SeparationVector), 0xFF0000FF);
+                    buffer->DrawDebugArrow(handle, tr1.Column(3).xyz(), Current->SeparatingAxis, 0.5f, 0x0000FFFF);
+                }
             }
 
             Current = Current->FNext;

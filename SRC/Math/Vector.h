@@ -104,6 +104,20 @@ public:
         y /= parA.y;
     }
 
+    // operator []
+    inline T operator[](i32 parIndex) const
+    {
+        switch (parIndex)
+        {
+        case 0:
+            return x;
+        case 1:
+            return y;
+        }
+        AssertNotReached();
+        return std::numeric_limits<T>::max();
+    }
+
 #define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
     inline Vector2<T> OP() const                                                                                                                                                   \
     {                                                                                                                                                                              \
@@ -261,6 +275,22 @@ public:
     inline void operator *=(const T parA) 
     {
         x *= parA; y *= parA; z *= parA;
+    }
+
+    // operator []
+    inline T operator[](i32 parIndex) const
+    {
+        switch (parIndex)
+        {
+        case 0:
+            return x;
+        case 1:
+            return y;
+        case 2:
+            return z;
+        }
+        AssertNotReached();
+        return std::numeric_limits<T>::max();
     }
 
 #define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
@@ -481,6 +511,24 @@ public:
     inline void operator *=(const T parA) 
     {
         x *= parA; y *= parA; z *= parA; w *= parA;
+    }
+
+    // operator []
+    inline T operator[](i32 parIndex) const
+    {
+        switch (parIndex)
+        {
+        case 0:
+            return x;
+        case 1:
+            return y;
+        case 2:
+            return z;
+        case 3:
+            return w;
+        }
+        AssertNotReached();
+        return std::numeric_limits<T>::max();
     }
 
 

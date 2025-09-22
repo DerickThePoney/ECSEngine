@@ -18,12 +18,25 @@ struct ContactEdge
     ContactEdge* FNext = nullptr;
 };
 
-enum EContactFlag
+enum EContactFlag : u32
 {
-    TOUCHING = 0x01,
-    ISLAND = 0x02,
-    CONTACT_INFO = 0x04, // temp value
-    COUNT
+    CT_TOUCHING,
+    CT_WAS_TOUCHING,
+    CT_ISLAND,
+    CT_CONTACT_INFO, // temp value
+    CT_COUNT
+};
+
+struct ContactManifold
+{
+    std::vector<vec3> FPositions;
+    std::vector<float> FPenetration;
+
+    void clear()
+    {
+        FPositions.clear();
+        FPenetration.clear();
+    }
 };
 
 struct Contact
@@ -45,12 +58,16 @@ public:
     Contact* FNext = nullptr;
     Contact* FPrev = nullptr;
 
-    // NEEDS LOTS OF OTHER STUFFS
+    //
+    ContactManifold FManifold;
     vec3 FContactNormal;
-    vec3 FContactPoint;
-    float FPenetration = 0.f;
 
-    BitSet<EContactFlag::COUNT> FFlags;
+    BitSet<EContactFlag::CT_COUNT> FFlags;
+
+#ifdef PERFORM_SECURITY_CHECKS
+    vec3 SeparatingAxis;
+    vec3 SeparationVector;
+#endif
 };
 } // namespace Physics
 } // namespace ECSEngine

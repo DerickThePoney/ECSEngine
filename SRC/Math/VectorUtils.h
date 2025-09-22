@@ -126,9 +126,17 @@ inline __forceinline Vector4<T> VecMin(const Vector4<T>& A, const Vector4<T>& B)
 }
 
 template<typename T>
+inline __forceinline Vector3<T> Invert(const Vector3<T>& A)
+{
+    return -1.f * A;
+}
+
+template<typename T>
 inline __forceinline Vector4<T> Invert(const Vector4<T>& A)
 {
-    return A * -1.f;
+    vec4 m1(-1.f);
+    m1.w = 1.f;
+    return A * m1;
 }
 
 template<typename T>
