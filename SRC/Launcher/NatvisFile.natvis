@@ -38,8 +38,8 @@
       </Synthetic>
     </Expand>
   </Type>
-  <Type Name="ECSEngine::Matrix4x4f">
-    <DisplayString>{{[{FValues[0]}, {FValues[4]}, {FValues[8]}]}}</DisplayString>
+  <Type Name="ECSEngine::Matrix3x3f">
+    <DisplayString>{{[{FValues[0]}, {FValues[3]}, {FValues[6]}]}}</DisplayString>
     <Expand>
       <Synthetic Name="r0">
         <DisplayString>{{[{FValues[0]}, {FValues[3]}, {FValues[6]}]}}</DisplayString>
