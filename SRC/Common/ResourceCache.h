@@ -27,8 +27,7 @@ public:
     void ReOpenFileSystem();
 
     std::shared_ptr<ResourceHandle> GetResourceHandle(const Resource* parResource);
-    i32 Preload(std::string parPattern, void (*parProgressCallback)(i32, bool&));
-    void Flush();
+    void ForceReleaseResource(std::shared_ptr<ResourceHandle>& parHandle);
 
     bool FileExists(Resource* parResource);
 

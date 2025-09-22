@@ -32,7 +32,7 @@ public:
     void Render() override;
     void EndUpdate() override;
 
-    void SetScenario(const std::string& parScenarioFile);
+    void SetScenario(const std::string& parScenarioFile, bool bForceReload = false);
 
 private:
     SceneScenario* FScenario;
