@@ -95,7 +95,7 @@ void PhysicsUpdateSystem::VirtualUpdate()
 
     const bool value = command.Evaluate();
 
-    foreachitemconst(rigidbody, RigidBodyAccessor)
+    /*foreachitemconst(rigidbody, RigidBodyAccessor)
     {
         const EntityId& UnitId = rigidbody.UnitId();
 
@@ -105,7 +105,7 @@ void PhysicsUpdateSystem::VirtualUpdate()
         {
             Physics::AddForceAtPointToBody(rigidbody.BodyHandle(), vec3(0.f, 30.f, 0.f), vec3(-0.5f, -0.5f, 0.f), false, true);
         }
-    }
+    }*/
 #pragma endregion PhysicsTests
 }
 

@@ -318,6 +318,32 @@ mat4 Orthographic(float left, float right, float bottom, float top)
 
 mat4 EulerAnglesXYZ(const float X, const float Y, const float Z)
 {
+    float tmp_ch = cosf(Y);
+    float tmp_sh = sinf(Y);
+    float tmp_cp = cosf(Z);
+    float tmp_sp = sinf(Z);
+    float tmp_cb = cosf(X);
+    float tmp_sb = sinf(X);
+
+    mat4 Result;
+    Result.FValues[0] = tmp_ch * tmp_cb + tmp_sh * tmp_sp * tmp_sb;
+    Result.FValues[1] = tmp_sb * tmp_cp;
+    Result.FValues[2] = -tmp_sh * tmp_cb + tmp_ch * tmp_sp * tmp_sb;
+    Result.FValues[3] = 0.f;
+    Result.FValues[4] = -tmp_ch * tmp_sb + tmp_sh * tmp_sp * tmp_cb;
+    Result.FValues[5] = tmp_cb * tmp_cp;
+    Result.FValues[6] = tmp_sb * tmp_sh + tmp_ch * tmp_sp * tmp_cb;
+    Result.FValues[7] = 0.f;
+    Result.FValues[8] = tmp_sh * tmp_cp;
+    Result.FValues[9] = -tmp_sp;
+    Result.FValues[10] = tmp_ch * tmp_cp;
+    Result.FValues[11] = 0.f;
+    Result.FValues[12] = 0.f;
+    Result.FValues[13] = 0.f;
+    Result.FValues[14] = 0.f;
+    Result.FValues[15] = 1.f;
+
+    /*
     float c1 = cosf(-X);
     float c2 = cosf(-Y);
     float c3 = cosf(-Z);
@@ -335,7 +361,7 @@ mat4 EulerAnglesXYZ(const float X, const float Y, const float Z)
     Result.FValues[8] = -s2;
     Result.FValues[9] = s1 * c2;
     Result.FValues[10] = c1 * c2;
-    Result.FValues[15] = 1.f;
+    Result.FValues[15] = 1.f;*/
     return Result;
 }
 
@@ -374,6 +400,15 @@ vec3 GetTranslation(const mat4& parMatrix)
 mat3 GetRotation(const mat4& parMatrix)
 {
     return mat3(parMatrix.Column(0).xyz(), parMatrix.Column(1).xyz(), parMatrix.Column(2).xyz());
+}
+
+mat4 GetRotationAsMat4(const mat4& parMatrix)
+{
+    mat4 res = mat4::Identity();
+    res.SetColumn(0, parMatrix.Column(0));
+    res.SetColumn(1, parMatrix.Column(1));
+    res.SetColumn(2, parMatrix.Column(2));
+    return res;
 }
 
 } // namespace ECSEngine

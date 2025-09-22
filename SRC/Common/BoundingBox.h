@@ -25,6 +25,7 @@ public:
 
     const VecType Center() const { return 0.5f * (FMin + FMax); }
     const VecType Extent() const { return FMax - FMin; }
+    const VecType HalfExtent() const { return 0.5f * (FMax - FMin); }
 
     bool IsZero() const { return length2(FMax - FMin) == 0.f; }
 

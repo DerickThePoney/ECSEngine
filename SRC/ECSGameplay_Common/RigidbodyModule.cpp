@@ -58,6 +58,17 @@ void RigidbodyModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
         worldMatrix.SetColumn(3, vec4::MakeHomogeneousPositionVec4(Position));
     }
 
+    if (parParameters.HasParameter<ModuleParameters::EulerAnglesXYZ>())
+    {
+        const vec3 euler = parParameters.Get_IFP<ModuleParameters::EulerAnglesXYZ>(vec3(0.0f));
+        worldMatrix = worldMatrix * EulerAnglesXYZ(euler.x, euler.y, euler.z);
+    }
+    else if (parParameters.HasParameter<ModuleParameters::Orientation>())
+    {
+        quat orientation = parParameters.Get_IFP<ModuleParameters::Orientation>(quat());
+        worldMatrix = worldMatrix * (mat4) orientation;
+    }
+
     const RigidbodyModuleTemplate* temp = Template<RigidbodyModuleTemplate>();
     FHandle = Physics::CreateNewPhysicsBody(worldMatrix, temp->GetBodyConfig());
 }
