@@ -56,6 +56,8 @@ public:
     float FLinearDamping = 0.1f;
     float FAngularDamping = 0.01f;
 
+    i32 FIslandIndex = -1;
+
     ContactEdge* FContactList = nullptr;
 
     // Helper functions

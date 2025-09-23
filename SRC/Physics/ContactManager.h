@@ -25,6 +25,8 @@ public:
     void DebugDrawContacts(BroadPhase& parBroadPhase);
 #endif
 
+    i32 ContactCount() const { return FContactCount; }
+
 private:
     void AddPotentialContactPair(const PhysicsBodyHandle& first, const PhysicsBodyHandle& second);
 

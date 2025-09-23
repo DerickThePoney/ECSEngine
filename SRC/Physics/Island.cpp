@@ -2,6 +2,9 @@
 
 #include "Island.h"
 
+#include "Contact.h"
+#include "RigidBody.h"
+
 namespace ECSEngine
 {
 namespace Physics
@@ -9,12 +12,25 @@ namespace Physics
 
 void Island::Init(u32 BodyCount, u32 ContactCount)
 {
-    Bodies.reserve(BodyCount);
+    FBodies.reserve(BodyCount);
+    FContacts.reserve(ContactCount);
 }
 
 void Island::Reset()
 {
-    Bodies.clear();
+    FBodies.clear();
+    FContacts.clear();
+}
+
+void Island::Add(RigidBody* BodyToAdd)
+{
+    BodyToAdd->FIslandIndex = FBodies.size();
+    FBodies.push_back(BodyToAdd);
+}
+
+void Island::Add(Contact* ContactToAdd)
+{
+    FContacts.push_back(ContactToAdd);
 }
 
 } // namespace Physics
