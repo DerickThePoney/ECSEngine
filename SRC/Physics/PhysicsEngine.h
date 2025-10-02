@@ -55,6 +55,8 @@ public:
     RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle);
     const RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle) const;
 
+    void AddMovedBody(RigidBody* body, vec3 displacement);
+
 #ifdef PERFORM_SECURITY_CHECKS
     void DrawDebug();
 #endif
@@ -72,7 +74,14 @@ private:
     std::set<PhysicsBodyHandle> FStaticRigidbodies;
     std::set<PhysicsBodyHandle> FKinematicRigidbodies;
     std::set<PhysicsBodyHandle> FPhysicsRigidbodies;
-    std::vector<PhysicsBodyHandle> FMovedBodies;
+
+    struct MovedBodies
+    {
+        PhysicsBodyHandle Handle;
+        vec3 Displacement;
+    };
+
+    std::vector<MovedBodies> FMovedBodies;
     BroadPhase FBroadPhase;
     ContactManager FContactManager;
 

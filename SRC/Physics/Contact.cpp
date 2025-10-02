@@ -9,6 +9,7 @@ namespace ECSEngine
 {
 namespace Physics
 {
+IMPLEMENT_POOL_ALLOCATED(ContactPoint);
 IMPLEMENT_POOL_ALLOCATED(Contact);
 
 void Contact::Evaluate()
@@ -47,6 +48,24 @@ void Contact::Evaluate()
     const bool bWasTouching = FFlags.GetValue(EContactFlag::CT_TOUCHING);
     FFlags.SetBit(EContactFlag::CT_WAS_TOUCHING, bWasTouching);
     FFlags.SetBit(EContactFlag::CT_TOUCHING, bTouching);
+
+    ComputeBasis();
+}
+
+// http://box2d.org/2014/02/computing-a-basis/
+void Contact::ComputeBasis()
+{
+    // Suppose vector a has all equal components and is a unit vector: a = (s, s, s)
+    // Then 3*s*s = 1, s = sqrt(1/3) = 0.57735027. This means that at least one component of a
+    // unit vector must be greater or equal to 0.57735027. Can use SIMD select operation.
+
+    if (fabsf(FContactNormal.x) >= 0.57735027f)
+        FContactTangents[0] = vec3(FContactNormal.y, -FContactNormal.x, 0.f);
+    else
+        FContactTangents[0] = vec3(0.f, FContactNormal.z, -FContactNormal.y);
+
+    FContactTangents[0] = Normalize(FContactTangents[0]);
+    FContactTangents[1] = Cross(FContactNormal, FContactTangents[0]);
 }
 
 } // namespace Physics

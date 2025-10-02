@@ -41,6 +41,9 @@ void PhysicsBodyConfig::DrawInEditor()
 
     ImGui::SliderFloat("Linear damping", &FLinearDamping, 0.f, 4.f);
     ImGui::SliderFloat("Angular damping", &FAngularDamping, 0.f, 4.f);
+
+    ImGui::SliderFloat("Restitution", &FRestitution, 0.f, 1.f);
+    ImGui::SliderFloat("Friction", &FFriction, 0.f, 1.f);
     ImGui::PopID();
 }
 

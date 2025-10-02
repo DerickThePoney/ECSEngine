@@ -9,7 +9,7 @@ class PhysicsEngine;
 class IslandManager
 {
 public:
-    void SolveIslands(PhysicsEngine* Engine);
+    void SolveIslands(PhysicsEngine* Engine, float parDeltaTime);
 };
 
 } // namespace Physics

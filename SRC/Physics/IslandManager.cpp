@@ -11,27 +11,39 @@ namespace ECSEngine
 {
 namespace Physics
 {
-void IslandManager::SolveIslands(PhysicsEngine* Engine)
+void IslandManager::SolveIslands(PhysicsEngine* Engine, float parDeltaTime)
 {
     Island IslandToSolve;
-    IslandToSolve.Init(Engine->FRigidbodies.size(), Engine->FContactManager.ContactCount());
 
+    u32 nbValidBodies = 0;
     for (auto& body : Engine->FRigidbodies)
     {
+        if (body == nullptr)
+        {
+            continue;
+        }
         body->FFlags.SetBit(ERigidBodyFlag::RB_ISLAND, false);
+        nbValidBodies++;
     }
+
+    IslandToSolve.Reserve(nbValidBodies, Engine->FContactManager.ContactCount());
 
     std::stack<RigidBody*> stack;
     forrange(i, 0, Engine->FRigidbodies.size())
     {
         RigidBody* seed = Engine->FRigidbodies[i].get();
+        if (seed == nullptr)
+        {
+            continue;
+        }
+
         if (seed->FFlags.GetValue(ERigidBodyFlag::RB_ISLAND))
         {
             continue;
         }
 
         // reinit the island
-        IslandToSolve.Init(Engine->FRigidbodies.size(), Engine->FContactManager.ContactCount()); //< ???TO OPTIMIZE
+        IslandToSolve.Reserve(nbValidBodies, Engine->FContactManager.ContactCount()); //< ???TO OPTIMIZE
 
         // mark the body as part of the island
         seed->FFlags.SetBit(ERigidBodyFlag::RB_ISLAND, true);
@@ -83,8 +95,20 @@ void IslandManager::SolveIslands(PhysicsEngine* Engine)
         }
 
         // solve the island
+        IslandToSolve.Initialise();
+        IslandToSolve.Solve(parDeltaTime);
 
         // TODO: reset static bodies flags
+        foreachitem(body, IslandToSolve.FBodies)
+        {
+            if (body->FMoveabilityType == EPhysicsMoveability::STATIC)
+            {
+                body->FFlags.SetBit(ERigidBodyFlag::RB_ISLAND, false);
+            }
+        }
+
+        // Reset the island
+        IslandToSolve.Reset();
     }
 }
 } // namespace Physics
