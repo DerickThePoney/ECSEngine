@@ -23,6 +23,10 @@ struct PhysicsBodyConfig
     // Moveability
     EPhysicsMoveability::Type FMoveability = EPhysicsMoveability::STATIC;
 
+    // Physics material
+    float FRestitution = 0.2f;
+    float FFriction = 0.4f;
+
     // TO ADD:
     // - Colliders/PhysicsShapes
     // - Collision channels
@@ -41,6 +45,8 @@ struct PhysicsBodyConfig
         PROPERTYFIELD(LinearDamping, 0.1f);
         PROPERTYFIELD(AngularDamping, 0.01f);
         PROPERTYFIELD(Moveability, EPhysicsMoveability::STATIC);
+        PROPERTYFIELD(Restitution, 0.2f);
+        PROPERTYFIELD(Friction, 0.4f);
     }
 
     void DrawInEditor();

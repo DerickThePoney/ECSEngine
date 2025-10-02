@@ -123,29 +123,6 @@ inline bool TrackEdgeAxis(i32* axis, i32 n, float s, float* sMax, const vec3& no
     return false;
 }
 //--------------------------------------------------------------------------------------------------
-// in stands for "incoming"
-// out stands for "outgoing"
-// I stands for "incident"
-// R stands for "reference"
-// See D. Gregorius GDC 2015 on creating contacts for more details
-// Each feature pair is used to cache solutions from one physics tick to another. This is
-// called warmstarting, and lets boxes stack and stay stable. Feature pairs identify points
-// of contact over multiple physics ticks. Each feature pair is the junction of an incoming
-// feature and an outgoing feature, usually a result of clipping routines. The exact info
-// stored in the feature pair can be arbitrary as long as the result is a unique ID for a
-// given intersecting configuration.
-union FeaturePair
-{
-    struct
-    {
-        u8 inR;
-        u8 outR;
-        u8 inI;
-        u8 outI;
-    };
-
-    i32 key;
-};
 
 //--------------------------------------------------------------------------------------------------
 struct ClipVertex
@@ -720,21 +697,21 @@ bool OBBIntersection(Contact* C, const mat4& parTransformA, const AABB3f& parBou
         {
             C->FContactNormal = (flip) ? Invert(Normal) : Normal;
 
-            C->FManifold.FPositions.reserve(outNum);
-            C->FManifold.FPenetration.reserve(outNum);
+            C->FManifold.FContactPoints.reserve(outNum);
 
             for (i32 i = 0; i < outNum; ++i)
             {
-                /*if (flip)
+                FeaturePair pair = out[i].f;
+                if (flip)
                 {
                     std::swap(pair.inI, pair.inR);
                     std::swap(pair.outI, pair.outR);
                 }
 
-                c->fp = out[i].f;*/
-
-                C->FManifold.FPositions.push_back(out[i].v);
-                C->FManifold.FPenetration.push_back(depths[i]);
+                ContactPoint& CP = C->FManifold.FContactPoints.emplace_back();
+                CP.FPosition = out[i].v;
+                CP.FPenetration = depths[i];
+                CP.FP = pair;
             }
         }
         else
@@ -761,12 +738,14 @@ bool OBBIntersection(Contact* C, const mat4& parTransformA, const AABB3f& parBou
         C->FContactNormal = Normal;
         /*m->contactCount = 1;*/
 
-        /*q3Contact* c = m->contacts;
-        q3FeaturePair pair;*/
-        /*pair.key = axis;*/
-        /*C->fp = pair;*/
-        C->FManifold.FPositions.push_back(((CA + CB) * 0.5f));
-        C->FManifold.FPenetration.push_back(Penetration);
+        FeaturePair pair;
+        pair.key = Axis;
+
+        ContactPoint CP;
+        CP.FPosition = (CA + CB) * 0.5f;
+        CP.FPenetration = Penetration;
+        CP.FP = pair;
+        C->FManifold.FContactPoints.push_back(CP);
     }
 
     C->FFlags.SetBit(EContactFlag::CT_CONTACT_INFO, true);

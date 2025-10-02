@@ -65,7 +65,7 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
     while (Current != nullptr)
     {
         // TODO: Check if filtering is still valid, bodies are awake and all
-
+        Current->FFlags.SetBit(EContactFlag::CT_ISLAND, false);
         bool bOverlap = parBroadPhase.TestOverlap(Current->FFirstBody, Current->FSecondBody);
         if (!bOverlap)
         {
@@ -76,7 +76,30 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
         }
 
         // TODO EVALUATE CONTACT POINTS
+        ContactManifold OldManifold = Current->FManifold;
+        vec3 ot0 = Current->FContactTangents[0];
+        vec3 ot1 = Current->FContactTangents[1];
         Current->Evaluate();
+        ComputeBasis(Current);
+
+        foreachitem(CP, Current->FManifold.FContactPoints)
+        {
+            CP.FNormalImpulse = CP.FTangentImpulse[0] = CP.FTangentImpulse[1] = 0.f;
+
+            foreachitem(OCP, OldManifold.FContactPoints)
+            {
+                if (CP.FP.key == OCP.FP.key)
+                {
+                    CP.FNormalImpulse = OCP.FNormalImpulse;
+
+                    // Attempt to re-project old friction solutions
+                    vec3 friction = ot0 * OCP.FTangentImpulse[0] + ot1 * OCP.FTangentImpulse[1];
+                    CP.FTangentImpulse[0] = Dot(friction, Current->FContactTangents[0]);
+                    CP.FTangentImpulse[1] = Dot(friction, Current->FContactTangents[1]);
+                    break;
+                }
+            }
+        }
 
         Current = Current->FNext;
     }
@@ -114,6 +137,9 @@ void ContactManager::AddPotentialContactPair(const PhysicsBodyHandle& first, con
     Contact* c = new Contact();
     c->FFirstBody = first;
     c->FSecondBody = second;
+
+    c->FFriction = sqrtf(a->FFriction * b->FFriction);
+    c->FRestitution = Max(a->FRestitution, b->FRestitution);
 
     // 3. Insert it in a contact list
     c->FNext = FContactList;
@@ -199,6 +225,25 @@ void ContactManager::DestroyContact(Contact* c)
     FContactCount--;
 }
 
+// http://box2d.org/2014/02/computing-a-basis/
+void ContactManager::ComputeBasis(Contact* C)
+{
+    // Suppose vector a has all equal components and is a unit vector: a = (s, s, s)
+    // Then 3*s*s = 1, s = sqrt(1/3) = 0.57735027. This means that at least one component of a
+    // unit vector must be greater or equal to 0.57735027. Can use SIMD select operation.
+    vec3& a = C->FContactNormal;
+    vec3& b = C->FContactTangents[0];
+    vec3& c = C->FContactTangents[1];
+
+    if (fabsf(a.x) >= 0.57735027f)
+        b = vec3(a.y, -a.x, 0.f);
+    else
+        b = vec3(0.f, a.z, -a.y);
+
+    b = Normalize(b);
+    c = Cross(a, b);
+}
+
 #ifdef PERFORM_SECURITY_CHECKS
 void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
 {
@@ -234,11 +279,11 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
 
             if (bDrawContactInformation && bTouching && Current->FFlags.GetValue(EContactFlag::CT_CONTACT_INFO))
             {
-                for (const vec3& ContactPoint : Current->FManifold.FPositions)
+                for (const ContactPoint& CP : Current->FManifold.FContactPoints)
                 {
                     constexpr float Size = 0.05f;
-                    buffer->DrawAABB(handle, ContactPoint - Size, ContactPoint + Size, 0xFFFFFFFF);
-                    buffer->DrawDebugArrow(handle, ContactPoint, Current->FContactNormal, 0.5f, 0xFFFFFFFF);
+                    buffer->DrawAABB(handle, CP.FPosition - Size, CP.FPosition + Size, 0xFFFFFFFF);
+                    buffer->DrawDebugArrow(handle, CP.FPosition, Current->FContactNormal, 0.5f, 0xFFFFFFFF);
                 }
 
                 RigidBody* firstBody = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);

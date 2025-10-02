@@ -31,60 +31,11 @@ void PhysicsEngine::Cleanup()
 
 void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 {
-    // MAKE THE MOVED BODIES ARRAY A CLASS ONE AND ALLOW KINEMATIC UPDATES
-    // integrate velocity
-    foreachitem(bodyHandle, FPhysicsRigidbodies)
-    {
-        if (!bodyHandle.IsValid())
-        {
-            continue;
-        }
+    FContactManager.FindNewContacts(FBroadPhase);
 
-        RigidBody* body = FRigidbodies[bodyHandle.FId].get();
-        if (body == nullptr)
-        {
-            continue;
-        }
+    FContactManager.CollideContacts(this, FBroadPhase);
 
-        body->FVelocity += (body->FAccelerationDueToForces + body->FGravityScale * FConfig.FGravityValue * vec3(0.f, -1.f, 0.f)) * parDeltaTime;
-        body->FRotationVelocity += body->FInverseInertiaTensorWorld * body->FTorque * parDeltaTime;
-
-        // damping
-        body->FVelocity *= 1.f / (1.f + parDeltaTime * body->FLinearDamping);
-        body->FRotationVelocity *= 1.f / (1.f + parDeltaTime * body->FAngularDamping);
-
-        body->FAccelerationDueToForces = vec3(0.f);
-        body->FTorque = vec3(0.f);
-    }
-
-    struct MovedBodies
-    {
-        RigidBody* Body = nullptr;
-        vec3 displacement;
-    };
-
-    std::vector<MovedBodies> MovedBodiesArray;
-
-    // integrate position
-    foreachitem(bodyHandle, FPhysicsRigidbodies)
-    {
-        if (!bodyHandle.IsValid())
-        {
-            continue;
-        }
-
-        RigidBody* body = FRigidbodies[bodyHandle.FId].get();
-        if (body == nullptr)
-        {
-            continue;
-        }
-
-        const vec3 displacement = body->FVelocity * parDeltaTime;
-        body->FPosition += displacement;
-        body->FOrientation = AddVectorToQuaternion(body->FOrientation, body->FRotationVelocity * parDeltaTime);
-
-        MovedBodiesArray.push_back({ body, displacement });
-    }
+    FIslandManager.SolveIslands(this, parDeltaTime);
 
     // Update inertia tensor
     foreachitem(bodyHandle, FPhysicsRigidbodies)
@@ -103,16 +54,17 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         UpdateInertiaTransform(body);
     }
 
-    foreachitem(movedBody, MovedBodiesArray)
+    // Update moved bodies
+    foreachitem(movedBody, FMovedBodies)
     {
-        FBroadPhase.MoveBody(movedBody.Body, movedBody.displacement);
+        RigidBody* body = GetRigidBody(movedBody.Handle);
+        if (body == nullptr)
+        {
+            continue;
+        }
+        FBroadPhase.MoveBody(body, movedBody.Displacement);
     }
-
-    FContactManager.FindNewContacts(FBroadPhase);
-
-    FContactManager.CollideContacts(this, FBroadPhase);
-
-    FIslandManager.SolveIslands(this);
+    FMovedBodies.clear();
 }
 
 const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
@@ -170,6 +122,7 @@ bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
 
     FContactManager.RemoveBody(Handle);
     FBroadPhase.RemoveBody(FRigidbodies[Handle.FId].get());
+    FHandleGenerator.ReleaseId(Handle.FId);
     FRigidbodies[Handle.FId].reset(nullptr);
 
     return true;
@@ -386,19 +339,29 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     Body->FPosition = Transform.Column(3).xyz();
     Body->FOrientation = quat::FromMat4(Transform);
 
-    // Init Mass and Inertia
-    if (BodyConfig.FAutoComputeMass)
+    if (Body->FMoveabilityType == EPhysicsMoveability::PHYICS_ENABLED)
     {
-        Body->FMass = BodyConfig.FShape.ComputeMass(BodyConfig.FDensity);
+        // Init Mass and Inertia
+        if (BodyConfig.FAutoComputeMass)
+        {
+            Body->FMass = BodyConfig.FShape.ComputeMass(BodyConfig.FDensity);
+        }
+        else
+        {
+            Body->FMass = BodyConfig.FMass;
+        }
+
+        Body->FInvMass = (BodyConfig.FMass != 0.f) ? 1.f / BodyConfig.FMass : 1.f;
+        Body->FInertiaTensor = BodyConfig.FShape.ComputeInertiaTensor(Body->FMass);
+        Body->FInverseInertiaTensor = Invert(Body->FInertiaTensor);
     }
     else
     {
-        Body->FMass = BodyConfig.FMass;
+        Body->FMass = 0.f;
+        Body->FInvMass = 0.f;
+        Body->FInertiaTensor = mat3();
+        Body->FInverseInertiaTensor = mat3();
     }
-
-    Body->FInvMass = (BodyConfig.FMass != 0.f) ? 1.f / BodyConfig.FMass : 1.f;
-    Body->FInertiaTensor = BodyConfig.FShape.ComputeInertiaTensor(Body->FMass);
-    Body->FInverseInertiaTensor = Invert(Body->FInertiaTensor);
 
     Body->FCollisionShape = BodyConfig.FShape;
 
@@ -449,6 +412,16 @@ const RigidBody* PhysicsEngine::GetRigidBody(const PhysicsBodyHandle& Handle) co
     }
 
     return FRigidbodies[Handle.FId].get();
+}
+
+void PhysicsEngine::AddMovedBody(RigidBody* body, vec3 displacement)
+{
+    AlwaysCheckedAssert(body != nullptr);
+    if (body == nullptr)
+    {
+        return;
+    }
+    FMovedBodies.push_back({ body->FHandle, displacement });
 }
 
 #ifdef PERFORM_SECURITY_CHECKS

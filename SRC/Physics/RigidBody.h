@@ -56,6 +56,10 @@ public:
     float FLinearDamping = 0.1f;
     float FAngularDamping = 0.01f;
 
+    // TODO ADD RESTITUTION AND FRICTION
+    float FRestitution = 0.2f;
+    float FFriction = 0.4f;
+
     i32 FIslandIndex = -1;
 
     ContactEdge* FContactList = nullptr;

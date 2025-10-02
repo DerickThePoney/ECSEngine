@@ -32,9 +32,11 @@ private:
 
     void DestroyContact(Contact* c);
 
+    void ComputeBasis(Contact* C);
+
 private:
     Contact* FContactList = nullptr;
-    i32 FContactCount;
+    i32 FContactCount = 0;
 };
 } // namespace Physics
 } // namespace ECSEngine
