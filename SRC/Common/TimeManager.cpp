@@ -8,7 +8,7 @@
 
 namespace ECSEngine
 {
-constexpr float GameplayTickSize = 0.066f;
+constexpr float GameplayTickSize = 1.f / 60.f;
 
 class TimeManagerImpl : public Singleton<TimeManagerImpl>
 {
