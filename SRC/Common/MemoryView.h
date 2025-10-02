@@ -111,6 +111,12 @@ public:
     using const_reverse_iterator = MemoryViewReverseConstIterator;
 
 public:
+    MemoryView()
+        : FData(nullptr)
+        , FSize(0)
+    {
+    }
+
     MemoryView(T* parData, const u32 parSize)
         : FData(parData)
         , FSize(parSize)
