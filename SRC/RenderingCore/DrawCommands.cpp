@@ -92,22 +92,24 @@ void SetViewTranformCommand::SubmitCommand() const
 //----------------------------------------------------------------
 //          DrawAABBCommand
 //----------------------------------------------------------------
-class DrawAABBCommand : public IDrawCommand
+class DrawBoxCommand : public IDrawCommand
 {
-    DECLARE_POOL_ALLOCATED(DrawAABBCommand);
+    DECLARE_POOL_ALLOCATED(DrawBoxCommand);
 
 public:
-    DrawAABBCommand(const u16 parViewId,
+    DrawBoxCommand(const u16 parViewId,
           const MaterialInstanceHandle& parMaterialInstanceHandle,
           const vec3& parMin,
           const vec3& parMax,
           const bool parDrawAsCube,
+          const mat4& parTransfrom = mat4::Identity(),
           const u32 parColor = 0xFFFFFFFF);
-    virtual ~DrawAABBCommand();
+    virtual ~DrawBoxCommand();
 
     virtual void SubmitCommand() const override;
 
 private:
+    mat4 FTransform;
     vec3 FMin;
     vec3 FMax;
     bool FDrawAsCube;
@@ -115,26 +117,28 @@ private:
     const MaterialInstanceHandle& FMaterialInstanceHandle;
 };
 
-DrawAABBCommand::DrawAABBCommand(const u16 parViewId,
+DrawBoxCommand::DrawBoxCommand(const u16 parViewId,
       const MaterialInstanceHandle& parMaterialInstanceHandle,
       const vec3& parMin,
       const vec3& parMax,
       const bool parDrawAsCube,
+      const mat4& parTransfrom /*= mat4::Identity()*/,
       const u32 parColor /*= 0xFFFFFFFF*/)
     : IDrawCommand(parViewId)
     , FMaterialInstanceHandle(parMaterialInstanceHandle)
     , FColor(parColor)
     , FMin(parMin)
     , FMax(parMax)
+    , FTransform(parTransfrom)
     , FDrawAsCube(parDrawAsCube)
 {
 }
 
-DrawAABBCommand::~DrawAABBCommand()
+DrawBoxCommand::~DrawBoxCommand()
 {
 }
 
-void DrawAABBCommand::SubmitCommand() const
+void DrawBoxCommand::SubmitCommand() const
 {
     bgfx::TransientVertexBuffer vertexBuffer;
     bgfx::TransientIndexBuffer indexBuffer;
@@ -286,8 +290,7 @@ void DrawAABBCommand::SubmitCommand() const
     bgfx::setVertexBuffer(0, &vertexBuffer, 0, 8, vertexBuffer.layoutHandle);
     bgfx::setIndexBuffer(&indexBuffer, 0, nbIndices);
 
-    mat4 transform = mat4::Identity();
-    bgfx::setTransform(&transform.FValues[0]);
+    bgfx::setTransform(&FTransform.FValues[0]);
 
     const Rendering::MaterialInstance* instance = Rendering::MaterialManager::GetMaterialInstance(FMaterialInstanceHandle);
     AssertRelease(instance != nullptr);
@@ -295,7 +298,7 @@ void DrawAABBCommand::SubmitCommand() const
     bgfx::submit(FViewId, instance->GetProgram()->ProgramHandle());
 }
 
-IMPLEMENT_POOL_ALLOCATED(DrawAABBCommand);
+IMPLEMENT_POOL_ALLOCATED(DrawBoxCommand);
 
 //----------------------------------------------------------------
 //          DrawDebugArrowCommand
@@ -1828,12 +1831,21 @@ void DrawCommandBuffer::DrawMeshWithPose(const SkelettonPose* parSkelettonPose,
 
 void DrawCommandBuffer::DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parMin, const vec3& parMax, const u32 parColor /*= 0xFFFFFFFF*/)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, false, parColor)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawBoxCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, false, mat4::Identity(), parColor)));
 }
 
 void DrawCommandBuffer::DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parMin, const vec3& parMax, const u32 parColor /*= 0xFFFFFFFF*/)
 {
-    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawAABBCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, true, parColor)));
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawBoxCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, true, mat4::Identity(), parColor)));
+}
+
+void DrawCommandBuffer::DrawOOB(const MaterialInstanceHandle& parMaterialInstanceHandle,
+      const vec3& parMin,
+      const vec3& parMax,
+      const mat4& parTransfrom /*= mat4::Identity()*/,
+      const u32 parColor /*= 0xFFFFFFFF*/)
+{
+    FCommandVector.push_back(std::unique_ptr<IDrawCommand>(new DrawBoxCommand(FViewId, parMaterialInstanceHandle, parMin, parMax, false, parTransfrom, parColor)));
 }
 
 void DrawCommandBuffer::DrawFrustum(const MaterialInstanceHandle& parMaterialInstanceHandle,
