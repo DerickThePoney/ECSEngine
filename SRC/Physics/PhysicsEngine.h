@@ -66,6 +66,9 @@ private:
 
     void UpdateInertiaTransform(RigidBody* Body);
 
+#ifdef PERFORM_SECURITY_CHECKS
+    void DrawDebugInternal();
+#endif
 private:
     PhysicsEngineConfiguration FConfig;
 

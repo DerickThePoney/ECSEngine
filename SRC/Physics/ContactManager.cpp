@@ -101,6 +101,8 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
             }
         }
 
+        // TODO SENSORS
+
         Current = Current->FNext;
     }
 }

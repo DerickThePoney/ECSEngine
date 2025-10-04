@@ -5,6 +5,18 @@
 #include "PhysicsBodyConfig.h"
 #include "PhysicsBodyHandle.h"
 
+#ifdef PERFORM_SECURITY_CHECKS
+#include "Common/CameraHelpers.h"
+#include "Common/CameraManager.h"
+#include "Common/ColorUtils.h"
+#include "Common/InputManager.h"
+#include "ECSCore/AdjustableDebugParameters.h"
+#include "RenderingCore/BGFXRenderingBackend.h"
+#include "RenderingCore/DrawCommands.h"
+#include "RenderingCore/GLFWDisplayWindowHandler.h"
+#include "RenderingCore/MaterialManager.h"
+#endif
+
 namespace ECSEngine
 {
 namespace Physics
@@ -427,8 +439,54 @@ void PhysicsEngine::AddMovedBody(RigidBody* body, vec3 displacement)
 #ifdef PERFORM_SECURITY_CHECKS
 void PhysicsEngine::DrawDebug()
 {
+    DrawDebugInternal();
     FBroadPhase.DebugBroadPhase();
     FContactManager.DebugDrawContacts(FBroadPhase);
+}
+
+void PhysicsEngine::DrawDebugInternal()
+{
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bDrawCollisionShapes, false, "Draw CollisionShapes", "Physics/Collisions");
+
+    if (bDrawCollisionShapes)
+    {
+        Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
+        u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+        Camera* camera = CameraManager::Instance().GetCamera(camId);
+        buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
+        Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+
+        static const u32 DynamicShapeColor = ColorUtils::ConvertToU32(vec4(0.f, 1.f, 0.f, 1.f));
+        static const u32 StaticShapeColor = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 0.f, 1.f));
+
+        foreachitemconst(bodyU, FRigidbodies)
+        {
+            const RigidBody* body = bodyU.get();
+            if (body == nullptr)
+            {
+                continue;
+            }
+
+            u32 ShapeColor = DynamicShapeColor;
+            if (body->FMoveabilityType == EPhysicsMoveability::STATIC)
+            {
+                ShapeColor = StaticShapeColor;
+            }
+
+            if (body->FCollisionShape.GetShapeType() == ECollisionShape::BOX)
+            {
+                AABB3f LocalAABB = body->FCollisionShape.GetLocalAABB();
+                buffer->DrawOOB(handle, LocalAABB.Min(), LocalAABB.Max(), body->GetTransform(), ShapeColor);
+            }
+            else
+            {
+                AssertNotReached();
+            }
+        }
+
+        buffer->Submit();
+        Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(buffer);
+    }
 }
 #endif
 

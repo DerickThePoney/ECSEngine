@@ -71,6 +71,11 @@ public:
           const mat4& parTransform = mat4::Identity());
     void DrawAABB(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parMin, const vec3& parMax, const u32 parColor = 0xFFFFFFFF);
     void DrawAABBAsCube(const MaterialInstanceHandle& parMaterialInstanceHandle, const vec3& parMin, const vec3& parMax, const u32 parColor = 0xFFFFFFFF);
+    void DrawOOB(const MaterialInstanceHandle& parMaterialInstanceHandle,
+          const vec3& parMin,
+          const vec3& parMax,
+          const mat4& parTransfrom = mat4::Identity(),
+          const u32 parColor = 0xFFFFFFFF);
     void DrawFrustum(const MaterialInstanceHandle& parMaterialInstanceHandle,
           const mat4& parWorldViewTransform,
           const mat4& parProjectionMatrix,
