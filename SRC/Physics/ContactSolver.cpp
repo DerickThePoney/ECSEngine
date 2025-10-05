@@ -56,11 +56,8 @@ void ContactSolver::PreSolve(float parDeltaTime)
             // Warm start contact
             vec3 P = CS.Normal * CPS.NormalImpulse;
 
-            /*if (m_enableFriction)
-            {
-                P += cs->tangentVectors[0] * c->tangentImpulse[0];
-                P += cs->tangentVectors[1] * c->tangentImpulse[1];
-            }*/
+            P += CS.TangentVectors[0] * CPS.TangentImpulses[0];
+            P += CS.TangentVectors[1] * CPS.TangentImpulses[1];
 
             vA -= P * CS.MA;
             wA -= CS.IA * Cross(CPS.CtoA, P);
