@@ -42,6 +42,11 @@ void IslandManager::SolveIslands(PhysicsEngine* Engine, float parDeltaTime)
             continue;
         }
 
+        if (seed->FMoveabilityType == EPhysicsMoveability::STATIC)
+        {
+            continue;
+        }
+
         // reinit the island
         IslandToSolve.Reserve(nbValidBodies, Engine->FContactManager.ContactCount()); //< ???TO OPTIMIZE
 
@@ -62,6 +67,10 @@ void IslandManager::SolveIslands(PhysicsEngine* Engine, float parDeltaTime)
             IslandToSolve.Add(body);
 
             // TODO awaken + check for static
+            if (body->FMoveabilityType == EPhysicsMoveability::STATIC)
+            {
+                continue;
+            }
 
             // loop through the contacts
             for (ContactEdge* edge = body->FContactList; edge; edge = edge->FNext)
