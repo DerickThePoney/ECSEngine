@@ -271,7 +271,7 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
 
             u32 Color = PotentialContactColor;
             const bool bTouching = Current->FFlags.GetValue(EContactFlag::CT_TOUCHING);
-            if (Current->FFlags.GetValue(EContactFlag::CT_TOUCHING))
+            if (bTouching)
             {
                 Color = TouchingContactColor;
             }
@@ -279,7 +279,27 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
             buffer->DrawAABB(handle, aabb1.Min(), aabb1.Max(), Color);
             buffer->DrawAABB(handle, aabb2.Min(), aabb2.Max(), Color);
 
-            if (bDrawContactInformation && bTouching && Current->FFlags.GetValue(EContactFlag::CT_CONTACT_INFO))
+            Current = Current->FNext;
+        }
+        buffer->Submit();
+        Rendering::BGFXRenderingBackend::Instance().ReleaseCommandBuffer(buffer);
+    }
+
+    if (bDrawContactInformation)
+    {
+        Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
+        u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+        Camera* camera = CameraManager::Instance().GetCamera(camId);
+        buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
+        Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+
+        static const u32 PotentialContactColor = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 0.f, 1.f));
+        static const u32 TouchingContactColor = ColorUtils::ConvertToU32(vec4(0.f, 1.f, 0.f, 1.f));
+
+        Contact* Current = FContactList;
+        while (Current != nullptr)
+        {
+            if (Current->FFlags.GetValue(EContactFlag::CT_TOUCHING) && Current->FFlags.GetValue(EContactFlag::CT_CONTACT_INFO))
             {
                 for (const ContactPoint& CP : Current->FManifold.FContactPoints)
                 {
