@@ -42,6 +42,12 @@ void IslandManager::SolveIslands(PhysicsEngine* Engine, float parDeltaTime)
             continue;
         }
 
+        // seed must be awake
+        if (!seed->IsAwake())
+        {
+            continue;
+        }
+
         if (seed->FMoveabilityType == EPhysicsMoveability::STATIC)
         {
             continue;
@@ -65,6 +71,9 @@ void IslandManager::SolveIslands(PhysicsEngine* Engine, float parDeltaTime)
 
             // add the body to the island
             IslandToSolve.Add(body);
+
+            // Awaken all bodies set to the island
+            body->SetAwake(true);
 
             // TODO awaken + check for static
             if (body->FMoveabilityType == EPhysicsMoveability::STATIC)

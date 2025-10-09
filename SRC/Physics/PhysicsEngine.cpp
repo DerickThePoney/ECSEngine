@@ -382,6 +382,8 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     Body->FAngularDamping = BodyConfig.FAngularDamping;
     if (!BodyConfig.FApplyGravity)
         Body->FGravityScale = 0.f;
+
+    Body->SetAwake(true);
 }
 
 void PhysicsEngine::UpdateInertiaTransform(RigidBody* Body)

@@ -54,5 +54,27 @@ mat4 RigidBody::GetTransform() const
     return Translation(FPosition) * (mat4)FOrientation;
 }
 
+void RigidBody::SetAwake(bool bValue)
+{
+    if (bValue)
+    {
+        if (!IsAwake())
+        {
+            FFlags.SetBit(ERigidBodyFlag::RB_AWAKE, true);
+            FSleepingTimer = 0.f;
+        }
+    }
+    else
+    {
+        FSleepingTimer = 0.f;
+        FFlags.SetBit(ERigidBodyFlag::RB_AWAKE, false);
+    }
+}
+
+bool RigidBody::IsAwake() const
+{
+    return FFlags.GetValue(ERigidBodyFlag::RB_AWAKE);
+}
+
 } // namespace Physics
 } // namespace ECSEngine
