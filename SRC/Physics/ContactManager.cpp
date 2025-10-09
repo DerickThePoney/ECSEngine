@@ -171,6 +171,9 @@ void ContactManager::AddPotentialContactPair(const PhysicsBodyHandle& first, con
         b->FContactList->FPrev = &c->FSecondBodyEdge;
     }
     b->FContactList = &c->FSecondBodyEdge;
+
+    a->SetAwake(true);
+    b->SetAwake(true);
     FContactCount++;
 }
 
@@ -222,6 +225,9 @@ void ContactManager::DestroyContact(Contact* c)
     {
         b->FContactList = c->FSecondBodyEdge.FNext;
     }
+
+    a->SetAwake(true);
+    b->SetAwake(true);
 
     delete c;
     FContactCount--;
@@ -293,23 +299,25 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
         buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
         Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
 
-        static const u32 PotentialContactColor = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 0.f, 1.f));
-        static const u32 TouchingContactColor = ColorUtils::ConvertToU32(vec4(0.f, 1.f, 0.f, 1.f));
+        static const u32 AwakeContactColor = ColorUtils::ConvertToU32(vec4(0.f, 1.f, 0.f, 1.f));
+        static const u32 AsleepContactColor = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 0.f, 1.f));
 
         Contact* Current = FContactList;
         while (Current != nullptr)
         {
             if (Current->FFlags.GetValue(EContactFlag::CT_TOUCHING) && Current->FFlags.GetValue(EContactFlag::CT_CONTACT_INFO))
             {
+                RigidBody* firstBody = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);
+                RigidBody* secondBody = PhysicsEngine::Instance().GetRigidBody(Current->FSecondBody);
+
+                const u32 Color = (firstBody->IsAwake()) ? AwakeContactColor : AsleepContactColor;
                 for (const ContactPoint& CP : Current->FManifold.FContactPoints)
                 {
                     constexpr float Size = 0.05f;
-                    buffer->DrawAABB(handle, CP.FPosition - Size, CP.FPosition + Size, 0xFFFFFFFF);
-                    buffer->DrawDebugArrow(handle, CP.FPosition, Current->FContactNormal, 0.5f, 0xFFFFFFFF);
+                    buffer->DrawAABB(handle, CP.FPosition - Size, CP.FPosition + Size, Color);
+                    buffer->DrawDebugArrow(handle, CP.FPosition, Current->FContactNormal, 0.5f, Color);
                 }
 
-                RigidBody* firstBody = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);
-                RigidBody* secondBody = PhysicsEngine::Instance().GetRigidBody(Current->FSecondBody);
                 mat4 tr1 = firstBody->GetTransform();
                 mat4 tr2 = secondBody->GetTransform();
                 vec4 toCenter = tr2.Column(3) - tr1.Column(3);

@@ -130,6 +130,7 @@ void Island::Solve(float parDeltaTime)
     }
 
     // solve and integrate and synchronize positions
+    float MinSleepTimer = std::numeric_limits<float>::max();
     forrange(i, 0, FBodies.size())
     {
         RigidBody* body = FBodies[i];
@@ -149,11 +150,40 @@ void Island::Solve(float parDeltaTime)
         body->FVelocity = Velocities.FLinearVelocity;
         body->FRotationVelocity = Velocities.FRotationVelocity;
 
-        const vec3 displacement = body->FVelocity * parDeltaTime;
-        body->FPosition += displacement;
-        body->FOrientation = AddVectorToQuaternion(body->FOrientation, body->FRotationVelocity * parDeltaTime);
+        const float sqrLinVel = Dot(body->FVelocity, body->FVelocity);
+        const float sqrAngVel = Dot(body->FRotationVelocity, body->FRotationVelocity);
+        static constexpr float linTol = 0.01f;
+        static constexpr float angTol = 3.f * Pi() / 180.f;
 
-        Engine.AddMovedBody(body, displacement);
+        if (sqrLinVel > linTol || sqrAngVel > angTol)
+        {
+            const vec3 displacement = body->FVelocity * parDeltaTime;
+            body->FPosition += displacement;
+            body->FOrientation = AddVectorToQuaternion(body->FOrientation, body->FRotationVelocity * parDeltaTime);
+            body->FSleepingTimer = 0.f;
+            MinSleepTimer = 0.f;
+            Engine.AddMovedBody(body, displacement);
+        }
+        else
+        {
+            body->FSleepingTimer += parDeltaTime;
+            MinSleepTimer = Min(body->FSleepingTimer, MinSleepTimer);
+        }
+    }
+
+    // if the minsleep timer is lower than some tolerance, put everyone to sleep
+    if (MinSleepTimer > 0.5f)
+    {
+        foreachitem(body, FBodies)
+        {
+            AlwaysCheckedAssert(body != nullptr);
+            if (body == nullptr)
+            {
+                continue;
+            }
+
+            body->SetAwake(false);
+        }
     }
 
     // set to sleep TODO

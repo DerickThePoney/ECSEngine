@@ -56,11 +56,13 @@ public:
     float FLinearDamping = 0.1f;
     float FAngularDamping = 0.01f;
 
-    // TODO ADD RESTITUTION AND FRICTION
+    // Restitution and friction
     float FRestitution = 0.2f;
     float FFriction = 0.4f;
 
+    // Misc stuff
     i32 FIslandIndex = -1;
+    float FSleepingTimer;
 
     ContactEdge* FContactList = nullptr;
 
@@ -72,6 +74,9 @@ public:
     void AddRotationImpulse(const vec3& Impulse, bool bTreatAsRotationVelocityChange);
 
     mat4 GetTransform() const;
+
+    void SetAwake(bool bValue);
+    bool IsAwake() const;
 
     BitSet<ERigidBodyFlag::RB_COUNT> FFlags;
 };
