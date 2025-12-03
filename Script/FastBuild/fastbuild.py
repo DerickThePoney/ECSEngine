@@ -31,12 +31,12 @@ fbuildtemplate = """
 
 def GetVSStuff():
     vswhere = "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe"
-    vswhere_params = [vswhere, '-products', '*', '-version', '[16.7,18.0)', '-property', 'installationPath', '-latest', '-format', 'value']
+    vswhere_params = [vswhere, '-products', '*', '-version', '[16.7,19.0)', '-property', 'installationPath', '-latest', '-format', 'value']
     vswhere_popen = subprocess.Popen(vswhere_params, stdout = subprocess.PIPE)
     (vs2017_path, vswhere_stderr) = vswhere_popen.communicate(None)
 
     vswhere = "C:\\Program Files (x86)\\Microsoft Visual Studio\\Installer\\vswhere.exe"
-    vswhere_params = [vswhere, '-products', '*', '-version', '[16.7,18.0)', '-property', 'installationVersion', '-latest']
+    vswhere_params = [vswhere, '-products', '*', '-version', '[16.7,19.0)', '-property', 'installationVersion', '-latest']
     vswhere_popen = subprocess.Popen(vswhere_params, stdout = subprocess.PIPE)
     (vs2017_version, vswhere_stderr) = vswhere_popen.communicate(None)
     vs2017_version = vs2017_version.decode().split('\r\n')[0]
