@@ -59,11 +59,7 @@ private:
         BoxData FBoxData;
         SphereData FSphereData;
 
-        ShapeData()
-            : FBoxData()
-            , FSphereData()
-        {
-        }
+        ShapeData() { }
     };
 
     ShapeData FShapeData;

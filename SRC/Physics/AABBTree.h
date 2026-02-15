@@ -42,7 +42,7 @@ public:
 
     void RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& parLeafsHit);
 
-    void OverlapQuery(const AABB3f& parAABB, FQueryCallback& Callback);
+    void OverlapQuery(const AABB3f& parAABB, const FQueryCallback& Callback);
 
     AABB3f GetFatAABB3f(const PhysicsBodyHandle& parHandle) const;
 

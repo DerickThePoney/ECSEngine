@@ -13,12 +13,12 @@ public:
 
     SERIALIZE()
     {
-        PROPERTYFIELD(FFilename, "INVALID");
-        PROPERTYFIELD(FSoundGroup, ESoundGroup::MUSICS);
-        PROPERTYFIELD(FStream, false);
-        PROPERTYFIELD(FSpatialized, false);
-        PROPERTYFIELD(FAllowPitchChanges, false);
-        PROPERTYFIELD(FbLoop, false);
+        PROPERTYFIELD(Filename, "INVALID");
+        PROPERTYFIELD(SoundGroup, ESoundGroup::MUSICS);
+        PROPERTYFIELD(Stream, false);
+        PROPERTYFIELD(Spatialized, false);
+        PROPERTYFIELD(AllowPitchChanges, false);
+        PROPERTYFIELD(bLoop, false);
     }
 
     std::string FFilename = "INVALID";

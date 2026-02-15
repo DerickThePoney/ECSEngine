@@ -622,7 +622,8 @@ private:
             ImGui::PushID(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
             forrange(i, 0, FProperty->size())
             {
-                FPropertyDrawer(fmt::format("Item_{}", i), (*FProperty)[i]);
+                std::string ItemStr = fmt::format("Item_{}", i);
+                FPropertyDrawer(ItemStr, (*FProperty)[i]);
             }
             ImGui::PopID();
         }
@@ -662,7 +663,8 @@ private:
                     action = 2;
                 }
                 ImGui::SameLine();
-                FPropertyDrawer(fmt::format("Item_{}", i), (*FProperty)[i]);
+                std::string ItemStr = fmt::format("Item_{}", i);
+                FPropertyDrawer(ItemStr, (*FProperty)[i]);
                 ImGui::PopID();
             }
             ImGui::Unindent();
