@@ -82,7 +82,7 @@
       .ProjectInputPaths  = .ProjectFilesPath
 
       .ProjectConfigs  = .ProjectConfigurations
-      .AdditionalOptions = ' /std:c++17' // pour intellisense
+      .AdditionalOptions = ' /std:c++20' // pour intellisense
     }
 
     ^'$ExeName$Projects' + '$ProjectName$'

@@ -6,7 +6,7 @@ namespace ECSEngine
 {
 namespace SoundGroup
 {
-char* GetName(ESoundGroup parValue)
+const char* GetName(ESoundGroup parValue)
 {
     switch (parValue)
     {

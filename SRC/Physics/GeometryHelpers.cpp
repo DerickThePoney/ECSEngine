@@ -57,7 +57,8 @@ AABB3f ComputeAABBFromOBB(const AABB3f& OBB, const mat4& Transform)
 {
     FixedSizedArrayInSitu<vec4, 8> Corners;
 
-    ExtractAABBCorners(OBB, MemoryView<vec4>(Corners.data(), Corners.size()));
+    auto CornersMemView = MemoryView<vec4>(Corners.data(), Corners.size());
+    ExtractAABBCorners(OBB, CornersMemView);
 
     vec3 newMin(std::numeric_limits<float>::max()), newMax(-std::numeric_limits<float>::max());
     foreachitemconst(corner, Corners)

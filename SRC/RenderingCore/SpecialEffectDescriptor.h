@@ -15,8 +15,8 @@ public:
 
     SERIALIZE()
     {
-        PROPERTYFIELD(FVFXDescriptor, nullptr);
-        PROPERTYFIELD(FSoundDescriptor, nullptr);
+        PROPERTYFIELD(VFXDescriptor, nullptr);
+        PROPERTYFIELD(SoundDescriptor, nullptr);
     }
 
 private:

@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/Assertions.h"
 #include "VectorTypes.h"
 
 // clang-format off
@@ -114,8 +115,9 @@ public:
         case 1:
             return y;
         }
-        AssertNotReached();
-        return std::numeric_limits<T>::max();
+
+        AssertNotReached();        
+        return T();
     }
 
 #define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
@@ -290,7 +292,7 @@ public:
             return z;
         }
         AssertNotReached();
-        return std::numeric_limits<T>::max();
+        return T();
     }
 
 #define MAKE_SWIZZLE_OP_2(OP, A, B)                                                                                                                                                \
@@ -528,7 +530,7 @@ public:
             return w;
         }
         AssertNotReached();
-        return std::numeric_limits<T>::max();
+        return T();
     }
 
 

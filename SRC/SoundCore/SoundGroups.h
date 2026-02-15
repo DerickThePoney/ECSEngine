@@ -13,6 +13,6 @@ enum class ESoundGroup : u8
 
 namespace SoundGroup
 {
-char* GetName(ESoundGroup parValue);
+const char* GetName(ESoundGroup parValue);
 }
 } // namespace ECSEngine

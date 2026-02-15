@@ -184,7 +184,7 @@ void AABBTree::RaycastTree(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& 
     }
 }
 
-void AABBTree::OverlapQuery(const AABB3f& parAABB, FQueryCallback& Callback)
+void AABBTree::OverlapQuery(const AABB3f& parAABB, const FQueryCallback& Callback)
 {
     std::queue<u32> nodesQueue;
 

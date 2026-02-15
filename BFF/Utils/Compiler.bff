@@ -102,7 +102,8 @@ Print( "Disabling Incremental Link")
     + ' /Zc:rvalueCast'     ; https://msdn.microsoft.com/fr-fr/library/dn449507.aspx
     + ' /Zc:static_assert-'
     + ' /Zc:preprocessor'
-    + ' /std:c++17 /Zc:__cplusplus'
+    + ' /std:c++latest /Zc:__cplusplus'
+    + ' /permissive-'
     + ' -c "%1"'
 
     .PreprocessorOptions = ''
@@ -501,7 +502,7 @@ Compiler( 'Compiler-MSVC2019-x64' )
     Using( .MSVC2019BasePath )
 
     .Root       = '$ToolsPath$\x64'
-    .RedistPath = '$VSINSTALLPATH$\Redist\MSVC\$VSREDISTVERSION$\x64\Microsoft.VC143.CRT'
+    .RedistPath = '$VSINSTALLPATH$\Redist\MSVC\$VSREDISTVERSION$\x64\Microsoft.VC145.CRT'
     .Executable = '$Root$\cl.exe'
     .ExtraFiles =
     {
@@ -585,12 +586,12 @@ Compiler( 'Compiler-MSVC2019-x64' )
     .CompilerOptions = ''
         + ' /errorreport:none'
         + ' /utf-8'
-        + ' /std:c++17 /Zc:__cplusplus'
+        + ' /std:c++latest /Zc:__cplusplus /permissive-'
         + .CompilerOptionsHacks
     .PCHOptions = ''
         + ' /errorreport:none'
         + ' /utf-8'
-        + ' /std:c++17 /Zc:__cplusplus'
+        + ' /std:c++latest /Zc:__cplusplus /permissive-'
         + .CompilerOptionsHacks
     .CompilerFamily     = 'Visual'
 
