@@ -201,11 +201,11 @@ void ContactManager::DestroyContact(Contact* c)
     // remove from first body
     if (c->FFirstBodyEdge.FPrev != nullptr)
     {
-        c->FFirstBodyEdge.FPrev = c->FFirstBodyEdge.FNext;
+        c->FFirstBodyEdge.FPrev->FNext = c->FFirstBodyEdge.FNext;
     }
     if (c->FFirstBodyEdge.FNext != nullptr)
     {
-        c->FFirstBodyEdge.FNext = c->FFirstBodyEdge.FPrev;
+        c->FFirstBodyEdge.FNext->FPrev = c->FFirstBodyEdge.FPrev;
     }
     if (a->FContactList == &c->FFirstBodyEdge)
     {
@@ -215,11 +215,11 @@ void ContactManager::DestroyContact(Contact* c)
     // remove from second body
     if (c->FSecondBodyEdge.FPrev != nullptr)
     {
-        c->FSecondBodyEdge.FPrev = c->FSecondBodyEdge.FNext;
+        c->FSecondBodyEdge.FPrev->FNext = c->FSecondBodyEdge.FNext;
     }
     if (c->FSecondBodyEdge.FNext != nullptr)
     {
-        c->FSecondBodyEdge.FNext = c->FSecondBodyEdge.FPrev;
+        c->FSecondBodyEdge.FNext->FPrev = c->FSecondBodyEdge.FPrev;
     }
     if (b->FContactList == &c->FSecondBodyEdge)
     {
