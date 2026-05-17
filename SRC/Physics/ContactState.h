@@ -13,6 +13,7 @@ struct ContactPointState
     float NormalImpulse = 0.f; // Accumulated normal impulse (for warm starting)
     float TangentImpulses[2]; // Accumulated tangent impulse (for warm starting)
     float Bias = 0.f;
+    float RestitutionBias = 0.f;
     float NormalMass = 0.f;
     float TangentMass[2];
 };

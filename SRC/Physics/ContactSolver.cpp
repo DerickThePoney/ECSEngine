@@ -10,8 +10,8 @@ namespace ECSEngine
 {
 namespace Physics
 {
-static constexpr float BAUMGARTE = 0.2;
-static constexpr float PENETRATION_SLOP = 0.05;
+static constexpr float BAUMGARTE = 0.3f;
+static constexpr float PENETRATION_SLOP = 0.01f;
 
 void ContactSolver::Initialise(Island* parIsland)
 {
@@ -42,12 +42,12 @@ void ContactSolver::PreSolve(float parDeltaTime)
             nm += Dot(raCn, CS.IA * raCn) + Dot(rbCn, CS.IB * rbCn);
             CPS.NormalMass = (nm != 0.f) ? 1.f / nm : 0.f;
 
-            for (i32 i = 0; i < 2; ++i)
+            for (i32 t = 0; t < 2; ++t)
             {
-                vec3 raCt = Cross(CS.TangentVectors[i], CPS.CtoA);
-                vec3 rbCt = Cross(CS.TangentVectors[i], CPS.CtoB);
-                tm[i] += Dot(raCt, CS.IA * raCt) + Dot(rbCt, CS.IB * rbCt);
-                CPS.TangentMass[i] = (tm[i] != 0.f) ? 1.f / tm[i] : 0.f;
+                vec3 raCt = Cross(CS.TangentVectors[t], CPS.CtoA);
+                vec3 rbCt = Cross(CS.TangentVectors[t], CPS.CtoB);
+                tm[t] += Dot(raCt, CS.IA * raCt) + Dot(rbCt, CS.IB * rbCt);
+                CPS.TangentMass[t] = (tm[t] != 0.f) ? 1.f / tm[t] : 0.f;
             }
 
             // Precalculate bias factor
@@ -69,7 +69,7 @@ void ContactSolver::PreSolve(float parDeltaTime)
             float dv = Dot(vB + Cross(wB, CPS.CtoB) - vA - Cross(wA, CPS.CtoA), CS.Normal);
 
             if (dv < -1.f)
-                CPS.Bias += -(CS.Restitution) * dv;
+                CPS.RestitutionBias = -(CS.Restitution) * dv;
         }
 
         // Write velocities back
@@ -91,14 +91,37 @@ void ContactSolver::Solve()
         vec3 vB = FIsland->FVelocities[CS.IndexB].FLinearVelocity;
         vec3 wB = FIsland->FVelocities[CS.IndexB].FRotationVelocity;
 
-        forrange(i, 0, CS.NumberOfContacts)
+        forrange(j, 0, CS.NumberOfContacts)
         {
-            ContactPointState& CPS = CS.ContactPoints[i];
+            ContactPointState& CPS = CS.ContactPoints[j];
 
             // relative velocity at contact
             vec3 dv = vB + Cross(wB, CPS.CtoB) - vA - Cross(wA, CPS.CtoA);
 
-            // TODO FRICTION
+            // ── FRICTION ──────────────────────────────────────────────
+            for (i32 t = 0; t < 2; ++t)
+            {
+                // Vitesse relative selon la tangente
+                float vt = Dot(dv, CS.TangentVectors[t]);
+
+                // Calcul de l'impulsion tangentielle
+                float lambda = CPS.TangentMass[t] * (-vt);
+
+                // Cône de Coulomb : clamp selon l'impulsion normale
+                // La friction max = coefficient * force normale accumulée
+                float maxFriction = CS.Friction * CPS.NormalImpulse;
+                float oldImpulse = CPS.TangentImpulses[t];
+                CPS.TangentImpulses[t] = Clamp(oldImpulse + lambda, -maxFriction, maxFriction);
+                lambda = CPS.TangentImpulses[t] - oldImpulse;
+
+                // Application de l'impulsion tangentielle
+                vec3 impulse = CS.TangentVectors[t] * lambda;
+                vA -= impulse * CS.MA;
+                wA -= CS.IA * Cross(CPS.CtoA, impulse);
+                vB += impulse * CS.MB;
+                wB += CS.IB * Cross(CPS.CtoB, impulse);
+            }
+            // ─────────────────────────────────────────────────────────
 
             // Normal Contact resolution
             {
@@ -106,7 +129,7 @@ void ContactSolver::Solve()
                 float vn = Dot(dv, CS.Normal);
 
                 // Factor in positional bias to calculate impulse scalar j
-                float lambda = CPS.NormalMass * (-vn + CPS.Bias);
+                float lambda = CPS.NormalMass * (-vn + CPS.Bias + CPS.RestitutionBias);
 
                 // Clamp impulse
                 float tempPN = CPS.NormalImpulse;
