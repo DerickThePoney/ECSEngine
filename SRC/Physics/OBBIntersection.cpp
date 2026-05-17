@@ -310,8 +310,8 @@ void ComputeIncidentFace(const mat4& itx, const vec3& e, vec3 n, ClipVertex* out
             out[1].f.outI = 5;
             out[2].f.inI = 5;
             out[2].f.outI = 6;
-            out[3].f.inI = 5;
-            out[3].f.outI = 6;
+            out[3].f.inI = 6;
+            out[3].f.outI = 7;
         }
     }
 
@@ -379,7 +379,7 @@ i32 Orthographic(float sign, float e, i32 axis, i32 clipEdge, ClipVertex* in, i3
         // B
         if (((InFront(da) && InFront(db)) || On(da) || On(db)))
         {
-            assert(outCount < 8);
+            AlwaysCheckedAssert(outCount < 8);
             out[outCount++] = b;
         }
 
@@ -390,7 +390,7 @@ i32 Orthographic(float sign, float e, i32 axis, i32 clipEdge, ClipVertex* in, i3
             cv.v = a.v + (b.v - a.v) * (da / (da - db));
             cv.f.outR = clipEdge;
             cv.f.outI = 0;
-            assert(outCount < 8);
+            AlwaysCheckedAssert(outCount < 8);
             out[outCount++] = cv;
         }
 
@@ -401,10 +401,10 @@ i32 Orthographic(float sign, float e, i32 axis, i32 clipEdge, ClipVertex* in, i3
             cv.v = a.v + (b.v - a.v) * (da / (da - db));
             cv.f.inR = clipEdge;
             cv.f.inI = 0;
-            assert(outCount < 8);
+            AlwaysCheckedAssert(outCount < 8);
             out[outCount++] = cv;
 
-            assert(outCount < 8);
+            AlwaysCheckedAssert(outCount < 8);
             out[outCount++] = b;
         }
 
@@ -743,7 +743,7 @@ bool OBBIntersection(Contact* C, const mat4& parTransformA, const AABB3f& parBou
 
         ContactPoint CP;
         CP.FPosition = (CA + CB) * 0.5f;
-        CP.FPenetration = Penetration;
+        CP.FPenetration = MaxPenetration;
         CP.FP = pair;
         C->FManifold.FContactPoints.push_back(CP);
     }
