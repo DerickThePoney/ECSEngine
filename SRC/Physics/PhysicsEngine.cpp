@@ -480,6 +480,11 @@ void PhysicsEngine::DrawDebugInternal()
                 AABB3f LocalAABB = body->FCollisionShape.GetLocalAABB();
                 buffer->DrawOOB(handle, LocalAABB.Min(), LocalAABB.Max(), body->GetTransform(), ShapeColor);
             }
+            else if (body->FCollisionShape.GetShapeType() == ECollisionShape::SPHERE)
+            {
+                buffer->DrawDebugSphere(
+                      handle, (body->GetTransform() * vec4::MakeHomogeneousPositionVec4(body->FCollisionShape.GetCenter())).xyz(), body->FCollisionShape.GetRadius(), ShapeColor);
+            }
             else
             {
                 AssertNotReached();
