@@ -3,7 +3,9 @@
 #include "Contact.h"
 
 #include "OBBIntersection.h"
+#include "OBBSphereIntersection.h"
 #include "PhysicsEngine.h"
+#include "SphereIntersection.h"
 
 namespace ECSEngine
 {
@@ -34,13 +36,35 @@ void Contact::Evaluate()
         }
         case ECollisionShape::SPHERE:
         {
+            bTouching = OBBSphereIntersection(this, firstBody->GetTransform(), firstBody->FCollisionShape.GetLocalAABB(), secondBody->GetTransform(),
+                  vec4::MakeHomogeneousPositionVec4(secondBody->FCollisionShape.GetCenter()), secondBody->FCollisionShape.GetRadius(), false);
+            break;
         }
         default:
-            AssertNotReachedMsg("Collision method is not implemented !");
+            AssertNotReachedMsg("Collision method for BOX to ??? is not implemented !");
         }
         break;
     }
     case ECollisionShape::SPHERE:
+        switch (secondBody->FCollisionShape.GetShapeType())
+        {
+        case ECollisionShape::BOX:
+        {
+            bTouching = OBBSphereIntersection(this, secondBody->GetTransform(), secondBody->FCollisionShape.GetLocalAABB(), firstBody->GetTransform(),
+                  vec4::MakeHomogeneousPositionVec4(firstBody->FCollisionShape.GetCenter()), firstBody->FCollisionShape.GetRadius(), true);
+            break;
+        }
+        case ECollisionShape::SPHERE:
+        {
+            bTouching = SphereIntersection(this, firstBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(firstBody->FCollisionShape.GetCenter()),
+                  firstBody->FCollisionShape.GetRadius(), secondBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(secondBody->FCollisionShape.GetCenter()),
+                  secondBody->FCollisionShape.GetRadius());
+            break;
+        }
+        default:
+            AssertNotReachedMsg("Collision method for SPHERE to ??? is not implemented !");
+        }
+        break;
     default:
         AssertNotReachedMsg("Collision method is not implemented !");
     }

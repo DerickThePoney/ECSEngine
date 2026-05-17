@@ -27,6 +27,9 @@ public:
     AABB3f ComputeAABB(const mat4& Transform) const;
     AABB3f GetLocalAABB() const;
 
+    vec3 GetCenter() const { return FCenter; }
+    float GetRadius() const { return FShapeData.FSphereData.Radius; }
+
     ECollisionShape GetShapeType() const { return FShapeType; }
 
     void DrawInEditor();
