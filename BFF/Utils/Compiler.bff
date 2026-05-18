@@ -492,7 +492,7 @@ Print( "Using Windows 10 SDK $WindowsSDKVersion10$" )
     .ToolsBasePath      = '$ToolsPath$\x64'
 ]
 
-.PlatformToolset = 'v143'
+.PlatformToolset = 'v145'
 
 //------------------------------------------------------------------------------
 // Microsoft Visual Studio 2019 (x64)

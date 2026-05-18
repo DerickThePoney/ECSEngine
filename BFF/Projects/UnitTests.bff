@@ -13,5 +13,5 @@
     #include "../Utils/MakeProjectStandard.bff"
     #undef USE_PRECOMPILED_HEADERS
 
-    ^'$ExeName$Projects' + 'Tracy' + 'fmt' + 'imgui' + 'Math' + 'Common' + 'ECSCore'
+    ^'$ExeName$Projects' + 'Tracy' + 'imgui' + 'Math' + 'Common' + 'ECSCore'
 }
