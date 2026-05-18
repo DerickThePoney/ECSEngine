@@ -87,7 +87,8 @@ void ColonySelectionPanelController::VirtualUpdate()
         else
             ImGui::Text("Needs %d food", peonsInColony * GameplayConstants::PeonFeeding::PeonEatQuantity);
 
-        ImGui::ProgressBar(progress, ImVec2(-1.f, 0.f), std::format("{:.2f}s remaining", 0).c_str());
+        const std::string overlay = std::format("{:.2f}s remaining", 0.f);
+        ImGui::ProgressBar(progress, ImVec2(-1.f, 0.f), overlay.c_str());
         ImGui::PopID();
 
         constexpr static u32 maxResourcesPerColumns = 4;
