@@ -80,7 +80,7 @@ void ImguiRenderer::Init(const u32 parContext)
     io.IniFilename = NULL;
 
     {
-        ECSEngine::Resource styleResource(fmt::format(
+        ECSEngine::Resource styleResource(std::format(
               "Styles\\Style_{}.style", Rendering::RenderPassId::GetNameFromType((Rendering::RenderPassId::Type)(parContext + Rendering::RenderPassId::IMGUI_PASSES_START))));
         if (GlobalResourceCache::Instance().FCache->FileExists(&styleResource))
         {

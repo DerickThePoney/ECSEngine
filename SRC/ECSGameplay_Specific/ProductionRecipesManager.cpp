@@ -67,7 +67,7 @@ void ProductionRecipesManager::DrawInEditor()
         }
     }
     ImGui::Separator();
-    if (ImGui::Button(fmt::format("Add Recipe").c_str()))
+    if (ImGui::Button(std::format("Add Recipe").c_str()))
     {
         FRecipes.push_back(ProductionRecipe());
     }

@@ -32,7 +32,7 @@ void ColonyModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters
 {
     parent_type::VirtualInit(parUnitId, parParameters);
 
-    FName = fmt::format("Colony_{}", parUnitId.GetSequentialId());
+    FName = std::format("Colony_{}", parUnitId.GetSequentialId());
 }
 
 } // namespace ECSEngine

@@ -126,7 +126,7 @@ void BuildMenuController::FillWindow()
         tabs[0]->AppendChild(std::move(newTab));
 
         Rml::ElementPtr newPanel = FDocument->CreateElement("panel");
-        newPanel->SetId(fmt::format("{}-panel", BuildingCategory::AsString((BuildingCategory::Type)i)).c_str());
+        newPanel->SetId(std::format("{}-panel", BuildingCategory::AsString((BuildingCategory::Type)i)).c_str());
         panels[0]->AppendChild(std::move(newPanel));
     }
 
@@ -135,12 +135,12 @@ void BuildMenuController::FillWindow()
     {
         auto& costRule = buildCostDesc[i];
 
-        Rml::Element* tabToUse = FDocument->GetElementById(fmt::format("{}-panel", BuildingCategory::AsString(costRule.BuildingType())).c_str());
+        Rml::Element* tabToUse = FDocument->GetElementById(std::format("{}-panel", BuildingCategory::AsString(costRule.BuildingType())).c_str());
         AssertRelease(tabToUse != nullptr);
         Rml::ElementPtr newBuilding = FDocument->CreateElement("buildicon");
         newBuilding->SetId(costRule.BuildingTemplateName().c_str());
         newBuilding->SetInnerRML(costRule.BuildingTemplateName().c_str());
-        newBuilding->SetAttribute("data-event-click", fmt::format("buildiconclicked({})", i).c_str());
+        newBuilding->SetAttribute("data-event-click", std::format("buildiconclicked({})", i).c_str());
         tabToUse->AppendChild(std::move(newBuilding));
     }
 }

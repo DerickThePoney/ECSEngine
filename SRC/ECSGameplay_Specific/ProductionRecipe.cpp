@@ -40,7 +40,7 @@ void ProductionRecipe::DrawInEditor()
 void ProductionRecipe::DrawComponentsInEditor(const std::string& parName, std::vector<RecipeComponent>& parVector)
 {
     ImGui::PushID(parName.c_str());
-    if (ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", parName).c_str()))
+    if (ImGui::CollapsingHeader(std::format("{}##VectorPropertyDrawer", parName).c_str()))
     {
         ImGui::Indent();
         auto itToErase = parVector.end();
@@ -68,7 +68,7 @@ void ProductionRecipe::DrawComponentsInEditor(const std::string& parName, std::v
             }
             ImGui::SameLine();
 
-            EDITOR_PROPERTY_RECIPE_COMPONENT(fmt::format("Item_{}", i), parVector[i]);
+            EDITOR_PROPERTY_RECIPE_COMPONENT(std::format("Item_{}", i), parVector[i]);
 
             ImGui::PopID();
         }
@@ -100,7 +100,7 @@ void ProductionRecipe::DrawComponentsInEditor(const std::string& parName, std::v
             }
         }
 
-        if (ImGui::Button(fmt::format("Add {}", parName).c_str()))
+        if (ImGui::Button(std::format("Add {}", parName).c_str()))
         {
             parVector.push_back({ GameResource::LENGTH, 0 });
         }

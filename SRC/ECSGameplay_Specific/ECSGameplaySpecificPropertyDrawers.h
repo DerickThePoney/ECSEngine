@@ -31,7 +31,7 @@ public:
 
         const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
-        if (ImGui::BeginCombo(fmt::format("##{}", FPropertyName).c_str(), GameResource::GetName(*FProperty)))
+        if (ImGui::BeginCombo(std::format("##{}", FPropertyName).c_str(), GameResource::GetName(*FProperty)))
         {
             forrange(i, 0, lastIndex)
             {
@@ -79,7 +79,7 @@ public:
 
         const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
-        if (ImGui::BeginCombo(fmt::format("##{}", FPropertyName).c_str(), BuildingCategory::AsString(*FProperty)))
+        if (ImGui::BeginCombo(std::format("##{}", FPropertyName).c_str(), BuildingCategory::AsString(*FProperty)))
         {
             forrange(i, 0, lastIndex)
             {
@@ -157,7 +157,7 @@ public:
 
         const vec2 availableSize = ImGui::GetContentRegionAvail();
         ImGui::SetNextItemWidth(availableSize.x * 0.4f);
-        if (ImGui::BeginCombo(fmt::format("##{}", FPropertyName).c_str(), FNameProperty->c_str()))
+        if (ImGui::BeginCombo(std::format("##{}", FPropertyName).c_str(), FNameProperty->c_str()))
         {
             forrange(i, 0, lastIndex)
             {

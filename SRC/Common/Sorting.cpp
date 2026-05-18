@@ -80,7 +80,7 @@ void TestSorting()
 #ifdef ENABLE_SECURITY_CHECKS
                 for (size_t i = 0, j = 1; j < b.size(); i = j++)
                     if (b[i] > b[j])
-                        std::cout << fmt::format("error on {} ({}) and {} ({})", i, b[i], j, b[j]);
+                        std::cout << std::format("error on {} ({}) and {} ({})", i, b[i], j, b[j]);
 #endif // ENABLE_SECURITY_CHECKS 
             }
 
@@ -92,7 +92,7 @@ void TestSorting()
 #ifdef ENABLE_SECURITY_CHECKS
                 for (size_t i = 0, j = 1; j < b.size(); i = j++)
                     if (b[i] > b[j])
-                        std::cout << fmt::format("error on {} ({}) and {} ({})", i, b[i], j, b[j]);
+                        std::cout << std::format("error on {} ({}) and {} ({})", i, b[i], j, b[j]);
 #endif // ENABLE_SECURITY_CHECKS 
             }
 
@@ -136,7 +136,7 @@ void TestSorting()
                 LexSort sorter;
                 for (size_t i = 0, j = 1; j < b.size(); i = j++)
                     if (!sorter(b[i], b[j]))
-                        std::cout << fmt::format("error on {} ({}, {}) and {} ({}, {})", i, b[i].x, b[i].y, j, b[j].x, b[j].y);
+                        std::cout << std::format("error on {} ({}, {}) and {} ({}, {})", i, b[i].x, b[i].y, j, b[j].x, b[j].y);
 #endif // ENABLE_SECURITY_CHECKS 
             }
 
@@ -149,7 +149,7 @@ void TestSorting()
                 LexSort sorter;
                 for (size_t i = 0, j = 1; j < b.size(); i = j++)
                     if (!sorter(b[i], b[j]))
-                        std::cout << fmt::format("error on {} ({}, {}) and {} ({}, {})", i, b[i].x, b[i].y, j, b[j].x, b[j].y);
+                        std::cout << std::format("error on {} ({}, {}) and {} ({}, {})", i, b[i].x, b[i].y, j, b[j].x, b[j].y);
 #endif // ENABLE_SECURITY_CHECKS 
             }
 

@@ -274,7 +274,7 @@ void UIStyleEditor(bool* parOpen)
             if (ImGui::MenuItem("Save"))
             {
                 const std::string& basePath = GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName();
-                const std::string filename = fmt::format("{}\\Styles\\Style_{}.style", basePath, Rendering::RenderPassId::GetNameFromType(passToEdit));
+                const std::string filename = std::format("{}\\Styles\\Style_{}.style", basePath, Rendering::RenderPassId::GetNameFromType(passToEdit));
                 bool isNewFile = false;
                 {
 
