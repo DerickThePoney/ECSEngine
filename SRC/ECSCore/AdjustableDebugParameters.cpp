@@ -113,7 +113,7 @@ public:
     u32 GetValue() const { return FValue; }
 
 protected:
-    virtual void VirtualDrawAdjustableDebug() override { ImGui::SliderInt(fmt::format("#{}", Name()).c_str(), (int*)&FValue, FMin, FMax); }
+    virtual void VirtualDrawAdjustableDebug() override { ImGui::SliderInt(std::format("#{}", Name()).c_str(), (int*)&FValue, FMin, FMax); }
 
 private:
     u32 FValue = 0;
@@ -139,7 +139,7 @@ public:
     bool GetValue() const { return FValue; }
 
 protected:
-    virtual void VirtualDrawAdjustableDebug() override { ImGui::Checkbox(fmt::format("##{}", Name()).c_str(), &FValue); }
+    virtual void VirtualDrawAdjustableDebug() override { ImGui::Checkbox(std::format("##{}", Name()).c_str(), &FValue); }
 
 private:
     bool FValue;
@@ -166,7 +166,7 @@ public:
     float GetValue() const { return FValue; }
 
 protected:
-    virtual void VirtualDrawAdjustableDebug() override { ImGui::SliderFloat(fmt::format("##{}", Name()).c_str(), &FValue, FMin, FMax); }
+    virtual void VirtualDrawAdjustableDebug() override { ImGui::SliderFloat(std::format("##{}", Name()).c_str(), &FValue, FMin, FMax); }
 
 private:
     float FValue;
@@ -197,7 +197,7 @@ public:
 protected:
     virtual void VirtualDrawAdjustableDebug() override
     {
-        ImGui::InputDouble(fmt::format("##{}", Name()).c_str(), &FValue);
+        ImGui::InputDouble(std::format("##{}", Name()).c_str(), &FValue);
         FValue = Clamp(FValue, FMin, FMax);
     }
 
@@ -231,7 +231,7 @@ protected:
     {
         FamilyIterator choiceIt(FChoices);
         AssertRelease(FValue < choiceIt.size());
-        if (ImGui::BeginCombo(fmt::format("##{}", Name()).c_str(), choiceIt.GetFamily(FValue).c_str()))
+        if (ImGui::BeginCombo(std::format("##{}", Name()).c_str(), choiceIt.GetFamily(FValue).c_str()))
         {
             forrange(i, 0, choiceIt.size())
             {

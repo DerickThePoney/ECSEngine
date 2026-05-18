@@ -20,7 +20,7 @@
         u32 size = parChunk.GetBuffer().ReadSize();                                                                                                                                \
                                                                                                                                                                                    \
         u32 expectedId = typeid(TYPE).hash_code();                                                                                                                                 \
-        AlwaysCheckedAssertMsg(id == expectedId, fmt::format("SaveFile is probably corrupted as the id for {} does not match the id we got !", #TYPE).c_str());                    \
+        AlwaysCheckedAssertMsg(id == expectedId, std::format("SaveFile is probably corrupted as the id for {} does not match the id we got !", #TYPE).c_str());                    \
         AlwaysCheckedAssertMsg(size == 0, "Got non zero size while reading guards...");                                                                                            \
                                                                                                                                                                                    \
         parValue.SaveLoad(parChunk);                                                                                                                                               \
@@ -41,7 +41,7 @@
         u32 size = parChunk.GetBuffer().ReadSize();                                                                                                                                \
                                                                                                                                                                                    \
         u32 expectedId = typeid(TYPE).hash_code();                                                                                                                                 \
-        AlwaysCheckedAssertMsg(id == expectedId, fmt::format("SaveFile is probably corrupted as the id for {} does not match the id we got !", #TYPE).c_str());                    \
+        AlwaysCheckedAssertMsg(id == expectedId, std::format("SaveFile is probably corrupted as the id for {} does not match the id we got !", #TYPE).c_str());                    \
         AlwaysCheckedAssertMsg(size == 0, "Got non zero size while reading guards...");                                                                                            \
                                                                                                                                                                                    \
         parValue->SaveLoad(parChunk);                                                                                                                                              \

@@ -271,7 +271,7 @@ MemoryView<const u32> TextInput()
 
 void SetInputsAlreadyUsed(const bool parKeyboardInputUsed, const bool parMouseInputUsed)
 {
-    // LOG_INPUT(fmt::format("keyboard {} - mouse {}", ((parKeyboardInputUsed) ? "true" : "false"), ((parMouseInputUsed) ? "true" : "false")));
+    // LOG_INPUT(std::format("keyboard {} - mouse {}", ((parKeyboardInputUsed) ? "true" : "false"), ((parMouseInputUsed) ? "true" : "false")));
     InputManager::Instance().SetInputsAlreadyUsed(parKeyboardInputUsed, parMouseInputUsed);
 }
 

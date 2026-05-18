@@ -210,7 +210,7 @@ void SceneActionPolygonalPattern::VirtualDrawEditor()
                     action = 2;
                 }
                 ImGui::SameLine();
-                EDITOR_PROPERTY_VECTOR(vec2, fmt::format("Hole {} points", i + 1), FPolygonHoles[i].data(), false);
+                EDITOR_PROPERTY_VECTOR(vec2, std::format("Hole {} points", i + 1), FPolygonHoles[i].data(), false);
                 ImGui::PopID();
                 ++i;
             }
@@ -282,7 +282,10 @@ bool SceneActionPolygonalPattern::VirtualDrawInSceneEditor(Rendering::DrawComman
         }
     }
 
-    foreachitemconst(partition, FPartitions) { parCommandBuffer.DrawLines(parMaterial, partition.data(), (u32)partition.size(), 0.f, 0xFFFF0000, true); }
+    foreachitemconst(partition, FPartitions)
+    {
+        parCommandBuffer.DrawLines(parMaterial, partition.data(), (u32)partition.size(), 0.f, 0xFFFF0000, true);
+    }
 
     return true;
 }

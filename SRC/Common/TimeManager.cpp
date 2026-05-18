@@ -81,7 +81,7 @@ void NewFrame()
 
 void NewGameplayTick()
 {
-    LOG_GAMEPLAY(fmt::format("Current gameplay tick {}", TimeManagerImpl::Instance().CurrentGameplayTick()));
+    LOG_GAMEPLAY(std::format("Current gameplay tick {}", TimeManagerImpl::Instance().CurrentGameplayTick()));
     TimeManagerImpl::Instance().NewGameplayTick();
 }
 

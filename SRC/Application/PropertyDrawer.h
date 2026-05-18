@@ -341,8 +341,8 @@ public:
 
         ImGui::Text(FName.c_str());
         ImGui::Indent();
-        ImGui::InputFloat2(fmt::format("Min##{}", (void*)FProperty).c_str(), (float*)&min, 2);
-        ImGui::InputFloat2(fmt::format("Max##{}", (void*)FProperty).c_str(), (float*)&max, 2);
+        ImGui::InputFloat2(std::format("Min##{}", (void*)FProperty).c_str(), (float*)&min, 2);
+        ImGui::InputFloat2(std::format("Max##{}", (void*)FProperty).c_str(), (float*)&max, 2);
         ImGui::Unindent();
 
         FProperty->SetMin(min);
@@ -492,18 +492,18 @@ public:
 private:
     void ShowFixedSize()
     {
-        if (ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str()))
+        if (ImGui::CollapsingHeader(std::format("{}##VectorPropertyDrawer", FName).c_str()))
         {
             forrange(i, 0, FProperty->size())
             {
-                MakeSimpleProperty(fmt::format("Item_{}", i), &(*FProperty)[i]);
+                MakeSimpleProperty(std::format("Item_{}", i), &(*FProperty)[i]);
             }
         }
     }
 
     void ShowVariableSize()
     {
-        if (ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str()))
+        if (ImGui::CollapsingHeader(std::format("{}##VectorPropertyDrawer", FName).c_str()))
         {
             ImGui::Indent();
             auto itToErase = FProperty->end();
@@ -530,7 +530,7 @@ private:
                     action = 2;
                 }
                 ImGui::SameLine();
-                MakeSimpleProperty(fmt::format("Item_{}", i), &(*FProperty)[i]);
+                MakeSimpleProperty(std::format("Item_{}", i), &(*FProperty)[i]);
                 ImGui::PopID();
             }
             ImGui::Unindent();
@@ -561,7 +561,7 @@ private:
                 }
             }
 
-            if (ImGui::Button(fmt::format("Add {}", FName).c_str()))
+            if (ImGui::Button(std::format("Add {}", FName).c_str()))
             {
                 T newElement = 0.5f * ((*FProperty)[0] + (*FProperty)[FProperty->size() - 1]);
                 FProperty->push_back(newElement);
@@ -615,14 +615,14 @@ private:
     {
         bool show = true;
         if (FCollapsingHeader)
-            show = ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
+            show = ImGui::CollapsingHeader(std::format("{}##VectorPropertyDrawer", FName).c_str());
 
         if (show)
         {
-            ImGui::PushID(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
+            ImGui::PushID(std::format("{}##VectorPropertyDrawer", FName).c_str());
             forrange(i, 0, FProperty->size())
             {
-                std::string ItemStr = fmt::format("Item_{}", i);
+                std::string ItemStr = std::format("Item_{}", i);
                 FPropertyDrawer(ItemStr, (*FProperty)[i]);
             }
             ImGui::PopID();
@@ -633,11 +633,11 @@ private:
     {
         bool show = true;
         if (FCollapsingHeader)
-            show = ImGui::CollapsingHeader(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
+            show = ImGui::CollapsingHeader(std::format("{}##VectorPropertyDrawer", FName).c_str());
 
         if (show)
         {
-            ImGui::PushID(fmt::format("{}##VectorPropertyDrawer", FName).c_str());
+            ImGui::PushID(std::format("{}##VectorPropertyDrawer", FName).c_str());
             ImGui::Indent();
             auto itToErase = FProperty->end();
             u32 i = 0;
@@ -663,7 +663,7 @@ private:
                     action = 2;
                 }
                 ImGui::SameLine();
-                std::string ItemStr = fmt::format("Item_{}", i);
+                std::string ItemStr = std::format("Item_{}", i);
                 FPropertyDrawer(ItemStr, (*FProperty)[i]);
                 ImGui::PopID();
             }
@@ -695,7 +695,7 @@ private:
                 }
             }
 
-            if (ImGui::Button(fmt::format("Add {}", FName).c_str()))
+            if (ImGui::Button(std::format("Add {}", FName).c_str()))
             {
                 FProperty->push_back(T());
             }

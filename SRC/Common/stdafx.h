@@ -14,6 +14,8 @@
 #include <atomic>
 #include <malloc.h>
 #include <chrono>
+#include <format>
+#include <algorithm>
 // clang-format on
 
 #include "Assertions.h"
@@ -24,5 +26,3 @@
 #include "Profiling.h"
 #include "Serialization.h"
 #include "Types.h"
-
-#include <fmt/format.h>

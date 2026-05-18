@@ -84,7 +84,7 @@ void MaterialManagerSingleton::Initialise()
     GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.programv2", programsList);
     foreachitemconst(programDescFile, programsList)
     {
-        LOG_RENDERING(fmt::format("Loading multipass programs {}...", programDescFile));
+        LOG_RENDERING(std::format("Loading multipass programs {}...", programDescFile));
         Resource res(programDescFile);
         std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
 
@@ -110,7 +110,7 @@ void MaterialManagerSingleton::Initialise()
 #ifdef PERFORM_SECURITY_CHECKS
                 if (itFind->second.second != uniform.second)
                 {
-                    const std::string message = fmt::format("A uniform named {} was already created with type {} and we are trying to create another one with type {}",
+                    const std::string message = std::format("A uniform named {} was already created with type {} and we are trying to create another one with type {}",
                           uniform.first, itFind->second.second, uniform.second);
 
                     AssertNotReachedMsg(message.c_str());
@@ -126,7 +126,7 @@ void MaterialManagerSingleton::Initialise()
             }
         }
 
-        LOG_RENDERING(fmt::format("Loading Multi Pass Program {}...    SUCCESS", programDescFile));
+        LOG_RENDERING(std::format("Loading Multi Pass Program {}...    SUCCESS", programDescFile));
     }
 
     LOG_RENDERING("Initialising materials");
@@ -135,7 +135,7 @@ void MaterialManagerSingleton::Initialise()
     GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.material", materialsList);
     foreachitemconst(material, materialsList)
     {
-        LOG_RENDERING(fmt::format("Loading Material {}...", material));
+        LOG_RENDERING(std::format("Loading Material {}...", material));
         Resource res(material);
         std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
 
@@ -149,14 +149,14 @@ void MaterialManagerSingleton::Initialise()
         FMaterialDescriptors.push_back(descriptor);
         FFileToMaterialDescriptor[material] = id;
 
-        LOG_RENDERING(fmt::format("Loading Material {}...    SUCCESS", material));
+        LOG_RENDERING(std::format("Loading Material {}...    SUCCESS", material));
     }
 
     std::vector<std::string> materialsV2List;
     GlobalResourceCache::Instance().FCache->GetFileSystem()->ListResourceFiles("*.materialv2", materialsV2List);
     foreachitemconst(material, materialsV2List)
     {
-        LOG_RENDERING(fmt::format("Loading Multi Pass Material {}...", material));
+        LOG_RENDERING(std::format("Loading Multi Pass Material {}...", material));
         Resource res(material);
         std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
 
@@ -170,7 +170,7 @@ void MaterialManagerSingleton::Initialise()
         FMultiPassMaterialDescriptors.push_back(descriptor);
         FFileToMultiPassMaterialDescriptor[material] = id;
 
-        LOG_RENDERING(fmt::format("Loading Multi Pass Material {}...    SUCCESS", material));
+        LOG_RENDERING(std::format("Loading Multi Pass Material {}...    SUCCESS", material));
     }
 
     foreachitemconst(material, FMaterialDescriptors)
@@ -181,11 +181,11 @@ void MaterialManagerSingleton::Initialise()
         auto itFind = FFileToProgramDescriptor.find(programName);
         if (itFind != FFileToProgramDescriptor.end())
         {
-            LOG_RENDERING(fmt::format("Program {} is already loaded", programName));
+            LOG_RENDERING(std::format("Program {} is already loaded", programName));
             continue;
         }
 
-        LOG_RENDERING(fmt::format("Loading Program {}...", programName));
+        LOG_RENDERING(std::format("Loading Program {}...", programName));
         Resource res(programName);
         std::shared_ptr<ResourceHandle> handle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&res);
 
@@ -213,7 +213,7 @@ void MaterialManagerSingleton::Initialise()
 #ifdef PERFORM_SECURITY_CHECKS
                 if (itFind->second.second != uniform.second)
                 {
-                    const std::string message = fmt::format("A uniform named {} was already created with type {} and we are trying to create another one with type {}",
+                    const std::string message = std::format("A uniform named {} was already created with type {} and we are trying to create another one with type {}",
                           uniform.first, itFind->second.second, uniform.second);
 
                     AssertNotReachedMsg(message.c_str());
@@ -229,7 +229,7 @@ void MaterialManagerSingleton::Initialise()
             }
         }
 
-        LOG_RENDERING(fmt::format("Loading Program {}...    SUCCESS", programName));
+        LOG_RENDERING(std::format("Loading Program {}...    SUCCESS", programName));
     }
 }
 

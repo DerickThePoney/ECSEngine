@@ -201,20 +201,20 @@ SoundHandle MiniAudioSoundEngine::PlaySoundFromDescriptor(const SoundDescriptor&
         flags |= MA_SOUND_FLAG_NO_PITCH;
 
     result = ma_sound_init_from_file(&FEngine, parDescriptor.FFilename.c_str(), flags, FSoundGroups[(unsigned int)parDescriptor.FSoundGroup], NULL, &Sound->FSound);
-    AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, std::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
     if (result != MA_SUCCESS)
     {
-        LOG_SOUND(fmt::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+        LOG_SOUND(std::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
         return {};
     }
 
     ma_sound_set_looping(&Sound->FSound, parDescriptor.FbLoop);
 
     result = ma_sound_start(&Sound->FSound);
-    AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to start sound {}", parDescriptor.FFilename.c_str()).c_str());
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, std::format("WARNING: Failed to start sound {}", parDescriptor.FFilename.c_str()).c_str());
     if (result != MA_SUCCESS)
     {
-        LOG_SOUND(fmt::format("WARNING: Failed to start sound {}", parDescriptor.FFilename.c_str()).c_str());
+        LOG_SOUND(std::format("WARNING: Failed to start sound {}", parDescriptor.FFilename.c_str()).c_str());
         return {};
     }
 
@@ -245,19 +245,19 @@ float MiniAudioSoundEngine::GetSoundDuration(const SoundDescriptor& parDescripto
     ma_sound Sound;
     ma_result result;
     result = ma_sound_init_from_file(&FEngine, parDescriptor.FFilename.c_str(), 0, NULL, NULL, &Sound);
-    AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, std::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
     if (result != MA_SUCCESS)
     {
-        LOG_SOUND(fmt::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+        LOG_SOUND(std::format("WARNING: Failed to load sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
         return -1.f;
     }
 
     float res = 0.f;
     result = ma_sound_get_length_in_seconds(&Sound, &res);
-    AlwaysCheckedAssertMsg(result == MA_SUCCESS, fmt::format("WARNING: Failed to get length of sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+    AlwaysCheckedAssertMsg(result == MA_SUCCESS, std::format("WARNING: Failed to get length of sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
     if (result != MA_SUCCESS)
     {
-        LOG_SOUND(fmt::format("WARNING: Failed to get length of sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
+        LOG_SOUND(std::format("WARNING: Failed to get length of sound \"{}\"", parDescriptor.FFilename.c_str()).c_str());
         return -1.f;
     }
 

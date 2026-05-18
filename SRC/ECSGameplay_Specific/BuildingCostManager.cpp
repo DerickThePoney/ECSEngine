@@ -139,7 +139,7 @@ void BuildingCostManager::DrawEditor()
     forrange(i, 0, FBuildingsCostRules.size())
     {
         ImGui::PushID((int)i);
-        if (ImGui::Selectable(fmt::format("{} - ", i).c_str(), (u32)i == selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0.f, 200.f)))
+        if (ImGui::Selectable(std::format("{} - ", i).c_str(), (u32)i == selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0.f, 200.f)))
             selected = (u32)i;
         ImGui::SameLine();
         FBuildingsCostRules[i].DrawEditor();
