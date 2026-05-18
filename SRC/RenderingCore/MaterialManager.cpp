@@ -111,7 +111,7 @@ void MaterialManagerSingleton::Initialise()
                 if (itFind->second.second != uniform.second)
                 {
                     const std::string message = std::format("A uniform named {} was already created with type {} and we are trying to create another one with type {}",
-                          uniform.first, itFind->second.second, uniform.second);
+                          uniform.first, (int)itFind->second.second, (int)uniform.second);
 
                     AssertNotReachedMsg(message.c_str());
                 }
@@ -214,7 +214,7 @@ void MaterialManagerSingleton::Initialise()
                 if (itFind->second.second != uniform.second)
                 {
                     const std::string message = std::format("A uniform named {} was already created with type {} and we are trying to create another one with type {}",
-                          uniform.first, itFind->second.second, uniform.second);
+                          uniform.first, (int)itFind->second.second, (int)uniform.second);
 
                     AssertNotReachedMsg(message.c_str());
                 }
