@@ -67,7 +67,9 @@ bool OBBCapsuleIntersection(Contact* C,
     };
 
     // Remplacer les deux boucles par une collecte de candidats
-    std::vector<CandidateContact> Candidates;
+    constexpr u32 MaxCandidates = 14; // 12 arêtes + 2 endpoints
+    CandidateContact Candidates[MaxCandidates];
+    u32 NumCandidates = 0;
 
     for (const auto& Edge : Edges)
     {
@@ -75,7 +77,7 @@ bool OBBCapsuleIntersection(Contact* C,
         vec3 OnSeg, OnEdge;
         const float DistSq = GeometryHelpers::ClosestPointSegmentSegment(ASLocal, AELocal, tA, OnSeg, Edge[0], Edge[1], tB, OnEdge);
 
-        Candidates.push_back({ OnSeg, OnEdge, DistSq });
+        Candidates[NumCandidates++] = { OnSeg, OnEdge, DistSq };
     }
 
     const vec3 Endpoints[2] = { ASLocal, AELocal };
@@ -85,78 +87,77 @@ bool OBBCapsuleIntersection(Contact* C,
 
         if (IsInside)
         {
-            const float Distances[6] = {
-                Endpoint.x - MinB.x,
-                MaxB.x - Endpoint.x,
-                Endpoint.y - MinB.y,
-                MaxB.y - Endpoint.y,
-                Endpoint.z - MinB.z,
-                MaxB.z - Endpoint.z,
-            };
+            // Utiliser la direction depuis le centre de l'AABB vers l'endpoint
+            // pour déterminer la face de sortie naturelle
+            const vec3 CenterToEndpoint = Endpoint - CenterBLocal;
 
-            int BestFace = 0;
-            for (int i = 1; i < 6; ++i)
-                if (Distances[i] < Distances[BestFace])
-                    BestFace = i;
+            // Normaliser par les demi-extents pour trouver la face dominante
+            const vec3 Normalized = vec3(CenterToEndpoint.x / HalfExtents.x, CenterToEndpoint.y / HalfExtents.y, CenterToEndpoint.z / HalfExtents.z);
+
+            // La composante dominante donne la face de sortie
+            const vec3 Abs = vec3(fabsf(Normalized.x), fabsf(Normalized.y), fabsf(Normalized.z));
 
             vec3 SurfacePoint = Endpoint;
-            switch (BestFace)
-            {
-            case 0:
-                SurfacePoint.x = MinB.x;
-                break;
-            case 1:
-                SurfacePoint.x = MaxB.x;
-                break;
-            case 2:
-                SurfacePoint.y = MinB.y;
-                break;
-            case 3:
-                SurfacePoint.y = MaxB.y;
-                break;
-            case 4:
-                SurfacePoint.z = MinB.z;
-                break;
-            case 5:
-                SurfacePoint.z = MaxB.z;
-                break;
-            }
+            if (Abs.x >= Abs.y && Abs.x >= Abs.z)
+                SurfacePoint.x = Normalized.x > 0.f ? MaxB.x : MinB.x;
+            else if (Abs.y >= Abs.x && Abs.y >= Abs.z)
+                SurfacePoint.y = Normalized.y > 0.f ? MaxB.y : MinB.y;
+            else
+                SurfacePoint.z = Normalized.z > 0.f ? MaxB.z : MinB.z;
 
-            const float PenetrationDist = Distances[BestFace];
-            Candidates.push_back({ Endpoint, SurfacePoint, -(PenetrationDist * PenetrationDist) });
+            const float PenetrationDist = LengthSq(Endpoint - SurfacePoint);
+            Candidates[NumCandidates++] = { Endpoint, SurfacePoint, -(PenetrationDist) };
         }
         else
         {
             const vec3 Clamped = Clamp(Endpoint, MinB, MaxB);
             const float DistSq = LengthSq(Endpoint - Clamped);
-            Candidates.push_back({ Endpoint, Clamped, DistSq });
+            Candidates[NumCandidates++] = { Endpoint, Clamped, DistSq };
         }
     }
 
     // Trouver la normale de référence depuis le meilleur candidat
-    const auto& Best = *std::min_element(Candidates.begin(), Candidates.end(), [](const CandidateContact& A, const CandidateContact& B) { return A.DistSq < B.DistSq; });
+    u32 BestIdx = 0;
+    forrange(i, 0, NumCandidates)
+    {
+        const float Di = Candidates[i].DistSq;
+        const float Db = Candidates[BestIdx].DistSq;
+        const bool IEndpoint = (i >= 12);
+        const bool BEndpoint = (BestIdx >= 12);
+        const float Bias = (!BEndpoint && IEndpoint) ? 1e-4f : 0.f;
+
+        if (Di < Db + Bias)
+            BestIdx = i;
+    }
+
+    const CandidateContact& Best = Candidates[BestIdx];
+    const bool BestIsInside = (BestIdx >= 12) && (Best.DistSq < 0.f);
 
     const vec3 BestDiffLocal = Best.OnSegLocal - Best.OnBoxLocal;
     const float BestDistSqLocal = LengthSq(BestDiffLocal);
 
-    if (BestDistSqLocal > parRadiusA * parRadiusA)
+    // Test de rejet :
+    // - Cas extérieur : distance segment->surface doit être <= rayon
+    // - Cas intérieur : toujours en contact par définition
+    if (!BestIsInside && BestDistSqLocal > parRadiusA * parRadiusA)
         return false;
 
     const float BestDistLocal = sqrtf(BestDistSqLocal);
-    vec3 ContactNormal = (BestDistSqLocal > 1e-6f) ? (parTransformB * vec4::MakeHomogeneousDirectionVec4(BestDiffLocal) / BestDistLocal).xyz() : vec3(0.f, 1.f, 0.f);
+    C->FContactNormal = (BestDistSqLocal > 1e-6f) ? (parTransformB * vec4::MakeHomogeneousDirectionVec4(BestDiffLocal) / BestDistLocal).xyz() : vec3(0.f, 1.f, 0.f);
+    vec3 OriginalContactNormal = C->FContactNormal;
 
     if (parInvertResult)
-        ContactNormal = Invert(ContactNormal);
-
-    C->FContactNormal = ContactNormal;
+        C->FContactNormal = Invert(OriginalContactNormal);
 
     // Ajouter tous les contacts dont la normale est compatible et la distance dans le rayon
     for (const auto& Candidate : Candidates)
     {
+        const bool CandidateIsInside = (Candidate.DistSq < 0.f);
         const vec3 DiffLocal = Candidate.OnSegLocal - Candidate.OnBoxLocal;
         const float DistSqLocal = LengthSq(DiffLocal);
 
-        if (DistSqLocal > parRadiusA * parRadiusA)
+        // Même logique : cas intérieur toujours valide, cas extérieur filtré par rayon
+        if (!CandidateIsInside && DistSqLocal > parRadiusA * parRadiusA)
             continue;
 
         // Filtrer les contacts dont la normale est opposée (évite les doublons parasites)
@@ -170,7 +171,7 @@ bool OBBCapsuleIntersection(Contact* C,
         const vec3 OnBox = (parTransformB * vec4(Candidate.OnBoxLocal, 1.f)).xyz();
 
         ContactPoint CP;
-        const vec3 ContactOnCapsule = OnSeg - ContactNormal * parRadiusA;
+        const vec3 ContactOnCapsule = OnSeg - OriginalContactNormal * parRadiusA;
         CP.FPosition = parInvertResult ? ContactOnCapsule : OnBox;
         CP.FPenetration = parRadiusA - DistLocal;
         C->FManifold.FContactPoints.push_back(CP);
