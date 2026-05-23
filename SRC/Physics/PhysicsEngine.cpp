@@ -481,18 +481,37 @@ void PhysicsEngine::DrawDebugInternal()
                 ShapeColor = SleepingShapeColor;
             }
 
-            if (body->FCollisionShape.GetShapeType() == ECollisionShape::BOX)
+            switch (body->FCollisionShape.GetShapeType())
+            {
+            case ECollisionShape::BOX:
             {
                 AABB3f LocalAABB = body->FCollisionShape.GetLocalAABB();
                 buffer->DrawOOB(handle, LocalAABB.Min(), LocalAABB.Max(), body->GetTransform(), ShapeColor);
+                break;
             }
-            else if (body->FCollisionShape.GetShapeType() == ECollisionShape::SPHERE)
+            case ECollisionShape::SPHERE:
             {
                 buffer->DrawDebugSphere(
                       handle, (body->GetTransform() * vec4::MakeHomogeneousPositionVec4(body->FCollisionShape.GetCenter())).xyz(), body->FCollisionShape.GetRadius(), ShapeColor);
+                break;
             }
-            else
+            case ECollisionShape::CAPSULE:
             {
+                const mat4 Tr = body->GetTransform();
+                const vec4 CapsuleCenter = (Tr * vec4::MakeHomogeneousPositionVec4(body->FCollisionShape.GetCenter()));
+                const vec4 CapsuleAxis = Tr.Column(1);
+                const float HalfLength = body->FCollisionShape.GetHalfLength();
+                const float Radius = body->FCollisionShape.GetRadius();
+
+                const vec4 Ac = CapsuleCenter - CapsuleAxis * HalfLength;
+                const vec4 Bc = CapsuleCenter + CapsuleAxis * HalfLength;
+
+                buffer->DrawDebugSphere(handle, Ac.xyz(), body->FCollisionShape.GetRadius(), ShapeColor);
+                buffer->DrawDebugSphere(handle, Bc.xyz(), body->FCollisionShape.GetRadius(), ShapeColor);
+
+                break;
+            }
+            default:
                 AssertNotReached();
             }
         }
