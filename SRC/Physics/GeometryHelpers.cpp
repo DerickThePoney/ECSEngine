@@ -83,6 +83,82 @@ bool FirstAABBContainsSecond(const AABB3f& parFirst, const AABB3f& parSecond)
 
     return res;
 }
+
+// @Ericson - Real Time Collision Detection - p148-151
+float ClosestPointSegmentSegment(const vec3& parAS, const vec3& parAE, float& outAT, vec3& outAC, const vec3& parBS, const vec3& parBE, float& outBT, vec3& outBC)
+{
+    vec3 DA = parAE - parAS;
+    vec3 DB = parBE - parBS;
+    vec3 R = parAS - parBS;
+
+    float a = LengthSq(DA);
+    float e = LengthSq(DB);
+
+    constexpr float EPSILON = 1e-6f;
+    if (a <= EPSILON && e <= EPSILON)
+    {
+        // degenerate case where both segments collapse to points
+        outAT = outBT = 0.f;
+        outAC = parAS;
+        outBC = parBS;
+
+        return LengthSq(outAC - outBC);
+    }
+
+    float f = Dot(DB, R);
+    if (a <= EPSILON)
+    {
+        // first segment degenerates into a point
+        outAT = 0.f;
+        outBT = f / e;
+        outBT = Clamp(outBT, 0.f, 1.f);
+    }
+    else
+    {
+        float c = Dot(DA, R);
+
+        if (e <= EPSILON)
+        {
+            // second segment degenerates into a point
+            outBT = 0.f;
+            outAT = Clamp(-c / a, 0.f, 1.f);
+        }
+        else
+        {
+            float b = Dot(DA, DB);
+            float denom = a * e - b * b;
+            if (denom > EPSILON)
+            {
+                outAT = Clamp((b * f - c * e) / denom, 0.f, 1.f);
+            }
+            else
+            {
+                outAT = 0.f;
+            }
+
+            outBT = (b * outAT + f);
+            if (outBT < 0.f)
+            {
+                outBT = 0.f;
+                outAT = Clamp(-c / a, 0.f, 1.f);
+            }
+            else if (outBT > e)
+            {
+                outBT = 1.f;
+                outAT = Clamp((b - c) / a, 0.f, 1.f);
+            }
+            else
+            {
+                outBT = outBT / e;
+            }
+        }
+    }
+
+    outAC = parAS + DA * outAT;
+    outBC = parBS + DB * outBT;
+
+    return Dot(outAC - outBC, outAC - outBC);
+}
 } // namespace GeometryHelpers
 } // namespace Physics
 } // namespace ECSEngine
