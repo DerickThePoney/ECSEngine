@@ -736,7 +736,6 @@ bool OBBIntersection(Contact* C, const mat4& parTransformA, const AABB3f& parBou
         EdgesContact(&CA, &CB, PA, QA, PB, QB);
 
         C->FContactNormal = Normal;
-        /*m->contactCount = 1;*/
 
         FeaturePair pair;
         pair.key = Axis;
@@ -747,8 +746,6 @@ bool OBBIntersection(Contact* C, const mat4& parTransformA, const AABB3f& parBou
         CP.FP = pair;
         C->FManifold.FContactPoints.push_back(CP);
     }
-
-    C->FFlags.SetBit(EContactFlag::CT_CONTACT_INFO, true);
 
     return true;
 }

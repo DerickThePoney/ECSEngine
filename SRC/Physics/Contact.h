@@ -23,7 +23,6 @@ enum EContactFlag : u32
     CT_TOUCHING,
     CT_WAS_TOUCHING,
     CT_ISLAND,
-    CT_CONTACT_INFO, // temp value
     CT_COUNT
 };
 
