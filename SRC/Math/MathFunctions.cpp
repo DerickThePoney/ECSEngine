@@ -27,6 +27,11 @@ vec3 Degree(const vec3& parV)
     return vec3(Degree(parV.x), Degree(parV.y), Degree(parV.z));
 }
 
+vec3 Clamp(const vec3& a, const vec3& m, const vec3& M)
+{
+    return vec3(Clamp(a.x, m.x, M.x), Clamp(a.y, m.y, M.y), Clamp(a.z, m.z, M.z));
+}
+
 float Atan2(float x, float y)
 {
     return atan2f(x, y);

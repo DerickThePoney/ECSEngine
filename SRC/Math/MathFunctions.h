@@ -27,6 +27,8 @@ inline float Clamp(float a, float m, float M)
     return Min(Max(a, m), M);
 }
 
+vec3 Clamp(const vec3& a, const vec3& m, const vec3& M);
+
 float Atan2(float x, float y);
 float Cos(float x);
 float Sin(float x);
