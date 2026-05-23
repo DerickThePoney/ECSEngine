@@ -305,7 +305,7 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
         Contact* Current = FContactList;
         while (Current != nullptr)
         {
-            if (Current->FFlags.GetValue(EContactFlag::CT_TOUCHING) && Current->FFlags.GetValue(EContactFlag::CT_CONTACT_INFO))
+            if (Current->FFlags.GetValue(EContactFlag::CT_TOUCHING))
             {
                 RigidBody* firstBody = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);
                 RigidBody* secondBody = PhysicsEngine::Instance().GetRigidBody(Current->FSecondBody);
