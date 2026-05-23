@@ -15,6 +15,9 @@ float ProjectBoxToAxis(const vec4& parAxis, const mat4& parTransform, const AABB
 AABB3f ComputeAABBFromOBB(const AABB3f& OBB, const mat4& Transform);
 
 bool FirstAABBContainsSecond(const AABB3f& parFirst, const AABB3f& parSecond);
+
+// @Ericson - Real Time Collision Detection - p148-151
+float ClosestPointSegmentSegment(const vec3& parAS, const vec3& parAE, float& outAT, vec3& outAC, const vec3& parBS, const vec3& parBE, float& outBT, vec3& outBC);
 } // namespace GeometryHelpers
 } // namespace Physics
 } // namespace ECSEngine
