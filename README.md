@@ -3,6 +3,22 @@
 Windows C++ game engine built around a custom ECS, plus a sample game (`BuildingGame`).  
 Rendering uses **BGFX**, UI mixes **imgui** / **RmlUi**, audio uses **miniaudio**, and profiling uses **Tracy**. Builds are driven by **FASTBuild** + MSVC.
 
+## Engine capabilities
+
+What the codebase actually supports today (inferred from `SRC/`):
+
+- **ECS / gameplay composition** — Entity worlds, templates, and composable **modules** (position, orientation, appearance, rigidbody, colliders, ownership links, …). New modules can be scaffolded with `GenerateModule.py`.
+- **Sample game systems** — Colony / building gameplay on a circular grid: construction, storage, recipe production, energy producers/consumers, selection UI, and feedback.
+- **Physics** — Custom rigid-body engine with island solving, contact generation, broadphase (AABB tree), and shapes: **box / sphere / capsule** (including OBB and mixed intersections).
+- **Pathfinding** — Navmesh-style requests over world polygons/obstacles (`NavMeshPathfindingManager`), plus circular-grid path graphs for colony movement.
+- **Rendering (BGFX)** — Multi-pass materials/programs, mesh drawing (including skinned poses), terrain / heightmap + quad-tree LOD, editor grid/scene views, ID-buffer picking, selection outlines, and a final combine pass.
+- **UI** — Immediate-mode **ImGui** tools/editors, plus **RmlUi** for data-driven in-game / panel UI.
+- **Editor tooling** (`--editor`) — Scene / scenario editing, entity-template and game-rules editors, GFX representation editor, physics config UI, resource-cache and logger debug views.
+- **Content pipeline** — Assimp-based **AssetCooker**, resource cache loading from loose files or **datapacks**, and **DataPacker** for shipping `Assets.datapack` / `Sounds.datapack`.
+- **Audio** — miniaudio-backed sound engine with grouped sounds (e.g. music vs SFX) and async resource loading.
+- **Serialization** — cereal-based save/load for configs, templates, modules, and application setup (JSON-friendly workflows).
+- **Profiling & debug draw** — Tracy instrumentation; debug primitives (AABBs, OOBs, frustums, spheres, arrows, lines) in the draw command buffer.
+
 ## What this repo contains
 
 | Path | Purpose |
