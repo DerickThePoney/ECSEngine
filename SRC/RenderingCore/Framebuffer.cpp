@@ -67,7 +67,12 @@ void FramebufferInstance::AddAttachement(bool parHasMips,
     AssertRelease(bgfx::isValid(handle));
     u32 idx = (u32)FAttachments.size();
     FAttachments.resize(FAttachments.size() + 1);
-    FAttachments[idx].init(handle, parAccess, parLayer, parMip);
+
+    // Attachment::init is (handle, access, layer, numLayers, mip, flags).
+    // Default flags are BGFX_ATTACHMENT_AUTO_GEN_MIPS, which is invalid for depth attachments.
+    const bool isDepth = parFormat > bgfx::TextureFormat::UnknownDepth;
+    const uint8_t resolveFlags = (parHasMips && !isDepth) ? BGFX_ATTACHMENT_AUTO_GEN_MIPS : BGFX_ATTACHMENT_NONE;
+    FAttachments[idx].init(handle, parAccess, parLayer, parNumLayers, parMip, resolveFlags);
 }
 
 bool FramebufferInstance::ResizeIFN(const uvec2 parNewSize)
@@ -79,7 +84,7 @@ bool FramebufferInstance::ResizeIFN(const uvec2 parNewSize)
     std::vector<FBAttachmentInfos> attachementsInfos = FFBAttachementsInfos;
     Destroy();
 
-    foreachitemconst(att, attachementsInfos) { AddAttachement(att.parHasMips, att.parNumLayers, att.parFormat, att.parFlags, att.parAccess, att.parLayer, att.parHasMips); }
+    foreachitemconst(att, attachementsInfos) { AddAttachement(att.parHasMips, att.parNumLayers, att.parFormat, att.parFlags, att.parAccess, att.parLayer, att.parMip); }
     InitFramebuffer();
     return true;
 }
