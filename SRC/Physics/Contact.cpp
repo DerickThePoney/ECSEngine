@@ -100,7 +100,7 @@ void Contact::Evaluate()
         {
             bTouching = CapsuleIntersection(this, firstBody->GetTransform(), firstBody->FCollisionShape.GetCenter(), firstBody->FCollisionShape.GetRadius(),
                   firstBody->FCollisionShape.GetHalfLength(), secondBody->GetTransform(), secondBody->FCollisionShape.GetCenter(), secondBody->FCollisionShape.GetRadius(),
-                  firstBody->FCollisionShape.GetHalfLength());
+                  secondBody->FCollisionShape.GetHalfLength());
             break;
         }
         default:
