@@ -25,15 +25,15 @@ void BGFXRenderingBackend::Init()
 {
     AssertRelease(GLFWDisplayWindowHandler::HasInstance());
     GLFWDisplayWindowHandler& window = GLFWDisplayWindowHandler::Instance();
-    bgfx::PlatformData pd;
-    pd.nwh = window.GetNativeWindowHandle();
 
     bgfx::Init bgfxInit;
-    bgfxInit.platformData = pd;
+    bgfxInit.swapChain.nwh = window.GetNativeWindowHandle();
+    bgfxInit.swapChain.width = window.GetSize().x;
+    bgfxInit.swapChain.height = window.GetSize().y;
+    bgfxInit.platformData.type = bgfx::NativeWindowHandleType::Default;
     bgfxInit.type = bgfx::RendererType::Direct3D11; // Automatically choose a renderer.
-    bgfxInit.resolution.width = window.GetSize().x;
-    bgfxInit.resolution.height = window.GetSize().y;
-    bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
+
+    bgfxInit.reset = BGFX_RESET_VSYNC;
     // #ifdef PERFORM_SECURITY_CHECKS
     //     bgfxInit.debug = true;
     // #endif
@@ -76,7 +76,16 @@ void BGFXRenderingBackend::RenderFrame()
 
 void BGFXRenderingBackend::Resize(u32 width, u32 height)
 {
-    bgfx::reset(width, height, BGFX_RESET_VSYNC);
+    constexpr uint32_t kSwapChainFlags = 0 | BGFX_SWAP_CHAIN_FULLSCREEN_MASK | BGFX_SWAP_CHAIN_MSAA_MASK | BGFX_SWAP_CHAIN_SRGB_BACKBUFFER | BGFX_SWAP_CHAIN_HDR10 |
+          BGFX_SWAP_CHAIN_HIDPI | BGFX_SWAP_CHAIN_TRANSPARENT_BACKBUFFER;
+
+    bgfx::SwapChain swapChain;
+    swapChain.width = width;
+    swapChain.height = height;
+    swapChain.flags = BGFX_RESET_VSYNC & kSwapChainFlags;
+
+    bgfx::reset(BGFX_RESET_VSYNC & ~kSwapChainFlags, &swapChain);
+
     bgfx::setViewRect(RenderPassId::EDITOR_PASS, 0, 0, width, height);
     bgfx::setViewRect(RenderPassId::EDITOR_UI_PASS, 0, 0, width, height);
     bgfx::setViewRect(RenderPassId::DEBUG_PASS, 0, 0, width, height);
@@ -87,7 +96,7 @@ bool BGFXRenderingBackend::IsInstancingEnabled()
 {
     // Get renderer capabilities info.
     const bgfx::Caps* caps = bgfx::getCaps();
-    return !(0 == (BGFX_CAPS_INSTANCING & caps->supported));
+    return caps->limits.maxInstanceData > 0;
 }
 
 DrawCommandBuffer* BGFXRenderingBackend::CreateCommandBuffer(RenderPassId::Type parViewId /*= RenderPassId::GEOMETRY_PASS */)

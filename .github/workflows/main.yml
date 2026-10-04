@@ -40,14 +40,14 @@ jobs:
 
       - run: |
           mkdir External/BGFX/bgfx/.build/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/bin/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4
         with:
           name: BGFX-Binaries-Release
-          path: External/BGFX/bgfx/.build/win64_vs2022/bin/
+          path: External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Build all
         run: py -u Script/Compil/BuildAll.py -ut -c Release -m msbuild.exe
@@ -84,14 +84,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: BGFX-Binaries-Release
-          path: External/BGFX/bgfx/.build/win64_vs2022/bin/*Release.*
+          path: External/BGFX/bgfx/.build/win64_vs2026/bin/*Release.*
           if-no-files-found: error
 
       - name: Upload BGFX debug build
         uses: actions/upload-artifact@v4
         with:
           name: BGFX-Binaries-Debug
-          path: External/BGFX/bgfx/.build/win64_vs2022/bin/*Debug.*
+          path: External/BGFX/bgfx/.build/win64_vs2026/bin/*Debug.*
           if-no-files-found: error
 
   # This workflow contains a single job called "build-release"
@@ -117,14 +117,14 @@ jobs:
 
       - run: |
           mkdir External/BGFX/bgfx/.build/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/bin/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4
         with:
           name: BGFX-Binaries-Release
-          path: External/BGFX/bgfx/.build/win64_vs2022/bin/
+          path: External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Build all
         run: py -u Script/Compil/BuildAll.py -e -c Release -m msbuild.exe
@@ -172,14 +172,14 @@ jobs:
 
       - run: |
           mkdir External/BGFX/bgfx/.build/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/bin/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4
         with:
           name: BGFX-Binaries-Debug
-          path: External/BGFX/bgfx/.build/win64_vs2022/bin/
+          path: External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Build all
         run: py -u Script/Compil/BuildAll.py -e -c Debug -m msbuild.exe
@@ -208,14 +208,14 @@ jobs:
 
       - run: |
           mkdir External/BGFX/bgfx/.build/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/bin/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4
         with:
           name: BGFX-Binaries-Release
-          path: External/BGFX/bgfx/.build/win64_vs2022/bin/
+          path: External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Build all
         run: py -u Script/Compil/BuildAll.py -e -c Profile -m msbuild.exe
@@ -244,14 +244,14 @@ jobs:
 
       - run: |
           mkdir External/BGFX/bgfx/.build/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/
-          mkdir External/BGFX/bgfx/.build/win64_vs2022/bin/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/
+          mkdir External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Download a Build Artifact
         uses: actions/download-artifact@v4
         with:
           name: BGFX-Binaries-Release
-          path: External/BGFX/bgfx/.build/win64_vs2022/bin/
+          path: External/BGFX/bgfx/.build/win64_vs2026/bin/
 
       - name: Build all
         run: py -u Script/Compil/BuildAll.py -e -c Final -m msbuild.exe
