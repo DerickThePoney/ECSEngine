@@ -95,9 +95,8 @@ py -u Script/Compil/BuildAll.py -b -c Release -t   # BGFX tools (shaderc, textur
 py -u Script/Compil/BuildAll.py -b -c Release -s   # BGFX examples
 ```
 
-> Note: BGFX project generation is still Genie `vs2022` → outputs under  
-> `External/BGFX/bgfx/.build/win64_vs2022/`. You can compile that solution with VS 2026’s MSBuild.  
-> The engine itself uses the VS 2026 (`v145`) toolset via FASTBuild.
+> Note: BGFX is generated with Genie `vs2026` → `.build/projects/vs2026/bgfx.slnx` and libs under  
+> `External/BGFX/bgfx/.build/win64_vs2026/`. The engine uses the VS 2026 (`v145`) toolset via FASTBuild.
 
 ### 2. Build the engine / game
 
