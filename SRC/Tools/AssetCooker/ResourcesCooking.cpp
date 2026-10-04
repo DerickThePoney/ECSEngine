@@ -323,7 +323,7 @@ bool CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    // --varyingdef varying.def.sc -f vs_CircularBuilding.sc -o vs_CircularBuilding.bin -p vs_5_0 -i ../../../../External/BGFX/bgfx/src/ --type vertex --platform windows -O 3 -V
+    // --varyingdef varying.def.sc -f vs_CircularBuilding.sc -o vs_CircularBuilding.bin -p s_5_0 -i ../../../../External/BGFX/bgfx/src/ --type vertex --platform windows -O 3
     std::wstring wideString = L"..\\External\\BGFX\\ToolBinaries\\shadercRelease.exe ";
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring filename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + parFileName);
@@ -346,8 +346,7 @@ bool CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION
 
     std::wstring cookedFilename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + fileNoExtension + ".bin");
     std::wstring pathW = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + path);
-    wideString += L"--varyingdef " + pathW + L"varying.def.sc -f " + filename + L" -o " + cookedFilename +
-          L" -i ..\\External\\BGFX\\bgfx\\src\\ --platform windows -O 3 -V --disasm ";
+    wideString += L"--varyingdef " + pathW + L"varying.def.sc -f " + filename + L" -o " + cookedFilename + L" -i ..\\External\\BGFX\\bgfx\\src\\ --platform windows -O 3 --disasm ";
 
     if (type == 0)
         wideString += L"-p s_5_0 --type vertex";
