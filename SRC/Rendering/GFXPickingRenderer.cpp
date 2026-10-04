@@ -113,7 +113,9 @@ void GFXPickingRenderer::EndSelectionPass()
     FDrawCommandBuffer->Submit();
 
     // Blit and read
-    bgfx::blit(Rendering::RenderPassId::SELECTION_BLIT_PASS, { .handle = FPickingBlitTexture }, { .handle = FPickFramebuffer->GetTextureHandle(0) });
+    bgfx::blit(Rendering::RenderPassId::SELECTION_BLIT_PASS,
+               { .handle = FPickingBlitTexture },
+               { .handle = FPickFramebuffer->GetTextureHandle(0) });
     u32 availableAtFrame = bgfx::read({ .handle = FPickingBlitTexture }, FSelectionData);
     if (!FReadingAvailable)
         Rendering::BGFXRenderingBackend::Instance().AddRequestOnSpecificFrame(availableAtFrame, DELEGATE(&GFXPickingRenderer::SetDataIsAvailable, *this));
