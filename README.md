@@ -44,6 +44,37 @@ Rendering uses **BGFX**, UI mixes **imgui** / **RmlUi**, audio uses **miniaudio*
 
 Configs: `Debug` | `Release` | `Profile` | `Final`.
 
+## External libraries
+
+Third-party code lives under `External/` (plus `tools/` for host binaries). Most are git submodules pulled by `Script/Cloning/CloneSubmodules.py`; some are vendored trees or prebuilt binaries checked into the repo.
+
+| Library | Path | Role | How it gets there |
+|---------|------|------|-------------------|
+| **bgfx** | `External/BGFX/bgfx` | Cross-platform rendering backend | Submodule (`-e` / `-b`) |
+| **bx** | `External/BGFX/bx` | bgfx base utilities + Genie (`genie.exe`) | Submodule (with BGFX) |
+| **bimg** | `External/BGFX/bimg` | bgfx image encode/decode | Submodule (with BGFX) |
+| **GLFW** | `External/glfw-3.3.bin.WIN64` | Window / input (prebuilt Win64 + `glfw3.dll`) | Vendored binaries in repo |
+| **Dear ImGui** | `External/imgui` (and legacy `External/IMGUI` entry in `.gitmodules`) | Immediate-mode UI / editor widgets | Submodule (`-e`) |
+| **RmlUi** | `External/RMLUI/RMLUI` | HTML/CSS-like runtime UI | Vendored under `External/RMLUI` |
+| **FreeType** | `External/RMLUI/FreeType` | Font rasterization for RmlUi | Vendored under `External/RMLUI` |
+| **Assimp** | `External/assimp` + `External/assimpBinaries` | 3D asset import (AssetCooker); prebuilt `assimp-vc142-*.dll` / libs | Sources via submodule; binaries vendored |
+| **miniaudio** | `External/miniaudio` | Audio playback / sound engine backend | Submodule (`-e`) |
+| **cereal** | `External/cereal` | Serialization (JSON/binary archives) | Submodule (`-e`) |
+| **Tracy** | `External/tracy` (+ `tools/Tracy.exe`) | Frame profiler client; standalone profiler UI in `tools/` | Submodule (`-e`); UI binary in `tools/` |
+| **brigand** | `External/brigand/brigand` | Compile-time metaprogramming helpers | Submodule (`-e`) |
+| **GLM** | `External/glm` | Mathematics (vectors/matrices); include-only | Expected under `External/glm` (see BFF `glm.bff`) |
+| **Boost** (subset) | `External/boost/...` | Header-only pieces used by the engine (e.g. variant, mpl, stacktrace, …) | Expected modular Boost headers under `External/boost` (see BFF `boost.bff`) |
+| **polypartition** | `External/polypartition-master` | Polygon partitioning / triangulation | Vendored sources in repo |
+| **teeny-sha1** | `External/teeny-sha1-master` | SHA-1 hashing (AssetCooker) | Vendored sources in repo |
+| **doctest** | `External/Test/doctest` | Unit-test framework | Submodule (`-t`) |
+| **FASTBuild** | `tools/FBuild.exe` | Build system used for the engine/solution | Binary in `tools/` |
+
+Notes:
+
+- BGFX is built separately (`BuildAll.py -b`); engine links `bgfx` / `bimg` / `bx` from `External/BGFX/bgfx/.build/win64_vs2026/bin/`.
+- Assimp DLLs are copied into `bin/` for AssetCooker; GLFW’s `glfw3.dll` is copied for the game.
+- Clone helpers: `-e` / `--engine` pulls engine externals (includes BGFX), `-b` only BGFX, `-t` / `--tests` pulls doctest, `-a` / `--all` pulls engine + assets + tests.
+
 ## Requirements
 
 - Windows 10/11 x64
