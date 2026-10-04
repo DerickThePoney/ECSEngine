@@ -3,9 +3,11 @@
 Windows C++ game engine built around a custom ECS, plus a sample game (`BuildingGame`).  
 Rendering uses **BGFX**, UI mixes **imgui** / **RmlUi**, audio uses **miniaudio**, and profiling uses **Tracy**. Builds are driven by **FASTBuild** + MSVC.
 
+This is a **toy / learning engine**, not a production framework. A lot of the tech is unfinished, experimental, or mid-refactor — the repo exists mainly as a playground to try out new techniques (ECS design, physics, rendering, tooling, etc.). Expect rough edges, incomplete systems, and APIs that change when something more interesting comes along.
+
 ## Engine capabilities
 
-What the codebase actually supports today (inferred from `SRC/`):
+What the codebase currently explores (inferred from `SRC/`; completeness varies):
 
 - **ECS / gameplay composition** — Entity worlds, templates, and composable **modules** (position, orientation, appearance, rigidbody, colliders, ownership links, …). New modules can be scaffolded with `GenerateModule.py`.
 - **Sample game systems** — Colony / building gameplay on a circular grid: construction, storage, recipe production, energy producers/consumers, selection UI, and feedback.
