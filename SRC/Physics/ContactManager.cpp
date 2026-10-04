@@ -317,18 +317,6 @@ void ContactManager::DebugDrawContacts(BroadPhase& parBroadPhase)
                     buffer->DrawAABB(handle, CP.FPosition - Size, CP.FPosition + Size, Color);
                     buffer->DrawDebugArrow(handle, CP.FPosition, Current->FContactNormal, 0.5f, Color);
                 }
-
-                mat4 tr1 = firstBody->GetTransform();
-                mat4 tr2 = secondBody->GetTransform();
-                vec4 toCenter = tr2.Column(3) - tr1.Column(3);
-
-                buffer->DrawDebugArrow(handle, tr1.Column(3).xyz(), Normalize(toCenter.xyz()), Length(toCenter), 0xFF00FFFF);
-
-                if (bDebugBoxContact)
-                {
-                    buffer->DrawDebugArrow(handle, tr1.Column(3).xyz(), Current->SeparationVector, Length(Current->SeparationVector), 0xFF0000FF);
-                    buffer->DrawDebugArrow(handle, tr1.Column(3).xyz(), Current->SeparatingAxis, 0.5f, 0x0000FFFF);
-                }
             }
 
             Current = Current->FNext;
