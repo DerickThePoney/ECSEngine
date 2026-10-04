@@ -23,12 +23,12 @@ jobs:
     steps:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: setup-msbuild
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v3
 
       - name: Clone ENGINE submodules
         run: py -u Script/Cloning/CloneSubmodules.py -e
@@ -61,12 +61,12 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
           # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: setup-msbuild
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v3
 
       - name: Clone BGFX
         run: py -u Script/Cloning/CloneSubmodules.py -b
@@ -81,14 +81,14 @@ jobs:
         shell: bash
 
       - name: Upload BGFX release build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: BGFX-Binaries-Release
           path: External/BGFX/bgfx/.build/win64_vs2026/bin/*Release.*
           if-no-files-found: error
 
       - name: Upload BGFX debug build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: BGFX-Binaries-Debug
           path: External/BGFX/bgfx/.build/win64_vs2026/bin/*Debug.*
@@ -104,12 +104,12 @@ jobs:
     steps:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: setup-msbuild
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v3
 
       - name: Clone ENGINE submodules
         run: py -u Script/Cloning/CloneSubmodules.py -e
@@ -131,7 +131,7 @@ jobs:
         shell: bash
 
       - name: Upload Release build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ECSEngine-Binaries-Release
           path: |
@@ -140,7 +140,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload AssetCooker Release build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AssetCooker-Binaries-Release
           path: |
@@ -159,12 +159,12 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: setup-msbuild
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v3
 
       - name: Clone ENGINE submodules
         run: py -u Script/Cloning/CloneSubmodules.py -e
@@ -195,12 +195,12 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: setup-msbuild
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v3
 
       - name: Clone ENGINE submodules
         run: py -u Script/Cloning/CloneSubmodules.py -e
@@ -231,12 +231,12 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: setup-msbuild
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v3
 
       - name: Clone ENGINE submodules
         run: py -u Script/Cloning/CloneSubmodules.py -e
@@ -262,7 +262,7 @@ jobs:
     needs: build-release
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
 
