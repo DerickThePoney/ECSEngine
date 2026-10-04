@@ -127,7 +127,7 @@ bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
         return false;
     }
 
-    if (Handle.FId > FRigidbodies.size())
+    if (Handle.FId >= FRigidbodies.size())
     {
         return false;
     }
