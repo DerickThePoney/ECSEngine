@@ -50,10 +50,10 @@ void Island::Initialise()
         RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(C->FFirstBody);
         RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(C->FSecondBody);
         AssertRelease(bodyA && bodyB);
-        CS.CenterA = bodyA->FPosition;
-        CS.CenterB = bodyB->FPosition;
-        CS.IA = bodyA->FInverseInertiaTensor;
-        CS.IB = bodyB->FInverseInertiaTensor;
+        CS.CenterA = bodyA->FCenterOfMassWorld;
+        CS.CenterB = bodyB->FCenterOfMassWorld;
+        CS.IA = bodyA->FInverseInertiaTensorWorld;
+        CS.IB = bodyB->FInverseInertiaTensorWorld;
         CS.MA = bodyA->FInvMass;
         CS.MB = bodyB->FInvMass;
 
@@ -158,11 +158,13 @@ void Island::Solve(float parDeltaTime)
         if (sqrLinVel > linTol || sqrAngVel > angTol)
         {
             const vec3 displacement = body->FVelocity * parDeltaTime;
-            body->FPosition += displacement;
+            body->FCenterOfMassWorld += displacement;
             body->FOrientation = AddVectorToQuaternion(body->FOrientation, body->FRotationVelocity * parDeltaTime);
+            vec3 oldPosition = body->FPosition;
+            body->FPosition = body->FCenterOfMassWorld - (mat4(body->FOrientation) * vec4::MakeHomogeneousPositionVec4(body->FCenterOfMassLocal)).xyz();
             body->FSleepingTimer = 0.f;
             MinSleepTimer = 0.f;
-            Engine.AddMovedBody(body, displacement);
+            Engine.AddMovedBody(body, body->FPosition - oldPosition);
         }
         else
         {

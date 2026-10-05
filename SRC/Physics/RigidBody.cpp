@@ -76,5 +76,10 @@ bool RigidBody::IsAwake() const
     return FFlags.GetValue(ERigidBodyFlag::RB_AWAKE);
 }
 
+void RigidBody::UpdateCoMWorld()
+{
+    FCenterOfMassWorld = (GetTransform() * vec4::MakeHomogeneousPositionVec4(FCenterOfMassLocal)).xyz();
+}
+
 } // namespace Physics
 } // namespace ECSEngine

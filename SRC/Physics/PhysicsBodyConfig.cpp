@@ -6,6 +6,11 @@ namespace ECSEngine
 {
 namespace Physics
 {
+vec3 PhysicsBodyConfig::ComputeCoMLocal() const
+{
+    return FShape.GetCenter();
+}
+
 void PhysicsBodyConfig::DrawInEditor()
 {
     ImGui::PushID(this);

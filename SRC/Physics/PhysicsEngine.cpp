@@ -150,6 +150,7 @@ bool PhysicsEngine::SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3&
     }
 
     body->FPosition = Position;
+    body->UpdateCoMWorld();
     return true;
 }
 
@@ -174,6 +175,8 @@ bool PhysicsEngine::SetBodyOrientation(const PhysicsBodyHandle& Handle, const qu
     }
 
     body->FOrientation = Orientation;
+    body->UpdateCoMWorld();
+    UpdateInertiaTransform(body);
     return true;
 }
 
@@ -267,7 +270,7 @@ bool PhysicsEngine::AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const
         PointToUse = (Translation(body->FPosition) * (mat4)body->FOrientation * vec4::MakeHomogeneousPositionVec4(Point)).xyz();
     }
 
-    PointToUse -= body->FPosition;
+    PointToUse -= body->FCenterOfMassWorld;
 
     body->AddForce(Force, bTreatAsAcceleration);
 
@@ -318,7 +321,7 @@ bool PhysicsEngine::AddImpulseAtPointToBody(const PhysicsBodyHandle& Handle, con
         PointToUse = (Translation(body->FPosition) * (mat4)body->FOrientation * vec4::MakeHomogeneousPositionVec4(Point)).xyz();
     }
 
-    PointToUse -= body->FPosition;
+    PointToUse -= body->FCenterOfMassWorld;
     body->AddImpulse(Impulse, bTreatAsVelocityChange);
 
     vec3 RotationImpulseToAdd = Cross(PointToUse, Impulse);
@@ -375,6 +378,9 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
         Body->FInverseInertiaTensor = mat3();
     }
 
+    Body->FCenterOfMassLocal = BodyConfig.ComputeCoMLocal();
+    Body->FCenterOfMassWorld = (Transform * vec4::MakeHomogeneousPositionVec4(Body->FCenterOfMassLocal)).xyz();
+
     Body->FCollisionShape = BodyConfig.FShape;
 
     // Init damping coefficients
@@ -382,6 +388,8 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     Body->FAngularDamping = BodyConfig.FAngularDamping;
     if (!BodyConfig.FApplyGravity)
         Body->FGravityScale = 0.f;
+
+    UpdateInertiaTransform(Body);
 
     Body->SetAwake(true);
 }
