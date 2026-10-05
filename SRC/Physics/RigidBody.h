@@ -42,7 +42,7 @@ public:
 
     // COM
     vec3 FCenterOfMassLocal;
-    /*vec3 FCenterOfMassWorld;*/
+    vec3 FCenterOfMassWorld;
 
     // Mass and inertia
     mat3 FInertiaTensor;
@@ -77,6 +77,8 @@ public:
 
     void SetAwake(bool bValue);
     bool IsAwake() const;
+
+    void UpdateCoMWorld();
 
     BitSet<ERigidBodyFlag::RB_COUNT> FFlags;
 };

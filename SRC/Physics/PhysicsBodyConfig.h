@@ -27,6 +27,8 @@ struct PhysicsBodyConfig
     float FRestitution = 0.2f;
     float FFriction = 0.4f;
 
+    vec3 ComputeCoMLocal() const;
+
     // TO ADD:
     // - Colliders/PhysicsShapes
     // - Collision channels
