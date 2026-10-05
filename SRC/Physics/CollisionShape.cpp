@@ -192,65 +192,62 @@ float CollisionShape::GetRadius() const
 
 void CollisionShape::DrawInEditor()
 {
-    if (ImGui::CollapsingHeader("CollisionShape"))
+    ImGui::Indent();
+    if (ImGui::BeginCombo("Shape Type", GetName(FShapeType).c_str()))
     {
-        ImGui::Indent();
-        if (ImGui::BeginCombo("Shape Type", GetName(FShapeType).c_str()))
         {
-            {
-                bool is_selected = (FShapeType == ECollisionShape::NONE);
-                if (ImGui::Selectable(GetName(ECollisionShape::NONE).c_str(), is_selected))
-                    FShapeType = ECollisionShape::NONE;
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();
-            }
-
-            {
-                bool is_selected = (FShapeType == ECollisionShape::BOX);
-                if (ImGui::Selectable(GetName(ECollisionShape::BOX).c_str(), is_selected))
-                    FShapeType = ECollisionShape::BOX;
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();
-            }
-
-            {
-                bool is_selected = (FShapeType == ECollisionShape::SPHERE);
-                if (ImGui::Selectable(GetName(ECollisionShape::SPHERE).c_str(), is_selected))
-                    FShapeType = ECollisionShape::SPHERE;
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();
-            }
-
-            {
-                bool is_selected = (FShapeType == ECollisionShape::CAPSULE);
-                if (ImGui::Selectable(GetName(ECollisionShape::CAPSULE).c_str(), is_selected))
-                    FShapeType = ECollisionShape::CAPSULE;
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();
-            }
-
-            ImGui::EndCombo();
+            bool is_selected = (FShapeType == ECollisionShape::NONE);
+            if (ImGui::Selectable(GetName(ECollisionShape::NONE).c_str(), is_selected))
+                FShapeType = ECollisionShape::NONE;
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
         }
 
-        EDITOR_PROPERTY_SIMPLE("Offset", FCenter);
-
-        switch (FShapeType)
         {
-        case ECSEngine::Physics::ECollisionShape::BOX:
-            EDITOR_PROPERTY_WITH_LIMITS("Extents", FShapeData.FBoxData.FExtents, vec3(0.f), vec3(10000.f));
-            break;
-        case ECSEngine::Physics::ECollisionShape::SPHERE:
-            EDITOR_PROPERTY_WITH_LIMITS("Radius", FShapeData.FSphereData.Radius, 0.f, 10000.f);
-            break;
-        case ECSEngine::Physics::ECollisionShape::CAPSULE:
-            EDITOR_PROPERTY_WITH_LIMITS("Radius", FShapeData.FCapsuleData.Radius, 0.f, 10000.f);
-            EDITOR_PROPERTY_WITH_LIMITS("HalfLength", FShapeData.FCapsuleData.HalfLength, 0.f, 10000.f);
-            break;
-        default:
-            break;
+            bool is_selected = (FShapeType == ECollisionShape::BOX);
+            if (ImGui::Selectable(GetName(ECollisionShape::BOX).c_str(), is_selected))
+                FShapeType = ECollisionShape::BOX;
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
         }
-        ImGui::Unindent();
+
+        {
+            bool is_selected = (FShapeType == ECollisionShape::SPHERE);
+            if (ImGui::Selectable(GetName(ECollisionShape::SPHERE).c_str(), is_selected))
+                FShapeType = ECollisionShape::SPHERE;
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+
+        {
+            bool is_selected = (FShapeType == ECollisionShape::CAPSULE);
+            if (ImGui::Selectable(GetName(ECollisionShape::CAPSULE).c_str(), is_selected))
+                FShapeType = ECollisionShape::CAPSULE;
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+
+        ImGui::EndCombo();
     }
+
+    EDITOR_PROPERTY_SIMPLE("Offset", FCenter);
+
+    switch (FShapeType)
+    {
+    case ECSEngine::Physics::ECollisionShape::BOX:
+        EDITOR_PROPERTY_WITH_LIMITS("Extents", FShapeData.FBoxData.FExtents, vec3(0.f), vec3(10000.f));
+        break;
+    case ECSEngine::Physics::ECollisionShape::SPHERE:
+        EDITOR_PROPERTY_WITH_LIMITS("Radius", FShapeData.FSphereData.Radius, 0.f, 10000.f);
+        break;
+    case ECSEngine::Physics::ECollisionShape::CAPSULE:
+        EDITOR_PROPERTY_WITH_LIMITS("Radius", FShapeData.FCapsuleData.Radius, 0.f, 10000.f);
+        EDITOR_PROPERTY_WITH_LIMITS("HalfLength", FShapeData.FCapsuleData.HalfLength, 0.f, 10000.f);
+        break;
+    default:
+        break;
+    }
+    ImGui::Unindent();
 }
 
 } // namespace Physics

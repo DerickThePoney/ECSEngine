@@ -8,7 +8,8 @@ namespace Physics
 {
 vec3 PhysicsBodyConfig::ComputeCoMLocal() const
 {
-    return FShape.GetCenter();
+    // TODO: Compute proper centroid.
+    return FShapes[0].GetCenter();
 }
 
 void PhysicsBodyConfig::DrawInEditor()
@@ -42,7 +43,15 @@ void PhysicsBodyConfig::DrawInEditor()
         ImGui::SliderFloat("Density", &FDensity, 0.f, 50.f);
     }
 
-    FShape.DrawInEditor();
+    auto ShapeDrawer = [](std::string& parName, CollisionShape& parShape)
+    {
+        ImGui::PushID(ImGui::GetID(&parName));
+        if (ImGui::CollapsingHeader(parName.c_str()))
+            parShape.DrawInEditor();
+        ImGui::PopID();
+    };
+
+    EDITOR_PROPERTY_COMPLEXVECTOR(CollisionShape, "Shapes", FShapes, false, ShapeDrawer, true);
 
     ImGui::SliderFloat("Linear damping", &FLinearDamping, 0.f, 4.f);
     ImGui::SliderFloat("Angular damping", &FAngularDamping, 0.f, 4.f);
