@@ -465,11 +465,33 @@ void ClosestPointsSegmentAABB(const vec3& parAS, const vec3& parAE, const vec3& 
     for (const vec3& endpoint : endpoints)
     {
         const vec3 clamped = Clamp(endpoint, parMin, parMax);
+        const float distSq = LengthSq(endpoint - clamped);
+
+        // Clamp identity ⇒ endpoint is inside the solid; treat as interior MTD.
+        if (distSq <= 1e-12f)
+        {
+            vec3 surfacePoint;
+            float exitDepth = 0.f;
+            u8 faceAxis = 0;
+            float faceSign = 1.f;
+            ComputeMinFaceExit(endpoint, parMin, parMax, surfacePoint, exitDepth, faceAxis, faceSign);
+
+            outResult.OnSegment = endpoint;
+            outResult.OnAABB = surfacePoint;
+            outResult.DistSq = 0.f;
+            outResult.ExitDepth = exitDepth;
+            outResult.Interior = true;
+            outResult.Feature = ESegmentAABBFeature::Interior;
+            outResult.FaceAxis = faceAxis;
+            outResult.FaceSign = faceSign;
+            return;
+        }
+
         ESegmentAABBFeature feature = ESegmentAABBFeature::Vertex;
         u8 faceAxis = 0;
         float faceSign = 1.f;
         ClassifyClampedFeature(endpoint, clamped, parMin, parMax, feature, faceAxis, faceSign);
-        ConsiderCandidate(endpoint, clamped, LengthSq(endpoint - clamped), feature, faceAxis, faceSign, outResult);
+        ConsiderCandidate(endpoint, clamped, distSq, feature, faceAxis, faceSign, outResult);
     }
 
     // Six face rectangles.
