@@ -97,39 +97,12 @@ bool TryEmitFaceManifold(Contact* C,
     if (axisAlongNormal > kMaxAlignWithNormal)
         return false;
 
+    // Clip only against the face rectangle (UV). Do NOT shrink the span with a plane-distance
+    // slab here: a slight tip would clip one end and leave both contacts on the low half,
+    // which torques the capsule. Per-point radius checks below reject ends that are too far.
     float tMin = 0.f;
     float tMax = 1.f;
     constexpr float kEps = 1e-6f;
-
-    // Exterior: keep 0 <= exteriorDistance <= radius.
-    // Interior: keep exteriorDistance <= 0 (on/inside the exit face).
-    const float faceSign = parClosest.FaceSign;
-    const float startAxis = Component(parASLocal, axis);
-    const float deltaAxis = Component(Delta, axis);
-    const float startExterior = faceSign * (startAxis - plane);
-    const float deltaExterior = faceSign * deltaAxis;
-    const float minExterior = parClosest.Interior ? -1e20f : 0.f;
-    const float maxExterior = parClosest.Interior ? 0.f : parRadiusA;
-
-    if (fabsf(deltaExterior) > kEps)
-    {
-        const float tAtMax = (maxExterior - startExterior) / deltaExterior;
-        const float tAtMin = (minExterior - startExterior) / deltaExterior;
-        if (deltaExterior > 0.f)
-        {
-            tMin = Max(tMin, tAtMin);
-            tMax = Min(tMax, tAtMax);
-        }
-        else
-        {
-            tMin = Max(tMin, tAtMax);
-            tMax = Min(tMax, tAtMin);
-        }
-    }
-    else if (startExterior < minExterior - kEps || startExterior > maxExterior + kEps)
-    {
-        return false;
-    }
 
     auto ClipAgainstSlab = [&](u8 parClipAxis, float parMin, float parMax)
     {
@@ -163,17 +136,10 @@ bool TryEmitFaceManifold(Contact* C,
     if (tMin > tMax)
         return false;
 
-    // Overlap too short → treat as a single point contact.
-    constexpr float kMinOverlapT = 0.05f;
-    if ((tMax - tMin) <= kMinOverlapT)
-        return false;
-
-    // Prefer contacts on either side of the capsule center whenever the valid face overlap
-    // allows it. If the overlap sits entirely on one half (partial face coverage or a slight
-    // tip that clipped the other end), fall back to a single closest contact instead of an
-    // unbalanced pair that torques the capsule.
+    // Need real support on either side of the capsule center (not a barely-straddling pair).
     constexpr float kCenterT = 0.5f;
-    if (tMin >= kCenterT - kEps || tMax <= kCenterT + kEps)
+    constexpr float kMinSideT = 0.2f; // >= 20% of segment length on each side of center
+    if (tMin > kCenterT - kMinSideT || tMax < kCenterT + kMinSideT)
         return false;
 
     auto BuildPointAtT = [&](float t, vec3& outOnSeg, vec3& outOnBox, float& outPenetration) -> bool
@@ -184,10 +150,13 @@ bool TryEmitFaceManifold(Contact* C,
         SetComponent(outOnBox, uAxis, Clamp(Component(outOnSeg, uAxis), uMin, uMax));
         SetComponent(outOnBox, vAxis, Clamp(Component(outOnSeg, vAxis), vMin, vMax));
 
-        if (parClosest.Interior)
+        // Inside the solid: depth from the exit face.
+        const float exteriorDistance = parClosest.FaceSign * (Component(outOnSeg, axis) - plane);
+        if (exteriorDistance < 0.f)
         {
-            const float exitDepth = fabsf(Component(outOnSeg, axis) - plane);
-            outPenetration = -(parRadiusA + exitDepth);
+            outPenetration = -(parRadiusA - exteriorDistance); // radius + depth
+            // Keep the box point on the face plane for a stable normal/position.
+            SetComponent(outOnBox, axis, plane);
             return true;
         }
 
@@ -200,6 +169,7 @@ bool TryEmitFaceManifold(Contact* C,
 
     vec3 onSeg0, onBox0, onSeg1, onBox1;
     float pen0 = 0.f, pen1 = 0.f;
+    // Extremes of the face overlap → one contact toward each end when both are in range.
     if (!BuildPointAtT(tMin, onSeg0, onBox0, pen0) || !BuildPointAtT(tMax, onSeg1, onBox1, pen1))
         return false;
 
