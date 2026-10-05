@@ -93,7 +93,7 @@ bool TryEmitFaceManifold(Contact* C,
     // to the face normal. Any meaningful end-on component → keep a single closest contact
     // so the manifold does not shift while the capsule is still tipping.
     const float axisAlongNormal = fabsf(Component(Delta, axis)) / sqrtf(segmentLenSq);
-    constexpr float kMaxAlignWithNormal = 0.05f; // ~81°+ from the face normal
+    constexpr float kMaxAlignWithNormal = 0.05f; // nearly perpendicular to the face normal
     if (axisAlongNormal > kMaxAlignWithNormal)
         return false;
 
@@ -168,35 +168,44 @@ bool TryEmitFaceManifold(Contact* C,
     if ((tMax - tMin) <= kMinOverlapT)
         return false;
 
-    auto TryEmitAtT = [&](float t) -> bool
-    {
-        const vec3 onSegLocal = parASLocal + Delta * t;
-        vec3 onBoxLocal = onSegLocal;
-        SetComponent(onBoxLocal, axis, plane);
-        SetComponent(onBoxLocal, uAxis, Clamp(Component(onSegLocal, uAxis), uMin, uMax));
-        SetComponent(onBoxLocal, vAxis, Clamp(Component(onSegLocal, vAxis), vMin, vMax));
+    // Prefer contacts on either side of the capsule center whenever the valid face overlap
+    // allows it. If the overlap sits entirely on one half (partial face coverage or a slight
+    // tip that clipped the other end), fall back to a single closest contact instead of an
+    // unbalanced pair that torques the capsule.
+    constexpr float kCenterT = 0.5f;
+    if (tMin >= kCenterT - kEps || tMax <= kCenterT + kEps)
+        return false;
 
-        float penetration = 0.f;
+    auto BuildPointAtT = [&](float t, vec3& outOnSeg, vec3& outOnBox, float& outPenetration) -> bool
+    {
+        outOnSeg = parASLocal + Delta * t;
+        outOnBox = outOnSeg;
+        SetComponent(outOnBox, axis, plane);
+        SetComponent(outOnBox, uAxis, Clamp(Component(outOnSeg, uAxis), uMin, uMax));
+        SetComponent(outOnBox, vAxis, Clamp(Component(outOnSeg, vAxis), vMin, vMax));
+
         if (parClosest.Interior)
         {
-            const float exitDepth = fabsf(Component(onSegLocal, axis) - plane);
-            penetration = -(parRadiusA + exitDepth);
-        }
-        else
-        {
-            const float dist = Length(onSegLocal - onBoxLocal);
-            if (dist > parRadiusA + 1e-4f)
-                return false;
-            penetration = dist - parRadiusA;
+            const float exitDepth = fabsf(Component(outOnSeg, axis) - plane);
+            outPenetration = -(parRadiusA + exitDepth);
+            return true;
         }
 
-        EmitContactPoint(C, parTransformB, onSegLocal, onBoxLocal, parRadiusA, penetration, parInvertResult);
+        const float dist = Length(outOnSeg - outOnBox);
+        if (dist > parRadiusA + 1e-4f)
+            return false;
+        outPenetration = dist - parRadiusA;
         return true;
     };
 
-    const bool emitted0 = TryEmitAtT(tMin);
-    const bool emitted1 = TryEmitAtT(tMax);
-    return emitted0 || emitted1;
+    vec3 onSeg0, onBox0, onSeg1, onBox1;
+    float pen0 = 0.f, pen1 = 0.f;
+    if (!BuildPointAtT(tMin, onSeg0, onBox0, pen0) || !BuildPointAtT(tMax, onSeg1, onBox1, pen1))
+        return false;
+
+    EmitContactPoint(C, parTransformB, onSeg0, onBox0, parRadiusA, pen0, parInvertResult);
+    EmitContactPoint(C, parTransformB, onSeg1, onBox1, parRadiusA, pen1, parInvertResult);
+    return true;
 }
 } // namespace
 
