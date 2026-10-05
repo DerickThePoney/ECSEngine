@@ -42,25 +42,33 @@ void SetComponent(vec3& parV, u8 parAxis, float parValue)
 
 void EmitContactPoint(Contact* C,
       const mat4& parTransformB,
-      const vec3& parOnSegLocal,
       const vec3& parOnBoxLocal,
-      const float parRadiusA,
       const float parPenetration,
-      const bool parInvertResult)
+      const FeaturePair& parFeature)
 {
-    const vec3 OnSeg = (parTransformB * vec4::MakeHomogeneousPositionVec4(parOnSegLocal)).xyz();
-    const vec3 OnBox = (parTransformB * vec4::MakeHomogeneousPositionVec4(parOnBoxLocal)).xyz();
-
+    // Always on the box face (same as OBBSphereIntersection). Using the capsule
+    // surface offset when the capsule was body A sank contacts below the face
+    // during penetration and made debug manifolds look detached.
     ContactPoint CP;
-    // Capsule as body A: same convention as CapsuleSphereIntersection (offset along final normal).
-    // Box as body A: contact on the box surface (same as OBBSphereIntersection).
-    CP.FPosition = parInvertResult ? (OnSeg + C->FContactNormal * parRadiusA) : OnBox;
+    CP.FPosition = (parTransformB * vec4::MakeHomogeneousPositionVec4(parOnBoxLocal)).xyz();
     CP.FPenetration = parPenetration;
+    CP.FP = parFeature;
     C->FManifold.FContactPoints.push_back(CP);
 }
 
-// When the capsule lies along a face, clip the segment to that face and emit the two ends of the
-// overlap. End-on / edge / vertex hits keep a single closest contact instead.
+FeaturePair MakeCapsuleFeature(u8 parFaceAxis, float parFaceSign, u8 parPointIndex)
+{
+    FeaturePair pair;
+    pair.inR = parFaceAxis;
+    pair.outR = (parFaceSign > 0.f) ? 1 : 0;
+    pair.inI = parPointIndex;
+    pair.outI = 0;
+    return pair;
+}
+
+// When the capsule lies along a face, clip the segment to that face and emit two
+// contacts placed symmetrically about the capsule center. End-on / edge / vertex
+// hits keep a single closest contact instead.
 bool TryEmitFaceManifold(Contact* C,
       const mat4& parTransformB,
       const vec3& parASLocal,
@@ -68,8 +76,7 @@ bool TryEmitFaceManifold(Contact* C,
       const vec3& parMinB,
       const vec3& parMaxB,
       const GeometryHelpers::SegmentAABBClosestResult& parClosest,
-      const float parRadiusA,
-      const bool parInvertResult)
+      const float parRadiusA)
 {
     if (parClosest.Feature != GeometryHelpers::ESegmentAABBFeature::Face && parClosest.Feature != GeometryHelpers::ESegmentAABBFeature::Interior)
         return false;
@@ -136,22 +143,28 @@ bool TryEmitFaceManifold(Contact* C,
     if (tMin > tMax)
         return false;
 
-    // Need real support on either side of the capsule center (not a barely-straddling pair).
+    // Place contacts symmetrically about the segment center within the face overlap.
+    // Emitting the raw clip extremes allowed pairs like (0.3, 1.0) that both sit on one
+    // half of the capsule and produce a persistent yaw/slide torque.
     constexpr float kCenterT = 0.5f;
     constexpr float kMinSideT = 0.2f; // >= 20% of segment length on each side of center
-    if (tMin > kCenterT - kMinSideT || tMax < kCenterT + kMinSideT)
+    const float lever = Min(kCenterT - tMin, tMax - kCenterT);
+    if (lever + 1e-4f < kMinSideT)
         return false;
 
-    auto BuildPointAtT = [&](float t, vec3& outOnSeg, vec3& outOnBox, float& outPenetration) -> bool
+    const float t0 = kCenterT - lever;
+    const float t1 = kCenterT + lever;
+
+    auto BuildPointAtT = [&](float t, vec3& outOnBox, float& outPenetration) -> bool
     {
-        outOnSeg = parASLocal + Delta * t;
-        outOnBox = outOnSeg;
+        const vec3 onSeg = parASLocal + Delta * t;
+        outOnBox = onSeg;
         SetComponent(outOnBox, axis, plane);
-        SetComponent(outOnBox, uAxis, Clamp(Component(outOnSeg, uAxis), uMin, uMax));
-        SetComponent(outOnBox, vAxis, Clamp(Component(outOnSeg, vAxis), vMin, vMax));
+        SetComponent(outOnBox, uAxis, Clamp(Component(onSeg, uAxis), uMin, uMax));
+        SetComponent(outOnBox, vAxis, Clamp(Component(onSeg, vAxis), vMin, vMax));
 
         // Inside the solid: depth from the exit face.
-        const float exteriorDistance = parClosest.FaceSign * (Component(outOnSeg, axis) - plane);
+        const float exteriorDistance = parClosest.FaceSign * (Component(onSeg, axis) - plane);
         if (exteriorDistance < 0.f)
         {
             outPenetration = -(parRadiusA - exteriorDistance); // radius + depth
@@ -160,21 +173,20 @@ bool TryEmitFaceManifold(Contact* C,
             return true;
         }
 
-        const float dist = Length(outOnSeg - outOnBox);
+        const float dist = Length(onSeg - outOnBox);
         if (dist > parRadiusA + 1e-4f)
             return false;
         outPenetration = dist - parRadiusA;
         return true;
     };
 
-    vec3 onSeg0, onBox0, onSeg1, onBox1;
+    vec3 onBox0, onBox1;
     float pen0 = 0.f, pen1 = 0.f;
-    // Extremes of the face overlap → one contact toward each end when both are in range.
-    if (!BuildPointAtT(tMin, onSeg0, onBox0, pen0) || !BuildPointAtT(tMax, onSeg1, onBox1, pen1))
+    if (!BuildPointAtT(t0, onBox0, pen0) || !BuildPointAtT(t1, onBox1, pen1))
         return false;
 
-    EmitContactPoint(C, parTransformB, onSeg0, onBox0, parRadiusA, pen0, parInvertResult);
-    EmitContactPoint(C, parTransformB, onSeg1, onBox1, parRadiusA, pen1, parInvertResult);
+    EmitContactPoint(C, parTransformB, onBox0, pen0, MakeCapsuleFeature(axis, parClosest.FaceSign, 0));
+    EmitContactPoint(C, parTransformB, onBox1, pen1, MakeCapsuleFeature(axis, parClosest.FaceSign, 1));
     return true;
 }
 } // namespace
@@ -236,13 +248,13 @@ bool OBBCapsuleIntersection(Contact* C,
 
     C->FContactNormal = parInvertResult ? Invert(NormalBoxToCap) : NormalBoxToCap;
 
-    // Lying on a face → up to 2 contacts at the ends of the face overlap.
+    // Lying on a face → up to 2 contacts symmetric about the capsule center.
     // Edge / vertex / end-on → fall through to a single closest contact.
-    if (TryEmitFaceManifold(C, parTransformB, ASLocal, AELocal, MinB, MaxB, Closest, parRadiusA, parInvertResult))
+    if (TryEmitFaceManifold(C, parTransformB, ASLocal, AELocal, MinB, MaxB, Closest, parRadiusA))
         return !C->FManifold.FContactPoints.empty();
 
     const float penetration = Closest.Interior ? -(parRadiusA + Closest.ExitDepth) : (sqrtf(Closest.DistSq) - parRadiusA);
-    EmitContactPoint(C, parTransformB, Closest.OnSegment, Closest.OnAABB, parRadiusA, penetration, parInvertResult);
+    EmitContactPoint(C, parTransformB, Closest.OnAABB, penetration, MakeCapsuleFeature(Closest.FaceAxis, Closest.FaceSign, 0));
     return true;
 }
 } // namespace Physics
