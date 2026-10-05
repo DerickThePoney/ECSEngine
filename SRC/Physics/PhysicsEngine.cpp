@@ -363,7 +363,7 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
             Body->FMass = BodyConfig.FMass;
         }
 
-        Body->FInvMass = (BodyConfig.FMass != 0.f) ? 1.f / BodyConfig.FMass : 1.f;
+        Body->FInvMass = (Body->FMass != 0.f) ? 1.f / Body->FMass : 1.f;
         Body->FInertiaTensor = BodyConfig.FShape.ComputeInertiaTensor(Body->FMass);
         Body->FInverseInertiaTensor = Invert(Body->FInertiaTensor);
     }
