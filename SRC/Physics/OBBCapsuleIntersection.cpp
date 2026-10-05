@@ -89,10 +89,12 @@ bool TryEmitFaceManifold(Contact* C,
     if (segmentLenSq <= 1e-8f)
         return false;
 
-    // End-on to the face: axis nearly parallel to the face normal → one contact is enough.
+    // Two contacts only when the capsule is lying on the face: axis nearly perpendicular
+    // to the face normal. Any meaningful end-on component → keep a single closest contact
+    // so the manifold does not shift while the capsule is still tipping.
     const float axisAlongNormal = fabsf(Component(Delta, axis)) / sqrtf(segmentLenSq);
-    constexpr float kLyingDotThreshold = 0.5f; // ~60 degrees from face normal
-    if (axisAlongNormal > kLyingDotThreshold)
+    constexpr float kMaxAlignWithNormal = 0.05f; // ~81°+ from the face normal
+    if (axisAlongNormal > kMaxAlignWithNormal)
         return false;
 
     float tMin = 0.f;
@@ -129,7 +131,8 @@ bool TryEmitFaceManifold(Contact* C,
         return false;
     }
 
-    auto ClipAgainstSlab = [&](u8 parClipAxis, float parMin, float parMax) {
+    auto ClipAgainstSlab = [&](u8 parClipAxis, float parMin, float parMax)
+    {
         const float s = Component(parASLocal, parClipAxis);
         const float d = Component(Delta, parClipAxis);
         if (fabsf(d) <= kEps)
@@ -165,7 +168,8 @@ bool TryEmitFaceManifold(Contact* C,
     if ((tMax - tMin) <= kMinOverlapT)
         return false;
 
-    auto TryEmitAtT = [&](float t) -> bool {
+    auto TryEmitAtT = [&](float t) -> bool
+    {
         const vec3 onSegLocal = parASLocal + Delta * t;
         vec3 onBoxLocal = onSegLocal;
         SetComponent(onBoxLocal, axis, plane);
