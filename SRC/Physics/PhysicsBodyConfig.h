@@ -14,7 +14,7 @@ struct PhysicsBodyConfig
     bool FAutoComputeMass = false;
     float FMass = 0.f;
     float FDensity = 1.f;
-    CollisionShape FShape;
+    std::vector<CollisionShape> FShapes;
 
     // Drag
     float FLinearDamping = 0.1f;
@@ -30,12 +30,10 @@ struct PhysicsBodyConfig
     vec3 ComputeCoMLocal() const;
 
     // TO ADD:
-    // - Colliders/PhysicsShapes
     // - Collision channels
     // - Drag (angular and linear)
     // - MassComputation
     // - Proper CoM computation
-    // - Moveability
 
     SERIALIZE()
     {
@@ -43,7 +41,7 @@ struct PhysicsBodyConfig
         PROPERTYFIELD(AutoComputeMass, false);
         PROPERTYFIELD(Mass, 0.f);
         PROPERTYFIELD(Density, 1.f);
-        PROPERTYFIELD(Shape, CollisionShape());
+        PROPERTYFIELD(Shapes, std::vector<CollisionShape>());
         PROPERTYFIELD(LinearDamping, 0.1f);
         PROPERTYFIELD(AngularDamping, 0.01f);
         PROPERTYFIELD(Moveability, EPhysicsMoveability::STATIC);
