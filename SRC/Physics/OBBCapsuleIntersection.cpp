@@ -78,45 +78,53 @@ void EmitFaceManifold(Contact* C, const mat4& parTransformB, const vec3& parASLo
     float tMax = 1.f;
     constexpr float kEps = 1e-6f;
 
-    if (fabsf(deltaAxis) > kEps)
-    {
-        // Signed distance from plane toward the exterior: FaceSign * (coord - plane)
-        // Outside contact when exteriorDistance <= radius; interior when exteriorDistance <= 0.
-        const float enterLimit = parClosest.Interior ? 0.f : parRadiusA;
-
-        // FaceSign * (startAxis + t * deltaAxis - plane) <= enterLimit
-        // FaceSign * deltaAxis * t <= enterLimit - FaceSign * (startAxis - plane)
+    // Exterior face contacts live in the slab 0 <= exteriorDistance <= radius.
+    // Interior contacts keep exteriorDistance <= 0 (on/inside the exit face).
+    // Previously only the upper bound was applied, which kept the entire interior half-space.
+    auto ClipToPlaneSlab = [&](float parMinExterior, float parMaxExterior) {
+        // FaceSign * (startAxis + t * deltaAxis - plane) in [parMinExterior, parMaxExterior]
         const float faceSign = parClosest.FaceSign;
-        const float rhs = enterLimit - faceSign * (startAxis - plane);
-        const float coeff = faceSign * deltaAxis;
+        const float startExterior = faceSign * (startAxis - plane);
+        const float deltaExterior = faceSign * deltaAxis;
 
-        if (fabsf(coeff) > kEps)
+        if (fabsf(deltaExterior) > kEps)
         {
-            const float tBound = rhs / coeff;
-            if (coeff > 0.f)
-                tMax = Min(tMax, tBound);
-            else
-                tMin = Max(tMin, tBound);
+            // t for exterior == bound: startExterior + t * deltaExterior = bound
+            auto ClipBound = [&](float parBound, bool parKeepBelow) {
+                const float tBound = (parBound - startExterior) / deltaExterior;
+                if (parKeepBelow)
+                {
+                    if (deltaExterior > 0.f)
+                        tMax = Min(tMax, tBound);
+                    else
+                        tMin = Max(tMin, tBound);
+                }
+                else
+                {
+                    if (deltaExterior > 0.f)
+                        tMin = Max(tMin, tBound);
+                    else
+                        tMax = Min(tMax, tBound);
+                }
+            };
+
+            ClipBound(parMaxExterior, true);  // exterior <= max
+            ClipBound(parMinExterior, false); // exterior >= min
         }
-        else if (rhs < 0.f)
+        else
         {
-            // Entire segment is outside the contact slab.
-            EmitContact(C, parTransformB, parClosest.OnSegment, parClosest.OnAABB, parCapsuleOffsetDir, parRadiusA,
-                  parClosest.Interior ? (parRadiusA + parClosest.ExitDepth) : (parRadiusA - sqrtf(parClosest.DistSq)), parInvertResult);
-            return;
+            if (startExterior < parMinExterior - kEps || startExterior > parMaxExterior + kEps)
+            {
+                tMin = 1.f;
+                tMax = 0.f;
+            }
         }
-    }
+    };
+
+    if (parClosest.Interior)
+        ClipToPlaneSlab(-std::numeric_limits<float>::max(), 0.f);
     else
-    {
-        const float exteriorDistance = parClosest.FaceSign * (startAxis - plane);
-        const float enterLimit = parClosest.Interior ? 0.f : parRadiusA;
-        if (exteriorDistance > enterLimit + kEps)
-        {
-            EmitContact(C, parTransformB, parClosest.OnSegment, parClosest.OnAABB, parCapsuleOffsetDir, parRadiusA, parRadiusA - sqrtf(parClosest.DistSq),
-                  parInvertResult);
-            return;
-        }
-    }
+        ClipToPlaneSlab(0.f, parRadiusA);
 
     if (tMin > tMax)
     {
@@ -254,9 +262,10 @@ bool OBBCapsuleIntersection(Contact* C,
     const vec3 NormalBoxToCap = (parTransformB * vec4::MakeHomogeneousDirectionVec4(SeparatingNormalLocal)).xyz();
     C->FContactNormal = parInvertResult ? Invert(NormalBoxToCap) : NormalBoxToCap;
 
-    // Direction used as OnSeg - offsetDir * radius to reach the capsule surface facing the box.
-    // Interior needs the opposite of the separating normal so the offset moves toward the exit face.
-    const vec3 CapsuleOffsetDir = Closest.Interior ? Invert(NormalBoxToCap) : NormalBoxToCap;
+    // Offset from the medial axis toward the box: OnSeg - offsetDir * radius.
+    // Always use the separating (box → capsule / outward) direction so the contact sits on the
+    // near side of the capsule. Inverting this for Interior placed phantoms on the far side.
+    const vec3 CapsuleOffsetDir = NormalBoxToCap;
 
     if (Closest.Feature == GeometryHelpers::ESegmentAABBFeature::Face || Closest.Feature == GeometryHelpers::ESegmentAABBFeature::Interior)
     {
