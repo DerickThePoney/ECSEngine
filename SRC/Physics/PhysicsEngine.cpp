@@ -359,7 +359,7 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
         // Init Mass and Inertia
         if (BodyConfig.FAutoComputeMass)
         {
-            Body->FMass = BodyConfig.FShape.ComputeMass(BodyConfig.FDensity);
+            Body->FMass = BodyConfig.FShapes[0].ComputeMass(BodyConfig.FDensity);
         }
         else
         {
@@ -367,7 +367,7 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
         }
 
         Body->FInvMass = (Body->FMass != 0.f) ? 1.f / Body->FMass : 1.f;
-        Body->FInertiaTensor = BodyConfig.FShape.ComputeInertiaTensor(Body->FMass);
+        Body->FInertiaTensor = BodyConfig.FShapes[0].ComputeInertiaTensor(Body->FMass);
         Body->FInverseInertiaTensor = Invert(Body->FInertiaTensor);
     }
     else
@@ -381,7 +381,7 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     Body->FCenterOfMassLocal = BodyConfig.ComputeCoMLocal();
     Body->FCenterOfMassWorld = (Transform * vec4::MakeHomogeneousPositionVec4(Body->FCenterOfMassLocal)).xyz();
 
-    Body->FCollisionShape = BodyConfig.FShape;
+    Body->FCollisionShape = BodyConfig.FShapes[0];
 
     // Init damping coefficients
     Body->FLinearDamping = BodyConfig.FLinearDamping;
