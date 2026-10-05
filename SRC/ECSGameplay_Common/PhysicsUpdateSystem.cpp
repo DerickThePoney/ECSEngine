@@ -63,50 +63,6 @@ void PhysicsUpdateSystem::VirtualUpdate()
             }
         }
     }
-
-#pragma region PhysicsTests
-    foreachitemconst(rigidbody, RigidBodyAccessor)
-    {
-        const EntityId& UnitId = rigidbody.UnitId();
-        PositionModule* positionModule = PositionAccessor[UnitId];
-        if (positionModule == nullptr)
-        {
-            continue;
-        }
-
-        if (positionModule->GetPosition3D().y < -20.f)
-        {
-            vec3 velocity;
-            if (Physics::GetBodyVelocity(rigidbody.BodyHandle(), velocity))
-            {
-                Physics::AddImpulseToBody(rigidbody.BodyHandle(), vec3(0.f, -2.f * velocity.y, 0.f), true);
-            }
-        }
-
-        if (Input::GetButtonDown(InputKeyNames::INPUT_KEY_LEFT_SHIFT))
-        {
-            Physics::AddForceToBody(rigidbody.BodyHandle(), vec3(0.f, 1000.f, 0.f), true);
-        }
-    }
-
-    KeyboardCommand command;
-    command.FInputType = EInputType::REPEATED;
-    command.FKeyboardKey = InputKeyNames::INPUT_KEY_SPACE;
-
-    const bool value = command.Evaluate();
-
-    /*foreachitemconst(rigidbody, RigidBodyAccessor)
-    {
-        const EntityId& UnitId = rigidbody.UnitId();
-
-        Physics::AddTorqueToBody(rigidbody.BodyHandle(), vec3(0.f, 10.f, 0.f));
-
-        if (value)
-        {
-            Physics::AddForceAtPointToBody(rigidbody.BodyHandle(), vec3(0.f, 30.f, 0.f), vec3(-0.5f, -0.5f, 0.f), false, true);
-        }
-    }*/
-#pragma endregion PhysicsTests
 }
 
 } // namespace ECSEngine
