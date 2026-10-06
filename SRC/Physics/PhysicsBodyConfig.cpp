@@ -6,11 +6,6 @@ namespace ECSEngine
 {
 namespace Physics
 {
-vec3 PhysicsBodyConfig::ComputeCoMLocal() const
-{
-    // TODO: Compute proper centroid.
-    return FShapes[0].GetCenter();
-}
 
 void PhysicsBodyConfig::DrawInEditor()
 {
