@@ -132,9 +132,27 @@ bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
         return false;
     }
 
+    RigidBody* body = FRigidbodies[Handle.FId].get();
     FContactManager.RemoveBody(Handle);
     FBroadPhase.RemoveBody(FRigidbodies[Handle.FId].get());
     FHandleGenerator.ReleaseId(Handle.FId);
+
+    switch (body->FMoveabilityType)
+    {
+    case EPhysicsMoveability::STATIC:
+        FStaticRigidbodies.erase(Handle);
+        break;
+    case EPhysicsMoveability::KINEMATIC:
+        FKinematicRigidbodies.erase(Handle);
+        break;
+    case EPhysicsMoveability::PHYICS_ENABLED:
+        FPhysicsRigidbodies.erase(Handle);
+        break;
+    default:
+        AssertNotReached();
+        break;
+    }
+
     FRigidbodies[Handle.FId].reset(nullptr);
 
     return true;
