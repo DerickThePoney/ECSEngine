@@ -18,11 +18,13 @@ void RigidBody::AddForce(const vec3& Force, bool bTreatAsAcceleration)
     {
         FAccelerationDueToForces += Force * FInvMass;
     }
+    SetAwake(true);
 }
 
 void RigidBody::AddTorque(const vec3& Torque)
 {
     FTorque += Torque;
+    SetAwake(true);
 }
 
 void RigidBody::AddImpulse(const vec3& Impulse, bool bTreatAsVelocityChange)
@@ -35,6 +37,7 @@ void RigidBody::AddImpulse(const vec3& Impulse, bool bTreatAsVelocityChange)
     {
         FVelocity += Impulse * FInvMass;
     }
+    SetAwake(true);
 }
 
 void RigidBody::AddRotationImpulse(const vec3& Impulse, bool bTreatAsRotationVelocityChange)
@@ -47,6 +50,7 @@ void RigidBody::AddRotationImpulse(const vec3& Impulse, bool bTreatAsRotationVel
     {
         FRotationVelocity += FInverseInertiaTensorWorld * Impulse;
     }
+    SetAwake(true);
 }
 
 mat4 RigidBody::GetTransform() const
