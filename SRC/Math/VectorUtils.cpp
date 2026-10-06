@@ -1,8 +1,13 @@
 #include "VectorUtils.h"
-#include "Vector.h"
+
 #include "MathFunctions.h"
+#include "Matrix.h"
+#include "Vector.h"
 
-
+ECSEngine::mat3 ECSEngine::MultTranspose(const vec3& A, const vec3& B_T)
+{
+    return mat3(A.x * B_T, A.y * B_T, A.z * B_T);
+}
 
 bool ECSEngine::IsNan(const vec2& A)
 {
