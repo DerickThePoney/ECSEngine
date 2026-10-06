@@ -499,10 +499,11 @@ void PhysicsEngine::DrawDebug()
 void PhysicsEngine::DrawDebugInternal()
 {
     ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bDrawCollisionShapes, false, "Draw CollisionShapes", "Physics/Collisions");
-    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bShowSleepingShapes, false, "Show SleepingShapes", "Physics/Collisions");
 
     if (bDrawCollisionShapes)
     {
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bShowSleepingShapes, false, "Show SleepingShapes", "Physics/Collisions");
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(bShowCenterOfMass, false, "Show CenterOfMass", "Physics/Collisions");
         Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
         u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
         Camera* camera = CameraManager::Instance().GetCamera(camId);
@@ -512,6 +513,7 @@ void PhysicsEngine::DrawDebugInternal()
         static const u32 DynamicShapeColor = ColorUtils::ConvertToU32(vec4(0.f, 1.f, 0.f, 1.f));
         static const u32 StaticShapeColor = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 0.f, 1.f));
         static const u32 SleepingShapeColor = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 1.f, 1.f));
+        static const u32 CoMColor = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 1.f, 1.f));
 
         foreachitemconst(bodyU, FRigidbodies)
         {
@@ -529,6 +531,11 @@ void PhysicsEngine::DrawDebugInternal()
             else if (bShowSleepingShapes && !body->FFlags.GetValue(ERigidBodyFlag::RB_AWAKE))
             {
                 ShapeColor = SleepingShapeColor;
+            }
+
+            if (bShowCenterOfMass)
+            {
+                buffer->DrawDebugSphere(handle, body->FCenterOfMassWorld, 0.1f, CoMColor);
             }
 
             foreachitemconst(shape, body->FCollisionShapes)
