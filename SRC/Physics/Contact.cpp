@@ -18,6 +18,22 @@ namespace Physics
 IMPLEMENT_POOL_ALLOCATED(ContactPoint);
 IMPLEMENT_POOL_ALLOCATED(Contact);
 
+namespace
+{
+// OBBIntersection / OBBSphereIntersection treat Column(3) as the box center and only use HalfExtent.
+// Bake shape offset into the transform and pass an origin-centered AABB so offset compound boxes work.
+mat4 ShapeOBBTransform(const mat4& bodyTransform, const vec3& shapeCenter)
+{
+    return bodyTransform * Translation(shapeCenter);
+}
+
+AABB3f OriginCenteredAABB(const AABB3f& localAABB)
+{
+    const vec3 he = localAABB.HalfExtent();
+    return AABB3f(Invert(he), he);
+}
+} // namespace
+
 void Contact::Evaluate()
 {
     RigidBody* firstBody = PhysicsEngine::Instance().GetRigidBody(FFirstBody);
@@ -45,13 +61,14 @@ void Contact::Evaluate()
                 {
                 case ECollisionShape::BOX:
                 {
-                    bTouching = OBBIntersection(this, firstBody->GetTransform(), ShapeA.GetLocalAABB(), secondBody->GetTransform(), ShapeB.GetLocalAABB());
+                    bTouching = OBBIntersection(this, ShapeOBBTransform(firstBody->GetTransform(), ShapeA.GetCenter()), OriginCenteredAABB(ShapeA.GetLocalAABB()),
+                          ShapeOBBTransform(secondBody->GetTransform(), ShapeB.GetCenter()), OriginCenteredAABB(ShapeB.GetLocalAABB()));
                     break;
                 }
                 case ECollisionShape::SPHERE:
                 {
-                    bTouching = OBBSphereIntersection(this, firstBody->GetTransform(), ShapeA.GetLocalAABB(), secondBody->GetTransform(),
-                          vec4::MakeHomogeneousPositionVec4(ShapeB.GetCenter()), ShapeB.GetRadius(), false);
+                    bTouching = OBBSphereIntersection(this, ShapeOBBTransform(firstBody->GetTransform(), ShapeA.GetCenter()), OriginCenteredAABB(ShapeA.GetLocalAABB()),
+                          secondBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(ShapeB.GetCenter()), ShapeB.GetRadius(), false);
                     break;
                 }
                 case ECollisionShape::CAPSULE:
@@ -70,8 +87,8 @@ void Contact::Evaluate()
                 {
                 case ECollisionShape::BOX:
                 {
-                    bTouching = OBBSphereIntersection(this, secondBody->GetTransform(), ShapeB.GetLocalAABB(), firstBody->GetTransform(),
-                          vec4::MakeHomogeneousPositionVec4(ShapeA.GetCenter()), ShapeA.GetRadius(), true);
+                    bTouching = OBBSphereIntersection(this, ShapeOBBTransform(secondBody->GetTransform(), ShapeB.GetCenter()), OriginCenteredAABB(ShapeB.GetLocalAABB()),
+                          firstBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(ShapeA.GetCenter()), ShapeA.GetRadius(), true);
                     break;
                 }
                 case ECollisionShape::SPHERE:
@@ -145,8 +162,7 @@ void Contact::Evaluate()
     if (!FManifold.FContactPoints.empty())
     {
         auto SortByPenetrationDesc = [](const ContactPoint& A, const ContactPoint& B) -> bool { return A.FPenetration > B.FPenetration; };
-        InPlaceSorting<std::vector<ContactPoint>, ContactPoint>(
-              FManifold.FContactPoints, 0, FManifold.FContactPoints.size() - 1, SortByPenetrationDesc);
+        InPlaceSorting<std::vector<ContactPoint>, ContactPoint>(FManifold.FContactPoints, 0, FManifold.FContactPoints.size() - 1, SortByPenetrationDesc);
 
         constexpr std::size_t kMaxContactPoints = 8;
         if (FManifold.FContactPoints.size() > kMaxContactPoints)
