@@ -167,8 +167,11 @@ bool PhysicsEngine::SetBodyPosition(const PhysicsBodyHandle& Handle, const vec3&
         return false;
     }
 
+    const vec3 Displacement = Position - body->FPosition;
     body->FPosition = Position;
     body->UpdateCoMWorld();
+    body->SetAwake(true);
+    AddMovedBody(body, Displacement);
     return true;
 }
 
@@ -181,6 +184,7 @@ bool PhysicsEngine::SetBodyVelocity(const PhysicsBodyHandle& Handle, const vec3&
     }
 
     body->FVelocity = Velocity;
+    body->SetAwake(true);
     return true;
 }
 
@@ -195,6 +199,8 @@ bool PhysicsEngine::SetBodyOrientation(const PhysicsBodyHandle& Handle, const qu
     body->FOrientation = Orientation;
     body->UpdateCoMWorld();
     UpdateInertiaTransform(body);
+    body->SetAwake(true);
+    AddMovedBody(body, vec3(0.f));
     return true;
 }
 
@@ -207,6 +213,7 @@ bool PhysicsEngine::SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, con
     }
 
     body->FRotationVelocity = RotationVelocity;
+    body->SetAwake(true);
     return true;
 }
 
