@@ -25,28 +25,29 @@ void Contact::Evaluate()
     FManifold.clear();
 
     bool bTouching = false;
-    switch (firstBody->FCollisionShape.GetShapeType())
+    CollisionShape& ShapeA = firstBody->FCollisionShapes[0];
+    CollisionShape& ShapeB = secondBody->FCollisionShapes[0];
+    switch (ShapeA.GetShapeType())
     {
     case ECollisionShape::BOX:
     {
-        switch (secondBody->FCollisionShape.GetShapeType())
+        switch (ShapeB.GetShapeType())
         {
         case ECollisionShape::BOX:
         {
-            bTouching = OBBIntersection(
-                  this, firstBody->GetTransform(), firstBody->FCollisionShape.GetLocalAABB(), secondBody->GetTransform(), secondBody->FCollisionShape.GetLocalAABB());
+            bTouching = OBBIntersection(this, firstBody->GetTransform(), ShapeA.GetLocalAABB(), secondBody->GetTransform(), ShapeB.GetLocalAABB());
             break;
         }
         case ECollisionShape::SPHERE:
         {
-            bTouching = OBBSphereIntersection(this, firstBody->GetTransform(), firstBody->FCollisionShape.GetLocalAABB(), secondBody->GetTransform(),
-                  vec4::MakeHomogeneousPositionVec4(secondBody->FCollisionShape.GetCenter()), secondBody->FCollisionShape.GetRadius(), false);
+            bTouching = OBBSphereIntersection(this, firstBody->GetTransform(), ShapeA.GetLocalAABB(), secondBody->GetTransform(),
+                  vec4::MakeHomogeneousPositionVec4(ShapeB.GetCenter()), ShapeB.GetRadius(), false);
             break;
         }
         case ECollisionShape::CAPSULE:
         {
-            bTouching = OBBCapsuleIntersection(this, secondBody->GetTransform(), secondBody->FCollisionShape.GetCenter(), secondBody->FCollisionShape.GetRadius(),
-                  secondBody->FCollisionShape.GetHalfLength(), firstBody->GetTransform(), firstBody->FCollisionShape.GetLocalAABB(), false);
+            bTouching = OBBCapsuleIntersection(
+                  this, secondBody->GetTransform(), ShapeB.GetCenter(), ShapeB.GetRadius(), ShapeB.GetHalfLength(), firstBody->GetTransform(), ShapeA.GetLocalAABB(), false);
             break;
         }
         default:
@@ -55,25 +56,24 @@ void Contact::Evaluate()
         break;
     }
     case ECollisionShape::SPHERE:
-        switch (secondBody->FCollisionShape.GetShapeType())
+        switch (ShapeB.GetShapeType())
         {
         case ECollisionShape::BOX:
         {
-            bTouching = OBBSphereIntersection(this, secondBody->GetTransform(), secondBody->FCollisionShape.GetLocalAABB(), firstBody->GetTransform(),
-                  vec4::MakeHomogeneousPositionVec4(firstBody->FCollisionShape.GetCenter()), firstBody->FCollisionShape.GetRadius(), true);
+            bTouching = OBBSphereIntersection(this, secondBody->GetTransform(), ShapeB.GetLocalAABB(), firstBody->GetTransform(),
+                  vec4::MakeHomogeneousPositionVec4(ShapeA.GetCenter()), ShapeA.GetRadius(), true);
             break;
         }
         case ECollisionShape::SPHERE:
         {
-            bTouching = SphereIntersection(this, firstBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(firstBody->FCollisionShape.GetCenter()),
-                  firstBody->FCollisionShape.GetRadius(), secondBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(secondBody->FCollisionShape.GetCenter()),
-                  secondBody->FCollisionShape.GetRadius());
+            bTouching = SphereIntersection(this, firstBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(ShapeA.GetCenter()), ShapeA.GetRadius(), secondBody->GetTransform(),
+                  vec4::MakeHomogeneousPositionVec4(ShapeB.GetCenter()), ShapeB.GetRadius());
             break;
         }
         case ECollisionShape::CAPSULE:
         {
-            bTouching = CapsuleSphereIntersection(this, secondBody->GetTransform(), secondBody->FCollisionShape.GetCenter(), secondBody->FCollisionShape.GetRadius(),
-                  secondBody->FCollisionShape.GetHalfLength(), firstBody->GetTransform(), firstBody->FCollisionShape.GetCenter(), firstBody->FCollisionShape.GetRadius(), true);
+            bTouching = CapsuleSphereIntersection(this, secondBody->GetTransform(), ShapeB.GetCenter(), ShapeB.GetRadius(), ShapeB.GetHalfLength(), firstBody->GetTransform(),
+                  ShapeA.GetCenter(), ShapeA.GetRadius(), true);
             break;
         }
         default:
@@ -82,25 +82,24 @@ void Contact::Evaluate()
         break;
     case ECollisionShape::CAPSULE:
     {
-        switch (secondBody->FCollisionShape.GetShapeType())
+        switch (ShapeB.GetShapeType())
         {
         case ECollisionShape::BOX:
         {
-            bTouching = OBBCapsuleIntersection(this, firstBody->GetTransform(), firstBody->FCollisionShape.GetCenter(), firstBody->FCollisionShape.GetRadius(),
-                  firstBody->FCollisionShape.GetHalfLength(), secondBody->GetTransform(), secondBody->FCollisionShape.GetLocalAABB(), true);
+            bTouching = OBBCapsuleIntersection(
+                  this, firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), ShapeA.GetHalfLength(), secondBody->GetTransform(), ShapeB.GetLocalAABB(), true);
             break;
         }
         case ECollisionShape::SPHERE:
         {
-            bTouching = CapsuleSphereIntersection(this, firstBody->GetTransform(), firstBody->FCollisionShape.GetCenter(), firstBody->FCollisionShape.GetRadius(),
-                  firstBody->FCollisionShape.GetHalfLength(), secondBody->GetTransform(), secondBody->FCollisionShape.GetCenter(), secondBody->FCollisionShape.GetRadius(), false);
+            bTouching = CapsuleSphereIntersection(this, firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), ShapeA.GetHalfLength(), secondBody->GetTransform(),
+                  ShapeB.GetCenter(), ShapeB.GetRadius(), false);
             break;
         }
         case ECollisionShape::CAPSULE:
         {
-            bTouching = CapsuleIntersection(this, firstBody->GetTransform(), firstBody->FCollisionShape.GetCenter(), firstBody->FCollisionShape.GetRadius(),
-                  firstBody->FCollisionShape.GetHalfLength(), secondBody->GetTransform(), secondBody->FCollisionShape.GetCenter(), secondBody->FCollisionShape.GetRadius(),
-                  secondBody->FCollisionShape.GetHalfLength());
+            bTouching = CapsuleIntersection(this, firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), ShapeA.GetHalfLength(), secondBody->GetTransform(),
+                  ShapeB.GetCenter(), ShapeB.GetRadius(), ShapeB.GetHalfLength());
             break;
         }
         default:

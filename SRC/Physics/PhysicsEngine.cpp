@@ -343,6 +343,50 @@ bool PhysicsEngine::AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, co
 
 #pragma endregion Impulses
 
+struct CompoundMassProperties
+{
+    float Mass = 0.f;
+    vec3 CenterOfMassLocal; // body space
+    mat3 InertiaAboutCoM; // body axes, about CoM
+};
+
+CompoundMassProperties ComputeCompoundMassProperties(const PhysicsBodyConfig& BodyConfig)
+{
+    CompoundMassProperties Result;
+
+    std::vector<float> masses;
+    std::vector<vec3> centers;
+
+    foreachitemconst(shape, BodyConfig.FShapes)
+    {
+        float m_i = shape.ComputeMass(BodyConfig.FDensity);
+        vec3 c_i = shape.GetCenter();
+
+        masses.push_back(m_i);
+        centers.push_back(c_i);
+
+        Result.Mass += m_i;
+        Result.CenterOfMassLocal += m_i * c_i;
+    }
+
+    if (Result.Mass > 0.f)
+        Result.CenterOfMassLocal /= Result.Mass;
+    else
+        Result.CenterOfMassLocal = vec3(0.f); // or equal-weight average of centers
+
+    forrange(i, 0, BodyConfig.FShapes.size())
+    {
+        const CollisionShape& shape = BodyConfig.FShapes[i];
+
+        mat3 I_i = shape.ComputeInertiaTensor(masses[i]);
+        vec3 r = centers[i] - Result.CenterOfMassLocal;
+
+        Result.InertiaAboutCoM += I_i + masses[i] * (Dot(r, r) * mat3::Identity() - MultTranspose(r, r));
+    }
+
+    return Result;
+}
+
 void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
 {
     AssertRelease(Body != nullptr);
@@ -356,19 +400,18 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
 
     if (Body->FMoveabilityType == EPhysicsMoveability::PHYICS_ENABLED)
     {
-        // Init Mass and Inertia
-        if (BodyConfig.FAutoComputeMass)
-        {
-            Body->FMass = BodyConfig.FShapes[0].ComputeMass(BodyConfig.FDensity);
-        }
-        else
-        {
-            Body->FMass = BodyConfig.FMass;
-        }
-
+        CompoundMassProperties MassProps = ComputeCompoundMassProperties(BodyConfig);
+        Body->FMass = (BodyConfig.FAutoComputeMass) ? MassProps.Mass : BodyConfig.FMass;
         Body->FInvMass = (Body->FMass != 0.f) ? 1.f / Body->FMass : 1.f;
-        Body->FInertiaTensor = BodyConfig.FShapes[0].ComputeInertiaTensor(Body->FMass);
+
+        Body->FInertiaTensor = MassProps.InertiaAboutCoM;
+        if (!BodyConfig.FAutoComputeMass && MassProps.Mass > 0.f)
+        {
+            Body->FInertiaTensor *= Body->FMass / MassProps.Mass;
+        }
         Body->FInverseInertiaTensor = Invert(Body->FInertiaTensor);
+        Body->FCenterOfMassLocal = MassProps.CenterOfMassLocal;
+        Body->FCenterOfMassWorld = (Transform * vec4::MakeHomogeneousPositionVec4(Body->FCenterOfMassLocal)).xyz();
     }
     else
     {
@@ -376,12 +419,11 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
         Body->FInvMass = 0.f;
         Body->FInertiaTensor = mat3();
         Body->FInverseInertiaTensor = mat3();
+        Body->FCenterOfMassLocal = vec3();
+        Body->FCenterOfMassWorld = Transform.Column(3).xyz();
     }
 
-    Body->FCenterOfMassLocal = BodyConfig.ComputeCoMLocal();
-    Body->FCenterOfMassWorld = (Transform * vec4::MakeHomogeneousPositionVec4(Body->FCenterOfMassLocal)).xyz();
-
-    Body->FCollisionShape = BodyConfig.FShapes[0];
+    Body->FCollisionShapes = BodyConfig.FShapes;
 
     // Init damping coefficients
     Body->FLinearDamping = BodyConfig.FLinearDamping;
@@ -489,38 +531,40 @@ void PhysicsEngine::DrawDebugInternal()
                 ShapeColor = SleepingShapeColor;
             }
 
-            switch (body->FCollisionShape.GetShapeType())
+            foreachitemconst(shape, body->FCollisionShapes)
             {
-            case ECollisionShape::BOX:
-            {
-                AABB3f LocalAABB = body->FCollisionShape.GetLocalAABB();
-                buffer->DrawOOB(handle, LocalAABB.Min(), LocalAABB.Max(), body->GetTransform(), ShapeColor);
-                break;
-            }
-            case ECollisionShape::SPHERE:
-            {
-                buffer->DrawDebugSphere(
-                      handle, (body->GetTransform() * vec4::MakeHomogeneousPositionVec4(body->FCollisionShape.GetCenter())).xyz(), body->FCollisionShape.GetRadius(), ShapeColor);
-                break;
-            }
-            case ECollisionShape::CAPSULE:
-            {
-                const mat4 Tr = body->GetTransform();
-                const vec4 CapsuleCenter = (Tr * vec4::MakeHomogeneousPositionVec4(body->FCollisionShape.GetCenter()));
-                const vec4 CapsuleAxis = Tr.Column(1);
-                const float HalfLength = body->FCollisionShape.GetHalfLength();
-                const float Radius = body->FCollisionShape.GetRadius();
+                switch (shape.GetShapeType())
+                {
+                case ECollisionShape::BOX:
+                {
+                    AABB3f LocalAABB = shape.GetLocalAABB();
+                    buffer->DrawOOB(handle, LocalAABB.Min(), LocalAABB.Max(), body->GetTransform(), ShapeColor);
+                    break;
+                }
+                case ECollisionShape::SPHERE:
+                {
+                    buffer->DrawDebugSphere(handle, (body->GetTransform() * vec4::MakeHomogeneousPositionVec4(shape.GetCenter())).xyz(), shape.GetRadius(), ShapeColor);
+                    break;
+                }
+                case ECollisionShape::CAPSULE:
+                {
+                    const mat4 Tr = body->GetTransform();
+                    const vec4 CapsuleCenter = (Tr * vec4::MakeHomogeneousPositionVec4(shape.GetCenter()));
+                    const vec4 CapsuleAxis = Tr.Column(1);
+                    const float HalfLength = shape.GetHalfLength();
+                    const float Radius = shape.GetRadius();
 
-                const vec4 Ac = CapsuleCenter - CapsuleAxis * HalfLength;
-                const vec4 Bc = CapsuleCenter + CapsuleAxis * HalfLength;
+                    const vec4 Ac = CapsuleCenter - CapsuleAxis * HalfLength;
+                    const vec4 Bc = CapsuleCenter + CapsuleAxis * HalfLength;
 
-                buffer->DrawDebugSphere(handle, Ac.xyz(), body->FCollisionShape.GetRadius(), ShapeColor);
-                buffer->DrawDebugSphere(handle, Bc.xyz(), body->FCollisionShape.GetRadius(), ShapeColor);
+                    buffer->DrawDebugSphere(handle, Ac.xyz(), shape.GetRadius(), ShapeColor);
+                    buffer->DrawDebugSphere(handle, Bc.xyz(), shape.GetRadius(), ShapeColor);
 
-                break;
-            }
-            default:
-                AssertNotReached();
+                    break;
+                }
+                default:
+                    AssertNotReached();
+                }
             }
         }
 

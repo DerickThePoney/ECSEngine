@@ -28,7 +28,7 @@ public:
     EPhysicsMoveability::Type FMoveabilityType = EPhysicsMoveability::STATIC;
 
     // Collision shape
-    CollisionShape FCollisionShape;
+    std::vector<CollisionShape> FCollisionShapes;
 
     // positional stuff
     vec3 FPosition;
@@ -78,6 +78,7 @@ public:
     void SetAwake(bool bValue);
     bool IsAwake() const;
 
+    AABB3f ComputeAABB(const mat4& parTransform) const;
     void UpdateCoMWorld();
 
     BitSet<ERigidBodyFlag::RB_COUNT> FFlags;
