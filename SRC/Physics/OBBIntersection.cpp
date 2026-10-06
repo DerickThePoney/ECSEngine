@@ -376,8 +376,9 @@ i32 Orthographic(float sign, float e, i32 axis, i32 clipEdge, ClipVertex* in, i3
 
         ClipVertex cv;
 
-        // B
-        if (((InFront(da) && InFront(db)) || On(da) || On(db)))
+        // Keep B only when both endpoints are in front, or both are on the plane.
+        // `On(da) || On(db)` kept exterior points and widened edge contact manifolds.
+        if ((InFront(da) && InFront(db)) || (On(da) && On(db)))
         {
             AlwaysCheckedAssert(outCount < 8);
             out[outCount++] = b;
