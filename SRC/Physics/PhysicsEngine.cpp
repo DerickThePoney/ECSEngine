@@ -428,6 +428,8 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     // Init damping coefficients
     Body->FLinearDamping = BodyConfig.FLinearDamping;
     Body->FAngularDamping = BodyConfig.FAngularDamping;
+    Body->FFriction = BodyConfig.FFriction;
+    Body->FRestitution = BodyConfig.FRestitution;
     if (!BodyConfig.FApplyGravity)
         Body->FGravityScale = 0.f;
 
