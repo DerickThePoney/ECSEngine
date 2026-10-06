@@ -40,11 +40,7 @@ void SetComponent(vec3& parV, u8 parAxis, float parValue)
     }
 }
 
-void EmitContactPoint(Contact* C,
-      const mat4& parTransformB,
-      const vec3& parOnBoxLocal,
-      const float parPenetration,
-      const FeaturePair& parFeature)
+void EmitContactPoint(Contact* C, const mat4& parTransformB, const vec3& parOnBoxLocal, const float parPenetration, const FeaturePair& parFeature)
 {
     // Always on the box face (same as OBBSphereIntersection). Using the capsule
     // surface offset when the capsule was body A sank contacts below the face
@@ -251,7 +247,7 @@ bool OBBCapsuleIntersection(Contact* C,
     // Lying on a face → up to 2 contacts symmetric about the capsule center.
     // Edge / vertex / end-on → fall through to a single closest contact.
     if (TryEmitFaceManifold(C, parTransformB, ASLocal, AELocal, MinB, MaxB, Closest, parRadiusA))
-        return !C->FManifold.FContactPoints.empty();
+        return true;
 
     const float penetration = Closest.Interior ? -(parRadiusA + Closest.ExitDepth) : (sqrtf(Closest.DistSq) - parRadiusA);
     EmitContactPoint(C, parTransformB, Closest.OnAABB, penetration, MakeCapsuleFeature(Closest.FaceAxis, Closest.FaceSign, 0));
