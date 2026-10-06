@@ -27,13 +27,9 @@ struct PhysicsBodyConfig
     float FRestitution = 0.2f;
     float FFriction = 0.4f;
 
-    vec3 ComputeCoMLocal() const;
-
     // TO ADD:
     // - Collision channels
     // - Drag (angular and linear)
-    // - MassComputation
-    // - Proper CoM computation
 
     SERIALIZE()
     {
