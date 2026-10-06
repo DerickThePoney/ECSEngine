@@ -364,5 +364,10 @@ void GLFWDisplayWindowHandler::UpdateJoysticks(ImGuiIO& io)
     UpdateGamepads();
 }
 
+float GLFWDisplayWindowHandler::AspectRatio() const
+{
+    return (FHeight > 0 && FWidth > 0) ? (float)FWidth / (float)FHeight : 1.f;
+}
+
 } // namespace Rendering
 } // namespace ECSEngine
