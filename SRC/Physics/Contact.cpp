@@ -4,6 +4,7 @@
 
 #include "CapsuleIntersection.h"
 #include "CapsuleSphereIntersection.h"
+#include "Common/Sorting.h"
 #include "OBBCapsuleIntersection.h"
 #include "OBBIntersection.h"
 #include "OBBSphereIntersection.h"
@@ -138,6 +139,18 @@ void Contact::Evaluate()
                 }
             }
         }
+    }
+
+    // Deepest first so Island's 8-point cap keeps the most penetrating contacts.
+    if (!FManifold.FContactPoints.empty())
+    {
+        auto SortByPenetrationDesc = [](const ContactPoint& A, const ContactPoint& B) -> bool { return A.FPenetration > B.FPenetration; };
+        InPlaceSorting<std::vector<ContactPoint>, ContactPoint>(
+              FManifold.FContactPoints, 0, FManifold.FContactPoints.size() - 1, SortByPenetrationDesc);
+
+        constexpr std::size_t kMaxContactPoints = 8;
+        if (FManifold.FContactPoints.size() > kMaxContactPoints)
+            FManifold.FContactPoints.resize(kMaxContactPoints);
     }
 
     if (bAnyTouching)
