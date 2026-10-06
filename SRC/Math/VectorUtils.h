@@ -1,4 +1,5 @@
 #pragma once
+#include "MatrixTypes.h"
 #include "VectorTypes.h"
 
 #include <math.h>
@@ -171,6 +172,8 @@ inline __forceinline Vector4<T> Abs(const Vector4<T>& A)
 
     return res;
 }
+
+mat3 MultTranspose(const vec3& A, const vec3& B_T);
 
 bool IsNan(const vec2& A);
 
