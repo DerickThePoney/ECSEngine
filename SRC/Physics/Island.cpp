@@ -68,9 +68,10 @@ void Island::Initialise()
         CS.Normal = C->FContactNormal;
         CS.TangentVectors[0] = C->FContactTangents[0];
         CS.TangentVectors[1] = C->FContactTangents[1];
-        CS.NumberOfContacts = C->FManifold.FContactPoints.size();
+        i32 MaxContactsToWrite = Min(C->FManifold.FContactPoints.size(), 8);
+        CS.NumberOfContacts = MaxContactsToWrite;
 
-        forrange(i, 0, CS.NumberOfContacts)
+        forrange(i, 0, MaxContactsToWrite)
         {
             ContactPointState& CPS = CS.ContactPoints[i];
             ContactPoint& CP = C->FManifold.FContactPoints[i];

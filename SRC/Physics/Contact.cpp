@@ -24,96 +24,128 @@ void Contact::Evaluate()
 
     FManifold.clear();
 
-    bool bTouching = false;
-    CollisionShape& ShapeA = firstBody->FCollisionShapes[0];
-    CollisionShape& ShapeB = secondBody->FCollisionShapes[0];
-    switch (ShapeA.GetShapeType())
+    bool bAnyTouching = false;
+    i32 CurrentContactPoints = 0;
+    float maxPenetration = -std::numeric_limits<float>::max();
+    vec3 maxPenetrationNormal;
+    forrange(i, 0, firstBody->FCollisionShapes.size())
     {
-    case ECollisionShape::BOX:
-    {
-        switch (ShapeB.GetShapeType())
+        forrange(j, 0, secondBody->FCollisionShapes.size())
         {
-        case ECollisionShape::BOX:
-        {
-            bTouching = OBBIntersection(this, firstBody->GetTransform(), ShapeA.GetLocalAABB(), secondBody->GetTransform(), ShapeB.GetLocalAABB());
-            break;
+            CurrentContactPoints = FManifold.FContactPoints.size();
+            CollisionShape& ShapeA = firstBody->FCollisionShapes[i];
+            CollisionShape& ShapeB = secondBody->FCollisionShapes[j];
+            bool bTouching = false;
+            switch (ShapeA.GetShapeType())
+            {
+            case ECollisionShape::BOX:
+            {
+                switch (ShapeB.GetShapeType())
+                {
+                case ECollisionShape::BOX:
+                {
+                    bTouching = OBBIntersection(this, firstBody->GetTransform(), ShapeA.GetLocalAABB(), secondBody->GetTransform(), ShapeB.GetLocalAABB());
+                    break;
+                }
+                case ECollisionShape::SPHERE:
+                {
+                    bTouching = OBBSphereIntersection(this, firstBody->GetTransform(), ShapeA.GetLocalAABB(), secondBody->GetTransform(),
+                          vec4::MakeHomogeneousPositionVec4(ShapeB.GetCenter()), ShapeB.GetRadius(), false);
+                    break;
+                }
+                case ECollisionShape::CAPSULE:
+                {
+                    bTouching = OBBCapsuleIntersection(this, secondBody->GetTransform(), ShapeB.GetCenter(), ShapeB.GetRadius(), ShapeB.GetHalfLength(), firstBody->GetTransform(),
+                          ShapeA.GetLocalAABB(), false);
+                    break;
+                }
+                default:
+                    AssertNotReachedMsg("Collision method for BOX to ??? is not implemented !");
+                }
+                break;
+            }
+            case ECollisionShape::SPHERE:
+                switch (ShapeB.GetShapeType())
+                {
+                case ECollisionShape::BOX:
+                {
+                    bTouching = OBBSphereIntersection(this, secondBody->GetTransform(), ShapeB.GetLocalAABB(), firstBody->GetTransform(),
+                          vec4::MakeHomogeneousPositionVec4(ShapeA.GetCenter()), ShapeA.GetRadius(), true);
+                    break;
+                }
+                case ECollisionShape::SPHERE:
+                {
+                    bTouching = SphereIntersection(this, firstBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(ShapeA.GetCenter()), ShapeA.GetRadius(),
+                          secondBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(ShapeB.GetCenter()), ShapeB.GetRadius());
+                    break;
+                }
+                case ECollisionShape::CAPSULE:
+                {
+                    bTouching = CapsuleSphereIntersection(this, secondBody->GetTransform(), ShapeB.GetCenter(), ShapeB.GetRadius(), ShapeB.GetHalfLength(),
+                          firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), true);
+                    break;
+                }
+                default:
+                    AssertNotReachedMsg("Collision method for SPHERE to ??? is not implemented !");
+                }
+                break;
+            case ECollisionShape::CAPSULE:
+            {
+                switch (ShapeB.GetShapeType())
+                {
+                case ECollisionShape::BOX:
+                {
+                    bTouching = OBBCapsuleIntersection(
+                          this, firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), ShapeA.GetHalfLength(), secondBody->GetTransform(), ShapeB.GetLocalAABB(), true);
+                    break;
+                }
+                case ECollisionShape::SPHERE:
+                {
+                    bTouching = CapsuleSphereIntersection(this, firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), ShapeA.GetHalfLength(),
+                          secondBody->GetTransform(), ShapeB.GetCenter(), ShapeB.GetRadius(), false);
+                    break;
+                }
+                case ECollisionShape::CAPSULE:
+                {
+                    bTouching = CapsuleIntersection(this, firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), ShapeA.GetHalfLength(), secondBody->GetTransform(),
+                          ShapeB.GetCenter(), ShapeB.GetRadius(), ShapeB.GetHalfLength());
+                    break;
+                }
+                default:
+                    AssertNotReachedMsg("Collision method for SPHERE to ??? is not implemented !");
+                }
+                break;
+            }
+            default:
+                AssertNotReachedMsg("Collision method is not implemented !");
+            }
+
+            // Handle the pair result;
+            if (bTouching)
+            {
+                bAnyTouching = true;
+                forrange(k, CurrentContactPoints, FManifold.FContactPoints.size())
+                {
+                    ContactPoint& cp = FManifold.FContactPoints[k];
+                    cp.FP.ShapeAIndex = i;
+                    cp.FP.ShapeBIndex = j;
+
+                    if (cp.FPenetration > maxPenetration)
+                    {
+                        maxPenetration = cp.FPenetration;
+                        maxPenetrationNormal = FContactNormal;
+                    }
+                }
+            }
         }
-        case ECollisionShape::SPHERE:
-        {
-            bTouching = OBBSphereIntersection(this, firstBody->GetTransform(), ShapeA.GetLocalAABB(), secondBody->GetTransform(),
-                  vec4::MakeHomogeneousPositionVec4(ShapeB.GetCenter()), ShapeB.GetRadius(), false);
-            break;
-        }
-        case ECollisionShape::CAPSULE:
-        {
-            bTouching = OBBCapsuleIntersection(
-                  this, secondBody->GetTransform(), ShapeB.GetCenter(), ShapeB.GetRadius(), ShapeB.GetHalfLength(), firstBody->GetTransform(), ShapeA.GetLocalAABB(), false);
-            break;
-        }
-        default:
-            AssertNotReachedMsg("Collision method for BOX to ??? is not implemented !");
-        }
-        break;
     }
-    case ECollisionShape::SPHERE:
-        switch (ShapeB.GetShapeType())
-        {
-        case ECollisionShape::BOX:
-        {
-            bTouching = OBBSphereIntersection(this, secondBody->GetTransform(), ShapeB.GetLocalAABB(), firstBody->GetTransform(),
-                  vec4::MakeHomogeneousPositionVec4(ShapeA.GetCenter()), ShapeA.GetRadius(), true);
-            break;
-        }
-        case ECollisionShape::SPHERE:
-        {
-            bTouching = SphereIntersection(this, firstBody->GetTransform(), vec4::MakeHomogeneousPositionVec4(ShapeA.GetCenter()), ShapeA.GetRadius(), secondBody->GetTransform(),
-                  vec4::MakeHomogeneousPositionVec4(ShapeB.GetCenter()), ShapeB.GetRadius());
-            break;
-        }
-        case ECollisionShape::CAPSULE:
-        {
-            bTouching = CapsuleSphereIntersection(this, secondBody->GetTransform(), ShapeB.GetCenter(), ShapeB.GetRadius(), ShapeB.GetHalfLength(), firstBody->GetTransform(),
-                  ShapeA.GetCenter(), ShapeA.GetRadius(), true);
-            break;
-        }
-        default:
-            AssertNotReachedMsg("Collision method for SPHERE to ??? is not implemented !");
-        }
-        break;
-    case ECollisionShape::CAPSULE:
-    {
-        switch (ShapeB.GetShapeType())
-        {
-        case ECollisionShape::BOX:
-        {
-            bTouching = OBBCapsuleIntersection(
-                  this, firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), ShapeA.GetHalfLength(), secondBody->GetTransform(), ShapeB.GetLocalAABB(), true);
-            break;
-        }
-        case ECollisionShape::SPHERE:
-        {
-            bTouching = CapsuleSphereIntersection(this, firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), ShapeA.GetHalfLength(), secondBody->GetTransform(),
-                  ShapeB.GetCenter(), ShapeB.GetRadius(), false);
-            break;
-        }
-        case ECollisionShape::CAPSULE:
-        {
-            bTouching = CapsuleIntersection(this, firstBody->GetTransform(), ShapeA.GetCenter(), ShapeA.GetRadius(), ShapeA.GetHalfLength(), secondBody->GetTransform(),
-                  ShapeB.GetCenter(), ShapeB.GetRadius(), ShapeB.GetHalfLength());
-            break;
-        }
-        default:
-            AssertNotReachedMsg("Collision method for SPHERE to ??? is not implemented !");
-        }
-        break;
-    }
-    default:
-        AssertNotReachedMsg("Collision method is not implemented !");
-    }
+
+    if (bAnyTouching)
+        FContactNormal = maxPenetrationNormal;
 
     const bool bWasTouching = FFlags.GetValue(EContactFlag::CT_TOUCHING);
     FFlags.SetBit(EContactFlag::CT_WAS_TOUCHING, bWasTouching);
-    FFlags.SetBit(EContactFlag::CT_TOUCHING, bTouching);
+    FFlags.SetBit(EContactFlag::CT_TOUCHING, bAnyTouching);
 
     ComputeBasis();
 }

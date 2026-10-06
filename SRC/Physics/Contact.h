@@ -45,9 +45,11 @@ union FeaturePair
         u8 outR;
         u8 inI;
         u8 outI;
+        u8 ShapeAIndex;
+        u8 ShapeBIndex;
     };
 
-    i32 key;
+    i64 key = 0;
 };
 
 struct ContactPoint
