@@ -708,7 +708,7 @@ mat4 AABBTree::ComputeBodyTransform(const RigidBody* Body) const
 
 AABB3f AABBTree::ComputeAABB(const RigidBody* Body, const mat4& Transform) const
 {
-    return Body->FCollisionShape.ComputeAABB(Transform);
+    return Body->ComputeAABB(Transform);
 }
 
 AABB3f AABBTree::ComputeAABB(const RigidBody* Body) const

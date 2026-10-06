@@ -76,6 +76,16 @@ bool RigidBody::IsAwake() const
     return FFlags.GetValue(ERigidBodyFlag::RB_AWAKE);
 }
 
+AABB3f RigidBody::ComputeAABB(const mat4& parTransform) const
+{
+    AABB3f result;
+    foreachitemconst(shape, FCollisionShapes)
+    {
+        result = AABB3f::Union(shape.ComputeAABB(parTransform), result);
+    }
+    return result;
+}
+
 void RigidBody::UpdateCoMWorld()
 {
     FCenterOfMassWorld = (GetTransform() * vec4::MakeHomogeneousPositionVec4(FCenterOfMassLocal)).xyz();
