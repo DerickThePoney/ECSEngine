@@ -22,7 +22,7 @@ public:
     const std::string& GetName() const { return FName; }
     void SetName(const std::string& parName) { FName = parName; }
 
-    float AspectRatio() const { return (float)FWidth / (float)FHeight; }
+    float AspectRatio() const;
     uvec2 GetSize() const { return uvec2(FWidth, FHeight); }
     void SetSize(const uvec2& parSize)
     {
