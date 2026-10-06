@@ -148,8 +148,11 @@ void Island::Solve(float parDeltaTime)
 
         const VelocityState& Velocities = FVelocities[i];
 
-        body->FVelocity = Velocities.FLinearVelocity;
-        body->FRotationVelocity = Velocities.FRotationVelocity;
+        if (body->FMoveabilityType == EPhysicsMoveability::PHYICS_ENABLED)
+        {
+            body->FVelocity = Velocities.FLinearVelocity;
+            body->FRotationVelocity = Velocities.FRotationVelocity;
+        }
 
         const float sqrLinVel = Dot(body->FVelocity, body->FVelocity);
         const float sqrAngVel = Dot(body->FRotationVelocity, body->FRotationVelocity);
