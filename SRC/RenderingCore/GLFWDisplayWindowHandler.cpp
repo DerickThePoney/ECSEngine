@@ -48,14 +48,14 @@ void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, in
         ImGUI::SetImGuiContext((RenderPassId::Type)i);
         ImGuiIO& io = ImGui::GetIO();
         if (action == GLFW_PRESS)
-            io.KeysDown[key] = true;
+            io.KeysData[key].Down = true;
         if (action == GLFW_RELEASE)
-            io.KeysDown[key] = false;
+            io.KeysData[key].Down = false;
 
         // Modifiers are not reliable across systems
-        io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-        io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-        io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+        io.KeyCtrl = io.KeyCtrl;
+        io.KeyShift = io.KeyShift;
+        io.KeyAlt = io.KeyAlt;
 #ifdef _WIN32
         io.KeySuper = false;
 #else
@@ -253,8 +253,9 @@ void GLFWDisplayWindowHandler::InitInputsForImGui(ImGuiIO& io)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos; // We can honor io.WantSetMousePos requests (optional, rarely used)
     io.BackendPlatformName = "ECSEngine_GLFW";
 
+    // TODO
     // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
-    io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
+    /*io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
     io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
     io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
     io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
@@ -275,14 +276,15 @@ void GLFWDisplayWindowHandler::InitInputsForImGui(ImGuiIO& io)
     io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
     io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
     io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-    io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+    io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;*/
 
     // TODO IMGUI
     /*io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
     io.ClipboardUserData = g_Window;*/
 #if defined(_WIN32)
-    io.ImeWindowHandle = GetNativeWindowHandle();
+    // TODO
+    //  ImGuiViewport::PlatformHandleRaw = GetNativeWindowHandle();
 #endif* /
 
     // Create mouse cursors

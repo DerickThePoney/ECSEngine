@@ -53,13 +53,13 @@ void BuildingCostDescriptor::DrawEditor()
     EDITOR_PROPERTY_ENTITY_TEMPLATE_FILTERED("##Template", et, FBuildingTemplateName, EEntityWorlds::BUILDINGS);
     EDITOR_PROPERTY_BUILDING_CATEGORY("##Category", FBuildingType);
     ImGui::NextColumn();
-    ImGui::BeginChild(ImGui::GetID(this), ImVec2(ImGui::GetContentRegionAvailWidth(), 200.f));
+    ImGui::BeginChild(ImGui::GetID(this), ImVec2(ImGui::GetContentRegionAvail().x, 200.f));
     ImGui::Columns(2);
     ImGui::Separator();
     DrawEditorHeader();
     ImGui::Separator();
 
-    auto drawCost = [](std::string& parName, BuildingResourceCost& parValue) 
+    auto drawCost = [](std::string& parName, BuildingResourceCost& parValue)
     {
         ImGui::PushID(ImGui::GetID(&parValue));
         EDITOR_PROPERTY_GAME_RESOURCES("", parValue.first, true);
@@ -139,7 +139,7 @@ void BuildingCostManager::DrawEditor()
     forrange(i, 0, FBuildingsCostRules.size())
     {
         ImGui::PushID((int)i);
-        if (ImGui::Selectable(std::format("{} - ", i).c_str(), (u32)i == selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0.f, 200.f)))
+        if (ImGui::Selectable(std::format("{} - ", i).c_str(), (u32)i == selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap, ImVec2(0.f, 200.f)))
             selected = (u32)i;
         ImGui::SameLine();
         FBuildingsCostRules[i].DrawEditor();

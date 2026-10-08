@@ -14,8 +14,8 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
     static bool showMessages[ELoggingCategory::LENGTH] = { true, true, true, true, true, true, true, true };
     static vec4 colors[ELoggingCategory::LENGTH] = {
 
-        vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(1.0f, 1.0f, 0.0f, 1.0f),
-        vec4(0.7f, 0.7f, 0.7f, 1.0f), vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.7f, 0.0f, 1.0f)
+        vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(1.0f, 1.0f, 0.0f, 1.0f), vec4(0.7f, 0.7f, 0.7f, 1.0f),
+        vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.7f, 0.0f, 1.0f)
 
     };
 
@@ -30,7 +30,7 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
     const vec2 checkboxesPlace = loggerSize * vec2(1 - messagePlaceProportion, 1.0f);
     ImGui::SetCursorPosX(((currentWindowSize - loggerSize) * 0.5f).x);
 
-    ImGui::BeginChildFrame(ImGui::GetID("Test"), messagePlace);
+    ImGui::BeginChild(ImGui::GetID("Test"), messagePlace);
     ImGui::Columns(2, "LoggerColumns", true);
     ImGui::Separator();
     ImGui::Text("Message");
@@ -57,7 +57,7 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
 
     ImGui::Columns(1);
     ImGui::Separator();
-    ImGui::EndChildFrame();
+    ImGui::EndChild();
 
     ImGui::SameLine();
 
@@ -65,12 +65,18 @@ void DrawLogger(const std::vector<MessageRecord>& parRecords, bool drawOwnWindow
 
     if (ImGui::Button("Select all"))
     {
-        forrange(i, 0, ELoggingCategory::LENGTH) { showMessages[i] = true; }
+        forrange(i, 0, ELoggingCategory::LENGTH)
+        {
+            showMessages[i] = true;
+        }
     }
     ImGui::SameLine(0.f, 20.f);
     if (ImGui::Button("Select None"))
     {
-        forrange(i, 0, ELoggingCategory::LENGTH) { showMessages[i] = false; }
+        forrange(i, 0, ELoggingCategory::LENGTH)
+        {
+            showMessages[i] = false;
+        }
     }
 
     ImGui::Separator();

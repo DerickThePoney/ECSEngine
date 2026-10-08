@@ -91,7 +91,7 @@ void PhysicsCollisionPresetEditor::DrawCollisionPresetsList()
     forrange(i, 0, CollisionPresets.size())
     {
         ImGui::PushID(i);
-        if (ImGui::Selectable(CollisionPresets[i].FName.c_str(), FSelected == i, ImGuiSelectableFlags_AllowItemOverlap))
+        if (ImGui::Selectable(CollisionPresets[i].FName.c_str(), FSelected == i, ImGuiSelectableFlags_AllowOverlap))
         {
             FSelected = (u32)i;
         }

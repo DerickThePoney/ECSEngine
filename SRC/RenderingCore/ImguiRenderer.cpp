@@ -180,9 +180,9 @@ void ImguiRenderer::Render(ImDrawData* parDrawData, const u16 parViewId)
                 bgfx::TextureHandle th = FTextureHandle;
                 bgfx::ProgramHandle program = FProgam;
 
-                if (NULL != cmd->TextureId)
+                if (NULL != cmd->GetTexID())
                 {
-                    const Rendering::TextureHandle* textureHandle = (Rendering::TextureHandle*)cmd->TextureId;
+                    const Rendering::TextureHandle* textureHandle = (Rendering::TextureHandle*)cmd->GetTexID();
                     const Rendering::Texture* textureToDisplay = Rendering::TextureManager::Instance().GetTexture(*textureHandle);
                     AssertRelease(textureToDisplay != nullptr);
                     AssertRelease(textureToDisplay->Valid());
