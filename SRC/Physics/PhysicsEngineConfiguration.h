@@ -16,8 +16,8 @@ struct PhysicsEngineConfiguration
     LayersArray FLayers;
     u32 FNumLayers = 0;
 
-    u32 LayerBit(std::string LayerName);
-    const std::string& LayerName(u32 LayerBit);
+    u32 LayerBit(std::string LayerName) const;
+    const std::string& LayerName(u32 LayerBit) const;
 
     SERIALIZE()
     {

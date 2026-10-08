@@ -6,7 +6,7 @@ namespace ECSEngine
 {
 namespace Physics
 {
-u32 PhysicsEngineConfiguration::LayerBit(std::string LayerName)
+u32 PhysicsEngineConfiguration::LayerBit(std::string LayerName) const
 {
     forrange(i, 0, FNumLayers)
     {
@@ -16,16 +16,17 @@ u32 PhysicsEngineConfiguration::LayerBit(std::string LayerName)
         }
     }
 
-    AssertNotReachedMsg(std::format("PhysicsEngineConfiguration::LayerBit: UNKNOWN layer name {}", LayerName).c_str());
-    return u32(-1);
+    AssertNotReachedMsg(std::format("PhysicsEngineConfiguration::LayerBit: UNKNOWN layer name {} - reverting to default", LayerName).c_str());
+    return u32(1);
 }
 
-const std::string& PhysicsEngineConfiguration::LayerName(u32 LayerBit)
+static std::string UNKOWNLAYER("UNKNOWN");
+const std::string& PhysicsEngineConfiguration::LayerName(u32 LayerBit) const
 {
     if (LayerBit >= FNumLayers)
     {
         AssertNotReachedMsg(std::format("PhysicsEngineConfiguration::LayerName: UNKNOWN layer bit {}", LayerBit).c_str());
-        return "UNKNOWN";
+        return UNKOWNLAYER;
     }
     return FLayers[LayerBit];
 }

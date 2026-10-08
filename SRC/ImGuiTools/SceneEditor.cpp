@@ -17,6 +17,7 @@
 #include "GameRulesEditor.h"
 #include "InputDebug.h"
 #include "LoggerGUI.h"
+#include "PhysicsCollisionPresetEditor.h"
 #include "PhysicsConfigurationEditor.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
@@ -94,6 +95,7 @@ void MainMenuBar(WindowsToShow& options, vec2& parOutMenuBarHeight, IOScene& par
         if (ImGui::BeginMenu("Physics"))
         {
             ImGui::MenuItem("Physics configuration", NULL, &options.showPhysicsConfigurationEditor);
+            ImGui::MenuItem("Physics collision presets", NULL, &options.showPhysicsCollisionPresetEditor);
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Rendering"))
@@ -371,6 +373,9 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
 
     if (parOutWindowsToShow.showPhysicsConfigurationEditor)
         DrawPhysicsConfigurationEditor(&parOutWindowsToShow.showPhysicsConfigurationEditor, menuBarHeight.y);
+
+    if (parOutWindowsToShow.showPhysicsCollisionPresetEditor)
+        DrawPhysicsCollisionPresetsEditor(&parOutWindowsToShow.showPhysicsCollisionPresetEditor, menuBarHeight.y);
 }
 
 void DrawPlayScenarioWindow(bool& parOutPlayScenario)
