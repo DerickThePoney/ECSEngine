@@ -179,6 +179,15 @@ void Contact::Evaluate()
     ComputeBasis();
 }
 
+bool Contact::CheckCanStillCollide()
+{
+    RigidBody* a = PhysicsEngine::Instance().GetRigidBody(FFirstBody);
+    RigidBody* b = PhysicsEngine::Instance().GetRigidBody(FSecondBody);
+
+    // return true if the bodies are still able to collide
+    return (a->FCollisionMask & b->FCollisionCategory) != 0 && (b->FCollisionMask & a->FCollisionCategory) != 0;
+}
+
 // http://box2d.org/2014/02/computing-a-basis/
 void Contact::ComputeBasis()
 {

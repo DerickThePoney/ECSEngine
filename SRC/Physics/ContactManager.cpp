@@ -66,6 +66,16 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
     {
         // TODO: Check if filtering is still valid, bodies are awake and all
         Current->FFlags.SetBit(EContactFlag::CT_ISLAND, false);
+
+        if (!Current->CheckCanStillCollide())
+        {
+            // The bodies can't collide with each other.
+            Contact* ToDestroy = Current;
+            Current = Current->FNext;
+            DestroyContact(ToDestroy);
+            continue;
+        }
+
         bool bOverlap = parBroadPhase.TestOverlap(Current->FFirstBody, Current->FSecondBody);
         if (!bOverlap)
         {
@@ -120,6 +130,12 @@ void ContactManager::AddPotentialContactPair(const PhysicsBodyHandle& first, con
 
     if (a == b)
     {
+        return;
+    }
+
+    if ((a->FCollisionMask & b->FCollisionCategory) == 0 || (b->FCollisionMask & a->FCollisionCategory) == 0)
+    {
+        // The bodies can't collide with each other.
         return;
     }
 
