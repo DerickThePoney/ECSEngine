@@ -60,6 +60,10 @@ public:
     float FRestitution = 0.2f;
     float FFriction = 0.4f;
 
+    // Collision filtering
+    u32 FCollisionCategory = 1;
+    u32 FCollisionMask = ~0u;
+
     // Misc stuff
     i32 FIslandIndex = -1;
     float FSleepingTimer;

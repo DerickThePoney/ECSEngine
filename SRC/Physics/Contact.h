@@ -78,6 +78,8 @@ struct Contact
 public:
     void Evaluate();
 
+    bool CheckCanStillCollide();
+
 private:
     void ComputeBasis();
 
