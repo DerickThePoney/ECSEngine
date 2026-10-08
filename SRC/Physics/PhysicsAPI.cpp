@@ -55,6 +55,11 @@ const PhysicsEngineConfiguration& GetConfig()
     return PhysicsEngine::Instance().Config();
 }
 
+PhysicsCollisionPresetManager& GetCollisionPresetManager()
+{
+    return PhysicsEngine::Instance().CollisionPresetManager();
+}
+
 void ShutdownPhysics()
 {
     PhysicsEngine::Instance().Cleanup();

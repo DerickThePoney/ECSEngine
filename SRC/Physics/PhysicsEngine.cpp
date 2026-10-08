@@ -33,6 +33,7 @@ PhysicsEngine::~PhysicsEngine()
 void PhysicsEngine::Initialize(const PhysicsEngineConfiguration& PhysicsConfig)
 {
     SetConfig(PhysicsConfig);
+    FCollisionPresetManager.Initialize(this);
 }
 
 void PhysicsEngine::Cleanup()

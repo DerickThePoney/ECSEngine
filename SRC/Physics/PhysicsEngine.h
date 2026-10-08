@@ -5,6 +5,7 @@
 #include "Common/Singleton.h"
 #include "ContactManager.h"
 #include "IslandManager.h"
+#include "PhysicsCollisionPresetManager.h"
 #include "PhysicsEngineConfiguration.h"
 #include "RigidBody.h"
 
@@ -28,6 +29,7 @@ public:
 
     const PhysicsEngineConfiguration& Config() const { return FConfig; }
     void SetConfig(const PhysicsEngineConfiguration& NewConfig) { FConfig = NewConfig; }
+    PhysicsCollisionPresetManager& CollisionPresetManager() { return FCollisionPresetManager; }
 
     const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
     bool DestroyPhysicsBody(const PhysicsBodyHandle& Handle);
@@ -71,6 +73,7 @@ private:
 #endif
 private:
     PhysicsEngineConfiguration FConfig;
+    PhysicsCollisionPresetManager FCollisionPresetManager;
 
     IdGenerator FHandleGenerator; // TODO MAKE PHYSICS HANDLE ID GENERATOR THAT SPECIALISES THIS
     std::vector<std::unique_ptr<RigidBody>> FRigidbodies;
