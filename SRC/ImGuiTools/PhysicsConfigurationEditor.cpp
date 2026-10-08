@@ -48,6 +48,37 @@ void PhysicsConfigurationEditor::DrawEditor(bool* parOpen, float parMenuBarHeigh
         bHasChanged = true;
     }
 
+    if (ImGui::CollapsingHeader("Collision Layers"))
+    {
+        ImGui::Indent();
+        forrange(i, 0, Config.FNumLayers)
+        {
+            ImGui::PushID(i);
+            ImGui::Text(std::format("Layer {}", i).c_str());
+            ImGui::SameLine();
+
+            char buff[1024];
+            sprintf(buff, "%s", Config.FLayers[i].c_str());
+            if (ImGui::InputText("##LayerEdit", buff, 1024))
+            {
+                Config.FLayers[i] = std::string(buff);
+                bHasChanged = true;
+            }
+            ImGui::PopID();
+        }
+
+        if (Config.FNumLayers < 32)
+        {
+            if (ImGui::Button("Add##CollisionLayer"))
+            {
+                Config.FNumLayers++;
+                bHasChanged = true;
+            }
+        }
+
+        ImGui::Unindent();
+    }
+
     if (bHasChanged)
     {
         Physics::SetConfig(Config);
