@@ -341,8 +341,8 @@ public:
 
         ImGui::Text(FName.c_str());
         ImGui::Indent();
-        ImGui::InputFloat2(std::format("Min##{}", (void*)FProperty).c_str(), (float*)&min, 2);
-        ImGui::InputFloat2(std::format("Max##{}", (void*)FProperty).c_str(), (float*)&max, 2);
+        ImGui::InputFloat2(std::format("Min##{}", (void*)FProperty).c_str(), (float*)&min);
+        ImGui::InputFloat2(std::format("Max##{}", (void*)FProperty).c_str(), (float*)&max);
         ImGui::Unindent();
 
         FProperty->SetMin(min);

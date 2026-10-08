@@ -137,7 +137,7 @@ void SceneItemsWindow(SceneScenario* parScene, WindowsToShow& options, const vec
 
         ImGui::SetCursorPosX(xCursor);
 
-        ImGui::BeginChildFrame(ImGui::GetID("Scene items list"), listSize);
+        ImGui::BeginChild(ImGui::GetID("Scene items list"), listSize);
 
         SceneItemsContainer& sceneItems = parScene->GetSceneItemsForWriting();
         u32 i = 0;
@@ -160,7 +160,7 @@ void SceneItemsWindow(SceneScenario* parScene, WindowsToShow& options, const vec
             parScene->RemoveSceneItem(itToErase);
         }
 
-        ImGui::EndChildFrame();
+        ImGui::EndChild();
     }
     ImGui::End();
 }
@@ -405,12 +405,12 @@ void DrawPlayScenarioWindow(bool& parOutPlayScenario)
     ImGui::SetWindowPos(vec2((windowSize.x - thisWindowSize) * 0.5f, menuBarHeight.y));
     if (parOutPlayScenario)
     {
-        if (ImGui::ImageButton((ImTextureID)&pauseHandle, vec2(64, 64)))
+        if (ImGui::ImageButton("PauseButton", (ImTextureID)&pauseHandle, vec2(64, 64)))
             parOutPlayScenario = false;
     }
     else
     {
-        if (ImGui::ImageButton((ImTextureID)&playHandle, vec2(64, 64)))
+        if (ImGui::ImageButton("PlayButton", (ImTextureID)&playHandle, vec2(64, 64)))
             parOutPlayScenario = true;
     }
     ImGui::End();

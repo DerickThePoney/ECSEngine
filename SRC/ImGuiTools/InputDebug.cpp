@@ -16,9 +16,9 @@ void InputDebug(bool* shouldBeOpen)
     vec2 mousePosDelta = Input::GetMousePositionDelta();
     vec2 mouseScroll = Input::GetMouseScrollDelta();
 
-    ImGui::InputFloat2("Mouse position", (float*)&mousePos, 3, ImGuiInputTextFlags_ReadOnly);
-    ImGui::InputFloat2("Mouse delta", (float*)&mousePosDelta, 3, ImGuiInputTextFlags_ReadOnly);
-    ImGui::InputFloat2("Mouse scroll", (float*)&mouseScroll, 3, ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputFloat2("Mouse position", (float*)&mousePos, "%.3f", ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputFloat2("Mouse delta", (float*)&mousePosDelta, "%.3f", ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputFloat2("Mouse scroll", (float*)&mouseScroll, "%.3f", ImGuiInputTextFlags_ReadOnly);
 
     forrange(i, 0, 7)
     {

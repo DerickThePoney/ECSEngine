@@ -21,7 +21,7 @@ private:
 public:
     SAVE()
     {
-        ar(FName);
+        ar("Name", FName);
         std::string Category = GetCategoryName();
         NAMEDPROPERTYFIELD("Category", Category, "Default");
         std::vector<std::string> Masks = GetCollisionMaskNames();
