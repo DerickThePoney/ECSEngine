@@ -19,6 +19,233 @@ namespace Rendering
 
 namespace
 {
+ImGuiKey GlfwKeyToImGuiKey(int keycode)
+{
+    switch (keycode)
+    {
+    case GLFW_KEY_TAB:
+        return ImGuiKey_Tab;
+    case GLFW_KEY_LEFT:
+        return ImGuiKey_LeftArrow;
+    case GLFW_KEY_RIGHT:
+        return ImGuiKey_RightArrow;
+    case GLFW_KEY_UP:
+        return ImGuiKey_UpArrow;
+    case GLFW_KEY_DOWN:
+        return ImGuiKey_DownArrow;
+    case GLFW_KEY_PAGE_UP:
+        return ImGuiKey_PageUp;
+    case GLFW_KEY_PAGE_DOWN:
+        return ImGuiKey_PageDown;
+    case GLFW_KEY_HOME:
+        return ImGuiKey_Home;
+    case GLFW_KEY_END:
+        return ImGuiKey_End;
+    case GLFW_KEY_INSERT:
+        return ImGuiKey_Insert;
+    case GLFW_KEY_DELETE:
+        return ImGuiKey_Delete;
+    case GLFW_KEY_BACKSPACE:
+        return ImGuiKey_Backspace;
+    case GLFW_KEY_SPACE:
+        return ImGuiKey_Space;
+    case GLFW_KEY_ENTER:
+        return ImGuiKey_Enter;
+    case GLFW_KEY_ESCAPE:
+        return ImGuiKey_Escape;
+    case GLFW_KEY_APOSTROPHE:
+        return ImGuiKey_Apostrophe;
+    case GLFW_KEY_COMMA:
+        return ImGuiKey_Comma;
+    case GLFW_KEY_MINUS:
+        return ImGuiKey_Minus;
+    case GLFW_KEY_PERIOD:
+        return ImGuiKey_Period;
+    case GLFW_KEY_SLASH:
+        return ImGuiKey_Slash;
+    case GLFW_KEY_SEMICOLON:
+        return ImGuiKey_Semicolon;
+    case GLFW_KEY_EQUAL:
+        return ImGuiKey_Equal;
+    case GLFW_KEY_LEFT_BRACKET:
+        return ImGuiKey_LeftBracket;
+    case GLFW_KEY_BACKSLASH:
+        return ImGuiKey_Backslash;
+    case GLFW_KEY_RIGHT_BRACKET:
+        return ImGuiKey_RightBracket;
+    case GLFW_KEY_GRAVE_ACCENT:
+        return ImGuiKey_GraveAccent;
+    case GLFW_KEY_CAPS_LOCK:
+        return ImGuiKey_CapsLock;
+    case GLFW_KEY_SCROLL_LOCK:
+        return ImGuiKey_ScrollLock;
+    case GLFW_KEY_NUM_LOCK:
+        return ImGuiKey_NumLock;
+    case GLFW_KEY_PRINT_SCREEN:
+        return ImGuiKey_PrintScreen;
+    case GLFW_KEY_PAUSE:
+        return ImGuiKey_Pause;
+    case GLFW_KEY_KP_0:
+        return ImGuiKey_Keypad0;
+    case GLFW_KEY_KP_1:
+        return ImGuiKey_Keypad1;
+    case GLFW_KEY_KP_2:
+        return ImGuiKey_Keypad2;
+    case GLFW_KEY_KP_3:
+        return ImGuiKey_Keypad3;
+    case GLFW_KEY_KP_4:
+        return ImGuiKey_Keypad4;
+    case GLFW_KEY_KP_5:
+        return ImGuiKey_Keypad5;
+    case GLFW_KEY_KP_6:
+        return ImGuiKey_Keypad6;
+    case GLFW_KEY_KP_7:
+        return ImGuiKey_Keypad7;
+    case GLFW_KEY_KP_8:
+        return ImGuiKey_Keypad8;
+    case GLFW_KEY_KP_9:
+        return ImGuiKey_Keypad9;
+    case GLFW_KEY_KP_DECIMAL:
+        return ImGuiKey_KeypadDecimal;
+    case GLFW_KEY_KP_DIVIDE:
+        return ImGuiKey_KeypadDivide;
+    case GLFW_KEY_KP_MULTIPLY:
+        return ImGuiKey_KeypadMultiply;
+    case GLFW_KEY_KP_SUBTRACT:
+        return ImGuiKey_KeypadSubtract;
+    case GLFW_KEY_KP_ADD:
+        return ImGuiKey_KeypadAdd;
+    case GLFW_KEY_KP_ENTER:
+        return ImGuiKey_KeypadEnter;
+    case GLFW_KEY_KP_EQUAL:
+        return ImGuiKey_KeypadEqual;
+    case GLFW_KEY_LEFT_SHIFT:
+        return ImGuiKey_LeftShift;
+    case GLFW_KEY_LEFT_CONTROL:
+        return ImGuiKey_LeftCtrl;
+    case GLFW_KEY_LEFT_ALT:
+        return ImGuiKey_LeftAlt;
+    case GLFW_KEY_LEFT_SUPER:
+        return ImGuiKey_LeftSuper;
+    case GLFW_KEY_RIGHT_SHIFT:
+        return ImGuiKey_RightShift;
+    case GLFW_KEY_RIGHT_CONTROL:
+        return ImGuiKey_RightCtrl;
+    case GLFW_KEY_RIGHT_ALT:
+        return ImGuiKey_RightAlt;
+    case GLFW_KEY_RIGHT_SUPER:
+        return ImGuiKey_RightSuper;
+    case GLFW_KEY_MENU:
+        return ImGuiKey_Menu;
+    case GLFW_KEY_0:
+        return ImGuiKey_0;
+    case GLFW_KEY_1:
+        return ImGuiKey_1;
+    case GLFW_KEY_2:
+        return ImGuiKey_2;
+    case GLFW_KEY_3:
+        return ImGuiKey_3;
+    case GLFW_KEY_4:
+        return ImGuiKey_4;
+    case GLFW_KEY_5:
+        return ImGuiKey_5;
+    case GLFW_KEY_6:
+        return ImGuiKey_6;
+    case GLFW_KEY_7:
+        return ImGuiKey_7;
+    case GLFW_KEY_8:
+        return ImGuiKey_8;
+    case GLFW_KEY_9:
+        return ImGuiKey_9;
+    case GLFW_KEY_A:
+        return ImGuiKey_A;
+    case GLFW_KEY_B:
+        return ImGuiKey_B;
+    case GLFW_KEY_C:
+        return ImGuiKey_C;
+    case GLFW_KEY_D:
+        return ImGuiKey_D;
+    case GLFW_KEY_E:
+        return ImGuiKey_E;
+    case GLFW_KEY_F:
+        return ImGuiKey_F;
+    case GLFW_KEY_G:
+        return ImGuiKey_G;
+    case GLFW_KEY_H:
+        return ImGuiKey_H;
+    case GLFW_KEY_I:
+        return ImGuiKey_I;
+    case GLFW_KEY_J:
+        return ImGuiKey_J;
+    case GLFW_KEY_K:
+        return ImGuiKey_K;
+    case GLFW_KEY_L:
+        return ImGuiKey_L;
+    case GLFW_KEY_M:
+        return ImGuiKey_M;
+    case GLFW_KEY_N:
+        return ImGuiKey_N;
+    case GLFW_KEY_O:
+        return ImGuiKey_O;
+    case GLFW_KEY_P:
+        return ImGuiKey_P;
+    case GLFW_KEY_Q:
+        return ImGuiKey_Q;
+    case GLFW_KEY_R:
+        return ImGuiKey_R;
+    case GLFW_KEY_S:
+        return ImGuiKey_S;
+    case GLFW_KEY_T:
+        return ImGuiKey_T;
+    case GLFW_KEY_U:
+        return ImGuiKey_U;
+    case GLFW_KEY_V:
+        return ImGuiKey_V;
+    case GLFW_KEY_W:
+        return ImGuiKey_W;
+    case GLFW_KEY_X:
+        return ImGuiKey_X;
+    case GLFW_KEY_Y:
+        return ImGuiKey_Y;
+    case GLFW_KEY_Z:
+        return ImGuiKey_Z;
+    case GLFW_KEY_F1:
+        return ImGuiKey_F1;
+    case GLFW_KEY_F2:
+        return ImGuiKey_F2;
+    case GLFW_KEY_F3:
+        return ImGuiKey_F3;
+    case GLFW_KEY_F4:
+        return ImGuiKey_F4;
+    case GLFW_KEY_F5:
+        return ImGuiKey_F5;
+    case GLFW_KEY_F6:
+        return ImGuiKey_F6;
+    case GLFW_KEY_F7:
+        return ImGuiKey_F7;
+    case GLFW_KEY_F8:
+        return ImGuiKey_F8;
+    case GLFW_KEY_F9:
+        return ImGuiKey_F9;
+    case GLFW_KEY_F10:
+        return ImGuiKey_F10;
+    case GLFW_KEY_F11:
+        return ImGuiKey_F11;
+    case GLFW_KEY_F12:
+        return ImGuiKey_F12;
+    default:
+        return ImGuiKey_None;
+    }
+}
+
+void UpdateImGuiKeyModifiers(ImGuiIO& io, GLFWwindow* window)
+{
+    io.AddKeyEvent(ImGuiMod_Ctrl, (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS));
+    io.AddKeyEvent(ImGuiMod_Shift, (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS));
+    io.AddKeyEvent(ImGuiMod_Alt, (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS));
+    io.AddKeyEvent(ImGuiMod_Super, (glfwGetKey(window, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS));
+}
+
 void WindowSizeCallback(GLFWwindow* window, int width, int height)
 {
     AssertRelease(GLFWDisplayWindowHandler::HasInstance());
@@ -32,9 +259,7 @@ void WindowScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     for (u16 i = (u16)RenderPassId::IMGUI_PASSES_START; i < (u16)RenderPassId::IMGUI_PASSES_END + 1; i++)
     {
         ImGUI::SetImGuiContext((RenderPassId::Type)i);
-        ImGuiIO& io = ImGui::GetIO();
-        io.MouseWheelH += (float)xoffset;
-        io.MouseWheel += (float)yoffset;
+        ImGui::GetIO().AddMouseWheelEvent((float)xoffset, (float)yoffset);
     }
 
     Input::SetMouseScrollDelta(vec2((float)xoffset, (float)yoffset));
@@ -42,31 +267,29 @@ void WindowScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 
 void WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    if (action != GLFW_PRESS && action != GLFW_RELEASE)
+        return;
+
+    const bool down = (action == GLFW_PRESS);
+    const ImGuiKey imguiKey = GlfwKeyToImGuiKey(key);
     bool ctrl = false, shift = false, alt = false;
+
     for (u16 i = (u16)RenderPassId::IMGUI_PASSES_START; i < (u16)RenderPassId::IMGUI_PASSES_END + 1; i++)
     {
         ImGUI::SetImGuiContext((RenderPassId::Type)i);
         ImGuiIO& io = ImGui::GetIO();
-        if (action == GLFW_PRESS)
-            io.KeysData[key].Down = true;
-        if (action == GLFW_RELEASE)
-            io.KeysData[key].Down = false;
-
-        // Modifiers are not reliable across systems
-        io.KeyCtrl = io.KeyCtrl;
-        io.KeyShift = io.KeyShift;
-        io.KeyAlt = io.KeyAlt;
-#ifdef _WIN32
-        io.KeySuper = false;
-#else
-        io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
-#endif
+        UpdateImGuiKeyModifiers(io, window);
+        if (imguiKey != ImGuiKey_None)
+        {
+            io.AddKeyEvent(imguiKey, down);
+            io.SetKeyEventNativeData(imguiKey, key, scancode);
+        }
         ctrl = ctrl || io.KeyCtrl;
         shift = shift || io.KeyShift;
         alt = alt || io.KeyAlt;
     }
 
-    Input::SetKeyboardButtonState(key, action == GLFW_PRESS || action == GLFW_REPEAT, shift, ctrl, alt);
+    Input::SetKeyboardButtonState(key, down, shift, ctrl, alt);
 }
 
 void WindowCharCallback(GLFWwindow* window, unsigned int c)
@@ -74,8 +297,7 @@ void WindowCharCallback(GLFWwindow* window, unsigned int c)
     for (u16 i = (u16)RenderPassId::IMGUI_PASSES_START; i < (u16)RenderPassId::IMGUI_PASSES_END + 1; i++)
     {
         ImGUI::SetImGuiContext((RenderPassId::Type)i);
-        ImGuiIO& io = ImGui::GetIO();
-        io.AddInputCharacter(c);
+        ImGui::GetIO().AddInputCharacter(c);
     }
 
     Input::AddCharacterInput(c);
@@ -253,40 +475,6 @@ void GLFWDisplayWindowHandler::InitInputsForImGui(ImGuiIO& io)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos; // We can honor io.WantSetMousePos requests (optional, rarely used)
     io.BackendPlatformName = "ECSEngine_GLFW";
 
-    // TODO
-    // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
-    /*io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
-    io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
-    io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
-    io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
-    io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
-    io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
-    io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
-    io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
-    io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
-    io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
-    io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
-    io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
-    io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
-    io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
-    io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
-    io.KeyMap[ImGuiKey_KeyPadEnter] = GLFW_KEY_KP_ENTER;
-    io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
-    io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
-    io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
-    io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
-    io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-    io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;*/
-
-    // TODO IMGUI
-    /*io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
-    io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
-    io.ClipboardUserData = g_Window;*/
-#if defined(_WIN32)
-    // TODO
-    //  ImGuiViewport::PlatformHandleRaw = GetNativeWindowHandle();
-#endif* /
-
     // Create mouse cursors
     // (By design, on X11 cursors are user configurable and some cursors may be missing. When a cursor doesn't exist,
     // GLFW will emit an error which will often be printed by the app, so we temporarily disable error reporting.
@@ -297,7 +485,7 @@ void GLFWDisplayWindowHandler::InitInputsForImGui(ImGuiIO& io)
     FMouseCursors[ImGuiMouseCursor_ResizeNS] = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
     FMouseCursors[ImGuiMouseCursor_ResizeEW] = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
     FMouseCursors[ImGuiMouseCursor_Hand] = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
-#if GLFW_HAS_NEW_CURSORS
+#if defined(GLFW_RESIZE_ALL_CURSOR)
     FMouseCursors[ImGuiMouseCursor_ResizeAll] = glfwCreateStandardCursor(GLFW_RESIZE_ALL_CURSOR);
     FMouseCursors[ImGuiMouseCursor_ResizeNESW] = glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR);
     FMouseCursors[ImGuiMouseCursor_ResizeNWSE] = glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR);
@@ -308,36 +496,27 @@ void GLFWDisplayWindowHandler::InitInputsForImGui(ImGuiIO& io)
     FMouseCursors[ImGuiMouseCursor_ResizeNWSE] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
     FMouseCursors[ImGuiMouseCursor_NotAllowed] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
 #endif
+    glfwSetErrorCallback(prev_error_callback);
 }
 
 void GLFWDisplayWindowHandler::UpdateMousePosAndButtonsForImGUI(ImGuiIO& io)
 {
-    // Update buttons
-    for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++)
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+        io.AddMouseButtonEvent(i, glfwGetMouseButton(FWindow, i) != 0);
+
+    if (io.WantSetMousePos)
     {
-        // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
-        io.MouseDown[i] = /*g_MouseJustPressed[i] ||*/ glfwGetMouseButton(FWindow, i) != 0;
-        /*g_MouseJustPressed[i] = false;*/
+        glfwSetCursorPos(FWindow, (double)io.MousePos.x, (double)io.MousePos.y);
     }
-
-    // Update mouse position
-    const ImVec2 mouse_pos_backup = io.MousePos;
-    io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
-
-    const bool focused = glfwGetWindowAttrib(FWindow, GLFW_FOCUSED) != 0;
-
-    if (focused)
+    else if (glfwGetWindowAttrib(FWindow, GLFW_FOCUSED) != 0)
     {
-        if (io.WantSetMousePos)
-        {
-            glfwSetCursorPos(FWindow, (double)mouse_pos_backup.x, (double)mouse_pos_backup.y);
-        }
-        else
-        {
-            double mouse_x, mouse_y;
-            glfwGetCursorPos(FWindow, &mouse_x, &mouse_y);
-            io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);
-        }
+        double mouse_x, mouse_y;
+        glfwGetCursorPos(FWindow, &mouse_x, &mouse_y);
+        io.AddMousePosEvent((float)mouse_x, (float)mouse_y);
+    }
+    else
+    {
+        io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
     }
 }
 

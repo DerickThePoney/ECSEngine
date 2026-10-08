@@ -13,6 +13,7 @@
 #include "GLFWDisplayWindowHandler.h"
 #include "Texture.h"
 #include "TexturesManager.h"
+#include "bx/bx.h"
 #include "bx/math.h"
 
 #include <bx/timer.h>
@@ -27,6 +28,101 @@ namespace
 inline bool checkAvailTransientBuffers(uint32_t _numVertices, const bgfx::VertexLayout& _layout, uint32_t _numIndices)
 {
     return _numVertices == bgfx::getAvailTransientVertexBuffer(_numVertices, _layout) && (0 == _numIndices || _numIndices == bgfx::getAvailTransientIndexBuffer(_numIndices));
+}
+
+// Packed into ImTextureID for backend-managed textures (font atlas). Must be 8 bytes.
+struct ImGuiBgfxTexture
+{
+    bgfx::TextureHandle handle;
+    uint16_t flags;
+    uint32_t unused;
+};
+static_assert(sizeof(ImGuiBgfxTexture) == sizeof(ImTextureID), "ImGuiBgfxTexture must match ImTextureID size");
+
+ImTextureID PackImGuiTexture(bgfx::TextureHandle handle)
+{
+    ImGuiBgfxTexture tex{ handle, IMGUI_FLAGS_ALPHA_BLEND, 0 };
+    return bx::bitCast<ImTextureID>(tex);
+}
+
+bgfx::TextureHandle UnpackImGuiTexture(ImTextureID id)
+{
+    return bx::bitCast<ImGuiBgfxTexture>(id).handle;
+}
+
+void UpdateImGuiTexture(ImTextureData* texData)
+{
+    switch (texData->Status)
+    {
+    case ImTextureStatus_WantCreate:
+    {
+        AssertRelease(texData->Format == ImTextureFormat_RGBA32 || texData->BytesPerPixel == 4);
+
+        const bgfx::TextureHandle handle = bgfx::createTexture2D((uint16_t)texData->Width, (uint16_t)texData->Height, false, 1, bgfx::TextureFormat::BGRA8, 0);
+        bgfx::setName(handle, "ImGui Font Atlas");
+        bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)texData->Width, (uint16_t)texData->Height, bgfx::copy(texData->GetPixels(), texData->GetSizeInBytes()));
+
+        texData->SetTexID(PackImGuiTexture(handle));
+        texData->SetStatus(ImTextureStatus_OK);
+        break;
+    }
+
+    case ImTextureStatus_WantUpdates:
+    {
+        const bgfx::TextureHandle handle = UnpackImGuiTexture(texData->GetTexID());
+        AssertRelease(bgfx::isValid(handle));
+
+        for (ImTextureRect& rect : texData->Updates)
+        {
+            const uint32_t bpp = (uint32_t)texData->BytesPerPixel;
+            const bgfx::Memory* pix = bgfx::alloc(rect.h * rect.w * bpp);
+            bx::gather(pix->data, (const uint8_t*)texData->GetPixelsAt(rect.x, rect.y), texData->GetPitch(), rect.w * bpp, rect.h);
+            bgfx::updateTexture2D(handle, 0, 0, (uint16_t)rect.x, (uint16_t)rect.y, (uint16_t)rect.w, (uint16_t)rect.h, pix);
+        }
+
+        texData->SetStatus(ImTextureStatus_OK);
+        break;
+    }
+
+    case ImTextureStatus_WantDestroy:
+    {
+        if (texData->UnusedFrames > 0)
+        {
+            const ImTextureID id = texData->GetTexID();
+            if (id != ImTextureID_Invalid)
+            {
+                const bgfx::TextureHandle handle = UnpackImGuiTexture(id);
+                if (bgfx::isValid(handle))
+                    bgfx::destroy(handle);
+            }
+            texData->SetTexID(ImTextureID_Invalid);
+            texData->SetStatus(ImTextureStatus_Destroyed);
+        }
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+void DestroyAllImGuiTextures()
+{
+    for (ImTextureData* texData : ImGui::GetPlatformIO().Textures)
+    {
+        if (texData->Status == ImTextureStatus_Destroyed)
+            continue;
+
+        const ImTextureID id = texData->GetTexID();
+        if (id != ImTextureID_Invalid)
+        {
+            const bgfx::TextureHandle handle = UnpackImGuiTexture(id);
+            if (bgfx::isValid(handle))
+                bgfx::destroy(handle);
+        }
+        texData->SetTexID(ImTextureID_Invalid);
+        texData->SetStatus(ImTextureStatus_Destroyed);
+    }
 }
 } // namespace
 
@@ -55,8 +151,8 @@ private:
     FixedSizedArrayInSitu<ImGuiContext*, PassesNumber> FImguiContexts;
     bgfx::VertexLayout FVertexLayout;
     bgfx::ProgramHandle FProgam;
-    bgfx::TextureHandle FTextureHandle;
     bgfx::UniformHandle FTextureSampleUniform;
+    std::shared_ptr<ECSEngine::ResourceHandle> FFontDataHandle;
 };
 
 void ImguiRenderer::Init(const u32 parContext)
@@ -75,6 +171,11 @@ void ImguiRenderer::Init(const u32 parContext)
 
     ImGuiIO& io = ImGui::GetIO();
 
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
+    io.BackendRendererName = "ECSEngine_bgfx";
+
+    ImGui::StyleColorsDark();
+
     io.DisplaySize = ImVec2(1280.0f, 720.0f);
     io.DeltaTime = 1.0f / 60.0f;
     io.IniFilename = NULL;
@@ -86,15 +187,26 @@ void ImguiRenderer::Init(const u32 parContext)
         {
             std::shared_ptr<ECSEngine::ResourceHandle> styleResHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&styleResource);
             AssertRelease(styleResHandle != nullptr);
-            memcpy(&ImGui::GetStyle(), styleResHandle->WritableBuffer(), sizeof(ImGuiStyle));
+            // ImGuiStyle layout changed in 1.92; only apply blobs that match the current size.
+            if (styleResHandle->Size() == sizeof(ImGuiStyle))
+            {
+                memcpy(&ImGui::GetStyle(), styleResHandle->WritableBuffer(), sizeof(ImGuiStyle));
+            }
         }
     }
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (style.FontScaleDpi <= 0.f)
+        style.FontScaleDpi = 1.f;
+    if (style.FontScaleMain <= 0.f)
+        style.FontScaleMain = 1.f;
+    if (style.FontSizeBase <= 0.f)
+        style.FontSizeBase = 20.f;
 
     GLFWDisplayWindowHandler::Instance().InitInputsForImGui(io);
 
     if (parContext == 0)
     {
-        bgfx::RendererType::Enum type = bgfx::getRendererType();
         FProgam = LoadProgram("Shaders\\Perso\\", "ImGUI", "ocornut_imgui");
 
         FVertexLayout.begin()
@@ -105,30 +217,35 @@ void ImguiRenderer::Init(const u32 parContext)
 
         FTextureSampleUniform = bgfx::createUniform("s_tex", bgfx::UniformType::Sampler);
 
-        uint8_t* data;
-        int32_t width;
-        int32_t height;
-
         ECSEngine::ResourceCache* cache = ECSEngine::GlobalResourceCache::Instance().FCache;
-        ECSEngine::Resource shaderResource("Fonts\\OpenSans-Regular.ttf");
-        std::shared_ptr<ECSEngine::ResourceHandle> shaderDataHandle = cache->GetResourceHandle(&shaderResource);
+        ECSEngine::Resource fontResource("Fonts\\OpenSans-Regular.ttf");
+        // Keep TTF bytes alive for the atlas lifetime (required since ImGui 1.92 / FontDataOwnedByAtlas = false).
+        FFontDataHandle = cache->GetResourceHandle(&fontResource);
+        AssertRelease(FFontDataHandle != nullptr);
+
         ImFontConfig config;
         config.FontDataOwnedByAtlas = false;
         config.MergeMode = false;
-        io.Fonts->AddFontFromMemoryTTF(shaderDataHandle->WritableBuffer(), shaderDataHandle->Size(), 20, &config);
-
-        io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
-
-        FTextureHandle = bgfx::createTexture2D((uint16_t)width, (uint16_t)height, false, 1, bgfx::TextureFormat::BGRA8, 0, bgfx::copy(data, width * height * 4));
+        io.Fonts->AddFontFromMemoryTTF(FFontDataHandle->WritableBuffer(), (int)FFontDataHandle->Size(), 20.f, &config);
+        // Texture upload is deferred to Render() via ImDrawData::Textures (RendererHasTextures).
     }
 }
 
 void ImguiRenderer::Render(ImDrawData* parDrawData, const u16 parViewId)
 {
-    // SHAMELESSLY STOLEN FROM BGFX EXAMPLES...
-    const ImGuiIO& io = ImGui::GetIO();
-    const float width = io.DisplaySize.x;
-    const float height = io.DisplaySize.y;
+    if (parDrawData->Textures != nullptr)
+    {
+        for (ImTextureData* texData : *parDrawData->Textures)
+        {
+            if (texData->Status != ImTextureStatus_OK)
+                UpdateImGuiTexture(texData);
+        }
+    }
+
+    const float width = parDrawData->DisplaySize.x;
+    const float height = parDrawData->DisplaySize.y;
+    if (width <= 0.f || height <= 0.f || parDrawData->CmdLists.Size == 0)
+        return;
 
     bgfx::setViewName(parViewId, "ImGui");
     bgfx::setViewMode(parViewId, bgfx::ViewMode::Sequential);
@@ -142,7 +259,7 @@ void ImguiRenderer::Render(ImDrawData* parDrawData, const u16 parViewId)
     }
 
     // Render command lists
-    for (int32_t ii = 0, num = parDrawData->CmdListsCount; ii < num; ++ii)
+    for (int32_t ii = 0, num = parDrawData->CmdLists.Size; ii < num; ++ii)
     {
         bgfx::TransientVertexBuffer tvb;
         bgfx::TransientIndexBuffer tib;
@@ -175,24 +292,25 @@ void ImguiRenderer::Render(ImDrawData* parDrawData, const u16 parViewId)
             }
             else if (0 != cmd->ElemCount)
             {
-                uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA;
+                uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA
+                                 | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
-                bgfx::TextureHandle th = FTextureHandle;
+                bgfx::TextureHandle th = BGFX_INVALID_HANDLE;
                 bgfx::ProgramHandle program = FProgam;
 
-                if (NULL != cmd->GetTexID())
+                if (cmd->TexRef._TexData != nullptr)
                 {
-                    const Rendering::TextureHandle* textureHandle = (Rendering::TextureHandle*)cmd->GetTexID();
+                    // Backend-managed texture (font atlas): ImTextureID packs a bgfx handle.
+                    th = UnpackImGuiTexture(cmd->GetTexID());
+                }
+                else if (cmd->GetTexID() != ImTextureID_Invalid)
+                {
+                    // User texture: ImTextureID is a pointer to Rendering::TextureHandle (e.g. ImageButton).
+                    const Rendering::TextureHandle* textureHandle = (const Rendering::TextureHandle*)(uintptr_t)cmd->GetTexID();
                     const Rendering::Texture* textureToDisplay = Rendering::TextureManager::Instance().GetTexture(*textureHandle);
                     AssertRelease(textureToDisplay != nullptr);
                     AssertRelease(textureToDisplay->Valid());
-
-                    state |= BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
                     th = textureToDisplay->Handle();
-                }
-                else
-                {
-                    state |= BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
                 }
 
                 const uint16_t xx = uint16_t(bx::max(cmd->ClipRect.x, 0.0f));
@@ -222,14 +340,21 @@ void ImguiRenderer::Shutdown(const u32 parContext)
 {
     AssertRelease(parContext < PassesNumber);
     AssertRelease(FImguiContexts[parContext] != nullptr);
+
+    if (parContext == 0)
+    {
+        SetCurrentContext(0);
+        DestroyAllImGuiTextures();
+    }
+
     ImGui::DestroyContext(FImguiContexts[parContext]);
+    FImguiContexts[parContext] = nullptr;
 
     if (parContext == 0)
     {
         bgfx::destroy(FTextureSampleUniform);
-        bgfx::destroy(FTextureHandle);
-
         bgfx::destroy(FProgam);
+        FFontDataHandle.reset();
     }
 }
 
@@ -279,8 +404,6 @@ void NewFrame()
         GLFWDisplayWindowHandler::Instance().UpdateMouseCursorForImGUI(io);
         GLFWDisplayWindowHandler::Instance().UpdateJoysticks(io);
 
-        //// Update game controllers (if enabled and available)
-        // ImGui_ImplGlfw_UpdateGamepads();
         captureKeyboard = captureKeyboard || io.WantCaptureKeyboard;
         captureMouse = captureMouse || io.WantCaptureMouse;
 
@@ -298,14 +421,15 @@ void Render()
         ImGui::EndFrame();
         ImGui::Render();
         ImDrawData* draw_data = ImGui::GetDrawData();
-        if (draw_data->CmdListsCount > 0)
-            ECSEngine::Rendering::ImguiRenderer::Instance().Render(draw_data, i);
+        // Always call Render so ImDrawData::Textures (WantCreate/Update/Destroy) are processed.
+        ECSEngine::Rendering::ImguiRenderer::Instance().Render(draw_data, i);
     }
 }
 
 void Shutdown()
 {
-    for (u16 i = RenderPassId::IMGUI_PASSES_START; i < RenderPassId::IMGUI_PASSES_END + 1; ++i)
+    // Destroy non-owning contexts first; context 0 owns the shared font atlas / backend textures.
+    for (u16 i = RenderPassId::IMGUI_PASSES_END + 1; i-- > RenderPassId::IMGUI_PASSES_START;)
     {
         ECSEngine::Rendering::ImguiRenderer::Instance().Shutdown(i - RenderPassId::IMGUI_PASSES_START);
     }
