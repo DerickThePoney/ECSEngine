@@ -122,7 +122,7 @@ void PhysicsCollisionPresetEditor::DrawCollisionPresetEditor()
     // Name updater
     char text[256];
     sprintf(text, "%s", Current.FName.c_str());
-    ImGui::InputText("", text, 256);
+    ImGui::InputText("##PresetName", text, 256);
     Current.FName = std::string(text);
 
     // Category Updater
