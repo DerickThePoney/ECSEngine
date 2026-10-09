@@ -7,6 +7,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "OrientationModule.h"
+#include "Physics/ContactEvent.h"
 #include "Physics/PhysicsAPI.h"
 #include "PositionModule.h"
 #include "RigidbodyModule.h"
@@ -31,6 +32,13 @@ void PhysicsUpdateSystem::VirtualUpdate()
     parent_type::VirtualUpdate();
 
     Physics::UpdatePhysics();
+
+    // TODO Figure out a way to dispatch contact events
+    auto ContactEvents = Physics::GetContactEvents();
+    u32 ContactEventsCount = Physics::GetContactEventsCount();
+    // - ContactEvents manager that registers FHandle -> EntityId maps and allows modules to register on to it.
+    // - Messaging system ?
+    // TODO STUFF WITH EVENTS
 
     ModuleAccessor<RigidbodyModule> RigidBodyAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<PositionModule> PositionAccessor(EEntityWorlds::STANDARD);
