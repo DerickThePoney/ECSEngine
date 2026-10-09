@@ -21,7 +21,7 @@ private:
 public:
     SAVE()
     {
-        ar("Name", FName);
+        ar(cereal::make_nvp("Name", FName));
         std::string Category = GetCategoryName();
         NAMEDPROPERTYFIELD("Category", Category, "Default");
         std::vector<std::string> Masks = GetCollisionMaskNames();
