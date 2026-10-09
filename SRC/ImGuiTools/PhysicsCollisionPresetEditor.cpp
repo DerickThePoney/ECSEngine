@@ -143,8 +143,41 @@ void PhysicsCollisionPresetEditor::DrawCollisionPresetEditor()
         ImGui::EndCombo();
     }
 
-    forrange(i, 0, Config.FNumLayers)
+    ImGui::Separator();
+
+    ImGui::Text("Collision channels to collide with");
+
+    const u32 AllLayersMask = ((1u << Config.FNumLayers) - 1);
+    const bool bIsAllChannels = (Current.FCollisionMask & AllLayersMask) == AllLayersMask;
+
+    if (bIsAllChannels)
+        Current.FCollisionMask = -1u;
+
+    bool bWantsAllChannels = bIsAllChannels;
+    ImGui::Checkbox("Collide all", &bWantsAllChannels);
+
+    if (!bIsAllChannels && bWantsAllChannels)
+        Current.FCollisionMask = -1u;
+
+    ImGui::SameLine();
+    bool bWantsNoChannels = Current.FCollisionMask == 0;
+    ImGui::Checkbox("Collide None", &bWantsNoChannels);
+    if (bWantsNoChannels)
+        Current.FCollisionMask = 0;
+
+    static constexpr i32 NbColumns = 4;
+    if (ImGui::BeginTable("CollidesWith", NbColumns))
     {
+        forrange(i, 0, Config.FNumLayers)
+        {
+            if ((i % NbColumns) == 0)
+            {
+                ImGui::TableNextRow();
+            }
+            ImGui::TableNextColumn();
+            ImGui::CheckboxFlags(Config.LayerName(i).c_str(), &Current.FCollisionMask, 1u << i);
+        }
+        ImGui::EndTable();
     }
 }
 
