@@ -27,6 +27,9 @@ struct PhysicsBodyConfig
     float FRestitution = 0.2f;
     float FFriction = 0.4f;
 
+    // Collision preset
+    std::string FCollisionPreset = "DEFAULT";
+
     // TO ADD:
     // - Collision channels
     // - Drag (angular and linear)
@@ -43,6 +46,7 @@ struct PhysicsBodyConfig
         PROPERTYFIELD(Moveability, EPhysicsMoveability::STATIC);
         PROPERTYFIELD(Restitution, 0.2f);
         PROPERTYFIELD(Friction, 0.4f);
+        PROPERTYFIELD(CollisionPreset, "DEFAULT");
     }
 
     void DrawInEditor();

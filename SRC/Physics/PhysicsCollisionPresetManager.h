@@ -7,7 +7,7 @@ namespace Physics
 struct PhysicsCollisionPreset
 {
 public:
-    std::string FName = "Default";
+    std::string FName = "DEFAULT";
     u32 FCollisionCategory = 1;
     u32 FCollisionMask = 0;
 
@@ -30,7 +30,7 @@ public:
 
     LOAD()
     {
-        PROPERTYFIELD(Name, "Default");
+        PROPERTYFIELD(Name, "DEFAULT");
         std::string Category;
         NAMEDPROPERTYFIELD("Category", Category, "Default");
         SetCategoryName(Category);
@@ -47,11 +47,14 @@ class PhysicsCollisionPresetManager
 public:
     void Initialize(PhysicsEngine* Engine);
 
+    const PhysicsCollisionPreset& GetPreset(std::string parName) const;
+
     const std::vector<PhysicsCollisionPreset>& CollisionPresets() const { return FCollisionPresets; }
     std::vector<PhysicsCollisionPreset>& CollisionPresets() { return FCollisionPresets; }
 
 private:
     std::vector<PhysicsCollisionPreset> FCollisionPresets;
+    static PhysicsCollisionPreset DefaultPreset;
 };
 } // namespace Physics
 } // namespace ECSEngine
