@@ -34,7 +34,10 @@ void EntityTemplate::Initialise()
         }
     }
 
-    foreachitem(modIt, FModuleTemplates) { modIt.second->PostLoad(); }
+    foreachitem(modIt, FModuleTemplates)
+    {
+        modIt.second->PostLoad();
+    }
 
 #ifdef PERFORM_SECURITY_CHECKS
     FHasBeenInit = true;
@@ -87,7 +90,7 @@ void EntityTemplate::DrawEditor()
 
     char text[256];
     sprintf(text, "%s", FName.c_str());
-    ImGui::InputText("", text, 256);
+    ImGui::InputText("##EntityName", text, 256);
     FName = std::string(text);
 
     if (ImGui::BeginCombo("Entity world", EEntityWorldsHelpers::GetName(FWorld)))
