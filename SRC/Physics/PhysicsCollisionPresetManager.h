@@ -8,8 +8,8 @@ struct PhysicsCollisionPreset
 {
 public:
     std::string FName = "DEFAULT";
-    u32 FCollisionCategory = 1;
-    u32 FCollisionMask = 0;
+    u32 FCollisionCategory = 0;
+    u32 FCollisionMask = ~0u;
 
 private:
     std::string GetCategoryName() const;
