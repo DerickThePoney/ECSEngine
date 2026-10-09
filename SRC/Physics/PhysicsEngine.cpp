@@ -10,6 +10,7 @@
 #include "Common/CameraManager.h"
 #include "Common/ColorUtils.h"
 #include "Common/InputManager.h"
+#include "Common/Logger.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
@@ -44,6 +45,8 @@ void PhysicsEngine::Cleanup()
 
 void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 {
+    ClearContactEvents();
+
     FContactManager.FindNewContacts(FBroadPhase);
 
     FContactManager.CollideContacts(this, FBroadPhase);
@@ -519,6 +522,18 @@ void PhysicsEngine::AddMovedBody(RigidBody* body, vec3 displacement)
         return;
     }
     FMovedBodies.push_back({ body->FHandle, displacement });
+}
+
+void PhysicsEngine::PushContactEvent(const ContactEvent& Event)
+{
+    if (FContactEventsCount >= FContactEvents.size())
+    {
+#ifdef PERFORM_SECURITY_CHECKS
+        LOG_PHYSICS("Contact Queue filled");
+#endif
+        return;
+    }
+    FContactEvents[FContactEventsCount++] = Event;
 }
 
 #ifdef PERFORM_SECURITY_CHECKS
