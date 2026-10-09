@@ -72,7 +72,7 @@ std::vector<std::string> PhysicsCollisionPreset::GetCollisionMaskNames() const
             continue;
         }
 
-        MaskNames.push_back(Config.LayerName(LayerBit));
+        MaskNames.push_back(Config.LayerName(i));
     }
 
     return MaskNames;
@@ -104,7 +104,7 @@ void PhysicsCollisionPreset::SetCollisionMaskNames(std::vector<std::string>& Mas
     forrange(i, 0, Masks.size())
     {
         u32 LayerBit = Config.LayerBit(Masks[i]);
-        FCollisionMask = FCollisionMask & LayerBit;
+        FCollisionMask = FCollisionMask | (1u << LayerBit);
     }
 }
 #pragma endregion Presets
