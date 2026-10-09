@@ -3,6 +3,7 @@
 #include "BroadPhase.h"
 #include "Common/IdGenerator.h"
 #include "Common/Singleton.h"
+#include "ContactEvent.h"
 #include "ContactManager.h"
 #include "IslandManager.h"
 #include "PhysicsCollisionPresetManager.h"
@@ -15,6 +16,9 @@ namespace Physics
 {
 struct PhysicsBodyHandle;
 struct PhysicsBodyConfig;
+
+constexpr u32 MaxContactEvents = 1024;
+using ContactEventArray = std::array<ContactEvent, MaxContactEvents>;
 
 class PhysicsEngine : public Singleton<PhysicsEngine>
 {
@@ -59,6 +63,11 @@ public:
 
     void AddMovedBody(RigidBody* body, vec3 displacement);
 
+    void PushContactEvent(const ContactEvent& Event);
+    const ContactEventArray& GetContactEvents() const { return FContactEvents; }
+    u32 GetContactEventsCount() const { return FContactEventsCount; }
+    void ClearContactEvents() { FContactEventsCount = 0; }
+
 #ifdef PERFORM_SECURITY_CHECKS
     void DrawDebug();
 #endif
@@ -90,6 +99,8 @@ private:
     std::vector<MovedBodies> FMovedBodies;
     BroadPhase FBroadPhase;
     ContactManager FContactManager;
+    ContactEventArray FContactEvents;
+    u32 FContactEventsCount = 0;
 
     friend class IslandManager;
     IslandManager FIslandManager;
