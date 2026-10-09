@@ -13,6 +13,8 @@ namespace ECSEngine
 {
 namespace Physics
 {
+PhysicsCollisionPreset PhysicsCollisionPresetManager::DefaultPreset = PhysicsCollisionPreset();
+
 void PhysicsCollisionPresetManager::Initialize(PhysicsEngine* Engine)
 {
     const PhysicsEngineConfiguration& Config = Engine->Config();
@@ -38,6 +40,20 @@ void PhysicsCollisionPresetManager::Initialize(PhysicsEngine* Engine)
             archive(NAMEDPROPERTY("PhysicsCollisionPresets", FCollisionPresets));
         }
     }
+}
+
+const PhysicsCollisionPreset& PhysicsCollisionPresetManager::GetPreset(std::string parName) const
+{
+    if (parName == "DEFAULT")
+        return DefaultPreset;
+
+    foreachitemconst(Preset, FCollisionPresets)
+    {
+        if (parName == Preset.FName)
+            return Preset;
+    }
+    AssertNotReachedMsg(std::format("Unknown preset {}. Reverting to default preset...", parName).c_str());
+    return DefaultPreset;
 }
 
 #pragma region Presets

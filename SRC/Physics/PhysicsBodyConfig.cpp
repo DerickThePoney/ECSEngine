@@ -2,6 +2,9 @@
 
 #include "PhysicsBodyConfig.h"
 
+#include "PhysicsAPI.h"
+#include "PhysicsCollisionPresetManager.h"
+
 namespace ECSEngine
 {
 namespace Physics
@@ -53,6 +56,24 @@ void PhysicsBodyConfig::DrawInEditor()
 
     ImGui::SliderFloat("Restitution", &FRestitution, 0.f, 1.f);
     ImGui::SliderFloat("Friction", &FFriction, 0.f, 1.f);
+
+    if (ImGui::BeginCombo("Collision preset", FCollisionPreset.c_str()))
+    {
+        const PhysicsCollisionPresetManager& CollisionPresetManager = Physics::GetCollisionPresetManager();
+        const std::vector<PhysicsCollisionPreset>& Presets = CollisionPresetManager.CollisionPresets();
+
+        forrange(i, 0, Presets.size())
+        {
+            bool bIsSelected = FCollisionPreset == Presets[i].FName;
+            if (ImGui::Selectable(Presets[i].FName.c_str()))
+                FCollisionPreset = Presets[i].FName;
+            if (bIsSelected)
+                ImGui::SetItemDefaultFocus();
+        }
+
+        ImGui::EndCombo();
+    }
+
     ImGui::PopID();
 }
 
