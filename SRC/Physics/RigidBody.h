@@ -85,6 +85,8 @@ public:
     AABB3f ComputeAABB(const mat4& parTransform) const;
     void UpdateCoMWorld();
 
+    u32 GetCollisionCategoryBit() const { return 1u << FCollisionCategory; }
+
     BitSet<ERigidBodyFlag::RB_COUNT> FFlags;
 };
 } // namespace Physics

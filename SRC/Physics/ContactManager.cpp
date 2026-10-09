@@ -133,7 +133,7 @@ void ContactManager::AddPotentialContactPair(const PhysicsBodyHandle& first, con
         return;
     }
 
-    if ((a->FCollisionMask & b->FCollisionCategory) == 0 || (b->FCollisionMask & a->FCollisionCategory) == 0)
+    if ((a->FCollisionMask & b->GetCollisionCategoryBit()) == 0 || (b->FCollisionMask & a->GetCollisionCategoryBit()) == 0)
     {
         // The bodies can't collide with each other.
         return;
