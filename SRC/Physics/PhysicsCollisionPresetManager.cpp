@@ -105,6 +105,8 @@ void PhysicsCollisionPreset::SetCollisionMaskNames(std::vector<std::string>& Mas
     PhysicsEngine& Engine = PhysicsEngine::Instance();
     const PhysicsEngineConfiguration& Config = Engine.Config();
 
+    FCollisionMask = 0;
+
     if (Masks.empty())
     {
         FCollisionMask = 0;
