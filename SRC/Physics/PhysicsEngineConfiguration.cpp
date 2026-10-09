@@ -17,7 +17,7 @@ u32 PhysicsEngineConfiguration::LayerBit(std::string LayerName) const
     }
 
     AssertNotReachedMsg(std::format("PhysicsEngineConfiguration::LayerBit: UNKNOWN layer name {} - reverting to default", LayerName).c_str());
-    return u32(1);
+    return u32(0);
 }
 
 static std::string UNKOWNLAYER("UNKNOWN");
