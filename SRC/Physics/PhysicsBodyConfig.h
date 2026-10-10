@@ -29,6 +29,7 @@ struct PhysicsBodyConfig
 
     // Collision preset
     std::string FCollisionPreset = "DEFAULT";
+    bool FGenerateContactEvents = false;
 
     // TO ADD:
     // - Collision channels
@@ -47,6 +48,7 @@ struct PhysicsBodyConfig
         PROPERTYFIELD(Restitution, 0.2f);
         PROPERTYFIELD(Friction, 0.4f);
         PROPERTYFIELD(CollisionPreset, "DEFAULT");
+        PROPERTYFIELD(GenerateContactEvents, false);
     }
 
     void DrawInEditor();

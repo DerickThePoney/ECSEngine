@@ -70,6 +70,9 @@ public:
 
     ContactEdge* FContactList = nullptr;
 
+    // Bool Flags
+    bool FGenerateContactEvents = false;
+
     // Helper functions
     void AddForce(const vec3& Force, bool bTreatAsAcceleration);
     void AddTorque(const vec3& Torque);

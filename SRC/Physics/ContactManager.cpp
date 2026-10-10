@@ -111,31 +111,38 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
             }
         }
 
-        // TODO SENSORS + BEGIN/END Contacts
-        const bool bWasTouching = Current->FFlags.GetValue(EContactFlag::CT_WAS_TOUCHING);
-        const bool bIsTouching = Current->FFlags.GetValue(EContactFlag::CT_TOUCHING);
-        if (!bWasTouching && bIsTouching)
+        // TODO SENSORS
+        RigidBody* a = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);
+        RigidBody* b = PhysicsEngine::Instance().GetRigidBody(Current->FSecondBody);
+        const bool bWantsEvent = a->FGenerateContactEvents || b->FGenerateContactEvents;
+
+        if (bWantsEvent)
         {
-            ContactEvent evt;
-            evt.Type = EContactEventType::Begin;
-            evt.BodyA = Current->FFirstBody;
-            evt.BodyB = Current->FSecondBody;
-            evt.Normal = Current->FContactNormal;
-            evt.ContactPoints = Current->FManifold.FContactPoints;
+            const bool bWasTouching = Current->FFlags.GetValue(EContactFlag::CT_WAS_TOUCHING);
+            const bool bIsTouching = Current->FFlags.GetValue(EContactFlag::CT_TOUCHING);
+            if (!bWasTouching && bIsTouching)
+            {
+                ContactEvent evt;
+                evt.Type = EContactEventType::Begin;
+                evt.BodyA = Current->FFirstBody;
+                evt.BodyB = Current->FSecondBody;
+                evt.Normal = Current->FContactNormal;
+                evt.ContactPoints = Current->FManifold.FContactPoints;
 
-            Engine->PushContactEvent(evt);
-        }
+                Engine->PushContactEvent(evt);
+            }
 
-        if (bWasTouching && !bIsTouching)
-        {
-            ContactEvent evt;
-            evt.Type = EContactEventType::End;
-            evt.BodyA = Current->FFirstBody;
-            evt.BodyB = Current->FSecondBody;
-            evt.Normal = Current->FContactNormal;
-            evt.ContactPoints = Current->FManifold.FContactPoints;
+            if (bWasTouching && !bIsTouching)
+            {
+                ContactEvent evt;
+                evt.Type = EContactEventType::End;
+                evt.BodyA = Current->FFirstBody;
+                evt.BodyB = Current->FSecondBody;
+                evt.Normal = Current->FContactNormal;
+                evt.ContactPoints = Current->FManifold.FContactPoints;
 
-            Engine->PushContactEvent(evt);
+                Engine->PushContactEvent(evt);
+            }
         }
 
         Current = Current->FNext;
@@ -224,10 +231,9 @@ void ContactManager::DestroyContact(Contact* c)
     RigidBody* b = PhysicsEngine::Instance().GetRigidBody(c->FSecondBody);
 
     // Dispatch End event
-    const bool bWasTouching = c->FFlags.GetValue(EContactFlag::CT_WAS_TOUCHING);
     const bool bIsTouching = c->FFlags.GetValue(EContactFlag::CT_TOUCHING);
-
-    if (bIsTouching)
+    const bool bWantsEvent = a->FGenerateContactEvents || b->FGenerateContactEvents;
+    if (bWantsEvent && bIsTouching)
     {
         ContactEvent evt;
         evt.Type = EContactEventType::End;
