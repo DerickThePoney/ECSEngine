@@ -468,6 +468,7 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     const PhysicsCollisionPreset& Preset = FCollisionPresetManager.GetPreset(BodyConfig.FCollisionPreset);
     Body->FCollisionCategory = Preset.FCollisionCategory;
     Body->FCollisionMask = Preset.FCollisionMask;
+    Body->FGenerateContactEvents = BodyConfig.FGenerateContactEvents;
 
     Body->SetAwake(true);
 }
