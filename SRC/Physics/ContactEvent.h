@@ -16,8 +16,6 @@ enum class EContactEventType : u8
 
 struct ContactEvent
 {
-    DECLARE_POOL_ALLOCATED(ContactEvent);
-
 public:
     PhysicsBodyHandle BodyA;
     PhysicsBodyHandle BodyB;
