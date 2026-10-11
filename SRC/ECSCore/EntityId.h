@@ -1,5 +1,8 @@
 ﻿#pragma once
 #include "WorldIds_fwd.h"
+
+#include <functional>
+
 namespace ECSEngine
 {
 #pragma pack(push, 1)
@@ -45,3 +48,12 @@ static bool operator<(const EntityId& left, const EntityId& right)
 }
 
 } // namespace ECSEngine
+
+namespace std
+{
+template<>
+struct hash<ECSEngine::EntityId>
+{
+    size_t operator()(const ECSEngine::EntityId& parId) const noexcept { return hash<u32>{ }(parId.GetRawId()); }
+};
+} // namespace std
