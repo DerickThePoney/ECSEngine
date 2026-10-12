@@ -33,7 +33,9 @@ void ContactEventEventManager::AddContactEventListener(const EntityId& unitID, B
     auto itFind = FEntityIdToPhysicsBodyHandle.find(unitID);
     if (itFind == FEntityIdToPhysicsBodyHandle.end())
     {
-        LOG_PHYSICS(std::format("Trying to register listeners for unregestered unitID {}", unitID.GetRawId()));
+#ifdef PERFORM_SECURITY_CHECKS
+        LOG_PHYSICS(std::format("Trying to register listeners for unregestered unitID {}", unitID));
+#endif
         return;
     }
     const PhysicsBodyHandle& handle = itFind->second;
@@ -50,7 +52,9 @@ void ContactEventEventManager::RemoveContactEventListener(const EntityId& unitID
     auto itFind = FEntityIdToPhysicsBodyHandle.find(unitID);
     if (itFind == FEntityIdToPhysicsBodyHandle.end())
     {
-        LOG_PHYSICS(std::format("Trying to register listeners for unregestered unitID {}", unitID.GetRawId()));
+#ifdef PERFORM_SECURITY_CHECKS
+        LOG_PHYSICS(std::format("Trying to register listeners for unregestered unitID {}", unitID));
+#endif
         return;
     }
     const PhysicsBodyHandle& handle = itFind->second;
