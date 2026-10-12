@@ -14,7 +14,7 @@ void BroadPhase::Shutdown()
 {
     FTree.Clear();
     FMovedBodies.clear();
-    FCurrentQuery = PhysicsBodyHandle{};
+    FCurrentQuery = PhysicsBodyHandle{ };
     FOverlapingBodies.clear();
 }
 
@@ -54,6 +54,11 @@ bool BroadPhase::TestOverlap(const PhysicsBodyHandle& first, const PhysicsBodyHa
 AABB3f BroadPhase::GetFatAABB3f(const PhysicsBodyHandle& handle) const
 {
     return FTree.GetFatAABB3f(handle);
+}
+
+void BroadPhase::Raycast(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& parLeafsHit)
+{
+    FTree.RaycastTree(parRay, parLeafsHit);
 }
 
 void BroadPhase::UpdatePotentialOverlappingPairs(FOverlapingPairDelegate& parCallback)

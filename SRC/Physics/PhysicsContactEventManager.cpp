@@ -114,5 +114,12 @@ void PhysicsContactEventManager::DispatchContactEvents(const ContactEventArray& 
     }
 }
 
+const EntityId& PhysicsContactEventManager::ConvertHandleToEntityId(const PhysicsBodyHandle& handle)
+{
+    auto itUnit = FPhysicsBodyHandleToEntityId.find(handle);
+    AssertRelease(itUnit != FPhysicsBodyHandleToEntityId.end());
+    return itUnit->second;
+}
+
 } // namespace Physics
 } // namespace ECSEngine

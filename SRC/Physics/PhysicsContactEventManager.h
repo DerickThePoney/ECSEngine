@@ -22,6 +22,8 @@ public:
 
     void DispatchContactEvents(const ContactEventArray& contactEvents, u32 ContactEventCount);
 
+    const EntityId& ConvertHandleToEntityId(const PhysicsBodyHandle& handle);
+
 private:
     std::unordered_map<PhysicsBodyHandle, EntityId> FPhysicsBodyHandleToEntityId;
     std::unordered_map<EntityId, PhysicsBodyHandle> FEntityIdToPhysicsBodyHandle;
