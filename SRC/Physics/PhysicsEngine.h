@@ -7,6 +7,7 @@
 #include "ContactManager.h"
 #include "IslandManager.h"
 #include "PhysicsCollisionPresetManager.h"
+#include "PhysicsContactEventManager.h"
 #include "PhysicsEngineConfiguration.h"
 #include "RigidBody.h"
 
@@ -31,6 +32,7 @@ public:
     const PhysicsEngineConfiguration& Config() const { return FConfig; }
     void SetConfig(const PhysicsEngineConfiguration& NewConfig) { FConfig = NewConfig; }
     PhysicsCollisionPresetManager& CollisionPresetManager() { return FCollisionPresetManager; }
+    PhysicsContactEventManager& ContactEventManager() { return FContactEventManager; }
 
     const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
     bool DestroyPhysicsBody(const PhysicsBodyHandle& Handle);
@@ -61,8 +63,6 @@ public:
     void AddMovedBody(RigidBody* body, vec3 displacement);
 
     void PushContactEvent(const ContactEvent& Event);
-    const ContactEventArray& GetContactEvents() const { return FContactEvents; }
-    u32 GetContactEventsCount() const { return FContactEventsCount; }
     void ClearContactEvents() { FContactEventsCount = 0; }
 
 #ifdef PERFORM_SECURITY_CHECKS
@@ -98,6 +98,8 @@ private:
     ContactManager FContactManager;
     ContactEventArray FContactEvents;
     u32 FContactEventsCount = 0;
+
+    PhysicsContactEventManager FContactEventManager;
 
     friend class IslandManager;
     IslandManager FIslandManager;

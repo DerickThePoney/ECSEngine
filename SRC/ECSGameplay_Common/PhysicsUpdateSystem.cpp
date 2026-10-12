@@ -33,13 +33,6 @@ void PhysicsUpdateSystem::VirtualUpdate()
 
     Physics::UpdatePhysics();
 
-    // TODO Figure out a way to dispatch contact events
-    auto ContactEvents = Physics::GetContactEvents();
-    u32 ContactEventsCount = Physics::GetContactEventsCount();
-    // - ContactEvents manager that registers FHandle -> EntityId maps and allows modules to register on to it.
-    // - Messaging system ?
-    // TODO STUFF WITH EVENTS
-
     ModuleAccessor<RigidbodyModule> RigidBodyAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<PositionModule> PositionAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<OrientationModule> OrientationAccessor(EEntityWorlds::STANDARD);
