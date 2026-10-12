@@ -25,5 +25,8 @@ public:
 
     EContactEventType Type;
 };
+
+constexpr u32 MaxContactEvents = 1024;
+using ContactEventArray = std::array<ContactEvent, MaxContactEvents>;
 } // namespace Physics
 } // namespace ECSEngine

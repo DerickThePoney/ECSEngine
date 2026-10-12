@@ -17,9 +17,6 @@ namespace Physics
 struct PhysicsBodyHandle;
 struct PhysicsBodyConfig;
 
-constexpr u32 MaxContactEvents = 1024;
-using ContactEventArray = std::array<ContactEvent, MaxContactEvents>;
-
 class PhysicsEngine : public Singleton<PhysicsEngine>
 {
 public:
