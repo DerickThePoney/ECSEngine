@@ -81,6 +81,10 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         FBroadPhase.MoveBody(body, movedBody.Displacement);
     }
     FMovedBodies.clear();
+
+    // Dispatch contact events
+    FContactEventManager.DispatchContactEvents(FContactEvents, FContactEventsCount);
+    ClearContactEvents();
 }
 
 const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)

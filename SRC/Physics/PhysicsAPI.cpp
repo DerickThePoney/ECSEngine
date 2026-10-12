@@ -71,14 +71,9 @@ void UpdatePhysics()
     PhysicsEngine::Instance().UpdatePhysics(TimeManager::GameplayDeltaTime());
 }
 
-const std::array<ContactEvent, 1024>& GetContactEvents()
+PhysicsContactEventManager& GetContactEventManager()
 {
-    return PhysicsEngine::Instance().GetContactEvents();
-}
-
-u32 GetContactEventsCount()
-{
-    return PhysicsEngine::Instance().GetContactEventsCount();
+    return PhysicsEngine::Instance().ContactEventManager();
 }
 
 const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)

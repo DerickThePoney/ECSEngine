@@ -9,21 +9,19 @@ struct PhysicsBodyConfig;
 struct PhysicsEngineConfiguration;
 struct ContactEvent;
 class PhysicsCollisionPresetManager;
+class PhysicsContactEventManager;
 
 // Init and shutdown
 void InitializePhysics(const std::string& ConfigurationFilename);
 void SetConfig(const PhysicsEngineConfiguration& Config);
 const PhysicsEngineConfiguration& GetConfig();
 PhysicsCollisionPresetManager& GetCollisionPresetManager();
+PhysicsContactEventManager& GetContactEventManager();
 void ShutdownPhysics();
 
 // Physics update
 void UpdatePhysics();
 // TODO BACKWARD UPDATE
-
-// Contact events
-const std::array<ContactEvent, 1024>& GetContactEvents();
-u32 GetContactEventsCount();
 
 // Body creation/destruction
 const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
