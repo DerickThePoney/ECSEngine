@@ -56,4 +56,13 @@ struct hash<ECSEngine::EntityId>
 {
     size_t operator()(const ECSEngine::EntityId& parId) const noexcept { return hash<u32>{ }(parId.GetRawId()); }
 };
+
+template<>
+struct formatter<ECSEngine::EntityId> : std::formatter<std::string>
+{
+    auto format(const ECSEngine::EntityId& unitId, format_context& ctx) const
+    {
+        return formatter<string>::format(std::format("[{}, {}]", unitId.GetWorldId(), unitId.GetSequentialId()), ctx);
+    }
+};
 } // namespace std
