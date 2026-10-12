@@ -45,6 +45,13 @@ bool FrustumBoundingBoxIntersect(const Frustum& parFrustum, const FrustumCorners
 
 bool SphereBoundingBoxIntersect(const vec4& parSphere, const BoundingBox<vec3>& parBox);
 
+// Rich slab test: returns entry/exit t and which face set the entry plane.
+// Assumes ray direction is usable with 1/D (zeros → ±Inf, same as current Tavianator code).
+// outHitAxis: 0=X, 1=Y, 2=Z, -1 if entry not from a forward face (e.g. origin inside).
+// outHitSign: -1 = hit Min plane of that axis, +1 = hit Max plane.
+bool RayAABBIntersection(const Ray3D& parRay, const BoundingBox<vec3>& parAABB, float parMaxDistance, float& outTMin, float& outTMax, i32& outHitAxis, float& outHitSign);
+
+// Thin wrapper — same signature/behavior as today (used by AABBTree + unit tests).
 bool RayAABBIntersection(const Ray3D& parRay, const BoundingBox<vec3>& parAABB);
 
 bool AABBABBBIntersection(const BoundingBox<vec3>& parFirst, const BoundingBox<vec3>& parSecond);

@@ -9,6 +9,7 @@
 #include "PhysicsCollisionPresetManager.h"
 #include "PhysicsContactEventManager.h"
 #include "PhysicsEngineConfiguration.h"
+#include "Raycast.h"
 #include "RigidBody.h"
 
 namespace ECSEngine
@@ -64,6 +65,8 @@ public:
 
     void PushContactEvent(const ContactEvent& Event);
     void ClearContactEvents() { FContactEventsCount = 0; }
+
+    bool Raycast(const RaycastQuery& Query, RaycastHit& outHit);
 
 #ifdef PERFORM_SECURITY_CHECKS
     void DrawDebug();

@@ -339,34 +339,73 @@ bool SphereBoundingBoxIntersect(const vec4& parSphere, const BoundingBox<vec3>& 
     return false;
 }
 
-// source https://tavianator.com/2011/ray_box.html
+bool RayAABBIntersection(const Ray3D& parRay, const BoundingBox<vec3>& parAABB, float parMaxDistance, float& outTMin, float& outTMax, i32& outHitAxis, float& outHitSign)
+{
+    // Tavianator ray-AABB slabs, extended with face tracking + max distance.
+    // https://tavianator.com/2011/ray_box.html
+
+    const vec3 InvDir = 1.f / parRay.FDirection;
+
+    float TMin = -std::numeric_limits<float>::max();
+    float TMax = std::numeric_limits<float>::max();
+    i32 HitAxis = -1;
+    float HitSign = 0.f;
+
+    const float Mins[3] = { parAABB.Min().x, parAABB.Min().y, parAABB.Min().z };
+    const float Maxs[3] = { parAABB.Max().x, parAABB.Max().y, parAABB.Max().z };
+    const float Origins[3] = { parRay.FOrigin.x, parRay.FOrigin.y, parRay.FOrigin.z };
+    const float InvDirs[3] = { InvDir.x, InvDir.y, InvDir.z };
+
+    for (i32 Axis = 0; Axis < 3; ++Axis)
+    {
+        float T1 = (Mins[Axis] - Origins[Axis]) * InvDirs[Axis];
+        float T2 = (Maxs[Axis] - Origins[Axis]) * InvDirs[Axis];
+        float SignNear = -1.f;
+        float SignFar = +1.f;
+
+        if (T1 > T2)
+        {
+            const float Tmp = T1;
+            T1 = T2;
+            T2 = Tmp;
+            SignNear = +1.f;
+            SignFar = -1.f;
+        }
+
+        // Entering plane for this axis becomes the global entry → remember face.
+        if (T1 > TMin)
+        {
+            TMin = T1;
+            HitAxis = Axis;
+            HitSign = SignNear;
+        }
+
+        TMax = Min(TMax, T2);
+
+        if (TMin > TMax)
+            return false;
+    }
+
+    // Clip exit by query budget (entry still allowed behind origin when inside).
+    TMax = Min(TMax, parMaxDistance);
+
+    // Same overlap predicate as before, with max-distance clipping on TMax.
+    if (!(TMax > Max(TMin, 0.f)))
+        return false;
+
+    outTMin = TMin;
+    outTMax = TMax;
+    outHitAxis = HitAxis;
+    outHitSign = HitSign;
+    return true;
+}
+
 bool RayAABBIntersection(const Ray3D& parRay, const BoundingBox<vec3>& parAABB)
 {
-    float tmin = -std::numeric_limits<float>::max(), tmax = std::numeric_limits<float>::max();
-    vec3 rayInvDir = 1.f / parRay.FDirection;
-
-    // X
-    float t1 = (parAABB.Min().x - parRay.FOrigin.x) * rayInvDir.x;
-    float t2 = (parAABB.Max().x - parRay.FOrigin.x) * rayInvDir.x;
-
-    tmin = Max(tmin, Min(t1, t2));
-    tmax = Min(tmax, Max(t1, t2));
-
-    // Y
-    t1 = (parAABB.Min().y - parRay.FOrigin.y) * rayInvDir.y;
-    t2 = (parAABB.Max().y - parRay.FOrigin.y) * rayInvDir.y;
-
-    tmin = Max(tmin, Min(t1, t2));
-    tmax = Min(tmax, Max(t1, t2));
-
-    // Z
-    t1 = (parAABB.Min().z - parRay.FOrigin.z) * rayInvDir.z;
-    t2 = (parAABB.Max().z - parRay.FOrigin.z) * rayInvDir.z;
-
-    tmin = Max(tmin, Min(t1, t2));
-    tmax = Min(tmax, Max(t1, t2));
-
-    return tmax > Max(tmin, 0.f);
+    float TMin, TMax, HitSign;
+    i32 HitAxis;
+    // No distance clip: match previous behavior.
+    return RayAABBIntersection(parRay, parAABB, std::numeric_limits<float>::max(), TMin, TMax, HitAxis, HitSign);
 }
 
 bool AABBABBBIntersection(const BoundingBox<vec3>& parFirst, const BoundingBox<vec3>& parSecond)
