@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "ContactEventManager.h"
+#include "PhysicsContactEventManager.h"
 
 #include "Common/Logger.h"
 #include "ContactEvent.h"
@@ -9,13 +9,13 @@ namespace ECSEngine
 {
 namespace Physics
 {
-void ContactEventEventManager::RegisterEntityHandleCorrespondance(const EntityId& unitID, PhysicsBodyHandle& bodyHandle)
+void PhysicsContactEventManager::RegisterEntityHandleCorrespondance(const EntityId& unitID, PhysicsBodyHandle& bodyHandle)
 {
     FPhysicsBodyHandleToEntityId.insert_or_assign(bodyHandle, unitID);
     FEntityIdToPhysicsBodyHandle.insert_or_assign(unitID, bodyHandle);
 }
 
-void ContactEventEventManager::UnegisterEntityHandleCorrespondance(const EntityId& unitID)
+void PhysicsContactEventManager::UnegisterEntityHandleCorrespondance(const EntityId& unitID)
 {
     auto itFind = FEntityIdToPhysicsBodyHandle.find(unitID);
     if (itFind == FEntityIdToPhysicsBodyHandle.end())
@@ -28,7 +28,7 @@ void ContactEventEventManager::UnegisterEntityHandleCorrespondance(const EntityI
     FEndContactListeners.erase(handle);
 }
 
-void ContactEventEventManager::AddContactEventListener(const EntityId& unitID, BeginContactDelegate* Begin, EndContactDelegate* End)
+void PhysicsContactEventManager::AddContactEventListener(const EntityId& unitID, BeginContactDelegate* Begin, EndContactDelegate* End)
 {
     auto itFind = FEntityIdToPhysicsBodyHandle.find(unitID);
     if (itFind == FEntityIdToPhysicsBodyHandle.end())
@@ -47,7 +47,7 @@ void ContactEventEventManager::AddContactEventListener(const EntityId& unitID, B
         FEndContactListeners.insert_or_assign(handle, *End);
 }
 
-void ContactEventEventManager::RemoveContactEventListener(const EntityId& unitID, BeginContactDelegate* Begin, EndContactDelegate* End)
+void PhysicsContactEventManager::RemoveContactEventListener(const EntityId& unitID, BeginContactDelegate* Begin, EndContactDelegate* End)
 {
     auto itFind = FEntityIdToPhysicsBodyHandle.find(unitID);
     if (itFind == FEntityIdToPhysicsBodyHandle.end())
@@ -62,33 +62,52 @@ void ContactEventEventManager::RemoveContactEventListener(const EntityId& unitID
     FEndContactListeners.erase(handle);
 }
 
-void ContactEventEventManager::DispatchContactEvents(const std::vector<ContactEvent>& contactEvents)
+void PhysicsContactEventManager::DispatchContactEvents(const ContactEventArray& contactEvents, u32 ContactEventCount)
 {
-    // Might handle to unitID translation here to actually be usefull...
-    foreachitemconst(evt, contactEvents)
+    forrange(i, 0, ContactEventCount)
     {
+        const ContactEvent& evt = contactEvents[i];
+
+        // Convert body handles to entityID
+        auto itUnit = FPhysicsBodyHandleToEntityId.find(evt.BodyA);
+        AlwaysCheckedAssert(itUnit != FPhysicsBodyHandleToEntityId.end());
+        if (itUnit == FPhysicsBodyHandleToEntityId.end())
+        {
+            continue;
+        }
+        const EntityId& unitA = itUnit->second;
+
+        itUnit = FPhysicsBodyHandleToEntityId.find(evt.BodyB);
+        AlwaysCheckedAssert(itUnit != FPhysicsBodyHandleToEntityId.end());
+        if (itUnit == FPhysicsBodyHandleToEntityId.end())
+        {
+            continue;
+        }
+        const EntityId& unitB = itUnit->second;
+
+        // Dispatch events
         switch (evt.Type)
         {
         case EContactEventType::Begin:
         {
             auto itFind = FBeginContactListeners.find(evt.BodyA);
             if (itFind != FBeginContactListeners.end())
-                itFind->second(evt);
+                itFind->second(unitA, unitB, evt);
 
             itFind = FBeginContactListeners.find(evt.BodyB);
             if (itFind != FBeginContactListeners.end())
-                itFind->second(evt);
+                itFind->second(unitA, unitB, evt);
             break;
         }
         case EContactEventType::End:
         {
             auto itFind = FEndContactListeners.find(evt.BodyA);
             if (itFind != FEndContactListeners.end())
-                itFind->second(evt);
+                itFind->second(unitA, unitB, evt);
 
             itFind = FEndContactListeners.find(evt.BodyB);
             if (itFind != FEndContactListeners.end())
-                itFind->second(evt);
+                itFind->second(unitA, unitB, evt);
             break;
         }
         }

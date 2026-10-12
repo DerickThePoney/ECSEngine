@@ -1,4 +1,5 @@
 #pragma once
+#include "ContactEvent.h"
 #include "ECSCore/EntityId.h"
 #include "PhysicsBodyHandle.h"
 
@@ -8,10 +9,10 @@ namespace ECSEngine
 namespace Physics
 {
 struct ContactEvent;
-using BeginContactDelegate = Delegate<void(const ContactEvent& evt)>;
-using EndContactDelegate = Delegate<void(const ContactEvent& evt)>;
+using BeginContactDelegate = Delegate<void(const EntityId& unitA, const EntityId& unitB, const ContactEvent& evt)>;
+using EndContactDelegate = Delegate<void(const EntityId& unitA, const EntityId& unitB, const ContactEvent& evt)>;
 
-class ContactEventEventManager
+class PhysicsContactEventManager
 {
 public:
     void RegisterEntityHandleCorrespondance(const EntityId& unitID, PhysicsBodyHandle& bodyHandle);
@@ -19,7 +20,7 @@ public:
     void AddContactEventListener(const EntityId& unitID, BeginContactDelegate* Begin = nullptr, EndContactDelegate* End = nullptr);
     void RemoveContactEventListener(const EntityId& unitID, BeginContactDelegate* Begin = nullptr, EndContactDelegate* End = nullptr);
 
-    void DispatchContactEvents(const std::vector<ContactEvent>& contactEvents);
+    void DispatchContactEvents(const ContactEventArray& contactEvents, u32 ContactEventCount);
 
 private:
     std::unordered_map<PhysicsBodyHandle, EntityId> FPhysicsBodyHandleToEntityId;
