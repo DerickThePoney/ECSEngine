@@ -7,13 +7,16 @@ namespace Physics
 struct PhysicsBodyHandle;
 struct PhysicsBodyConfig;
 struct PhysicsEngineConfiguration;
+struct ContactEvent;
 class PhysicsCollisionPresetManager;
+class PhysicsContactEventManager;
 
 // Init and shutdown
 void InitializePhysics(const std::string& ConfigurationFilename);
 void SetConfig(const PhysicsEngineConfiguration& Config);
 const PhysicsEngineConfiguration& GetConfig();
 PhysicsCollisionPresetManager& GetCollisionPresetManager();
+PhysicsContactEventManager& GetContactEventManager();
 void ShutdownPhysics();
 
 // Physics update

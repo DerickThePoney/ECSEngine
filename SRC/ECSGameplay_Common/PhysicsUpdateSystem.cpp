@@ -7,6 +7,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "OrientationModule.h"
+#include "Physics/ContactEvent.h"
 #include "Physics/PhysicsAPI.h"
 #include "PositionModule.h"
 #include "RigidbodyModule.h"

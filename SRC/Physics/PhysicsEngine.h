@@ -3,10 +3,13 @@
 #include "BroadPhase.h"
 #include "Common/IdGenerator.h"
 #include "Common/Singleton.h"
+#include "ContactEvent.h"
 #include "ContactManager.h"
 #include "IslandManager.h"
 #include "PhysicsCollisionPresetManager.h"
+#include "PhysicsContactEventManager.h"
 #include "PhysicsEngineConfiguration.h"
+#include "Raycast.h"
 #include "RigidBody.h"
 
 namespace ECSEngine
@@ -30,6 +33,7 @@ public:
     const PhysicsEngineConfiguration& Config() const { return FConfig; }
     void SetConfig(const PhysicsEngineConfiguration& NewConfig) { FConfig = NewConfig; }
     PhysicsCollisionPresetManager& CollisionPresetManager() { return FCollisionPresetManager; }
+    PhysicsContactEventManager& ContactEventManager() { return FContactEventManager; }
 
     const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
     bool DestroyPhysicsBody(const PhysicsBodyHandle& Handle);
@@ -58,6 +62,11 @@ public:
     const RigidBody* GetRigidBody(const PhysicsBodyHandle& Handle) const;
 
     void AddMovedBody(RigidBody* body, vec3 displacement);
+
+    void PushContactEvent(const ContactEvent& Event);
+    void ClearContactEvents() { FContactEventsCount = 0; }
+
+    bool Raycast(const RaycastQuery& Query, RaycastHit& outHit);
 
 #ifdef PERFORM_SECURITY_CHECKS
     void DrawDebug();
@@ -90,6 +99,10 @@ private:
     std::vector<MovedBodies> FMovedBodies;
     BroadPhase FBroadPhase;
     ContactManager FContactManager;
+    ContactEventArray FContactEvents;
+    u32 FContactEventsCount = 0;
+
+    PhysicsContactEventManager FContactEventManager;
 
     friend class IslandManager;
     IslandManager FIslandManager;

@@ -1,6 +1,8 @@
 #pragma once
 #include "Common/Types.h"
 
+#include <functional>
+
 namespace ECSEngine
 {
 namespace Physics
@@ -16,3 +18,16 @@ struct PhysicsBodyHandle
 };
 } // namespace Physics
 } // namespace ECSEngine
+
+namespace std
+{
+template<>
+struct hash<ECSEngine::Physics::PhysicsBodyHandle>
+{
+    size_t operator()(const ECSEngine::Physics::PhysicsBodyHandle& parHandle) const noexcept
+    {
+        const u64 packed = (static_cast<u64>(parHandle.FId) << 8) | parHandle.FGeneration;
+        return hash<u64>{ }(packed);
+    }
+};
+} // namespace std

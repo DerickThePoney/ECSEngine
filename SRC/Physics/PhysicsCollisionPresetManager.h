@@ -11,6 +11,8 @@ public:
     u32 FCollisionCategory = 0;
     u32 FCollisionMask = ~0u;
 
+    u32 GetCollisionCategoryBit() const { return 1u << FCollisionCategory; }
+
 private:
     std::string GetCategoryName() const;
     std::vector<std::string> GetCollisionMaskNames() const;

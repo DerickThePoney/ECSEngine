@@ -27,6 +27,11 @@ inline float Clamp(float a, float m, float M)
     return Min(Max(a, m), M);
 }
 
+inline float Clamp01(float a)
+{
+    return Min(Max(a, 0.f), 1.f);
+}
+
 vec3 Clamp(const vec3& a, const vec3& m, const vec3& M);
 
 float Atan2(float x, float y);

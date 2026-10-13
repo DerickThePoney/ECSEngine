@@ -24,11 +24,11 @@ struct RigidBody
 public:
     PhysicsBodyHandle FHandle;
 
-    // Moveability
-    EPhysicsMoveability::Type FMoveabilityType = EPhysicsMoveability::STATIC;
-
     // Collision shape
     std::vector<CollisionShape> FCollisionShapes;
+
+    // Moveability
+    EPhysicsMoveability::Type FMoveabilityType = EPhysicsMoveability::STATIC;
 
     // positional stuff
     vec3 FPosition;
@@ -70,6 +70,11 @@ public:
 
     ContactEdge* FContactList = nullptr;
 
+    BitSet<ERigidBodyFlag::RB_COUNT> FFlags;
+
+    // Bool Flags
+    bool FGenerateContactEvents = false;
+
     // Helper functions
     void AddForce(const vec3& Force, bool bTreatAsAcceleration);
     void AddTorque(const vec3& Torque);
@@ -86,8 +91,6 @@ public:
     void UpdateCoMWorld();
 
     u32 GetCollisionCategoryBit() const { return 1u << FCollisionCategory; }
-
-    BitSet<ERigidBodyFlag::RB_COUNT> FFlags;
 };
 } // namespace Physics
 } // namespace ECSEngine

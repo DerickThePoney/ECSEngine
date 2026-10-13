@@ -28,6 +28,8 @@ public:
 
     AABB3f GetFatAABB3f(const PhysicsBodyHandle& handle) const;
 
+    void Raycast(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& parLeafsHit);
+
 #ifdef PERFORM_SECURITY_CHECKS
     void DebugBroadPhase();
 #endif

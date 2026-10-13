@@ -2,14 +2,20 @@
 
 #include "PhysicsEngine.h"
 
+#include "Common/Sorting.h"
 #include "PhysicsBodyConfig.h"
 #include "PhysicsBodyHandle.h"
+#include "RayCapsuleIntersection.h"
+#include "RayOBBIntersection.h"
+#include "RaySphereIntersection.h"
+#include "Raycast.h"
 
 #ifdef PERFORM_SECURITY_CHECKS
 #include "Common/CameraHelpers.h"
 #include "Common/CameraManager.h"
 #include "Common/ColorUtils.h"
 #include "Common/InputManager.h"
+#include "Common/Logger.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/DrawCommands.h"
@@ -44,6 +50,8 @@ void PhysicsEngine::Cleanup()
 
 void PhysicsEngine::UpdatePhysics(float parDeltaTime)
 {
+    ClearContactEvents();
+
     FContactManager.FindNewContacts(FBroadPhase);
 
     FContactManager.CollideContacts(this, FBroadPhase);
@@ -78,6 +86,10 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         FBroadPhase.MoveBody(body, movedBody.Displacement);
     }
     FMovedBodies.clear();
+
+    // Dispatch contact events
+    FContactEventManager.DispatchContactEvents(FContactEvents, FContactEventsCount);
+    ClearContactEvents();
 }
 
 const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
@@ -465,6 +477,7 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     const PhysicsCollisionPreset& Preset = FCollisionPresetManager.GetPreset(BodyConfig.FCollisionPreset);
     Body->FCollisionCategory = Preset.FCollisionCategory;
     Body->FCollisionMask = Preset.FCollisionMask;
+    Body->FGenerateContactEvents = BodyConfig.FGenerateContactEvents;
 
     Body->SetAwake(true);
 }
@@ -519,6 +532,111 @@ void PhysicsEngine::AddMovedBody(RigidBody* body, vec3 displacement)
         return;
     }
     FMovedBodies.push_back({ body->FHandle, displacement });
+}
+
+void PhysicsEngine::PushContactEvent(const ContactEvent& Event)
+{
+    if (FContactEventsCount >= FContactEvents.size())
+    {
+#ifdef PERFORM_SECURITY_CHECKS
+        LOG_PHYSICS("Contact Queue filled");
+#endif
+        return;
+    }
+    FContactEvents[FContactEventsCount++] = Event;
+}
+
+struct RaycastPotentialContactSorting
+{
+    auto operator()(const PhysicsBodyHandle& a, const PhysicsBodyHandle& b)
+    {
+        vec3 PositionA, PositionB;
+        PhysicsEngine::Instance().GetBodyPosition(a, PositionA);
+        PhysicsEngine::Instance().GetBodyPosition(b, PositionB);
+
+        return LengthSq(PositionA - FOrigin) < LengthSq(PositionB - FOrigin);
+    }
+
+    vec3 FOrigin;
+};
+
+namespace
+{
+bool RayPrimitiveIntersection(const PhysicsBodyHandle Handle, const Ray3D& parRay, float MaxDistance, RigidBody* body, RaycastHit& outHit)
+{
+    bool bHitSomething = false;
+    foreachitemconst(shape, body->FCollisionShapes)
+    {
+        RaycastHit Temp{ .BodyHandle = Handle };
+        switch (shape.GetShapeType())
+        {
+        case ECollisionShape::BOX:
+        {
+            if (RayOBBIntersection(parRay, MaxDistance, body->GetTransform(), shape.GetLocalAABB(), Temp))
+            {
+                bHitSomething = true;
+            }
+            break;
+        }
+        case ECollisionShape::CAPSULE:
+            if (RayCapsuleIntersection(parRay, MaxDistance, body->GetTransform(), shape.GetCenter(), shape.GetRadius(), shape.GetHalfLength(), Temp))
+            {
+                bHitSomething = true;
+            }
+            break;
+        case ECollisionShape::SPHERE:
+            if (RaySphereIntersection(parRay, MaxDistance, body->GetTransform(), shape.GetCenter(), shape.GetRadius(), Temp))
+            {
+                bHitSomething = true;
+            }
+            break;
+        }
+
+        if (outHit.Distance > Temp.Distance)
+        {
+            outHit = Temp;
+        }
+    }
+    return bHitSomething;
+}
+} // namespace
+
+bool PhysicsEngine::Raycast(const RaycastQuery& Query, RaycastHit& outHit)
+{
+    PhysicsCollisionPreset Preset = FCollisionPresetManager.GetPreset(Query.Preset);
+
+    std::vector<PhysicsBodyHandle> PotentialHits;
+    PotentialHits.reserve(128);
+    FBroadPhase.Raycast(Query.Ray, PotentialHits);
+
+    if (PotentialHits.empty())
+    {
+        return false;
+    }
+
+    InPlaceSorting<std::vector<PhysicsBodyHandle>, PhysicsBodyHandle>(PotentialHits, 0, PotentialHits.size() - 1, RaycastPotentialContactSorting{ .FOrigin = Query.Ray.FOrigin });
+
+    const float MaxDistance = (Query.MaxDistance < 0.f) ? std::numeric_limits<float>::max() : Query.MaxDistance;
+    bool bHitSomething = false;
+    foreachitemconst(bodyHandle, PotentialHits)
+    {
+        RigidBody* body = GetRigidBody(bodyHandle);
+        AssertRelease(body != nullptr);
+
+        // filter out unwanted objects
+        if ((Preset.FCollisionMask & body->GetCollisionCategoryBit()) == 0 || (Preset.GetCollisionCategoryBit() & body->FCollisionMask) == 0)
+            continue;
+
+        if (RayPrimitiveIntersection(bodyHandle, Query.Ray, MaxDistance, body, outHit))
+        {
+            bHitSomething = true;
+        }
+    }
+
+    if (bHitSomething)
+        outHit.UnitId = FContactEventManager.ConvertHandleToEntityId(outHit.BodyHandle);
+
+    return bHitSomething;
 }
 
 #ifdef PERFORM_SECURITY_CHECKS

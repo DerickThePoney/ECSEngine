@@ -74,6 +74,8 @@ void PhysicsBodyConfig::DrawInEditor()
         ImGui::EndCombo();
     }
 
+    ImGui::Checkbox("Generates Contact Events", &FGenerateContactEvents);
+
     ImGui::PopID();
 }
 

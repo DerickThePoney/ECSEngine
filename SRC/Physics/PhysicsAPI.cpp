@@ -71,6 +71,11 @@ void UpdatePhysics()
     PhysicsEngine::Instance().UpdatePhysics(TimeManager::GameplayDeltaTime());
 }
 
+PhysicsContactEventManager& GetContactEventManager()
+{
+    return PhysicsEngine::Instance().ContactEventManager();
+}
+
 const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();

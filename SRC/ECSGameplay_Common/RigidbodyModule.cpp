@@ -8,6 +8,7 @@
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
 #include "Physics/PhysicsAPI.h"
+#include "Physics/PhysicsContactEventManager.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::RigidbodyModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::RigidbodyModuleTemplate);
@@ -66,16 +67,22 @@ void RigidbodyModule::VirtualInit(const EntityId& parUnitId, const ModuleParamet
     else if (parParameters.HasParameter<ModuleParameters::Orientation>())
     {
         quat orientation = parParameters.Get_IFP<ModuleParameters::Orientation>(quat());
-        worldMatrix = worldMatrix * (mat4) orientation;
+        worldMatrix = worldMatrix * (mat4)orientation;
     }
 
     const RigidbodyModuleTemplate* temp = Template<RigidbodyModuleTemplate>();
     FHandle = Physics::CreateNewPhysicsBody(worldMatrix, temp->GetBodyConfig());
+
+    Physics::PhysicsContactEventManager& ContactEventManager = Physics::GetContactEventManager();
+    ContactEventManager.RegisterEntityHandleCorrespondance(parUnitId, FHandle);
 }
 
 void RigidbodyModule::VirtualDeinit()
 {
     parent_type::VirtualDeinit();
+
+    Physics::PhysicsContactEventManager& ContactEventManager = Physics::GetContactEventManager();
+    ContactEventManager.UnegisterEntityHandleCorrespondance(UnitId());
 
     Physics::DestroyPhysicsBody(FHandle);
 }
