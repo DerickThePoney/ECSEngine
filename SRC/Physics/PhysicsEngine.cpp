@@ -147,6 +147,7 @@ bool PhysicsEngine::DestroyPhysicsBody(const PhysicsBodyHandle& Handle)
 
     RigidBody* body = FRigidbodies[Handle.FId].get();
     FContactManager.RemoveBody(Handle);
+    FJointsManager.RemoveBody(body);
     FBroadPhase.RemoveBody(FRigidbodies[Handle.FId].get());
     FHandleGenerator.ReleaseId(Handle.FId);
 
