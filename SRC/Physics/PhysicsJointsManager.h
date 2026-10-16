@@ -5,10 +5,18 @@ namespace ECSEngine
 {
 namespace Physics
 {
+class Island;
+struct RigidBody;
 
-class PhysicsJointManager
+class PhysicsJointsManager
 {
 public:
+    void RemoveBody(RigidBody* Body);
+
+    void Intialize(Island* parIsland);
+    void PreSolve();
+    void Solve();
+
     PhysicsJointHandle CreateDistanceJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const DistanceJointConfig& Config);
     void DestroyDistanceJoint(const PhysicsJointHandle& Handle);
 

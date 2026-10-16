@@ -9,6 +9,7 @@
 #include "PhysicsCollisionPresetManager.h"
 #include "PhysicsContactEventManager.h"
 #include "PhysicsEngineConfiguration.h"
+#include "PhysicsJointsManager.h"
 #include "Raycast.h"
 #include "RigidBody.h"
 
@@ -103,6 +104,8 @@ private:
     u32 FContactEventsCount = 0;
 
     PhysicsContactEventManager FContactEventManager;
+
+    PhysicsJointsManager FJointsManager;
 
     friend class IslandManager;
     IslandManager FIslandManager;

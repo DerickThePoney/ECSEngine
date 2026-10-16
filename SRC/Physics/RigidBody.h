@@ -3,6 +3,7 @@
 #include "Common/BitSet.h"
 #include "Math/VectorTypes.h"
 #include "PhysicsBodyHandle.h"
+#include "PhysicsJointHandle.h"
 #include "PhysicsMoveabilityEnum.h"
 
 namespace ECSEngine
@@ -69,6 +70,8 @@ public:
     float FSleepingTimer;
 
     ContactEdge* FContactList = nullptr;
+
+    std::vector<PhysicsJointHandle> FJoints;
 
     BitSet<ERigidBodyFlag::RB_COUNT> FFlags;
 
