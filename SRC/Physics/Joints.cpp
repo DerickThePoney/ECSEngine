@@ -8,18 +8,18 @@ namespace Physics
 {
 void DistanceJoint::Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const DistanceJointConfig& Config)
 {
-    FHeader.FBodyA = BodyA;
-    FHeader.FBodyB = BodyB;
+    FBodyA = BodyA;
+    FBodyB = BodyB;
     FConfig = Config;
 
     FImpulse = 0;
-    FHeader.bIsland = false;
+    bIsland = false;
 }
 
 void DistanceJoint::Destroy()
 {
-    FHeader.FBodyA = PhysicsBodyHandle{ };
-    FHeader.FBodyB = PhysicsBodyHandle{ };
+    FBodyA = PhysicsBodyHandle{ };
+    FBodyB = PhysicsBodyHandle{ };
 }
 } // namespace Physics
 } // namespace ECSEngine

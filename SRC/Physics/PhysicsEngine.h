@@ -35,6 +35,7 @@ public:
     void SetConfig(const PhysicsEngineConfiguration& NewConfig) { FConfig = NewConfig; }
     PhysicsCollisionPresetManager& CollisionPresetManager() { return FCollisionPresetManager; }
     PhysicsContactEventManager& ContactEventManager() { return FContactEventManager; }
+    PhysicsJointsManager& JointsManager() { return FJointsManager; }
 
     const PhysicsBodyHandle CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
     bool DestroyPhysicsBody(const PhysicsBodyHandle& Handle);

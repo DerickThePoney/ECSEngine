@@ -4,6 +4,7 @@
 
 #include "Contact.h"
 #include "Island.h"
+#include "Joints.h"
 #include "PhysicsEngine.h"
 #include "RigidBody.h"
 
@@ -25,6 +26,8 @@ void IslandManager::SolveIslands(PhysicsEngine* Engine, float parDeltaTime)
         body->FFlags.SetBit(ERigidBodyFlag::RB_ISLAND, false);
         nbValidBodies++;
     }
+
+    Engine->JointsManager().PreUpdate();
 
     IslandToSolve.Reserve(nbValidBodies, Engine->FContactManager.ContactCount());
 
@@ -103,6 +106,34 @@ void IslandManager::SolveIslands(PhysicsEngine* Engine, float parDeltaTime)
 
                 // try to add the other body to the list
                 RigidBody* other = Engine->GetRigidBody(edge->FOtherBody);
+                if (!other || other->FFlags.GetValue(ERigidBodyFlag::RB_ISLAND))
+                {
+                    continue;
+                }
+                other->FFlags.SetBit(ERigidBodyFlag::RB_ISLAND, true);
+                stack.push(other);
+            }
+
+            // Loop through the joints
+            foreachitem(jointHandle, body->FJoints)
+            {
+                // Get the joint
+                JointBase* joint = Engine->JointsManager().GetJoint(jointHandle);
+                if (joint == nullptr)
+                {
+                    AssertNotReached();
+                    continue;
+                }
+
+                if (joint->bIsland)
+                    continue;
+
+                // mark it as part of the island and push it in the island
+                joint->bIsland = true;
+                IslandToSolve.Add(joint);
+
+                // get the other body, wake it and add it to the stack and mark it as island
+                RigidBody* other = Engine->GetRigidBody((joint->FBodyA == body->FHandle) ? joint->FBodyB : joint->FBodyA);
                 if (!other || other->FFlags.GetValue(ERigidBodyFlag::RB_ISLAND))
                 {
                     continue;

@@ -7,13 +7,7 @@ namespace ECSEngine
 {
 namespace Physics
 {
-struct JointHeader
-{
-    PhysicsBodyHandle FBodyA;
-    PhysicsBodyHandle FBodyB;
-
-    bool bIsland = false;
-};
+class Island;
 
 struct JointConfig
 {
@@ -27,37 +21,54 @@ struct DistanceJointConfig
     float FLength = 0.f;
 };
 
-struct DistanceJoint
+struct JointBase
 {
-    JointHeader FHeader;
+    PhysicsBodyHandle FBodyA;
+    PhysicsBodyHandle FBodyB;
+
+    bool bIsland = false;
+
+    virtual void PreSolve(Island* parIsland) = 0;
+    virtual void Solve(Island* parIsland) = 0;
+};
+
+struct DistanceJoint : public JointBase
+{
     DistanceJointConfig FConfig;
 
     float FImpulse = 0.f;
 
     void Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const DistanceJointConfig& Config);
     void Destroy();
+
+    void PreSolve(Island* parIsland) override { }
+    void Solve(Island* parIsland) override { }
 };
 
 // Spherical / ball-and-socket: point lock only
-struct BallJoint
+struct BallJoint : public JointBase
 {
-    JointHeader FHeader;
     vec3 FPointImpulse; // warm-start λx,λy,λz
+
+    void PreSolve(Island* parIsland) override { }
+    void Solve(Island* parIsland) override { }
 };
 
 // Hinge = ball point lock + axis freeze + optional limit
-struct HingeJoint
+struct HingeJoint : public JointBase
 {
-    JointHeader FHeader;
     vec3 FPointImpulse; // same warm-start as ball
     vec3 FAxisALocal, FAxisBLocal;
     vec3 FRefALocal, FRefBLocal;
     float FReferenceAngle = 0.f;
-    bool FEnableLimit = false;
     float FLowerAngle = 0.f, FUpperAngle = 0.f;
     // EHingeLimitState FLimitState = EHingeLimitState::Inactive;
     float FLimitImpulse = 0.f;
     float FAxisImpulse[2] = { };
+    bool FEnableLimit = false;
+
+    void PreSolve(Island* parIsland) override { }
+    void Solve(Island* parIsland) override { }
 };
 
 } // namespace Physics
