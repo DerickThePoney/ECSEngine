@@ -57,7 +57,6 @@ void Island::Initialise()
         CS.MA = bodyA->FInvMass;
         CS.MB = bodyB->FInvMass;
 
-        // TODO: Restitution and friction
         CS.Friction = C->FFriction;
         CS.Restitution = C->FRestitution;
 
