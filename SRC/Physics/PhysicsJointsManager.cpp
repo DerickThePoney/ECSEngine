@@ -28,18 +28,6 @@ void PhysicsJointsManager::RemoveBody(RigidBody* Body)
     Body->FJoints.clear();
 }
 
-void PhysicsJointsManager::Intialize(Island* parIsland)
-{
-}
-
-void PhysicsJointsManager::PreSolve()
-{
-}
-
-void PhysicsJointsManager::Solve()
-{
-}
-
 PhysicsJointHandle PhysicsJointsManager::CreateDistanceJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const DistanceJointConfig& Config)
 {
     if (BodyA == BodyB)
@@ -110,8 +98,8 @@ void PhysicsJointsManager::DestroyDistanceJoint(const PhysicsJointHandle& Handle
     }
 
     // Detach the rigidbodies
-    RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(FDistanceJoints[Handle.FIndex].Joint.FHeader.FBodyA);
-    RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(FDistanceJoints[Handle.FIndex].Joint.FHeader.FBodyB);
+    RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(FDistanceJoints[Handle.FIndex].Joint.FBodyA);
+    RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(FDistanceJoints[Handle.FIndex].Joint.FBodyB);
     if (bodyA != nullptr)
     {
         for (auto it = bodyA->FJoints.begin(); it != bodyA->FJoints.end(); ++it)
@@ -144,6 +132,37 @@ void PhysicsJointsManager::DestroyDistanceJoint(const PhysicsJointHandle& Handle
     FDistanceJoints[Handle.FIndex].Joint.Destroy();
 
     FDistanceJointsIdGenerator.ReleaseId(Handle.FIndex);
+}
+
+JointBase* PhysicsJointsManager::GetJoint(const PhysicsJointHandle& Handle)
+{
+    if (!Handle.IsValid())
+        return nullptr;
+
+    switch (Handle.GetTypeAsEnum())
+    {
+    case EJointType::DISTANCE:
+    {
+        if (Handle.FIndex >= FDistanceJoints.size())
+            return nullptr;
+        if (FDistanceJoints[Handle.FIndex].Handle != Handle)
+            return nullptr;
+        return &FDistanceJoints[Handle.FIndex].Joint;
+        break;
+    }
+    default:
+        AssertNotReached();
+    }
+
+    return nullptr;
+}
+
+void PhysicsJointsManager::PreUpdate()
+{
+    foreachitem(joint, FDistanceJoints)
+    {
+        joint.Joint.bIsland = false;
+    }
 }
 
 u16 PhysicsJointsManager::GetNextDistanceJointId()

@@ -6,6 +6,7 @@ namespace Physics
 {
 class RigidBody;
 struct Contact;
+struct JointBase;
 
 struct VelocityState
 {
@@ -25,6 +26,7 @@ public:
 
     void Add(RigidBody* BodyToAdd);
     void Add(Contact* ContactToAdd);
+    void Add(JointBase* JointToAdd);
 
     void Solve(float parDeltaTime);
 
@@ -33,6 +35,7 @@ private:
     std::vector<VelocityState> FVelocities;
     std::vector<Contact*> FContacts;
     std::vector<ContactState> FContactStates;
+    std::vector<JointBase*> FJoints;
 };
 } // namespace Physics
 } // namespace ECSEngine

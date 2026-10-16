@@ -42,6 +42,11 @@ void Island::Add(Contact* ContactToAdd)
     FContacts.push_back(ContactToAdd);
 }
 
+void Island::Add(JointBase* JointToAdd)
+{
+    FJoints.push_back(JointToAdd);
+}
+
 void Island::Initialise()
 {
     foreachitemconst(C, FContacts)
