@@ -1,4 +1,5 @@
 #pragma once
+#include "JointsConfig.h"
 #include "Math/VectorTypes.h"
 #include "PhysicsBodyHandle.h"
 #include "PhysicsJointHandle.h"
@@ -9,18 +10,6 @@ namespace Physics
 {
 class Island;
 
-struct JointConfig
-{
-    vec3 FAnchorALocal;
-    vec3 FAnchorBLocal;
-};
-
-struct DistanceJointConfig
-{
-    JointConfig Common;
-    float FLength = 0.f;
-};
-
 struct JointBase
 {
     PhysicsBodyHandle FBodyA;
@@ -28,21 +17,33 @@ struct JointBase
 
     bool bIsland = false;
 
-    virtual void PreSolve(Island* parIsland) = 0;
-    virtual void Solve(Island* parIsland) = 0;
+    virtual void PreSolve(Island* parIsland, const float parDT) = 0;
+    virtual void Solve(Island* parIsland, const float parDT) = 0;
+};
+
+struct DistanceJointState
+{
+    vec3 xA, xB;
+    vec3 rA, rB;
+    vec3 d, n;
+    float C = 0.f;
+    float M_eff = 0.f;
+    float bias = 0.f;
 };
 
 struct DistanceJoint : public JointBase
 {
     DistanceJointConfig FConfig;
 
+    DistanceJointState FState; // TODO MOVE THIS OUT IN A SEPARATE SOLVER
+
     float FImpulse = 0.f;
 
     void Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const DistanceJointConfig& Config);
     void Destroy();
 
-    void PreSolve(Island* parIsland) override { }
-    void Solve(Island* parIsland) override { }
+    void PreSolve(Island* parIsland, const float parDT) override;
+    void Solve(Island* parIsland, const float parDT) override;
 };
 
 // Spherical / ball-and-socket: point lock only
@@ -50,8 +51,8 @@ struct BallJoint : public JointBase
 {
     vec3 FPointImpulse; // warm-start λx,λy,λz
 
-    void PreSolve(Island* parIsland) override { }
-    void Solve(Island* parIsland) override { }
+    void PreSolve(Island* parIsland, const float parDT) override { }
+    void Solve(Island* parIsland, const float parDT) override { }
 };
 
 // Hinge = ball point lock + axis freeze + optional limit
@@ -67,8 +68,8 @@ struct HingeJoint : public JointBase
     float FAxisImpulse[2] = { };
     bool FEnableLimit = false;
 
-    void PreSolve(Island* parIsland) override { }
-    void Solve(Island* parIsland) override { }
+    void PreSolve(Island* parIsland, const float parDT) override { }
+    void Solve(Island* parIsland, const float parDT) override { }
 };
 
 } // namespace Physics

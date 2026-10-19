@@ -120,18 +120,28 @@ void Island::Solve(float parDeltaTime)
         FVelocities[i].FRotationVelocity = body->FRotationVelocity;
     }
 
-    // solve contact contraints
+    // solve contact and joints contraints
     {
-        ContactSolver Solver;
-        Solver.Initialise(this);
-        Solver.PreSolve(parDeltaTime);
+        foreachitem(joint, FJoints)
+        {
+            joint->PreSolve(this, parDeltaTime);
+        }
+
+        ContactSolver CSolver;
+        CSolver.Initialise(this);
+        CSolver.PreSolve(parDeltaTime);
 
         forrange(i, 0, 10)
         {
-            Solver.Solve();
+            foreachitem(joint, FJoints)
+            {
+                joint->Solve(this, parDeltaTime);
+            }
+
+            CSolver.Solve();
         }
 
-        Solver.Shutdown();
+        CSolver.Shutdown();
     }
 
     // solve and integrate and synchronize positions

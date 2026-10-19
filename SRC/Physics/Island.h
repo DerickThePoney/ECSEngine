@@ -19,6 +19,8 @@ class Island
     friend struct ContactSolver;
     friend class IslandManager;
 
+    friend struct DistanceJoint;
+
 public:
     void Initialise();
     void Reserve(u32 BodyCount, u32 ContactCount);
