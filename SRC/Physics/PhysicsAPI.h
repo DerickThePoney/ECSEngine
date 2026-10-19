@@ -8,6 +8,8 @@ struct PhysicsBodyHandle;
 struct PhysicsBodyConfig;
 struct PhysicsEngineConfiguration;
 struct ContactEvent;
+struct PhysicsJointHandle;
+struct DistanceJointConfig;
 class PhysicsCollisionPresetManager;
 class PhysicsContactEventManager;
 
@@ -45,6 +47,11 @@ bool AddTorqueToBody(const PhysicsBodyHandle& Handle, const vec3& Torque);
 bool AddImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, bool bTreatAsVelocityChange);
 bool AddImpulseAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Impulse, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsVelocityChange);
 bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& RotationImpulse, bool bTreatAsRotationVelocityChange);
+
+// Joints Creation and Removal
+const PhysicsJointHandle CreateDistanceJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const DistanceJointConfig& Config);
+
+void DestroyJoint(const PhysicsJointHandle& JointHandle);
 
 #ifdef WITH_VISUAL_DEBUG
 // Debugs

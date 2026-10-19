@@ -70,12 +70,27 @@ PhysicsJointHandle PhysicsJointsManager::CreateDistanceJoint(const PhysicsBodyHa
     return FDistanceJoints[Id].Handle;
 }
 
-void PhysicsJointsManager::DestroyDistanceJoint(const PhysicsJointHandle& Handle)
+void PhysicsJointsManager::DestroyJoint(const PhysicsJointHandle& Handle)
 {
     if (!Handle.IsValid())
     {
         return;
     }
+
+    switch (Handle.GetTypeAsEnum())
+    {
+    case EJointType::DISTANCE:
+    {
+        DestroyDistanceJoint(Handle);
+        break;
+    }
+    default:
+        AssertNotReached();
+    }
+}
+
+void PhysicsJointsManager::DestroyDistanceJoint(const PhysicsJointHandle& Handle)
+{
 
     if (Handle.GetTypeAsEnum() != EJointType::DISTANCE)
     {

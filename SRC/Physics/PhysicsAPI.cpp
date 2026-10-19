@@ -176,6 +176,18 @@ bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Rotat
     return Engine.AddRotationImpulseToBody(Handle, RotationImpulse, bTreatAsRotationVelocityChange);
 }
 
+const PhysicsJointHandle CreateDistanceJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const DistanceJointConfig& Config)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.JointsManager().CreateDistanceJoint(HandleA, HandleB, Config);
+}
+
+void DestroyJoint(const PhysicsJointHandle& JointHandle)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    Engine.JointsManager().DestroyJoint(JointHandle);
+}
+
 #pragma endregion ForcesTorquesAndImpulses
 #ifdef WITH_VISUAL_DEBUG
 void DrawDebugs()

@@ -14,13 +14,15 @@ public:
     void RemoveBody(RigidBody* Body);
 
     PhysicsJointHandle CreateDistanceJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const DistanceJointConfig& Config);
-    void DestroyDistanceJoint(const PhysicsJointHandle& Handle);
+
+    void DestroyJoint(const PhysicsJointHandle& Handle);
 
     JointBase* GetJoint(const PhysicsJointHandle& Handle);
 
     void PreUpdate();
 
 private:
+    void DestroyDistanceJoint(const PhysicsJointHandle& Handle);
     u16 GetNextDistanceJointId();
 
 private:
