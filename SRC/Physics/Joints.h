@@ -46,13 +46,28 @@ struct DistanceJoint : public JointBase
     void Solve(Island* parIsland, const float parDT) override;
 };
 
+struct BallJointState
+{
+    vec3 xA, xB;
+    vec3 rA, rB;
+    vec3 M_eff;
+    vec3 bias;
+    vec3 C;
+};
+
 // Spherical / ball-and-socket: point lock only
 struct BallJoint : public JointBase
 {
+    BallJointConfig FConfig;
+
+    BallJointState FState; // TODO MOVE THIS OUT IN A SEPARATE SOLVER
+
     vec3 FPointImpulse; // warm-start λx,λy,λz
 
-    void PreSolve(Island* parIsland, const float parDT) override { }
-    void Solve(Island* parIsland, const float parDT) override { }
+    void Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const BallJointConfig& Config);
+    void Destroy();
+    void PreSolve(Island* parIsland, const float parDT) override;
+    void Solve(Island* parIsland, const float parDT) override;
 };
 
 // Hinge = ball point lock + axis freeze + optional limit

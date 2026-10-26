@@ -182,6 +182,12 @@ const PhysicsJointHandle CreateDistanceJoint(const PhysicsBodyHandle& HandleA, c
     return Engine.JointsManager().CreateDistanceJoint(HandleA, HandleB, Config);
 }
 
+const PhysicsJointHandle CreateBallJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const BallJointConfig& Config)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.JointsManager().CreateBallJoint(HandleA, HandleB, Config);
+}
+
 void DestroyJoint(const PhysicsJointHandle& JointHandle)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();

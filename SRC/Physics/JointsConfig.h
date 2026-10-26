@@ -32,5 +32,14 @@ struct DistanceJointConfig
     }
 };
 
+struct BallJointConfig
+{
+    JointConfig FCommon;
+
+    void DrawInEditor();
+
+    SERIALIZE() { PROPERTYFIELD(Common, JointConfig{ }); }
+};
+
 } // namespace Physics
 } // namespace ECSEngine
