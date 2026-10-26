@@ -85,6 +85,7 @@ const ModuleTemplate* EntityTemplate::GetModuleTemplate(const u32 parId) const
 
 void EntityTemplate::DrawEditor()
 {
+    ImGui::PushID(FName.c_str());
     ImGui::TextColored(vec4(0.8f, 0.8f, 0.8f, 1.0f), "Entity template name:");
     ImGui::SameLine(0.0f, 5.0f);
 
@@ -106,10 +107,12 @@ void EntityTemplate::DrawEditor()
     std::vector<u32> modulesToRemove;
     foreachitem(itModulesTemplates, FModuleTemplates)
     {
+        ImGui::PushID(itModulesTemplates.first);
         if (itModulesTemplates.second->DrawEditor())
         {
             modulesToRemove.push_back(itModulesTemplates.first);
         }
+        ImGui::PopID();
     }
 
     foreachitemconst(id, modulesToRemove)
@@ -117,6 +120,7 @@ void EntityTemplate::DrawEditor()
         FModuleTemplates.erase(id);
         RemoveModule(id);
     }
+    ImGui::PopID();
 }
 
 void EntityTemplate::UpdateKey()
