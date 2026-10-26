@@ -18,6 +18,7 @@ public:
     void VirtualUpdate() override;
 
     void AddDistanceJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::DistanceJointConfig& Config);
+    void AddBallJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::BallJointConfig& Config);
 
 private:
     struct DistanceJointRecord
@@ -27,5 +28,13 @@ private:
         Physics::DistanceJointConfig Config;
     };
     std::vector<DistanceJointRecord> DistanceJointToSpawn;
+
+    struct BallJointRecord
+    {
+        EntityId A;
+        EntityId B;
+        Physics::BallJointConfig Config;
+    };
+    std::vector<BallJointRecord> BallJointToSpawn;
 };
 } // namespace ECSEngine

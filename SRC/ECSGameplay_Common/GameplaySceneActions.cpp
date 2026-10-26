@@ -440,18 +440,44 @@ void SpawnJoinedEntitiesSceneAction::VirtualStart()
 
     const EntityId EntityA = EntityFactory::RequestCreateEntity(FTemplateA, container);
 
-    const vec3& aA = FConfig.FCommon.FAnchorALocal;
-    const vec3& aB = FConfig.FCommon.FAnchorBLocal;
+    vec3 aA, aB;
+    switch (FJointType)
+    {
+    case 0:
+        aA = FDistanceConfig.FCommon.FAnchorALocal;
+        aB = FDistanceConfig.FCommon.FAnchorBLocal;
+        break;
+    case 1:
+        aA = FBallConfig.FCommon.FAnchorALocal;
+        aB = FBallConfig.FCommon.FAnchorBLocal;
+        break;
+    }
 
     const vec3 euler = FSceneItem->GetEulerAngles();
     const mat4 R = EulerAnglesXYZ(euler.x, euler.y, euler.z); // rotation only
     const vec3 n = Normalize((R * vec4::MakeHomogeneousDirectionVec4(vec3(0.f, -1.f, 0.f))).xyz());
-    const vec3 posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz() + n * FConfig.FLength;
+    vec3 posB;
+    switch (FJointType)
+    {
+    case 0:
+        posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz() + n * FDistanceConfig.FLength;
+        break;
+    case 1:
+        posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz();
+        break;
+    }
 
     container.Set<ModuleParameters::Position>(posB);
     const EntityId EntityB = EntityFactory::RequestCreateEntity(FTemplateB, container);
-
-    PhysicsJointSpawner::Instance().AddDistanceJointToSpawn(EntityA, EntityB, FConfig);
+    switch (FJointType)
+    {
+    case 0:
+        PhysicsJointSpawner::Instance().AddDistanceJointToSpawn(EntityA, EntityB, FDistanceConfig);
+        break;
+    case 1:
+        PhysicsJointSpawner::Instance().AddBallJointToSpawn(EntityA, EntityB, FBallConfig);
+        break;
+    }
 }
 
 void SpawnJoinedEntitiesSceneAction::VirtualDrawEditor()
@@ -474,7 +500,22 @@ void SpawnJoinedEntitiesSceneAction::VirtualDrawEditor()
             FTemplateB = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateNameB);
         }
 
-        FConfig.DrawInEditor();
+        ImGui::RadioButton("Distance Joint", &FJointType, 0);
+        ImGui::RadioButton("Ball Joint", &FJointType, 1);
+
+        switch (FJointType)
+        {
+        case 0:
+        {
+            FDistanceConfig.DrawInEditor();
+            break;
+        }
+        case 1:
+        {
+            FBallConfig.DrawInEditor();
+            break;
+        }
+        }
     }
 }
 
@@ -540,13 +581,32 @@ bool SpawnJoinedEntitiesSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCom
         const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(descriptor->MeshFile());
         if (meshHandle.IsValid())
         {
-            const vec3& aA = FConfig.FCommon.FAnchorALocal;
-            const vec3& aB = FConfig.FCommon.FAnchorBLocal;
+            vec3 aA, aB;
+            switch (FJointType)
+            {
+            case 0:
+                aA = FDistanceConfig.FCommon.FAnchorALocal;
+                aB = FDistanceConfig.FCommon.FAnchorBLocal;
+                break;
+            case 1:
+                aA = FBallConfig.FCommon.FAnchorALocal;
+                aB = FBallConfig.FCommon.FAnchorBLocal;
+                break;
+            }
 
             const vec3 euler = FSceneItem->GetEulerAngles();
             const mat4 R = EulerAnglesXYZ(euler.x, euler.y, euler.z); // rotation only
             const vec3 n = Normalize((R * vec4::MakeHomogeneousDirectionVec4(vec3(0.f, -1.f, 0.f))).xyz());
-            const vec3 posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz() + n * FConfig.FLength;
+            vec3 posB;
+            switch (FJointType)
+            {
+            case 0:
+                posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz() + n * FDistanceConfig.FLength;
+                break;
+            case 1:
+                posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz();
+                break;
+            }
             const mat4 mtx = Translation(posB) * EulerAnglesXYZ(euler.x, euler.y, euler.z);
 
             if (descriptor->IsMultiPassMaterial())
