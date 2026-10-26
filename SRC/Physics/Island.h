@@ -20,6 +20,7 @@ class Island
     friend class IslandManager;
 
     friend struct DistanceJoint;
+    friend struct BallJoint;
 
 public:
     void Initialise();

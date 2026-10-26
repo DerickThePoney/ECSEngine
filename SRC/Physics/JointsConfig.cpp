@@ -17,5 +17,10 @@ void DistanceJointConfig::DrawInEditor()
     FCommon.DrawInEditor();
     EDITOR_PROPERTY_SIMPLE("Length", FLength);
 }
+
+void BallJointConfig::DrawInEditor()
+{
+    FCommon.DrawInEditor();
+}
 } // namespace Physics
 } // namespace ECSEngine
