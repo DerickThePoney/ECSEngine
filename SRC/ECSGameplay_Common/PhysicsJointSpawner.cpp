@@ -46,11 +46,32 @@ void PhysicsJointSpawner::VirtualUpdate()
     }
 
     DistanceJointToSpawn.clear();
+
+    foreachitemconst(record, BallJointToSpawn)
+    {
+        RigidbodyModule* EntityABodyModule = rigidBodies[record.A];
+        if (EntityABodyModule == nullptr)
+            continue;
+
+        RigidbodyModule* EntityBBodyModule = rigidBodies[record.B];
+        if (EntityBBodyModule == nullptr)
+            continue;
+
+        Physics::CreateBallJoint(EntityABodyModule->BodyHandle(), EntityBBodyModule->BodyHandle(), record.Config);
+    }
+
+    DistanceJointToSpawn.clear();
 }
 
 void PhysicsJointSpawner::AddDistanceJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::DistanceJointConfig& Config)
 {
     DistanceJointRecord record{ .A = EntityA, .B = EntityB, .Config = Config };
     DistanceJointToSpawn.emplace_back(record);
+}
+
+void PhysicsJointSpawner::AddBallJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::BallJointConfig& Config)
+{
+    BallJointRecord record{ .A = EntityA, .B = EntityB, .Config = Config };
+    BallJointToSpawn.emplace_back(record);
 }
 } // namespace ECSEngine
