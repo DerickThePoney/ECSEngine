@@ -16,6 +16,7 @@
 #include "ECSCore/EntityTemplateManager.h"
 #include "ECSCore/ModuleParameters.h"
 #include "NavMeshPathfindingManager.h"
+#include "PhysicsJointSpawner.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GFXRepresentation.h"
 #include "RenderingCore/GFXRepresentationDescriptor.h"
@@ -36,6 +37,9 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionPolygonalPattern, ECS
 
 CEREAL_REGISTER_TYPE(ECSEngine::CreateNavMeshSceneAction);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionPolygonalPattern, ECSEngine::CreateNavMeshSceneAction)
+
+CEREAL_REGISTER_TYPE(ECSEngine::SpawnJoinedEntitiesSceneAction);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::SceneActionWithBaseSceneItem, ECSEngine::SpawnJoinedEntitiesSceneAction)
 
 namespace ECSEngine
 {
@@ -82,7 +86,12 @@ void SpawnEntitySceneAction::VirtualDrawEditor()
 
     if (ShouldShowEditor())
     {
+        const auto OldTemplate = FEntityTemplateName;
         EDITOR_PROPERTY_ENTITY_TEMPLATE("Entity to spawn", FTemplate, FEntityTemplateName);
+        if (FEntityTemplateName != OldTemplate)
+        {
+            FTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateName);
+        }
     }
 }
 
@@ -394,6 +403,166 @@ void ConvexHullTestsPolygonalPatternSceneAction::GenerateHull()
     auto start = std::chrono::high_resolution_clock::now();
     ConvexHull(FRandomPoints, FConvexHull);
     FTimeTaken = (float)(std::chrono::high_resolution_clock::now() - start).count() / 1000000.f;
+}
+
+/*************************************************************/
+/*            SpawnJoinedEntities                            */
+/*************************************************************/
+IMPLEMENT_SCENE_ACTION(SpawnJoinedEntitiesSceneAction);
+
+SpawnJoinedEntitiesSceneAction::SpawnJoinedEntitiesSceneAction(const std::string& parFName)
+    : parent_type(parFName)
+{
+}
+
+SpawnJoinedEntitiesSceneAction::~SpawnJoinedEntitiesSceneAction()
+{
+}
+
+void SpawnJoinedEntitiesSceneAction::VirtualInitialise(const SceneScenario* parScene)
+{
+    parent_type::VirtualInitialise(parScene);
+    FTemplateA = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateNameA);
+    FTemplateB = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateNameB);
+}
+
+void SpawnJoinedEntitiesSceneAction::VirtualStart()
+{
+    parent_type::VirtualStart();
+
+    AssertRelease(FSceneItem != nullptr);
+    AssertRelease(FTemplateA != nullptr);
+    AssertRelease(FTemplateB != nullptr);
+
+    ModuleParameters::ParameterContainer container;
+    container.Set<ModuleParameters::Position>(FSceneItem->GetPosition());
+    container.Set<ModuleParameters::EulerAnglesXYZ>(FSceneItem->GetEulerAngles());
+
+    const EntityId EntityA = EntityFactory::RequestCreateEntity(FTemplateA, container);
+
+    const vec3& aA = FConfig.FCommon.FAnchorALocal;
+    const vec3& aB = FConfig.FCommon.FAnchorBLocal;
+
+    const vec3 euler = FSceneItem->GetEulerAngles();
+    const mat4 R = EulerAnglesXYZ(euler.x, euler.y, euler.z); // rotation only
+    const vec3 n = Normalize((R * vec4::MakeHomogeneousDirectionVec4(vec3(0.f, -1.f, 0.f))).xyz());
+    const vec3 posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz() + n * FConfig.FLength;
+
+    container.Set<ModuleParameters::Position>(posB);
+    const EntityId EntityB = EntityFactory::RequestCreateEntity(FTemplateB, container);
+
+    PhysicsJointSpawner::Instance().AddDistanceJointToSpawn(EntityA, EntityB, FConfig);
+}
+
+void SpawnJoinedEntitiesSceneAction::VirtualDrawEditor()
+{
+    parent_type::VirtualDrawEditor();
+
+    if (ShouldShowEditor())
+    {
+        const auto OldTemplateA = FEntityTemplateNameA;
+        EDITOR_PROPERTY_ENTITY_TEMPLATE("First Entity to spawn", FTemplateA, FEntityTemplateNameA);
+        if (FEntityTemplateNameA != OldTemplateA)
+        {
+            FTemplateA = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateNameA);
+        }
+
+        const auto OldTemplateB = FEntityTemplateNameB;
+        EDITOR_PROPERTY_ENTITY_TEMPLATE("Second Entity to spawn", FTemplateB, FEntityTemplateNameB);
+        if (FEntityTemplateNameB != OldTemplateB)
+        {
+            FTemplateB = EntityTemplateManager::Instance().GetEntityTemplate(FEntityTemplateNameB);
+        }
+
+        FConfig.DrawInEditor();
+    }
+}
+
+bool SpawnJoinedEntitiesSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial)
+{
+    parent_type::VirtualDrawInSceneEditor(parCommandBuffer, parMaterial);
+
+    {
+        if (FTemplateA == nullptr)
+            return false;
+
+        const bool hasApparenceModule = FTemplateA->HasModule<ApparenceModule>();
+        if (!hasApparenceModule)
+            return false;
+
+        const BaseSceneItem* item = GetSceneItem();
+        if (item == nullptr)
+            return false;
+
+        const ApparenceModuleTemplate* apparenceModuleTemplate = (ApparenceModuleTemplate*)FTemplateA->GetModuleTemplate<ApparenceModule>();
+        AssertRelease(apparenceModuleTemplate != nullptr);
+        const Rendering::GFXRepresentationDescriptor* descriptor = Rendering::GFXRepresentationDescriptorManager::Instance().Descriptor(
+              apparenceModuleTemplate->GFXRepresentationDescriptorName());
+        AssertRelease(descriptor != nullptr);
+
+        const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(descriptor->MeshFile());
+        if (meshHandle.IsValid())
+        {
+            const vec3 eulerAngles = item->GetEulerAngles();
+            const mat4 mtx = Translation(item->GetPosition()) * EulerAnglesXYZ(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+
+            if (descriptor->IsMultiPassMaterial())
+            {
+                const Rendering::MultiPassMaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMultiPassMaterialInstanceIFN(descriptor->MaterialName());
+                parCommandBuffer.DrawMesh(meshHandle, instanceHandle, mtx);
+            }
+            else
+            {
+                const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(descriptor->MaterialName());
+                parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial, mtx);
+            }
+        }
+    }
+
+    {
+        if (FTemplateB == nullptr)
+            return false;
+
+        const bool hasApparenceModule = FTemplateB->HasModule<ApparenceModule>();
+        if (!hasApparenceModule)
+            return false;
+
+        const BaseSceneItem* item = GetSceneItem();
+        if (item == nullptr)
+            return false;
+
+        const ApparenceModuleTemplate* apparenceModuleTemplate = (ApparenceModuleTemplate*)FTemplateB->GetModuleTemplate<ApparenceModule>();
+        AssertRelease(apparenceModuleTemplate != nullptr);
+        const Rendering::GFXRepresentationDescriptor* descriptor = Rendering::GFXRepresentationDescriptorManager::Instance().Descriptor(
+              apparenceModuleTemplate->GFXRepresentationDescriptorName());
+        AssertRelease(descriptor != nullptr);
+
+        const Rendering::MeshHandle meshHandle = Rendering::MeshManager::Instance().CreateMesh(descriptor->MeshFile());
+        if (meshHandle.IsValid())
+        {
+            const vec3& aA = FConfig.FCommon.FAnchorALocal;
+            const vec3& aB = FConfig.FCommon.FAnchorBLocal;
+
+            const vec3 euler = FSceneItem->GetEulerAngles();
+            const mat4 R = EulerAnglesXYZ(euler.x, euler.y, euler.z); // rotation only
+            const vec3 n = Normalize((R * vec4::MakeHomogeneousDirectionVec4(vec3(0.f, -1.f, 0.f))).xyz());
+            const vec3 posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz() + n * FConfig.FLength;
+            const mat4 mtx = Translation(posB) * EulerAnglesXYZ(euler.x, euler.y, euler.z);
+
+            if (descriptor->IsMultiPassMaterial())
+            {
+                const Rendering::MultiPassMaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMultiPassMaterialInstanceIFN(descriptor->MaterialName());
+                parCommandBuffer.DrawMesh(meshHandle, instanceHandle, mtx);
+            }
+            else
+            {
+                const Rendering::MaterialInstanceHandle instanceHandle = Rendering::MaterialManager::CreateMaterialInstanceIFN(descriptor->MaterialName());
+                parCommandBuffer.DrawMesh(meshHandle, (instanceHandle.IsValid()) ? instanceHandle : parMaterial, mtx);
+            }
+        }
+    }
+
+    return false;
 }
 
 } // namespace ECSEngine

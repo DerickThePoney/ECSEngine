@@ -34,8 +34,8 @@ void DistanceJoint::PreSolve(Island* parIsland, const float parDT)
     RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(FBodyB);
     AssertRelease(bodyA && bodyB);
 
-    FState.xA = (bodyA->GetTransform() * vec4::MakeHomogeneousPositionVec4(FConfig.Common.FAnchorALocal)).xyz();
-    FState.xB = (bodyB->GetTransform() * vec4::MakeHomogeneousPositionVec4(FConfig.Common.FAnchorBLocal)).xyz();
+    FState.xA = (bodyA->GetTransform() * vec4::MakeHomogeneousPositionVec4(FConfig.FCommon.FAnchorALocal)).xyz();
+    FState.xB = (bodyB->GetTransform() * vec4::MakeHomogeneousPositionVec4(FConfig.FCommon.FAnchorBLocal)).xyz();
 
     FState.rA = FState.xA - bodyA->FCenterOfMassWorld;
     FState.rB = FState.xB - bodyB->FCenterOfMassWorld;

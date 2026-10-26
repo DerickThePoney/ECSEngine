@@ -3,6 +3,7 @@
 #include "Common/NavMesh.h"
 #include "Common/NavMeshPath.h"
 #include "Common/PoolAllocator.h"
+#include "Physics/JointsConfig.h"
 
 namespace ECSEngine
 {
@@ -156,5 +157,46 @@ public:
     {
         ar(cereal::base_class<parent_type>(this));
     }
+};
+
+/*************************************************************/
+/*            SpawnJoinedEntities                            */
+/*************************************************************/
+class SpawnJoinedEntitiesSceneAction : public SceneActionWithBaseSceneItem
+{
+    DECLARE_SCENE_ACTION(SpawnJoinedEntitiesSceneAction, SceneActionWithBaseSceneItem);
+
+public:
+    SpawnJoinedEntitiesSceneAction(const std::string& parFName = "Dummy");
+    virtual ~SpawnJoinedEntitiesSceneAction();
+
+protected:
+    virtual void VirtualInitialise(const SceneScenario* parScene) override;
+
+    virtual void VirtualStart() override;
+
+    virtual void VirtualDrawEditor() override;
+    virtual bool VirtualDrawInSceneEditor(Rendering::DrawCommandBuffer& parCommandBuffer, Rendering::MaterialInstanceHandle& parMaterial);
+
+public:
+    const std::string& GetEntityTemplateNameA() const { return FEntityTemplateNameA; }
+    const std::string& GetEntityTemplateNameB() const { return FEntityTemplateNameB; }
+
+    void SetEntityTemplateNameA(const std::string& parName) { FEntityTemplateNameA = parName; }
+    void SetEntityTemplateNameB(const std::string& parName) { FEntityTemplateNameB = parName; }
+
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(cereal::base_class<parent_type>(this), PROPERTY(EntityTemplateNameA), PROPERTY(EntityTemplateNameB), PROPERTY(Config));
+    }
+
+private:
+    std::string FEntityTemplateNameA = "Entity template name A";
+    std::string FEntityTemplateNameB = "Entity template name B";
+    const EntityTemplate* FTemplateA = nullptr;
+    const EntityTemplate* FTemplateB = nullptr;
+
+    Physics::DistanceJointConfig FConfig;
 };
 } // namespace ECSEngine
