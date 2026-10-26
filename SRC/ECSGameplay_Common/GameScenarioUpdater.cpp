@@ -17,6 +17,7 @@
 #include "NavMeshPathfindingManager.h"
 #include "Physics/PhysicsAPI.h"
 #include "Physics/PhysicsEngine.h"
+#include "PhysicsJointSpawner.h"
 #include "Rendering/FinalCombinePass.h"
 #include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
@@ -105,6 +106,7 @@ void GameScenarioUpdater::Initialise()
     FColonyBuildingSystem.Init();
     FUserInterfaceSystem.Init();
     FPhysicsSystem.Init();
+    PhysicsJointSpawner::CreateIFP();
 
     FScenario->Initialise();
 }
@@ -117,6 +119,8 @@ void GameScenarioUpdater::Destroy()
     delete FScenario;
     FScenario = nullptr;
 
+    PhysicsJointSpawner::Instance().Finalize();
+    PhysicsJointSpawner::Delete();
     FPhysicsSystem.Destroy();
     FUserInterfaceSystem.Destroy();
     FColonyBuildingSystem.Destroy();
@@ -188,6 +192,8 @@ void GameScenarioUpdater::GameplayUpdate()
 
         WorldManager::Instance().ProcessDestroyEntities();
         WorldManager::Instance().ProcessWithEntitiesCreation();
+
+        PhysicsJointSpawner::Instance().Update();
     }
 
     {
