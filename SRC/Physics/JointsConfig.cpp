@@ -32,8 +32,8 @@ void HingeJointConfig::DrawInEditor()
 
     if (FEnableLimit)
     {
-        EDITOR_PROPERTY_ANGLE("Lower angle", FLowerAngle, -Pi(), Pi());
-        EDITOR_PROPERTY_ANGLE("Upper angle", FUpperAngle, FLowerAngle, Pi());
+        EDITOR_PROPERTY_ANGLE("Lower angle", FLowerAngle, -180.f, 180.f);
+        EDITOR_PROPERTY_ANGLE("Upper angle", FUpperAngle, FLowerAngle, 180.f);
     }
 }
 
