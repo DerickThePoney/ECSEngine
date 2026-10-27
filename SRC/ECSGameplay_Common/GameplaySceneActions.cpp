@@ -451,6 +451,10 @@ void SpawnJoinedEntitiesSceneAction::VirtualStart()
         aA = FBallConfig.FCommon.FAnchorALocal;
         aB = FBallConfig.FCommon.FAnchorBLocal;
         break;
+    case 2:
+        aA = FHingeConfig.FCommon.FAnchorALocal;
+        aB = FHingeConfig.FCommon.FAnchorBLocal;
+        break;
     }
 
     const vec3 euler = FSceneItem->GetEulerAngles();
@@ -463,6 +467,7 @@ void SpawnJoinedEntitiesSceneAction::VirtualStart()
         posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz() + n * FDistanceConfig.FLength;
         break;
     case 1:
+    case 2:
         posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz();
         break;
     }
@@ -476,6 +481,9 @@ void SpawnJoinedEntitiesSceneAction::VirtualStart()
         break;
     case 1:
         PhysicsJointSpawner::Instance().AddBallJointToSpawn(EntityA, EntityB, FBallConfig);
+        break;
+    case 2:
+        PhysicsJointSpawner::Instance().AddHingeJointToSpawn(EntityA, EntityB, FHingeConfig);
         break;
     }
 }
@@ -501,7 +509,10 @@ void SpawnJoinedEntitiesSceneAction::VirtualDrawEditor()
         }
 
         ImGui::RadioButton("Distance Joint", &FJointType, 0);
+        ImGui::SameLine();
         ImGui::RadioButton("Ball Joint", &FJointType, 1);
+        ImGui::SameLine();
+        ImGui::RadioButton("Hinge Joint", &FJointType, 2);
 
         switch (FJointType)
         {
@@ -513,6 +524,11 @@ void SpawnJoinedEntitiesSceneAction::VirtualDrawEditor()
         case 1:
         {
             FBallConfig.DrawInEditor();
+            break;
+        }
+        case 2:
+        {
+            FHingeConfig.DrawInEditor();
             break;
         }
         }
@@ -592,6 +608,10 @@ bool SpawnJoinedEntitiesSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCom
                 aA = FBallConfig.FCommon.FAnchorALocal;
                 aB = FBallConfig.FCommon.FAnchorBLocal;
                 break;
+            case 2:
+                aA = FHingeConfig.FCommon.FAnchorALocal;
+                aB = FHingeConfig.FCommon.FAnchorBLocal;
+                break;
             }
 
             const vec3 euler = FSceneItem->GetEulerAngles();
@@ -604,6 +624,7 @@ bool SpawnJoinedEntitiesSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCom
                 posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz() + n * FDistanceConfig.FLength;
                 break;
             case 1:
+            case 2:
                 posB = FSceneItem->GetPosition() + (R * vec4::MakeHomogeneousDirectionVec4(aA - aB)).xyz();
                 break;
             }

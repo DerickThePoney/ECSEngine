@@ -188,8 +188,8 @@ public:
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(cereal::base_class<parent_type>(this), PROPERTY(EntityTemplateNameA), PROPERTY(EntityTemplateNameB), PROPERTY(JointType), PROPERTY(DistanceConfig),
-              PROPERTY(BallConfig));
+        ar(cereal::base_class<parent_type>(this), PROPERTY(EntityTemplateNameA), PROPERTY(EntityTemplateNameB), PROPERTY(JointType), PROPERTY(DistanceConfig), PROPERTY(BallConfig),
+              PROPERTY(HingeConfig));
     }
 
 private:
@@ -201,5 +201,6 @@ private:
     int FJointType = 0;
     Physics::DistanceJointConfig FDistanceConfig;
     Physics::BallJointConfig FBallConfig;
+    Physics::HingeJointConfig FHingeConfig;
 };
 } // namespace ECSEngine

@@ -15,19 +15,13 @@ public:
 
     PhysicsJointHandle CreateDistanceJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const DistanceJointConfig& Config);
     PhysicsJointHandle CreateBallJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const BallJointConfig& Config);
+    PhysicsJointHandle CreateHingeJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const HingeJointConfig& Config);
 
     void DestroyJoint(const PhysicsJointHandle& Handle);
 
     JointBase* GetJoint(const PhysicsJointHandle& Handle);
 
     void PreUpdate();
-
-private:
-    void DestroyDistanceJoint(const PhysicsJointHandle& Handle);
-    u16 GetNextDistanceJointId();
-
-    void DestroyBallJoint(const PhysicsJointHandle& Handle);
-    u16 GetNextBallJointId();
 
 private:
     struct DistanceJointRecord
@@ -47,6 +41,15 @@ private:
     std::vector<BallJointRecord> FBallJoints;
 
     IdGenerator FBallJointsIdGenerator;
+
+    struct HingeJointRecord
+    {
+        HingeJoint Joint;
+        PhysicsJointHandle Handle;
+    };
+    std::vector<HingeJointRecord> FHingeJoints;
+
+    IdGenerator FHingeJointsIdGenerator;
 };
 
 } // namespace Physics

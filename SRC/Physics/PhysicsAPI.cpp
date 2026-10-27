@@ -188,6 +188,12 @@ const PhysicsJointHandle CreateBallJoint(const PhysicsBodyHandle& HandleA, const
     return Engine.JointsManager().CreateBallJoint(HandleA, HandleB, Config);
 }
 
+const PhysicsJointHandle CreateHingeJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const HingeJointConfig& Config)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.JointsManager().CreateHingeJoint(HandleA, HandleB, Config);
+}
+
 void DestroyJoint(const PhysicsJointHandle& JointHandle)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();

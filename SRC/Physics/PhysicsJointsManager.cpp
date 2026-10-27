@@ -13,24 +13,61 @@ void PhysicsJointsManager::RemoveBody(RigidBody* Body)
 {
     foreachitemconst(jointHandle, Body->FJoints)
     {
-        switch (jointHandle.GetTypeAsEnum())
-        {
-        case EJointType::DISTANCE:
-        {
-            DestroyDistanceJoint(jointHandle);
-            break;
-        }
-        case EJointType::BALL:
-        {
-            DestroyBallJoint(jointHandle);
-            break;
-        }
-        default:
-            AssertNotReachedMsg("Not implemented yet");
-        }
+        DestroyJoint(jointHandle);
     }
 
     Body->FJoints.clear();
+}
+
+u16 GetNextJointId(IdGenerator& Generator)
+{
+    u32 Id = Generator.GetNextId();
+    if ((Id & 0xFFFF0000) > 0)
+    {
+        LOG_ERROR("Already filled the joints buffer for this buffer");
+        AssertNotReached();
+        return (u16)~0;
+    }
+    return (u16)Id;
+}
+
+template<typename Container, typename JointConfig>
+PhysicsJointHandle
+CreateJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, Container& JointContainer, const JointConfig& Config, EJointType JointType, IdGenerator& Generator)
+{
+    RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(BodyA);
+    RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(BodyB);
+
+    if (bodyA == nullptr || bodyB == nullptr)
+    {
+        LOG_ERROR("Trying to attach stale bodies...");
+        return PhysicsJointHandle{ };
+    }
+
+    u16 Id = GetNextJointId(Generator);
+
+    if (Id == (u16)~0)
+    {
+        return PhysicsJointHandle{ };
+    }
+
+    if (Id >= JointContainer.size())
+    {
+        JointContainer.resize(Id + 1);
+        JointContainer[Id].Handle.FIndex = Id;
+        JointContainer[Id].Handle.FType = (u8)JointType;
+        JointContainer[Id].Handle.FGeneration = 0;
+    }
+
+    // Fill up joint data
+    JointContainer[Id].Joint.Initialize(BodyA, BodyB, Config);
+    bodyA->FJoints.push_back(JointContainer[Id].Handle);
+    bodyB->FJoints.push_back(JointContainer[Id].Handle);
+
+    bodyA->SetAwake(true);
+    bodyB->SetAwake(true);
+
+    return JointContainer[Id].Handle;
 }
 
 PhysicsJointHandle PhysicsJointsManager::CreateDistanceJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const DistanceJointConfig& Config)
@@ -41,41 +78,21 @@ PhysicsJointHandle PhysicsJointsManager::CreateDistanceJoint(const PhysicsBodyHa
         return PhysicsJointHandle{ };
     }
 
-    RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(BodyA);
-    RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(BodyB);
-
-    if (bodyA == nullptr || bodyB == nullptr)
-    {
-        LOG_ERROR("Trying to attach stale bodies...");
-        return PhysicsJointHandle{ };
-    }
-
-    u16 Id = GetNextDistanceJointId();
-    if (Id == (u16)~0)
-    {
-        return PhysicsJointHandle{ };
-    }
-
-    if (Id >= FDistanceJoints.size())
-    {
-        FDistanceJoints.resize(Id + 1);
-        FDistanceJoints[Id].Handle.FIndex = Id;
-        FDistanceJoints[Id].Handle.FType = (u8)EJointType::DISTANCE;
-        FDistanceJoints[Id].Handle.FGeneration = 0;
-    }
-
-    // Fill up joint data
-    FDistanceJoints[Id].Joint.Initialize(BodyA, BodyB, Config);
-    bodyA->FJoints.push_back(FDistanceJoints[Id].Handle);
-    bodyB->FJoints.push_back(FDistanceJoints[Id].Handle);
-
-    bodyA->SetAwake(true);
-    bodyB->SetAwake(true);
-
-    return FDistanceJoints[Id].Handle;
+    return CreateJoint(BodyA, BodyB, FDistanceJoints, Config, EJointType::DISTANCE, FDistanceJointsIdGenerator);
 }
 
 PhysicsJointHandle PhysicsJointsManager::CreateBallJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const BallJointConfig& Config)
+{
+    if (BodyA == BodyB)
+    {
+        LOG_ERROR("Nice try young padawan. But attaching the same body to the same joint is not supported !");
+        return PhysicsJointHandle{ };
+    }
+
+    return CreateJoint(BodyA, BodyB, FBallJoints, Config, EJointType::BALL, FBallJointsIdGenerator);
+}
+
+PhysicsJointHandle PhysicsJointsManager::CreateHingeJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const HingeJointConfig& Config)
 {
     if (BodyA == BodyB)
     {
@@ -92,29 +109,67 @@ PhysicsJointHandle PhysicsJointsManager::CreateBallJoint(const PhysicsBodyHandle
         return PhysicsJointHandle{ };
     }
 
-    u16 Id = GetNextBallJointId();
-    if (Id == (u16)~0)
+    return CreateJoint(BodyA, BodyB, FHingeJoints, Config, EJointType::HINGE, FHingeJointsIdGenerator);
+}
+
+template<typename Container>
+void DestroyJointTemplate(const PhysicsJointHandle& Handle, Container& JointContainer, IdGenerator& Generator, EJointType JointType)
+{
+    if (Handle.GetTypeAsEnum() != JointType)
     {
-        return PhysicsJointHandle{ };
+        LOG_ERROR(std::format("Trying to delete a joint (type {}) with a handle for type {}", (u8)JointType, Handle.FType).c_str());
+        return;
     }
 
-    if (Id >= FBallJoints.size())
+    if (Handle.FIndex >= JointContainer.size())
     {
-        FBallJoints.resize(Id + 1);
-        FBallJoints[Id].Handle.FIndex = Id;
-        FBallJoints[Id].Handle.FType = (u8)EJointType::BALL;
-        FBallJoints[Id].Handle.FGeneration = 0;
+        LOG_ERROR(std::format("Joint handle index is out of bound: {} - Count {}", Handle.FIndex, JointContainer.size()).c_str());
+        return;
     }
 
-    // Fill up joint data
-    FBallJoints[Id].Joint.Initialize(BodyA, BodyB, Config);
-    bodyA->FJoints.push_back(FBallJoints[Id].Handle);
-    bodyB->FJoints.push_back(FBallJoints[Id].Handle);
+    if (Handle.FGeneration != JointContainer[Handle.FIndex].Handle.FGeneration)
+    {
+        LOG_ERROR(
+              std::format("Trying to destroy an outdated joint: Handle Generation {} - Current Generation {}", Handle.FGeneration, JointContainer[Handle.FIndex].Handle.FGeneration)
+                    .c_str());
+        return;
+    }
 
-    bodyA->SetAwake(true);
-    bodyB->SetAwake(true);
+    // Detach the rigidbodies
+    RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(JointContainer[Handle.FIndex].Joint.FBodyA);
+    RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(JointContainer[Handle.FIndex].Joint.FBodyB);
+    if (bodyA != nullptr)
+    {
+        for (auto it = bodyA->FJoints.begin(); it != bodyA->FJoints.end(); ++it)
+        {
+            if (*it == Handle)
+            {
+                bodyA->FJoints.erase(it);
+                break;
+            }
+        }
 
-    return FBallJoints[Id].Handle;
+        bodyA->SetAwake(true);
+    }
+
+    if (bodyB != nullptr)
+    {
+        for (auto it = bodyB->FJoints.begin(); it != bodyB->FJoints.end(); ++it)
+        {
+            if (*it == Handle)
+            {
+                bodyB->FJoints.erase(it);
+                break;
+            }
+        }
+        bodyB->SetAwake(true);
+    }
+
+    // Just Increase the generation.
+    JointContainer[Handle.FIndex].Handle.FGeneration++;
+    JointContainer[Handle.FIndex].Joint.Destroy();
+
+    Generator.ReleaseId(Handle.FIndex);
 }
 
 void PhysicsJointsManager::DestroyJoint(const PhysicsJointHandle& Handle)
@@ -128,136 +183,22 @@ void PhysicsJointsManager::DestroyJoint(const PhysicsJointHandle& Handle)
     {
     case EJointType::DISTANCE:
     {
-        DestroyDistanceJoint(Handle);
+        DestroyJointTemplate(Handle, FDistanceJoints, FDistanceJointsIdGenerator, EJointType::DISTANCE);
         break;
     }
     case EJointType::BALL:
     {
-        DestroyBallJoint(Handle);
+        DestroyJointTemplate(Handle, FBallJoints, FBallJointsIdGenerator, EJointType::BALL);
+        break;
+    }
+    case EJointType::HINGE:
+    {
+        DestroyJointTemplate(Handle, FHingeJoints, FHingeJointsIdGenerator, EJointType::HINGE);
         break;
     }
     default:
         AssertNotReached();
     }
-}
-
-void PhysicsJointsManager::DestroyDistanceJoint(const PhysicsJointHandle& Handle)
-{
-
-    if (Handle.GetTypeAsEnum() != EJointType::DISTANCE)
-    {
-        LOG_ERROR(std::format("Trying to delete a distance joint (type {}) with a handle for type {}", (u8)EJointType::DISTANCE, Handle.FType).c_str());
-        return;
-    }
-
-    if (Handle.FIndex >= FDistanceJoints.size())
-    {
-        LOG_ERROR(std::format("Distance joint handle index is out of bound: {} - Count {}", Handle.FIndex, FDistanceJoints.size()).c_str());
-        return;
-    }
-
-    if (Handle.FGeneration != FDistanceJoints[Handle.FIndex].Handle.FGeneration)
-    {
-        LOG_ERROR(std::format(
-              "Trying to destroy an outdated joint: Handle Generation {} - Current Generation {}", Handle.FGeneration, FDistanceJoints[Handle.FIndex].Handle.FGeneration)
-                    .c_str());
-        return;
-    }
-
-    // Detach the rigidbodies
-    RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(FDistanceJoints[Handle.FIndex].Joint.FBodyA);
-    RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(FDistanceJoints[Handle.FIndex].Joint.FBodyB);
-    if (bodyA != nullptr)
-    {
-        for (auto it = bodyA->FJoints.begin(); it != bodyA->FJoints.end(); ++it)
-        {
-            if (*it == Handle)
-            {
-                bodyA->FJoints.erase(it);
-                break;
-            }
-        }
-
-        bodyA->SetAwake(true);
-    }
-
-    if (bodyB != nullptr)
-    {
-        for (auto it = bodyB->FJoints.begin(); it != bodyB->FJoints.end(); ++it)
-        {
-            if (*it == Handle)
-            {
-                bodyB->FJoints.erase(it);
-                break;
-            }
-        }
-        bodyB->SetAwake(true);
-    }
-
-    // Just Increase the generation.
-    FDistanceJoints[Handle.FIndex].Handle.FGeneration++;
-    FDistanceJoints[Handle.FIndex].Joint.Destroy();
-
-    FDistanceJointsIdGenerator.ReleaseId(Handle.FIndex);
-}
-
-void PhysicsJointsManager::DestroyBallJoint(const PhysicsJointHandle& Handle)
-{
-    if (Handle.GetTypeAsEnum() != EJointType::DISTANCE)
-    {
-        LOG_ERROR(std::format("Trying to delete a ball joint (type {}) with a handle for type {}", (u8)EJointType::DISTANCE, Handle.FType).c_str());
-        return;
-    }
-
-    if (Handle.FIndex >= FDistanceJoints.size())
-    {
-        LOG_ERROR(std::format("Ball joint handle index is out of bound: {} - Count {}", Handle.FIndex, FDistanceJoints.size()).c_str());
-        return;
-    }
-
-    if (Handle.FGeneration != FDistanceJoints[Handle.FIndex].Handle.FGeneration)
-    {
-        LOG_ERROR(std::format(
-              "Trying to destroy an outdated joint: Handle Generation {} - Current Generation {}", Handle.FGeneration, FDistanceJoints[Handle.FIndex].Handle.FGeneration)
-                    .c_str());
-        return;
-    }
-
-    // Detach the rigidbodies
-    RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(FBallJoints[Handle.FIndex].Joint.FBodyA);
-    RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(FBallJoints[Handle.FIndex].Joint.FBodyB);
-    if (bodyA != nullptr)
-    {
-        for (auto it = bodyA->FJoints.begin(); it != bodyA->FJoints.end(); ++it)
-        {
-            if (*it == Handle)
-            {
-                bodyA->FJoints.erase(it);
-                break;
-            }
-        }
-
-        bodyA->SetAwake(true);
-    }
-
-    if (bodyB != nullptr)
-    {
-        for (auto it = bodyB->FJoints.begin(); it != bodyB->FJoints.end(); ++it)
-        {
-            if (*it == Handle)
-            {
-                bodyB->FJoints.erase(it);
-                break;
-            }
-        }
-        bodyB->SetAwake(true);
-    }
-
-    // Just Increase the generation.
-    FBallJoints[Handle.FIndex].Handle.FGeneration++;
-    FBallJoints[Handle.FIndex].Joint.Destroy();
-
-    FBallJointsIdGenerator.ReleaseId(Handle.FIndex);
 }
 
 JointBase* PhysicsJointsManager::GetJoint(const PhysicsJointHandle& Handle)
@@ -285,6 +226,15 @@ JointBase* PhysicsJointsManager::GetJoint(const PhysicsJointHandle& Handle)
         return &FBallJoints[Handle.FIndex].Joint;
         break;
     }
+    case EJointType::HINGE:
+    {
+        if (Handle.FIndex >= FHingeJoints.size())
+            return nullptr;
+        if (FHingeJoints[Handle.FIndex].Handle != Handle)
+            return nullptr;
+        return &FHingeJoints[Handle.FIndex].Joint;
+        break;
+    }
     default:
         AssertNotReached();
     }
@@ -303,28 +253,11 @@ void PhysicsJointsManager::PreUpdate()
     {
         joint.Joint.bIsland = false;
     }
-}
 
-u16 PhysicsJointsManager::GetNextDistanceJointId()
-{
-    u32 Id = FDistanceJointsIdGenerator.GetNextId();
-    if ((Id & 0xFFFF0000) > 0)
+    foreachitem(joint, FHingeJoints)
     {
-        LOG_ERROR("Already filled the distance joints buffer");
-        return (u16)~0;
+        joint.Joint.bIsland = false;
     }
-    return (u16)Id;
-}
-
-u16 PhysicsJointsManager::GetNextBallJointId()
-{
-    u32 Id = FBallJointsIdGenerator.GetNextId();
-    if ((Id & 0xFFFF0000) > 0)
-    {
-        LOG_ERROR("Already filled the ball joints buffer");
-        return (u16)~0;
-    }
-    return (u16)Id;
 }
 } // namespace Physics
 } // namespace ECSEngine
