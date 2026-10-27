@@ -53,6 +53,8 @@ u32 ResourceFileDirectoryView::GetRawResourceSize(const Resource& r)
 
     if (itFind != FPathToFilename.end())
     {
+        const std::filesystem::path absolute = std::filesystem::path(FPath) / r.FName;
+        itFind->second.FFilesize = static_cast<u32>(std::filesystem::file_size(absolute));
         return itFind->second.FFilesize;
     }
     return 0;
