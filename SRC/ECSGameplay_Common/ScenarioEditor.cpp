@@ -186,8 +186,7 @@ void ScenarioEditor::UpdateForSceneEditing()
             outputArchive(*FCurrentScenario);
         }
 
-        if (isNewScene)
-            GlobalResourceCache::Instance().FCache->ReOpenFileSystem();
+        GlobalResourceCache::Instance().FCache->ReOpenFileSystem();
 
         FIOScene.saveScene = false;
     }
