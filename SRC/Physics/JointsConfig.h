@@ -52,6 +52,14 @@ struct HingeJointConfig
     float FLowerAngle = 0.f; // radians, relative to bind
     float FUpperAngle = 0.f;
 
+    bool FEnableMotor = false;
+    float FMotorSpeed = 0.f;
+    float FMaxMotorTorque = 0.f;
+
+    bool FUseTargetAngle = false;
+    float FTargetAngle = 0.f;
+    float FMotorStiffness = 0.f;
+
     SERIALIZE()
     {
         PROPERTYFIELD(Common, JointConfig{ });

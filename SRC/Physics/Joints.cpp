@@ -30,7 +30,7 @@ void DistanceJoint::Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBody
 {
     JointBase::Initialize(BodyA, BodyB);
     FConfig = Config;
-    FImpulse = 0;
+    FImpulse = 0.f;
 }
 
 void DistanceJoint::PreSolve(Island* parIsland, const float parDT)
@@ -221,6 +221,17 @@ void HingeJoint::Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHan
     FLimitState = EHingeLimitState::Inactive;
 
     // Anchors stay in FConfig.FCommon (same as ball) — no bake needed
+
+    // Set up motor data
+    FEnableMotor = FConfig.FEnableMotor;
+    FMotorSpeed = FConfig.FMotorSpeed;
+    FMaxMotorTorque = FConfig.FMaxMotorTorque;
+
+    FUseTargetAngle = FConfig.FUseTargetAngle;
+    FTargetAngle = FConfig.FTargetAngle;
+    FMotorStiffness = FConfig.FMotorStiffness;
+
+    FMotorImpulse = 0.f;
 }
 
 static void ComputeBasis(const vec3& a, vec3& b, vec3& c)
