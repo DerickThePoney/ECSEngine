@@ -123,6 +123,17 @@ struct HingeJoint : public JointBase
     float FLimitImpulse = 0.f;
     EHingeLimitState FLimitState = EHingeLimitState::Inactive;
 
+    // Motor Data
+    bool FEnableMotor = false;
+    float FMotorSpeed = 0.f;
+    float FMaxMotorTorque = 0.f;
+
+    bool FUseTargetAngle = false;
+    float FTargetAngle = 0.f;
+    float FMotorStiffness = 0.f;
+
+    float FMotorImpulse = 0.f;
+
     void Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const HingeJointConfig& Config);
     void PreSolve(Island* parIsland, const float parDT) override;
     void Solve(Island* parIsland, const float parDT) override;
