@@ -21,6 +21,7 @@ class Island
 
     friend struct DistanceJoint;
     friend struct BallJoint;
+    friend struct HingeJoint;
 
 public:
     void Initialise();

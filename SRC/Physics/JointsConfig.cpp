@@ -22,5 +22,20 @@ void BallJointConfig::DrawInEditor()
 {
     FCommon.DrawInEditor();
 }
+
+void HingeJointConfig::DrawInEditor()
+{
+    FCommon.DrawInEditor();
+
+    EDITOR_PROPERTY_SIMPLE("Hinge axis local on A", FAxisALocal);
+    EDITOR_PROPERTY_BOOL("Enable limits", FEnableLimit);
+
+    if (FEnableLimit)
+    {
+        EDITOR_PROPERTY_ANGLE("Lower angle", FLowerAngle, -Pi(), Pi());
+        EDITOR_PROPERTY_ANGLE("Upper angle", FUpperAngle, FLowerAngle, Pi());
+    }
+}
+
 } // namespace Physics
 } // namespace ECSEngine

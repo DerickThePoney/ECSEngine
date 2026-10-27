@@ -41,5 +41,26 @@ struct BallJointConfig
     SERIALIZE() { PROPERTYFIELD(Common, JointConfig{ }); }
 };
 
+struct HingeJointConfig
+{
+    JointConfig FCommon;
+
+    void DrawInEditor();
+
+    vec3 FAxisALocal; // hinge axis in A (normalize at create)
+    bool FEnableLimit = false;
+    float FLowerAngle = 0.f; // radians, relative to bind
+    float FUpperAngle = 0.f;
+
+    SERIALIZE()
+    {
+        PROPERTYFIELD(Common, JointConfig{ });
+        PROPERTYFIELD(AxisALocal, vec3{ });
+        PROPERTYFIELD(EnableLimit, false);
+        PROPERTYFIELD(LowerAngle, 0.f);
+        PROPERTYFIELD(UpperAngle, 0.f);
+    }
+};
+
 } // namespace Physics
 } // namespace ECSEngine

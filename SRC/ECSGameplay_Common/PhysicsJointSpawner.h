@@ -19,6 +19,7 @@ public:
 
     void AddDistanceJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::DistanceJointConfig& Config);
     void AddBallJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::BallJointConfig& Config);
+    void AddHingeJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::HingeJointConfig& Config);
 
 private:
     struct DistanceJointRecord
@@ -36,5 +37,13 @@ private:
         Physics::BallJointConfig Config;
     };
     std::vector<BallJointRecord> BallJointToSpawn;
+
+    struct HingeJointRecord
+    {
+        EntityId A;
+        EntityId B;
+        Physics::HingeJointConfig Config;
+    };
+    std::vector<HingeJointRecord> HingeJointToSpawn;
 };
 } // namespace ECSEngine
