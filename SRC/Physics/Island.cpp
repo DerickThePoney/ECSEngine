@@ -28,6 +28,7 @@ void Island::Reset()
     FVelocities.clear();
     FContacts.clear();
     FContactStates.clear();
+    FJoints.clear();
 }
 
 void Island::Add(RigidBody* BodyToAdd)
