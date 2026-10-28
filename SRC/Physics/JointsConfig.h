@@ -36,9 +36,26 @@ struct BallJointConfig
 {
     JointConfig FCommon;
 
+    bool FEnableMotor = false;
+    vec3 FMotorVelocityLocal;
+    float FMaxMotorTorque = 0.f;
+
+    bool FUseTargetOrientation = false;
+    vec3 FTargetEulerAngles;
+    float FMotorStiffness = 0.f;
+
     void DrawInEditor();
 
-    SERIALIZE() { PROPERTYFIELD(Common, JointConfig{ }); }
+    SERIALIZE()
+    {
+        PROPERTYFIELD(Common, JointConfig{ });
+        PROPERTYFIELD(EnableMotor, false);
+        PROPERTYFIELD(MotorVelocityLocal, vec3{ });
+        PROPERTYFIELD(MaxMotorTorque, 0.f);
+        PROPERTYFIELD(UseTargetOrientation, false);
+        PROPERTYFIELD(TargetEulerAngles, vec3{ });
+        PROPERTYFIELD(MotorStiffness, 0.f);
+    }
 };
 
 struct HingeJointConfig

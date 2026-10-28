@@ -21,6 +21,23 @@ void DistanceJointConfig::DrawInEditor()
 void BallJointConfig::DrawInEditor()
 {
     FCommon.DrawInEditor();
+
+    EDITOR_PROPERTY_BOOL("Enable Motor", FEnableMotor);
+    if (FEnableMotor)
+    {
+        EDITOR_PROPERTY_BOOL("Use Target Orientation", FUseTargetOrientation);
+        if (FUseTargetOrientation)
+        {
+            EDITOR_PROPERTY_EULER("Target Euler Angles", FTargetEulerAngles);
+            EDITOR_PROPERTY_WITH_LIMITS("Motor Stiffness", FMotorStiffness, 0.f, 100.f);
+        }
+        else
+        {
+            EDITOR_PROPERTY_WITH_LIMITS("Motor Speed", FMotorVelocityLocal, vec3(-20.f), vec3(20.f));
+        }
+
+        EDITOR_PROPERTY_WITH_LIMITS("Max Motor Torque", FMaxMotorTorque, 100.f, 1000.f);
+    }
 }
 
 void HingeJointConfig::DrawInEditor()
