@@ -306,5 +306,50 @@ void PhysicsJointsManager::SetHingeTargetAngle(const PhysicsJointHandle& JointHa
     joint->FMaxMotorTorque = MaxTorque;
 }
 
+void PhysicsJointsManager::SetBallMotor(const PhysicsJointHandle& JointHandle, bool bEnable, const vec3& VelocityInA, float MaxTorque)
+{
+    if (!JointHandle.IsValid())
+        return;
+
+    if (JointHandle.GetTypeAsEnum() != EJointType::BALL)
+    {
+        LOG_ERROR(std::format("Try to set ball motor up for joint of type {}", JointHandle.FType));
+        return;
+    }
+
+    BallJoint* joint = dynamic_cast<BallJoint*>(GetJoint(JointHandle));
+    if (joint == nullptr)
+    {
+        return;
+    }
+
+    joint->FEnableMotor = bEnable;
+    joint->FMotorVelocityLocal = VelocityInA;
+    joint->FMaxMotorTorque = MaxTorque;
+}
+
+void PhysicsJointsManager::SetBallTargetEulerAngles(const PhysicsJointHandle& JointHandle, bool bEnable, const vec3& EulerYawRollPitch, float Stiffness, float MaxTorque)
+{
+    if (!JointHandle.IsValid())
+        return;
+
+    if (JointHandle.GetTypeAsEnum() != EJointType::BALL)
+    {
+        LOG_ERROR(std::format("Try to set ball motor up for joint of type {}", JointHandle.FType));
+        return;
+    }
+
+    BallJoint* joint = dynamic_cast<BallJoint*>(GetJoint(JointHandle));
+    if (joint == nullptr)
+    {
+        return;
+    }
+
+    joint->FEnableMotor = bEnable;
+    joint->FTargetEulerAngles = EulerYawRollPitch;
+    joint->FMotorStiffness = Stiffness;
+    joint->FMaxMotorTorque = MaxTorque;
+}
+
 } // namespace Physics
 } // namespace ECSEngine
