@@ -67,6 +67,12 @@ struct HingeJointConfig
         PROPERTYFIELD(EnableLimit, false);
         PROPERTYFIELD(LowerAngle, 0.f);
         PROPERTYFIELD(UpperAngle, 0.f);
+        PROPERTYFIELD(EnableMotor, false);
+        PROPERTYFIELD(MotorSpeed, 0.f);
+        PROPERTYFIELD(MaxMotorTorque, 0.f);
+        PROPERTYFIELD(UseTargetAngle, false);
+        PROPERTYFIELD(TargetAngle, 0.f);
+        PROPERTYFIELD(MotorStiffness, 0.f);
     }
 };
 

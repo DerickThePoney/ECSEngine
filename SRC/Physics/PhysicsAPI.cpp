@@ -200,6 +200,18 @@ void DestroyJoint(const PhysicsJointHandle& JointHandle)
     Engine.JointsManager().DestroyJoint(JointHandle);
 }
 
+void SetHingeMotor(const PhysicsJointHandle& JointHandle, bool bEnable, float MotorSpeed, float MaxTorque)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    Engine.JointsManager().SetHingeMotor(JointHandle, bEnable, MotorSpeed, MaxTorque);
+}
+
+void SetHingeTargetAngle(const PhysicsJointHandle& JointHandle, bool bEnable, float TargetAngle, float Stiffness, float MaxTorque)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    Engine.JointsManager().SetHingeTargetAngle(JointHandle, bEnable, TargetAngle, Stiffness, MaxTorque);
+}
+
 #pragma endregion ForcesTorquesAndImpulses
 #ifdef WITH_VISUAL_DEBUG
 void DrawDebugs()

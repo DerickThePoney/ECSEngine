@@ -259,5 +259,52 @@ void PhysicsJointsManager::PreUpdate()
         joint.Joint.bIsland = false;
     }
 }
+
+void PhysicsJointsManager::SetHingeMotor(const PhysicsJointHandle& JointHandle, bool bEnable, float MotorSpeed, float MaxTorque)
+{
+    if (!JointHandle.IsValid())
+        return;
+
+    if (JointHandle.GetTypeAsEnum() != EJointType::HINGE)
+    {
+        LOG_ERROR(std::format("Try to set hinge motor up for joint of type {}", JointHandle.FType));
+        return;
+    }
+
+    HingeJoint* joint = dynamic_cast<HingeJoint*>(GetJoint(JointHandle));
+    if (joint == nullptr)
+    {
+        return;
+    }
+
+    joint->FEnableMotor = bEnable;
+    joint->FMotorSpeed = MotorSpeed;
+    joint->FMaxMotorTorque = MaxTorque;
+}
+
+void PhysicsJointsManager::SetHingeTargetAngle(const PhysicsJointHandle& JointHandle, bool bEnable, float TargetAngle, float Stiffness, float MaxTorque)
+{
+    if (!JointHandle.IsValid())
+        return;
+
+    if (JointHandle.GetTypeAsEnum() != EJointType::HINGE)
+    {
+        LOG_ERROR(std::format("Try to set hinge motor up for joint of type {}", JointHandle.FType));
+        return;
+    }
+
+    HingeJoint* joint = dynamic_cast<HingeJoint*>(GetJoint(JointHandle));
+    if (joint == nullptr)
+    {
+        return;
+    }
+
+    joint->FEnableMotor = bEnable;
+    joint->FUseTargetAngle = bEnable;
+    joint->FTargetAngle = TargetAngle;
+    joint->FMotorStiffness = Stiffness;
+    joint->FMaxMotorTorque = MaxTorque;
+}
+
 } // namespace Physics
 } // namespace ECSEngine
