@@ -61,9 +61,16 @@ struct BallJointState
     vec3 motorM_eff; // per axis
     vec3 motorVelocityWorld; // target ω this step (world)
     float maxMotorImpulse = 0.f;
+
+    // Cone / swing limit
+    bool coneLimitActive = false;
+    vec3 coneAxis; // unit axis that decreases θ when λ > 0
+    float coneAngle = 0.f;
+    float coneM_eff = 0.f;
+    float coneBias = 0.f;
 };
 
-// Spherical / ball-and-socket: point lock only
+// Spherical / ball-and-socket: point lock + optional cone limit + motor
 struct BallJoint : public JointBase
 {
     BallJointConfig FConfig;
@@ -71,6 +78,11 @@ struct BallJoint : public JointBase
     BallJointState FState; // TODO MOVE THIS OUT IN A SEPARATE SOLVER
 
     vec3 FPointImpulse; // warm-start λx,λy,λz
+
+    // Bind-time cone axes (filled in Initialize)
+    vec3 FAxisALocal;
+    vec3 FAxisBLocal;
+    float FConeLimitImpulse = 0.f;
 
     // Motor
     bool FEnableMotor = false;

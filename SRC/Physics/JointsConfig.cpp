@@ -22,6 +22,13 @@ void BallJointConfig::DrawInEditor()
 {
     FCommon.DrawInEditor();
 
+    EDITOR_PROPERTY_BOOL("Enable cone limit", FEnableConeLimit);
+    if (FEnableConeLimit)
+    {
+        EDITOR_PROPERTY_SIMPLE("Cone axis local on A", FConeAxisALocal);
+        EDITOR_PROPERTY_ANGLE("Max cone angle", FMaxConeAngle, 0.f, 180.f);
+    }
+
     EDITOR_PROPERTY_BOOL("Enable Motor", FEnableMotor);
     if (FEnableMotor)
     {
