@@ -174,7 +174,7 @@ void Island::Solve(float parDeltaTime)
         static constexpr float linTol = 0.01f;
         static constexpr float angTol = 3.f * Pi() / 180.f;
 
-        if (sqrLinVel > linTol || sqrAngVel > angTol)
+        if (sqrLinVel > linTol * linTol || sqrAngVel > angTol * angTol)
         {
             const vec3 displacement = body->FVelocity * parDeltaTime;
             body->FCenterOfMassWorld += displacement;
