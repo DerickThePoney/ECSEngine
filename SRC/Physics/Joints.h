@@ -89,6 +89,11 @@ struct HingeJointState
     float axisBias[2];
     float axisC[2]; // t1·aB, t2·aB
 
+    // Motor
+    float motorM_eff = 0.f;
+    float motorSpeed = 0.f; // effective target ω this step (servo may overwrite)
+    float maxMotorImpulse = 0.f;
+
     // Limit (optional)
     float theta = 0.f;
     float limitM_eff = 0.f;

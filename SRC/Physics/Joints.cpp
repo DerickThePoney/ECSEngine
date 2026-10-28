@@ -310,17 +310,24 @@ void HingeJoint::PreSolve(Island* parIsland, const float parDT)
         wB += bodyB->FInverseInertiaTensorWorld * tau;
     }
 
-    // ── Limit ─────────────────────────────────────────────────
-    FLimitState = EHingeLimitState::Inactive;
-    FState.limitM_eff = 0.f;
-    FState.limitBias = 0.f;
-    if (FConfig.FEnableLimit)
+    // ── Angle (limits and/or servo) ───────────────────────────
+    // Was only inside EnableLimit; servo also needs θ.
+    const bool needTheta = FConfig.FEnableLimit || (FEnableMotor && FUseTargetAngle);
+    if (needTheta)
     {
         const vec3 refA = (TA * vec4::MakeHomogeneousDirectionVec4(FRefALocal)).xyz();
         const vec3 refB = (TB * vec4::MakeHomogeneousDirectionVec4(FRefBLocal)).xyz();
         const float thetaRaw = atan2f(Dot(FState.aA, Cross(refA, refB)), Dot(refA, refB));
         FState.theta = UnwrapAngle(thetaRaw - FReferenceAngle, FPrevAngle);
         FPrevAngle = FState.theta;
+    }
+
+    // ── Limit ─────────────────────────────────────────────────
+    FLimitState = EHingeLimitState::Inactive;
+    FState.limitM_eff = 0.f;
+    FState.limitBias = 0.f;
+    if (FConfig.FEnableLimit)
+    {
         float C = 0.f;
 
         if (FState.theta < FConfig.FLowerAngle - ANGULAR_SLOP)
@@ -348,6 +355,37 @@ void HingeJoint::PreSolve(Island* parIsland, const float parDT)
             wA -= bodyA->FInverseInertiaTensorWorld * tau;
             wB += bodyB->FInverseInertiaTensorWorld * tau;
         }
+    }
+
+    // ── Motor ─────────────────────────────────────────────────
+    FState.motorM_eff = 0.f;
+    FState.motorSpeed = 0.f;
+    FState.maxMotorImpulse = 0.f;
+    const bool limitLocked = FConfig.FEnableLimit && (FConfig.FUpperAngle - FConfig.FLowerAngle) <= ANGULAR_SLOP;
+    if (FEnableMotor && !limitLocked)
+    {
+        // Servo writes a step-local speed; leave FMotorSpeed alone for setters.
+        FState.motorSpeed = FMotorSpeed;
+        if (FUseTargetAngle)
+            FState.motorSpeed = FMotorStiffness * (FTargetAngle - FState.theta);
+
+        // Don't drive further through the stops
+        if (FLimitState == EHingeLimitState::AtLower && FState.motorSpeed < 0.f)
+            FState.motorSpeed = 0.f;
+        if (FLimitState == EHingeLimitState::AtUpper && FState.motorSpeed > 0.f)
+            FState.motorSpeed = 0.f;
+
+        const float K = Dot(FState.aA, bodyA->FInverseInertiaTensorWorld * FState.aA) + Dot(FState.aA, bodyB->FInverseInertiaTensorWorld * FState.aA);
+        FState.motorM_eff = (fabsf(K) < 1e-3f) ? 0.f : 1.f / K;
+        FState.maxMotorImpulse = FMaxMotorTorque * parDT;
+        // Warm-start (same axis as free hinge spin)
+        const vec3 tau = FState.aA * FMotorImpulse;
+        wA -= bodyA->FInverseInertiaTensorWorld * tau;
+        wB += bodyB->FInverseInertiaTensorWorld * tau;
+    }
+    else
+    {
+        FMotorImpulse = 0.f; // no stale push when disabled / locked
     }
 }
 
@@ -383,6 +421,20 @@ void HingeJoint::Solve(Island* parIsland, const float parDT)
         const float dLambda = -FState.axisM_eff[k] * (Jv + FState.axisBias[k]);
         FAxisImpulse[k] += dLambda;
         const vec3 tau = u * dLambda;
+        wA -= bodyA->FInverseInertiaTensorWorld * tau;
+        wB += bodyB->FInverseInertiaTensorWorld * tau;
+    }
+
+    // ── Motor constraints ─────────────────────────────────────
+    if (FEnableMotor && FState.motorM_eff > 0.f)
+    {
+        const float Jv = Dot(FState.aA, wB - wA);
+        const float Cdot = Jv - FState.motorSpeed;
+        float dLambda = -FState.motorM_eff * Cdot;
+        const float old = FMotorImpulse;
+        FMotorImpulse = Clamp(old + dLambda, -FState.maxMotorImpulse, FState.maxMotorImpulse);
+        dLambda = FMotorImpulse - old;
+        const vec3 tau = FState.aA * dLambda;
         wA -= bodyA->FInverseInertiaTensorWorld * tau;
         wB += bodyB->FInverseInertiaTensorWorld * tau;
     }

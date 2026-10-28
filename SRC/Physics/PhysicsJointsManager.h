@@ -23,6 +23,10 @@ public:
 
     void PreUpdate();
 
+    // Motor
+    void SetHingeMotor(const PhysicsJointHandle& JointHandle, bool bEnable, float MotorSpeed, float MaxTorque);
+    void SetHingeTargetAngle(const PhysicsJointHandle& JointHandle, bool bEnable, float TargetAngle, float Stiffness, float MaxTorque);
+
 private:
     struct DistanceJointRecord
     {

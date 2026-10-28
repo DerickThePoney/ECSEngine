@@ -57,6 +57,10 @@ const PhysicsJointHandle CreateHingeJoint(const PhysicsBodyHandle& HandleA, cons
 
 void DestroyJoint(const PhysicsJointHandle& JointHandle);
 
+// Joint motors
+void SetHingeMotor(const PhysicsJointHandle& JointHandle, bool bEnable, float MotorSpeed, float MaxTorque);
+void SetHingeTargetAngle(const PhysicsJointHandle& JointHandle, bool bEnable, float TargetAngle, float Stiffness, float MaxTorque);
+
 #ifdef WITH_VISUAL_DEBUG
 // Debugs
 void DrawDebugs();
