@@ -212,6 +212,18 @@ void SetHingeTargetAngle(const PhysicsJointHandle& JointHandle, bool bEnable, fl
     Engine.JointsManager().SetHingeTargetAngle(JointHandle, bEnable, TargetAngle, Stiffness, MaxTorque);
 }
 
+void SetBallMotor(const PhysicsJointHandle& JointHandle, bool bEnable, const vec3& VelocityInA, float MaxTorque)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    Engine.JointsManager().SetBallMotor(JointHandle, bEnable, VelocityInA, MaxTorque);
+}
+
+void SetBallTargetEulerAngles(const PhysicsJointHandle& JointHandle, bool bEnable, const vec3& EulerYawRollPitch, float Stiffness, float MaxTorque)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    Engine.JointsManager().SetBallTargetEulerAngles(JointHandle, bEnable, EulerYawRollPitch, Stiffness, MaxTorque);
+}
+
 #pragma endregion ForcesTorquesAndImpulses
 #ifdef WITH_VISUAL_DEBUG
 void DrawDebugs()
