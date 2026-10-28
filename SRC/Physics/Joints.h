@@ -55,6 +55,12 @@ struct BallJointState
     vec3 M_eff;
     vec3 bias;
     vec3 C;
+
+    // Motor (angular, along body A's world axes)
+    vec3 e0, e1, e2; // A's world basis
+    vec3 motorM_eff; // per axis
+    vec3 motorVelocityWorld; // target ω this step (world)
+    float maxMotorImpulse = 0.f;
 };
 
 // Spherical / ball-and-socket: point lock only
@@ -65,6 +71,17 @@ struct BallJoint : public JointBase
     BallJointState FState; // TODO MOVE THIS OUT IN A SEPARATE SOLVER
 
     vec3 FPointImpulse; // warm-start λx,λy,λz
+
+    // Motor
+    bool FEnableMotor = false;
+    vec3 FMotorVelocityLocal;
+    float FMaxMotorTorque = 0.f;
+
+    bool FUseTargetOrientation = false;
+    vec3 FTargetEulerAngles;
+    float FMotorStiffness = 0.f;
+
+    vec3 FMotorImpulse;
 
     void Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const BallJointConfig& Config);
     void PreSolve(Island* parIsland, const float parDT) override;

@@ -101,6 +101,16 @@ void BallJoint::Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHand
     FConfig = Config;
 
     FPointImpulse = vec3();
+
+    FEnableMotor = FConfig.FEnableMotor;
+    FMotorVelocityLocal = FConfig.FMotorVelocityLocal;
+    FMaxMotorTorque = FConfig.FMaxMotorTorque;
+
+    FUseTargetOrientation = FConfig.FUseTargetOrientation;
+    FTargetEulerAngles = FConfig.FTargetEulerAngles;
+    FMotorStiffness = FConfig.FMotorStiffness;
+
+    FMotorImpulse = vec3{ };
 }
 
 void ComputeConstraintForI(float& M_effi, float& biasi, vec3 ei, float Ci, RigidBody* bodyA, RigidBody* bodyB, const vec3& rA, const vec3& rB, float parDT)
@@ -110,6 +120,24 @@ void ComputeConstraintForI(float& M_effi, float& biasi, vec3 ei, float Ci, Rigid
     float Ki = bodyA->FInvMass + bodyB->FInvMass + Dot(rai, bodyA->FInverseInertiaTensorWorld * rai) + Dot(rbi, bodyB->FInverseInertiaTensorWorld * rbi);
     M_effi = (abs(Ki) < 1.e-3f) ? 0 : 1 / Ki;
     biasi = (abs(Ci) < LINEAR_SLOP) ? 0 : (BAUMGARTE / parDT) * Ci;
+}
+
+static quat QuatConjugate(const quat& q)
+{
+    return quat(-q.x, -q.y, -q.z, q.w);
+}
+
+// Rotation vector of q (in the frame q is expressed in), shortest path
+static vec3 QuatToRotVec(quat q)
+{
+    if (q.w < 0.f)
+        q = quat(-q.x, -q.y, -q.z, -q.w);
+    const float w = Clamp(q.w, -1.f, 1.f);
+    const float sinHalf = sqrtf(Max(0.f, 1.f - w * w));
+    const float angle = 2.f * acosf(w);
+    if (sinHalf < 1e-4f || angle < ANGULAR_SLOP)
+        return vec3();
+    return vec3(q.x, q.y, q.z) * (angle / sinHalf);
 }
 
 void BallJoint::PreSolve(Island* parIsland, const float parDT)
@@ -141,6 +169,56 @@ void BallJoint::PreSolve(Island* parIsland, const float parDT)
     wA -= bodyA->FInverseInertiaTensorWorld * Cross(FState.rA, P);
     vB += P * bodyB->FInvMass;
     wB += bodyB->FInverseInertiaTensorWorld * Cross(FState.rB, P);
+
+    // ── Motor ─────────────────────────────────────────────────
+    FState.motorM_eff = vec3();
+    FState.motorVelocityWorld = vec3();
+    FState.maxMotorImpulse = 0.f;
+
+    if (FEnableMotor)
+    {
+        const mat4 RA = mat4(bodyA->FOrientation);
+        FState.e0 = Normalize((RA * vec4::MakeHomogeneousDirectionVec4(vec3(1, 0, 0))).xyz());
+        FState.e1 = Normalize((RA * vec4::MakeHomogeneousDirectionVec4(vec3(0, 1, 0))).xyz());
+        FState.e2 = Normalize((RA * vec4::MakeHomogeneousDirectionVec4(vec3(0, 0, 1))).xyz());
+
+        vec3 motorVelLocal = FMotorVelocityLocal;
+        if (FUseTargetOrientation)
+        {
+            // qRel = qA⁻¹ qB  (B relative to A)
+            const quat qA = bodyA->FOrientation;
+            const quat qB = bodyB->FOrientation;
+            const quat qRel = QuatConjugate(qA) * qB;
+
+            const mat4 Rtarget = EulerAnglesXYZ(FTargetEulerAngles.x, FTargetEulerAngles.y, FTargetEulerAngles.z);
+            const quat qTarget = quat::FromMat4(Rtarget);
+            const quat qErr = QuatConjugate(qTarget) * qRel; // still in A
+
+            // ω_local ≈ stiffness * rotvec(qErr)
+            motorVelLocal = QuatToRotVec(qErr) * FMotorStiffness;
+        }
+
+        FState.motorVelocityWorld = FState.e0 * motorVelLocal.x + FState.e1 * motorVelLocal.y + FState.e2 * motorVelLocal.z;
+
+        auto angularMeff = [&](const vec3& e) -> float
+        {
+            const float K = Dot(e, bodyA->FInverseInertiaTensorWorld * e) + Dot(e, bodyB->FInverseInertiaTensorWorld * e);
+            return (fabsf(K) < 1e-3f) ? 0.f : 1.f / K;
+        };
+        FState.motorM_eff.x = angularMeff(FState.e0);
+        FState.motorM_eff.y = angularMeff(FState.e1);
+        FState.motorM_eff.z = angularMeff(FState.e2);
+        FState.maxMotorImpulse = FMaxMotorTorque * parDT;
+
+        // Warm-start τ = Σ λ_i e_i
+        const vec3 tau = FState.e0 * FMotorImpulse.x + FState.e1 * FMotorImpulse.y + FState.e2 * FMotorImpulse.z;
+        wA -= bodyA->FInverseInertiaTensorWorld * tau;
+        wB += bodyB->FInverseInertiaTensorWorld * tau;
+    }
+    else
+    {
+        FMotorImpulse = vec3();
+    }
 }
 
 void ComputeImpulseForI(float& PointImpulseI, float& Pi, float v_reli, float M_effi, float biasi)
@@ -175,6 +253,29 @@ void BallJoint::Solve(Island* parIsland, const float parDT)
     wA -= bodyA->FInverseInertiaTensorWorld * Cross(FState.rA, P);
     vB += P * bodyB->FInvMass;
     wB += bodyB->FInverseInertiaTensorWorld * Cross(FState.rB, P);
+
+    // ── Motor ─────────────────────────────────────────────────
+    if (FEnableMotor)
+    {
+        auto solveMotorAxis = [&](float& impulseI, float M_effi, const vec3& e)
+        {
+            if (M_effi <= 0.f)
+                return;
+            const float targetW = Dot(e, FState.motorVelocityWorld);
+            const float Jv = Dot(e, wB - wA);
+            float dLambda = -M_effi * (Jv - targetW);
+            const float old = impulseI;
+            impulseI = Clamp(old + dLambda, -FState.maxMotorImpulse, FState.maxMotorImpulse);
+            dLambda = impulseI - old;
+            const vec3 tau = e * dLambda;
+            wA -= bodyA->FInverseInertiaTensorWorld * tau;
+            wB += bodyB->FInverseInertiaTensorWorld * tau;
+        };
+
+        solveMotorAxis(FMotorImpulse.x, FState.motorM_eff.x, FState.e0);
+        solveMotorAxis(FMotorImpulse.y, FState.motorM_eff.y, FState.e1);
+        solveMotorAxis(FMotorImpulse.z, FState.motorM_eff.z, FState.e2);
+    }
 }
 
 void HingeJoint::Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const HingeJointConfig& Config)
