@@ -36,6 +36,10 @@ struct BallJointConfig
 {
     JointConfig FCommon;
 
+    bool FEnableConeLimit = false;
+    vec3 FConeAxisALocal = vec3(0.f, 1.f, 0.f); // swing reference in A
+    float FMaxConeAngle = 1.57079632679f; // ~Pi/2 radians
+
     bool FEnableMotor = false;
     vec3 FMotorVelocityLocal;
     float FMaxMotorTorque = 0.f;
@@ -49,6 +53,9 @@ struct BallJointConfig
     SERIALIZE()
     {
         PROPERTYFIELD(Common, JointConfig{ });
+        PROPERTYFIELD(EnableConeLimit, false);
+        PROPERTYFIELD(ConeAxisALocal, vec3(0.f, 1.f, 0.f));
+        PROPERTYFIELD(MaxConeAngle, 1.57079632679f);
         PROPERTYFIELD(EnableMotor, false);
         PROPERTYFIELD(MotorVelocityLocal, vec3{ });
         PROPERTYFIELD(MaxMotorTorque, 0.f);

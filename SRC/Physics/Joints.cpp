@@ -100,7 +100,21 @@ void BallJoint::Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHand
     JointBase::Initialize(BodyA, BodyB);
     FConfig = Config;
 
+    RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(BodyA);
+    RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(BodyB);
+    AssertRelease(bodyA && bodyB);
+
     FPointImpulse = vec3();
+
+    // Cone bind frame (same world axis in A and B at create)
+    FAxisALocal = Normalize(Config.FConeAxisALocal);
+    {
+        const mat4 RA = mat4(bodyA->FOrientation);
+        const mat4 RB = mat4(bodyB->FOrientation);
+        const vec3 axisW = Normalize((RA * vec4::MakeHomogeneousDirectionVec4(FAxisALocal)).xyz());
+        FAxisBLocal = Normalize((Transpose(RB) * vec4::MakeHomogeneousDirectionVec4(axisW)).xyz());
+    }
+    FConeLimitImpulse = 0.f;
 
     FEnableMotor = FConfig.FEnableMotor;
     FMotorVelocityLocal = FConfig.FMotorVelocityLocal;
@@ -170,6 +184,51 @@ void BallJoint::PreSolve(Island* parIsland, const float parDT)
     vB += P * bodyB->FInvMass;
     wB += bodyB->FInverseInertiaTensorWorld * Cross(FState.rB, P);
 
+    const mat4 TA = bodyA->GetTransform();
+    const mat4 TB = bodyB->GetTransform();
+
+    // ── Cone limit (classify) ─────────────────────────────────
+    FState.coneLimitActive = false;
+    FState.coneM_eff = 0.f;
+    FState.coneBias = 0.f;
+    FState.coneAxis = vec3();
+    FState.coneAngle = 0.f;
+
+    if (FConfig.FEnableConeLimit)
+    {
+        const vec3 aA = Normalize((TA * vec4::MakeHomogeneousDirectionVec4(FAxisALocal)).xyz());
+        const vec3 aB = Normalize((TB * vec4::MakeHomogeneousDirectionVec4(FAxisBLocal)).xyz());
+        const float cosTheta = Clamp(Dot(aA, aB), -1.f, 1.f);
+        FState.coneAngle = acosf(cosTheta);
+
+        if (FState.coneAngle > FConfig.FMaxConeAngle - ANGULAR_SLOP)
+        {
+            vec3 u = Cross(aA, aB);
+            const float uLen = Length(u);
+            if (uLen > 1e-4f)
+            {
+                u *= 1.f / uLen;
+                // Same idea as hinge AtUpper: axis that decreases θ when λ > 0
+                FState.coneAxis = Invert(u);
+                FState.coneLimitActive = true;
+
+                const float C = FState.coneAngle - FConfig.FMaxConeAngle;
+                const float K = Dot(FState.coneAxis, bodyA->FInverseInertiaTensorWorld * FState.coneAxis) +
+                      Dot(FState.coneAxis, bodyB->FInverseInertiaTensorWorld * FState.coneAxis);
+                FState.coneM_eff = (fabsf(K) < 1e-3f) ? 0.f : 1.f / K;
+                FState.coneBias = (C < ANGULAR_SLOP) ? 0.f : 0.1f * (BAUMGARTE / parDT) * C;
+            }
+            else
+            {
+                FConeLimitImpulse = 0.f;
+            }
+        }
+        else
+        {
+            FConeLimitImpulse = 0.f;
+        }
+    }
+
     // ── Motor ─────────────────────────────────────────────────
     FState.motorM_eff = vec3();
     FState.motorVelocityWorld = vec3();
@@ -192,13 +251,22 @@ void BallJoint::PreSolve(Island* parIsland, const float parDT)
 
             const mat4 Rtarget = EulerAnglesXYZ(FTargetEulerAngles.x, FTargetEulerAngles.y, FTargetEulerAngles.z);
             const quat qTarget = quat::FromMat4(Rtarget);
-            const quat qErr = QuatConjugate(qTarget) * qRel; // still in A
+            const quat qErr = QuatConjugate(qRel) * qTarget; // still in A
 
             // ω_local ≈ stiffness * rotvec(qErr)
             motorVelLocal = QuatToRotVec(qErr) * FMotorStiffness;
         }
 
         FState.motorVelocityWorld = FState.e0 * motorVelLocal.x + FState.e1 * motorVelLocal.y + FState.e2 * motorVelLocal.z;
+
+        // Don't drive further out of the cone (brake along swing axis only)
+        if (FState.coneLimitActive)
+        {
+            const vec3 u = Invert(FState.coneAxis); // outward (increasing θ)
+            const float outward = Dot(FState.motorVelocityWorld, u);
+            if (outward > 0.f)
+                FState.motorVelocityWorld -= u * outward;
+        }
 
         auto angularMeff = [&](const vec3& e) -> float
         {
@@ -218,6 +286,14 @@ void BallJoint::PreSolve(Island* parIsland, const float parDT)
     else
     {
         FMotorImpulse = vec3();
+    }
+
+    // ── Cone warm-start ───────────────────────────────────────
+    if (FState.coneLimitActive)
+    {
+        const vec3 tau = FState.coneAxis * FConeLimitImpulse;
+        wA -= bodyA->FInverseInertiaTensorWorld * tau;
+        wB += bodyB->FInverseInertiaTensorWorld * tau;
     }
 }
 
@@ -275,6 +351,19 @@ void BallJoint::Solve(Island* parIsland, const float parDT)
         solveMotorAxis(FMotorImpulse.x, FState.motorM_eff.x, FState.e0);
         solveMotorAxis(FMotorImpulse.y, FState.motorM_eff.y, FState.e1);
         solveMotorAxis(FMotorImpulse.z, FState.motorM_eff.z, FState.e2);
+    }
+
+    // ── Cone limit ────────────────────────────────────────────
+    if (FState.coneLimitActive && FState.coneM_eff > 0.f)
+    {
+        const float Jv = Dot(FState.coneAxis, wB - wA);
+        float dLambda = -FState.coneM_eff * (Jv + FState.coneBias);
+        const float old = FConeLimitImpulse;
+        FConeLimitImpulse = Max(old + dLambda, 0.f); // unilateral
+        dLambda = FConeLimitImpulse - old;
+        const vec3 tau = FState.coneAxis * dLambda;
+        wA -= bodyA->FInverseInertiaTensorWorld * tau;
+        wB += bodyB->FInverseInertiaTensorWorld * tau;
     }
 }
 
