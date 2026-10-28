@@ -376,6 +376,20 @@ void MakePropertyWithLimits(const std::string& parName, T* parProperty, const T&
         drawer.ShowProperty();                                                                                                                                                     \
     }
 
+#define EDITOR_PROPERTY_EULER(NAME, PROPERTY)                                                                                                                                      \
+    {                                                                                                                                                                              \
+        vec3 eulerDegrees = Degree(PROPERTY);                                                                                                                                      \
+        EDITOR_PROPERTY_SIMPLE(NAME, eulerDegrees);                                                                                                                                \
+        PROPERTY = Radians(eulerDegrees);                                                                                                                                          \
+    }
+
+#define EDITOR_PROPERTY_EULER_WITH_LIMITS(NAME, PROPERTY, MIN, MAX)                                                                                                                \
+    {                                                                                                                                                                              \
+        vec3 eulerDegrees = Degree(PROPERTY);                                                                                                                                      \
+        EDITOR_PROPERTY_WITH_LIMITS(NAME, eulerDegrees, MIN, MAX);                                                                                                                 \
+        PROPERTY = Radians(eulerDegrees);                                                                                                                                          \
+    }
+
 #define EDITOR_PROPERTY_BOOL(NAME, PROPERTY)                                                                                                                                       \
     {                                                                                                                                                                              \
         PropertyDrawer<bool> drawer(NAME, &PROPERTY);                                                                                                                              \
