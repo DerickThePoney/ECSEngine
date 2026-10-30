@@ -103,7 +103,7 @@ void ModuleSystem::UnlockControllers()
 }
 
 template<class T>
-void ModuleSystem::RegisterDepency(const EEntityWorlds parEntityWorld)
+void ModuleSystem::RegisterDependency(const EEntityWorlds parEntityWorld)
 {
     AssertRelease(WorldManager::HasInstance());
     EntityWorld* world = WorldManager::Instance().GetWorldIFP(parEntityWorld);
@@ -113,7 +113,7 @@ void ModuleSystem::RegisterDepency(const EEntityWorlds parEntityWorld)
     FControllers.push_back(controller);
 }
 
-#define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE) template void ModuleSystem::RegisterDepency<NAME>(const EEntityWorlds);
+#define DECLARE_MODULE_AND_TEMPLATE(NAME, TEMPLATE) template void ModuleSystem::RegisterDependency<NAME>(const EEntityWorlds);
 #include "ModuleList.inl"
 #undef DECLARE_MODULE_AND_TEMPLATE
 

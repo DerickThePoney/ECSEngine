@@ -18,9 +18,9 @@ namespace ECSEngine
 PhysicsUpdateSystem::PhysicsUpdateSystem()
     : parent_type()
 {
-    RegisterDepency<PositionModule>(EEntityWorlds::STANDARD);
-    RegisterDepency<OrientationModule>(EEntityWorlds::STANDARD);
-    RegisterDepency<RigidbodyModule>(EEntityWorlds::STANDARD);
+    RegisterDependency<PositionModule>(EEntityWorlds::STANDARD);
+    RegisterDependency<OrientationModule>(EEntityWorlds::STANDARD);
+    RegisterDependency<RigidbodyModule>(EEntityWorlds::STANDARD);
 }
 
 PhysicsUpdateSystem::~PhysicsUpdateSystem()

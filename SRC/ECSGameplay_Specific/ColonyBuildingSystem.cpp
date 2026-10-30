@@ -21,7 +21,7 @@ namespace ECSEngine
 ColonyBuildingSystem::ColonyBuildingSystem()
     : ModuleSystem()
 {
-    RegisterDepency<StorageSlotModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<StorageSlotModule>(EEntityWorlds::BUILDINGS);
 }
 
 ColonyBuildingSystem::~ColonyBuildingSystem()

@@ -22,7 +22,7 @@ protected:
 
 protected:
     template<class T>
-    void RegisterDepency(const EEntityWorlds parEntityWorld);
+    void RegisterDependency(const EEntityWorlds parEntityWorld);
 
 protected:
     void LockControllers();

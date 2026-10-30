@@ -26,9 +26,9 @@ void UpdateStorageStats(ModuleAccessor<ResourceStorageModule>& parAccessor)
 ResourceStatisticsUpdateSystem::ResourceStatisticsUpdateSystem()
     : ModuleSystem()
 {
-    RegisterDepency<ResourceStorageModule>(EEntityWorlds::COLONY);
-    RegisterDepency<ResourceStorageModule>(EEntityWorlds::RESOURCE_PROD);
-    RegisterDepency<ResourceStorageModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<ResourceStorageModule>(EEntityWorlds::COLONY);
+    RegisterDependency<ResourceStorageModule>(EEntityWorlds::RESOURCE_PROD);
+    RegisterDependency<ResourceStorageModule>(EEntityWorlds::BUILDINGS);
 }
 
 void ResourceStatisticsUpdateSystem::VirtualUpdate()

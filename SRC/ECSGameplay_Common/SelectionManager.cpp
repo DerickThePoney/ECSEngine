@@ -14,7 +14,7 @@ SelectionManager::SelectionManager()
     : ModuleSystem()
     , Singleton()
 {
-    RegisterDepency<ApparenceModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<ApparenceModule>(EEntityWorlds::BUILDINGS);
     WorldManager::Instance().RegisterDeathListener(DELEGATE(&SelectionManager::OnUnitDeath, *this));
 }
 
