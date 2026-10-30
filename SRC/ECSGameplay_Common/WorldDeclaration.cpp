@@ -16,6 +16,7 @@
 #include "ECSGameplay_Specific/LinkToStorageModule.h"
 #include "ECSGameplay_Specific/RecipeProductionModule.h"
 #include "ECSGameplay_Specific/ResourceStorageModule.h"
+#include "ECSGameplay_Specific/RocketManagerModule.h"
 #include "ECSGameplay_Specific/StorageSlotModule.h"
 #include "OrientationModule.h"
 #include "PositionModule.h"
@@ -24,8 +25,12 @@
 
 namespace ECSEngine
 {
-using StandardControllers =
-      brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::RigidbodyModule, ECSEngine::BoxColliderModule>;
+using StandardControllers = brigand::list<ECSEngine::PositionModule,
+      ECSEngine::OrientationModule,
+      ECSEngine::ApparenceModule,
+      ECSEngine::RigidbodyModule,
+      ECSEngine::BoxColliderModule,
+      ECSEngine::RocketManagerModule>;
 
 using ResourceProducerControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::ResourceStorageModule>;
 
