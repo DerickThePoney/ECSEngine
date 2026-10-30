@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "Common/SavingSystemDeclaration.h"
 #include "Common/Singleton.h"
-#include "WorldIds_fwd.h"
 #include "ModuleParameters.h"
+#include "WorldIds_fwd.h"
 
 namespace ECSEngine
 {
@@ -51,8 +51,8 @@ private:
         const EntityTemplate* FTemplate;
         ModuleParameters::ParameterContainer FParameterContainer;
     };
+    std::vector<EntityCreationMessage> FNewEntitiesToCreate;
     std::vector<EntityCreationMessage> FEntitiesToCreate;
-
 
     std::vector<UnitDeathListener> FUnitDeathListeners;
 };
