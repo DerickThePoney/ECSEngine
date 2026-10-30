@@ -3,9 +3,9 @@
 #include "WorldManager.h"
 
 #include "Common/SavingSystemImplementation.h"
+#include "EntityTemplate.h"
 #include "EntityWorld.h"
 #include "WorldIds.h"
-#include "EntityTemplate.h"
 
 namespace ECSEngine
 {
@@ -24,7 +24,7 @@ void WorldManager::SaveLoad(Chunk& parChunk)
             if (world != nullptr)
                 nonNullWorlds++;
         }
-        parChunk& nonNullWorlds;
+        parChunk & nonNullWorlds;
 
         foreachitem(world, FWorlds)
         {
@@ -32,24 +32,24 @@ void WorldManager::SaveLoad(Chunk& parChunk)
                 continue;
 
             u32 worldId = world->WorldID();
-            parChunk& worldId;
+            parChunk & worldId;
             EntityWorld& worldRef = *(world.get());
-            parChunk& worldRef;
+            parChunk & worldRef;
         }
     }
     else
     {
         u32 nonNullWorlds = 0;
-        parChunk& nonNullWorlds;
+        parChunk & nonNullWorlds;
 
         forrange(i, 0, nonNullWorlds)
         {
             u32 worldId;
-            parChunk& worldId;
+            parChunk & worldId;
 
             AssertRelease(FWorlds[worldId] != nullptr);
             EntityWorld& worldRef = *(FWorlds[worldId]);
-            parChunk& worldRef;
+            parChunk & worldRef;
 
             worldRef.OnLoaded();
         }
@@ -116,15 +116,19 @@ void WorldManager::DestroyAllRemainingEntities()
 
 void WorldManager::ProcessWithEntitiesCreation()
 {
-    foreachitemconst(entityToCreate, FEntitiesToCreate)
+    while (!FNewEntitiesToCreate.empty())
     {
-        EntityWorld* world = GetWorldIFP(entityToCreate.FTemplate->GetWorldId());
-        AssertRelease(world != nullptr);
+        FEntitiesToCreate.swap(FNewEntitiesToCreate);
+        foreachitemconst(entityToCreate, FEntitiesToCreate)
+        {
+            EntityWorld* world = GetWorldIFP(entityToCreate.FTemplate->GetWorldId());
+            AssertRelease(world != nullptr);
 
-        AssertRelease(entityToCreate.FUnitId.Valid());
-        world->CreateEntityFromTemplateUsingEntityId(entityToCreate.FUnitId, entityToCreate.FTemplate, entityToCreate.FParameterContainer);
+            AssertRelease(entityToCreate.FUnitId.Valid());
+            world->CreateEntityFromTemplateUsingEntityId(entityToCreate.FUnitId, entityToCreate.FTemplate, entityToCreate.FParameterContainer);
+        }
+        FEntitiesToCreate.clear();
     }
-    FEntitiesToCreate.clear();
 }
 
 void WorldManager::MarkAsDead(const EntityId& parId)
@@ -139,7 +143,7 @@ void WorldManager::MarkAsDead(const EntityId& parId)
 
 void WorldManager::RequestCreateEntity(const EntityId parUnitId, const EntityTemplate* parTemplate, const ModuleParameters::ParameterContainer& parParameterContainer)
 {
-    FEntitiesToCreate.push_back({ parUnitId, parTemplate, parParameterContainer });
+    FNewEntitiesToCreate.push_back({ parUnitId, parTemplate, parParameterContainer });
 }
 
 const EntityTemplate* WorldManager::GetTemplateForEntityId(const EntityId& parUnitId) const
