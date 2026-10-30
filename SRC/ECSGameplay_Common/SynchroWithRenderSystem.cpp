@@ -16,13 +16,13 @@ namespace ECSEngine
 SynchroWithRenderSystem::SynchroWithRenderSystem()
     : parent_type()
 {
-    RegisterDepency<ApparenceModule>(EEntityWorlds::STANDARD);
-    RegisterDepency<PositionModule>(EEntityWorlds::STANDARD);
-    RegisterDepency<OrientationModule>(EEntityWorlds::STANDARD);
+    RegisterDependency<ApparenceModule>(EEntityWorlds::STANDARD);
+    RegisterDependency<PositionModule>(EEntityWorlds::STANDARD);
+    RegisterDependency<OrientationModule>(EEntityWorlds::STANDARD);
 
-    RegisterDepency<ApparenceModule>(EEntityWorlds::RESOURCE_PROD);
-    RegisterDepency<PositionModule>(EEntityWorlds::RESOURCE_PROD);
-    RegisterDepency<OrientationModule>(EEntityWorlds::RESOURCE_PROD);
+    RegisterDependency<ApparenceModule>(EEntityWorlds::RESOURCE_PROD);
+    RegisterDependency<PositionModule>(EEntityWorlds::RESOURCE_PROD);
+    RegisterDependency<OrientationModule>(EEntityWorlds::RESOURCE_PROD);
 }
 
 SynchroWithRenderSystem::~SynchroWithRenderSystem()

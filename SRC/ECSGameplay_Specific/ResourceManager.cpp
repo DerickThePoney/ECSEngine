@@ -12,7 +12,7 @@ ResourceManager::ResourceManager()
     : Singleton()
     , ModuleSystem()
 {
-    RegisterDepency<StorageSlotModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<StorageSlotModule>(EEntityWorlds::BUILDINGS);
 }
 
 ResourceManager::~ResourceManager()

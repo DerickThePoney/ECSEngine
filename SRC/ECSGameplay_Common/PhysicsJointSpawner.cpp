@@ -13,7 +13,7 @@ namespace ECSEngine
 {
 PhysicsJointSpawner::PhysicsJointSpawner()
 {
-    RegisterDepency<RigidbodyModule>(EEntityWorlds::STANDARD);
+    RegisterDependency<RigidbodyModule>(EEntityWorlds::STANDARD);
 }
 
 void PhysicsJointSpawner::Finalize()

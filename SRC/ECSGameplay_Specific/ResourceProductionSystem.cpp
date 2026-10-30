@@ -15,8 +15,8 @@ namespace ECSEngine
 ResourceProductionSystem::ResourceProductionSystem()
     : ModuleSystem()
 {
-    RegisterDepency<RecipeProductionModule>(EEntityWorlds::BUILDINGS);
-    RegisterDepency<ResourceStorageModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<RecipeProductionModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<ResourceStorageModule>(EEntityWorlds::BUILDINGS);
 }
 
 ResourceProductionSystem::~ResourceProductionSystem()

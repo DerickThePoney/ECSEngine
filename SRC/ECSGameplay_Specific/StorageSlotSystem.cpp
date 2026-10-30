@@ -20,11 +20,11 @@ namespace ECSEngine
 StorageSlotSystem::StorageSlotSystem()
     : ModuleSystem()
 {
-    RegisterDepency<StorageSlotModule>(EEntityWorlds::BUILDINGS);
-    RegisterDepency<ResourceStorageModule>(EEntityWorlds::BUILDINGS);
-    RegisterDepency<LinkToStorageModule>(EEntityWorlds::BUILDINGS);
-    RegisterDepency<PositionModule>(EEntityWorlds::BUILDINGS);
-    RegisterDepency<RecipeProductionModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<StorageSlotModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<ResourceStorageModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<LinkToStorageModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<PositionModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<RecipeProductionModule>(EEntityWorlds::BUILDINGS);
 }
 
 void StorageSlotSystem::VirtualUpdate()

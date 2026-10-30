@@ -25,8 +25,8 @@ EnergySystem::EnergySystem()
     : ModuleSystem()
     , Singleton<EnergySystem>()
 {
-    RegisterDepency<EnergyProducerModule>(EEntityWorlds::BUILDINGS);
-    RegisterDepency<EnergyConsumerModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<EnergyProducerModule>(EEntityWorlds::BUILDINGS);
+    RegisterDependency<EnergyConsumerModule>(EEntityWorlds::BUILDINGS);
 }
 
 i32 EnergySystem::TotalAvailableEnergy() const

@@ -16,9 +16,9 @@ namespace ECSEngine
 
 CameraMoverSystem::CameraMoverSystem()
 {
-    RegisterDepency<CameraMoverModule>(EEntityWorlds::CAMERA);
-    RegisterDepency<PositionModule>(EEntityWorlds::CAMERA);
-    RegisterDepency<OrientationModule>(EEntityWorlds::CAMERA);
+    RegisterDependency<CameraMoverModule>(EEntityWorlds::CAMERA);
+    RegisterDependency<PositionModule>(EEntityWorlds::CAMERA);
+    RegisterDependency<OrientationModule>(EEntityWorlds::CAMERA);
 
     FRight.FKeyboardKey = InputKeyNames::INPUT_KEY_A;
     FRight.FInputType = EInputType::REPEATED;
