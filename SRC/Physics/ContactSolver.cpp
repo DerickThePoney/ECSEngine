@@ -4,15 +4,13 @@
 
 #include "Contact.h"
 #include "Island.h"
+#include "PhysicsEngine.h"
 #include "RigidBody.h"
 
 namespace ECSEngine
 {
 namespace Physics
 {
-static constexpr float BAUMGARTE = 0.3f;
-static constexpr float PENETRATION_SLOP = 0.01f;
-
 void ContactSolver::Initialise(Island* parIsland)
 {
     FIsland = parIsland;
@@ -20,6 +18,10 @@ void ContactSolver::Initialise(Island* parIsland)
 
 void ContactSolver::PreSolve(float parDeltaTime)
 {
+    const PhysicsEngineConfiguration& Config = PhysicsEngine::Instance().Config();
+    const float Baumgarte = Config.FBaumgarte;
+    const float PenetrationSlop = Config.FPenetrationSlop;
+
     foreachitem(CS, FIsland->FContactStates)
     {
         vec3 vA = FIsland->FVelocities[CS.IndexA].FLinearVelocity;
@@ -51,7 +53,7 @@ void ContactSolver::PreSolve(float parDeltaTime)
             }
 
             // Precalculate bias factor
-            CPS.Bias = -BAUMGARTE * (1.0f / parDeltaTime) * Min(0.f, CPS.Penetration + PENETRATION_SLOP);
+            CPS.Bias = -Baumgarte * (1.0f / parDeltaTime) * Min(0.f, CPS.Penetration + PenetrationSlop);
 
             // Warm start contact
             vec3 P = CS.Normal * CPS.NormalImpulse;

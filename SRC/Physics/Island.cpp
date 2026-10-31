@@ -149,7 +149,8 @@ void Island::Solve(float parDeltaTime)
         CSolver.Initialise(this);
         CSolver.PreSolve(parDeltaTime);
 
-        forrange(i, 0, 10)
+        const u32 SolverIterations = PhysicsConfig.FSolverIterations;
+        forrange(i, 0, SolverIterations)
         {
             for (u8 b = 0; b < (u8)EJointType::LENGTH; ++b)
             {
