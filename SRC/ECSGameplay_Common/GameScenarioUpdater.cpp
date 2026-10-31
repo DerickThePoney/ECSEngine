@@ -106,6 +106,7 @@ void GameScenarioUpdater::Initialise()
     FColonyBuildingSystem.Init();
     FUserInterfaceSystem.Init();
     FPhysicsSystem.Init();
+    FRocketSystem.Init();
     PhysicsJointSpawner::CreateIFP();
 
     FScenario->Initialise();
@@ -121,6 +122,7 @@ void GameScenarioUpdater::Destroy()
 
     PhysicsJointSpawner::Instance().Finalize();
     PhysicsJointSpawner::Delete();
+    FRocketSystem.Destroy();
     FPhysicsSystem.Destroy();
     FUserInterfaceSystem.Destroy();
     FColonyBuildingSystem.Destroy();
@@ -187,6 +189,8 @@ void GameScenarioUpdater::GameplayUpdate()
         FColonyBuildingSystem.Update();
 
         ResourceManager::Instance().Update();
+
+        FRocketSystem.Update();
 
         FPhysicsSystem.Update();
 
