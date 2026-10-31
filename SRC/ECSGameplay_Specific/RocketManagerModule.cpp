@@ -57,6 +57,7 @@ void RocketManagerModule::SaveLoad(Chunk& parChunk)
 
 RocketManagerModule::RocketManagerModule()
     : Module()
+    , JointCreatedDelegate(DELEGATE(&RocketManagerModule::OnJointCreated, *this))
 {
 }
 
@@ -86,7 +87,12 @@ void RocketManagerModule::VirtualInit(const EntityId& parUnitId, const ModulePar
 
     FNozzleId = EntityFactory::RequestCreateEntity(moduleTemplate->GetNozzleTemplate(), container);
 
-    PhysicsJointSpawner::Instance().AddBallJointToSpawn(FBodyId, FNozzleId, JointConfig);
+    PhysicsJointSpawner::Instance().AddBallJointToSpawn(FBodyId, FNozzleId, JointConfig, &JointCreatedDelegate);
+}
+
+void RocketManagerModule::OnJointCreated(const Physics::PhysicsJointHandle& Handle)
+{
+    FJointHandle = Handle;
 }
 
 } // namespace ECSEngine

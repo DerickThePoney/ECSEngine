@@ -3,6 +3,7 @@
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "Physics/JointsConfig.h"
+#include "Physics/PhysicsJointHandle.h"
 
 namespace ECSEngine
 {
@@ -54,12 +55,23 @@ public:
     RocketManagerModule();
     ~RocketManagerModule();
 
+    EntityId BodyId() const { return FBodyId; }
+    EntityId NozzleId() const { return FNozzleId; }
+
+    Physics::PhysicsJointHandle NozzleJointHandle() const { return FJointHandle; }
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
+
+    void OnJointCreated(const Physics::PhysicsJointHandle& Handle);
 
 private:
     EntityId FBodyId;
     EntityId FNozzleId;
+
+    Physics::PhysicsJointHandle FJointHandle;
+
+    Delegate<void(const Physics::PhysicsJointHandle&)> JointCreatedDelegate;
 };
 
 } // namespace ECSEngine
