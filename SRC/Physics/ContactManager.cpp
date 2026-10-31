@@ -68,6 +68,16 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
         // TODO: Check if bodies are awake and all
         Current->FFlags.SetBit(EContactFlag::CT_ISLAND, false);
 
+        RigidBody* a = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);
+        RigidBody* b = PhysicsEngine::Instance().GetRigidBody(Current->FSecondBody);
+        const bool activeA = a->IsAwake() && a->FMoveabilityType != EPhysicsMoveability::STATIC;
+        const bool activeB = b->IsAwake() && b->FMoveabilityType != EPhysicsMoveability::STATIC;
+        if (!activeA && !activeB)
+        {
+            Current = Current->FNext;
+            continue;
+        }
+
         if (!Current->CheckCanStillCollide())
         {
             // The bodies can't collide with each other.
@@ -112,8 +122,6 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
         }
 
         // TODO SENSORS
-        RigidBody* a = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);
-        RigidBody* b = PhysicsEngine::Instance().GetRigidBody(Current->FSecondBody);
         const bool bWantsEvent = a->FGenerateContactEvents || b->FGenerateContactEvents;
 
         if (bWantsEvent)
