@@ -1,5 +1,6 @@
 #pragma once
 #include "ContactState.h"
+#include "PhysicsJointHandle.h"
 namespace ECSEngine
 {
 namespace Physics
@@ -18,10 +19,9 @@ class Island
 {
     friend struct ContactSolver;
     friend class IslandManager;
-
-    friend struct DistanceJoint;
-    friend struct BallJoint;
-    friend struct HingeJoint;
+    friend class DistanceJointBatch;
+    friend class BallJointBatch;
+    friend class HingeJointBatch;
 
 public:
     void Initialise();
@@ -30,7 +30,7 @@ public:
 
     void Add(RigidBody* BodyToAdd);
     void Add(Contact* ContactToAdd);
-    void Add(JointBase* JointToAdd);
+    void Add(JointBase* JointToAdd, EJointType Type);
 
     void Solve(float parDeltaTime);
 
@@ -39,7 +39,6 @@ private:
     std::vector<VelocityState> FVelocities;
     std::vector<Contact*> FContacts;
     std::vector<ContactState> FContactStates;
-    std::vector<JointBase*> FJoints;
 };
 } // namespace Physics
 } // namespace ECSEngine
