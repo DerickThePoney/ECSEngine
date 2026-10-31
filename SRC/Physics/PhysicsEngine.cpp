@@ -3,6 +3,7 @@
 #include "PhysicsEngine.h"
 
 #include "Common/Sorting.h"
+#include "JointBatchRegistry.h"
 #include "PhysicsBodyConfig.h"
 #include "PhysicsBodyHandle.h"
 #include "RayCapsuleIntersection.h"
@@ -40,10 +41,14 @@ void PhysicsEngine::Initialize(const PhysicsEngineConfiguration& PhysicsConfig)
 {
     SetConfig(PhysicsConfig);
     FCollisionPresetManager.Initialize(this);
+    JointBatchRegistry::CreateIFP();
+    JointBatchRegistry::Instance().Initialize();
 }
 
 void PhysicsEngine::Cleanup()
 {
+    JointBatchRegistry::Instance().Shutdown();
+    JointBatchRegistry::Destroy();
     FContactManager.Shutdown();
     FRigidbodies.clear();
 }

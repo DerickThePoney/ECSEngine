@@ -12,7 +12,8 @@ enum class EJointType : u8
 {
     DISTANCE,
     BALL,
-    HINGE
+    HINGE,
+    LENGTH
 };
 
 struct PhysicsJointHandle
