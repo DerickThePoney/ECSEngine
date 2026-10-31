@@ -5,6 +5,7 @@
 #include "ECSGameplay_Specific/ColonyFeedbackSystem.h"
 #include "ECSGameplay_Specific/ResourceProductionSystem.h"
 #include "ECSGameplay_Specific/ResourceStatisticsUpdateSystem.h"
+#include "ECSGameplay_Specific/RocketControllerSystem.h"
 #include "ECSGameplay_Specific/StorageFeedbackDrawer.h"
 #include "ECSGameplay_Specific/StorageSlotSystem.h"
 #include "ECSGameplay_Specific/UserInterfaceSystem.h"
@@ -42,6 +43,8 @@ private:
     SynchroWithRenderSystem FRenderingSystem;
 
     PhysicsUpdateSystem FPhysicsSystem;
+
+    RocketControllerSystem FRocketSystem;
 
     ColonyBuildingSystem FColonyBuildingSystem;
     ResourceProductionSystem FRawResourceProductionSystem;
