@@ -13,6 +13,10 @@ struct PhysicsEngineConfiguration
     float FAABBFattenValue = 1.f;
     float FAABBDisplacementMultiplier = 4.f;
 
+    u32 FSolverIterations = 10;
+    float FBaumgarte = 0.3f;
+    float FPenetrationSlop = 0.01f;
+
     LayersArray FLayers;
     u32 FNumLayers = 0;
 
@@ -24,6 +28,9 @@ struct PhysicsEngineConfiguration
         PROPERTYFIELD(GravityValue, 9.8f);
         PROPERTYFIELD(AABBFattenValue, 1.f);
         PROPERTYFIELD(AABBDisplacementMultiplier, 1.f);
+        PROPERTYFIELD(SolverIterations, 10);
+        PROPERTYFIELD(Baumgarte, 0.3f);
+        PROPERTYFIELD(PenetrationSlop, 0.01f);
         PROPERTYFIELD(Layers, LayersArray());
         PROPERTYFIELD(NumLayers, 0);
     }

@@ -130,7 +130,7 @@ void IslandManager::SolveIslands(PhysicsEngine* Engine, float parDeltaTime)
 
                 // mark it as part of the island and push it in the island
                 joint->bIsland = true;
-                IslandToSolve.Add(joint);
+                IslandToSolve.Add(joint, jointHandle.GetTypeAsEnum());
 
                 // get the other body, wake it and add it to the stack and mark it as island
                 RigidBody* other = Engine->GetRigidBody((joint->FBodyA == body->FHandle) ? joint->FBodyB : joint->FBodyA);

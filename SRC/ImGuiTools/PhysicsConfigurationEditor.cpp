@@ -33,11 +33,14 @@ void PhysicsConfigurationEditor::DrawEditor(bool* parOpen, float parMenuBarHeigh
     Physics::PhysicsEngineConfiguration Config = Physics::GetConfig();
 
     bool bHasChanged = false;
+
+    ImGui::SeparatorText("Gravity value");
     if (ImGui::InputFloat("Gravity value", &Config.FGravityValue))
     {
         bHasChanged = true;
     }
 
+    ImGui::SeparatorText("Broad phase configuration");
     if (ImGui::InputFloat("AABB fattening value", &Config.FAABBFattenValue))
     {
         bHasChanged = true;
@@ -48,6 +51,28 @@ void PhysicsConfigurationEditor::DrawEditor(bool* parOpen, float parMenuBarHeigh
         bHasChanged = true;
     }
 
+    ImGui::SeparatorText("Island solver configuration");
+    {
+        int SolverIterations = (int)Config.FSolverIterations;
+        if (ImGui::InputInt("Solver iterations", &SolverIterations))
+        {
+            Config.FSolverIterations = (u32)Max(1, SolverIterations);
+            bHasChanged = true;
+        }
+    }
+
+    ImGui::SeparatorText("Contact solver configuration");
+    if (ImGui::InputFloat("Baumgarte", &Config.FBaumgarte))
+    {
+        bHasChanged = true;
+    }
+
+    if (ImGui::InputFloat("Penetration slop", &Config.FPenetrationSlop))
+    {
+        bHasChanged = true;
+    }
+
+    ImGui::SeparatorText("Contact solver configuration");
     if (ImGui::CollapsingHeader("Collision Layers"))
     {
         ImGui::Indent();

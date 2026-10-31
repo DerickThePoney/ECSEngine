@@ -5,8 +5,11 @@
 #include "Contact.h"
 #include "ContactSolver.h"
 #include "ContactState.h"
+#include "IJointBatch.h"
+#include "JointBatchRegistry.h"
 #include "PhysicsEngine.h"
 #include "PhysicsEngineConfiguration.h"
+#include "PhysicsJointHandle.h"
 #include "RigidBody.h"
 
 namespace ECSEngine
@@ -28,7 +31,13 @@ void Island::Reset()
     FVelocities.clear();
     FContacts.clear();
     FContactStates.clear();
-    FJoints.clear();
+
+    IJointBatch* const* Batches = JointBatchRegistry::Instance().GetBatches();
+    for (u8 i = 0; i < (u8)EJointType::LENGTH; ++i)
+    {
+        if (Batches[i])
+            Batches[i]->Clear();
+    }
 }
 
 void Island::Add(RigidBody* BodyToAdd)
@@ -43,9 +52,11 @@ void Island::Add(Contact* ContactToAdd)
     FContacts.push_back(ContactToAdd);
 }
 
-void Island::Add(JointBase* JointToAdd)
+void Island::Add(JointBase* JointToAdd, EJointType Type)
 {
-    FJoints.push_back(JointToAdd);
+    IJointBatch* Batch = JointBatchRegistry::Instance().Get(Type);
+    AssertRelease(Batch != nullptr);
+    Batch->Add(JointToAdd);
 }
 
 void Island::Initialise()
@@ -69,7 +80,6 @@ void Island::Initialise()
         CS.IndexA = bodyA->FIslandIndex;
         CS.IndexB = bodyB->FIslandIndex;
 
-        // Contact copies
         CS.Normal = C->FContactNormal;
         CS.TangentVectors[0] = C->FContactTangents[0];
         CS.TangentVectors[1] = C->FContactTangents[1];
@@ -88,13 +98,19 @@ void Island::Initialise()
             CPS.TangentImpulses[1] = CP.FTangentImpulse[1];
         }
     }
+
+    IJointBatch* const* Batches = JointBatchRegistry::Instance().GetBatches();
+    for (u8 i = 0; i < (u8)EJointType::LENGTH; ++i)
+    {
+        if (Batches[i])
+            Batches[i]->Initialize(this);
+    }
 }
 
 void Island::Solve(float parDeltaTime)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
     const PhysicsEngineConfiguration& PhysicsConfig = Engine.Config();
-    // Apply gravity and integrate forces
     forrange(i, 0, FBodies.size())
     {
         RigidBody* body = FBodies[i];
@@ -109,7 +125,6 @@ void Island::Solve(float parDeltaTime)
             body->FVelocity += (body->FAccelerationDueToForces + body->FGravityScale * PhysicsConfig.FGravityValue * vec3(0.f, -1.f, 0.f)) * parDeltaTime;
             body->FRotationVelocity += body->FInverseInertiaTensorWorld * body->FTorque * parDeltaTime;
 
-            // damping
             body->FVelocity *= 1.f / (1.f + parDeltaTime * body->FLinearDamping);
             body->FRotationVelocity *= 1.f / (1.f + parDeltaTime * body->FAngularDamping);
 
@@ -121,31 +136,40 @@ void Island::Solve(float parDeltaTime)
         FVelocities[i].FRotationVelocity = body->FRotationVelocity;
     }
 
-    // solve contact and joints contraints
     {
-        foreachitem(joint, FJoints)
+        IJointBatch* const* Batches = JointBatchRegistry::Instance().GetBatches();
+
+        for (u8 i = 0; i < (u8)EJointType::LENGTH; ++i)
         {
-            joint->PreSolve(this, parDeltaTime);
+            if (Batches[i])
+                Batches[i]->PreSolve(this, parDeltaTime);
         }
 
         ContactSolver CSolver;
         CSolver.Initialise(this);
         CSolver.PreSolve(parDeltaTime);
 
-        forrange(i, 0, 10)
+        const u32 SolverIterations = PhysicsConfig.FSolverIterations;
+        forrange(i, 0, SolverIterations)
         {
-            foreachitem(joint, FJoints)
+            for (u8 b = 0; b < (u8)EJointType::LENGTH; ++b)
             {
-                joint->Solve(this, parDeltaTime);
+                if (Batches[b])
+                    Batches[b]->Solve(this);
             }
 
             CSolver.Solve();
         }
 
+        for (u8 i = 0; i < (u8)EJointType::LENGTH; ++i)
+        {
+            if (Batches[i])
+                Batches[i]->Shutdown();
+        }
+
         CSolver.Shutdown();
     }
 
-    // solve and integrate and synchronize positions
     float MinSleepTimer = std::numeric_limits<float>::max();
     forrange(i, 0, FBodies.size())
     {
@@ -192,7 +216,6 @@ void Island::Solve(float parDeltaTime)
         }
     }
 
-    // if the minsleep timer is lower than some tolerance, put everyone to sleep
     if (MinSleepTimer > 0.5f)
     {
         foreachitem(body, FBodies)
@@ -206,8 +229,6 @@ void Island::Solve(float parDeltaTime)
             body->SetAwake(false);
         }
     }
-
-    // set to sleep TODO
 }
 } // namespace Physics
 } // namespace ECSEngine
