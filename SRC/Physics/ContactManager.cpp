@@ -65,7 +65,6 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
     Contact* Current = FContactList;
     while (Current != nullptr)
     {
-        // TODO: Check if bodies are awake and all
         Current->FFlags.SetBit(EContactFlag::CT_ISLAND, false);
 
         RigidBody* a = PhysicsEngine::Instance().GetRigidBody(Current->FFirstBody);
