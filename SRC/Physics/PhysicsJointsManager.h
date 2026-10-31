@@ -29,6 +29,10 @@ public:
     void SetBallMotor(const PhysicsJointHandle& JointHandle, bool bEnable, const vec3& VelocityInA, float MaxTorque);
     void SetBallTargetEulerAngles(const PhysicsJointHandle& JointHandle, bool bEnable, const vec3& EulerYawRollPitch, float Stiffness, float MaxTorque);
 
+#ifdef PERFORM_SECURITY_CHECKS
+    void DebugDrawJoints();
+#endif
+
 private:
     struct DistanceJointRecord
     {

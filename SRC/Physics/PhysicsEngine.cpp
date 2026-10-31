@@ -651,6 +651,7 @@ void PhysicsEngine::DrawDebug()
     DrawDebugInternal();
     FBroadPhase.DebugBroadPhase();
     FContactManager.DebugDrawContacts(FBroadPhase);
+    FJointsManager.DebugDrawJoints();
 }
 
 void PhysicsEngine::DrawDebugInternal()
