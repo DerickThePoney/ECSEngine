@@ -11,6 +11,15 @@
 #include <fstream>
 #include <locale>
 
+namespace
+{
+std::string Lowercased(std::string value)
+{
+    std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    return value;
+}
+} // namespace
+
 namespace ECSEngine
 {
 ResourceFileDirectoryView::ResourceFileDirectoryView(const std::string& path, const std::string& sharedPath)
@@ -34,7 +43,7 @@ bool ResourceFileDirectoryView::Open()
 
 u32 ResourceFileDirectoryView::GetRawResource(const Resource& r, c8* buffer)
 {
-    auto itFind = FPathToFilename.find(r.FName);
+    auto itFind = FPathToFilename.find(Lowercased(r.FName));
     AlwaysCheckedAssert(itFind != FPathToFilename.end());
     std::ifstream ifs(itFind->second.FRoot + "\\" + r.FName, std::ios::binary);
     AssertRelease(ifs.good());
@@ -49,7 +58,7 @@ u32 ResourceFileDirectoryView::GetNumResources() const
 
 u32 ResourceFileDirectoryView::GetRawResourceSize(const Resource& r)
 {
-    auto itFind = FPathToFilename.find(r.FName);
+    auto itFind = FPathToFilename.find(Lowercased(r.FName));
     AlwaysCheckedAssert(itFind != FPathToFilename.end());
 
     if (itFind != FPathToFilename.end())
@@ -82,8 +91,7 @@ void ResourceFileDirectoryView::AddResourcesFromRoot(const std::string& root)
 
         const std::filesystem::path absolute = itDir->path();
         const std::filesystem::path path = std::filesystem::relative(absolute, root);
-        std::string filepath = path.string();
-        std::transform(filepath.begin(), filepath.end(), filepath.begin(), [](unsigned char c) { return std::tolower(c); });
+        const std::string filepath = Lowercased(path.string());
         if (FPathToFilename.find(filepath) != FPathToFilename.end())
             continue;
 
@@ -112,9 +120,7 @@ void ResourceFileDirectoryView::ListResourceFiles(const std::string& parWildcard
 
 bool ResourceFileDirectoryView::FileExists(const std::string& parFileName) const
 {
-    std::string lowerCaseFilename = parFileName;
-    std::transform(lowerCaseFilename.begin(), lowerCaseFilename.end(), lowerCaseFilename.begin(), [](unsigned char c) { return std::tolower(c); });
-    return FPathToFilename.find(lowerCaseFilename) != FPathToFilename.end();
+    return FPathToFilename.find(Lowercased(parFileName)) != FPathToFilename.end();
 }
 
 } // namespace ECSEngine
