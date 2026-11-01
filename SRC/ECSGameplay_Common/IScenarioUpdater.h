@@ -5,6 +5,8 @@ namespace ECSEngine
 class IScenarioUpdater
 {
 public:
+    virtual ~IScenarioUpdater() = default;
+
     virtual void Initialise() = 0;
     virtual void Destroy() = 0;
 

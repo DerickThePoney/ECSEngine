@@ -1,0 +1,1 @@
+DECLARE_MODULE_AND_TEMPLATE(RocketManagerModule, RocketManagerModuleTemplate)

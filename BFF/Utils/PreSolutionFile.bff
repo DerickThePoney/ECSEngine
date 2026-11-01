@@ -15,3 +15,5 @@
 .ToolsProjects = {}
 
 .LauncherProjects = {}
+
+.GameLaunchersProjects = {}

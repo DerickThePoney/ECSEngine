@@ -9,7 +9,7 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "ECSGameplay_Common/ECSLoader.h"
-#include "ECSGameplay_Specific/GameplaySpecificLoader.h"
+#include "GameIdentity.h"
 #include "Physics/PhysicsLoader.h"
 #include "RenderingCore/RenderingLoader.h"
 #include "SoundCore/SoundLoader.h"
@@ -20,6 +20,10 @@ int main(int argc, char** argv)
 {
     ECSEngine::CallStack::InitializeSymbols();
     ECSEngine::ReadMainCommandLine(argc, argv);
+#ifndef COMPILE_FINAL
+    if (!ECSEngine::Options.AssetsDirectoryOverridden)
+        ECSEngine::Configuration::AssetsDirectory = ECSEngine::GetGameAssetsDirectory();
+#endif
 
     ECSEngine::Profiling::StartProfiler();
     if (!ECSEngine::InitialiseGlobalCache())
@@ -45,13 +49,7 @@ int main(int argc, char** argv)
         {
 #ifndef COMPILE_FINAL
             AssertNotReached();
-            app.AddNewLoader<ECSEngine::LoaderInitialiseCommonResources>();
-            app.AddNewLoader<ECSEngine::ECSLoader>("\\Configuration\\EntityTemplates.json");
-            app.AddNewLoader<ECSEngine::SoundLoader>();
-            app.AddNewLoader<ECSEngine::PhysicsLoader>();
-            app.AddNewLoader<ECSEngine::RenderingLoader>("Base Application");
-            app.AddNewLoader<ECSEngine::ECSGameplaySpecificLoader>("\\Configuration\\GameplayRules.json");
-            app.SetGameplayUpdater_StealOwnership(new ECSEngine::ApplicationUpdaterWrapper());
+            ECSEngine::InstallDefaultApplication(app);
 
             {
                 std::ofstream ofstr("..\\Assets\\Configuration\\BaseApplication.json", std::ofstream::out);

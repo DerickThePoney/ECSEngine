@@ -5,8 +5,8 @@
 #include "Application/SceneManager.h"
 #include "Common/MainOptions.h"
 #include "Common/TimeManager.h"
-#include "ECSGameplay_Common/GameScenarioUpdater.h"
 #include "ECSGameplay_Common/ScenarioEditor.h"
+#include "ECSGameplay_Common/ScenarioFactory.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
@@ -49,16 +49,12 @@ void ApplicationUpdater::Initialise()
     {
         const std::string startScene = SceneManager::Instance().GetSceneFilenameFromIndex(0);
         AssertRelease(!startScene.empty());
-        GameScenarioUpdater* scene = new GameScenarioUpdater(); // TODO Main menu updater (//single ui system ?)
-        scene->SetScenario(startScene);
-        FScene = scene;
+        FScene = CreateScenario(startScene, false);
     }
 #else
     const std::string startScene = SceneManager::Instance().GetSceneFilenameFromIndex(0);
     AssertRelease(!startScene.empty());
-    GameScenarioUpdater* scene = new GameScenarioUpdater();
-    scene->SetScenario(startScene);
-    FScene = scene;
+    FScene = CreateScenario(startScene, false);
 #endif
 
     AssertRelease(FScene != nullptr);

@@ -1,17 +1,16 @@
 ﻿#pragma once
-#include "CameraMoverSystem.h"
+#include "ECSGameplay_Common/CameraMoverSystem.h"
 #include "Common/SavingSystemDeclaration.h"
-#include "ECSGameplay_Specific/ColonyBuildingSystem.h"
-#include "ECSGameplay_Specific/ColonyFeedbackSystem.h"
-#include "ECSGameplay_Specific/ResourceProductionSystem.h"
-#include "ECSGameplay_Specific/ResourceStatisticsUpdateSystem.h"
-#include "ECSGameplay_Specific/RocketControllerSystem.h"
-#include "ECSGameplay_Specific/StorageFeedbackDrawer.h"
-#include "ECSGameplay_Specific/StorageSlotSystem.h"
-#include "ECSGameplay_Specific/UserInterfaceSystem.h"
-#include "IScenarioUpdater.h"
-#include "PhysicsUpdateSystem.h"
-#include "SynchroWithRenderSystem.h"
+#include "ColonyBuildingSystem.h"
+#include "ColonyFeedbackSystem.h"
+#include "ResourceProductionSystem.h"
+#include "ResourceStatisticsUpdateSystem.h"
+#include "StorageFeedbackDrawer.h"
+#include "StorageSlotSystem.h"
+#include "UserInterfaceSystem.h"
+#include "ECSGameplay_Common/IScenarioUpdater.h"
+#include "ECSGameplay_Common/PhysicsUpdateSystem.h"
+#include "ECSGameplay_Common/SynchroWithRenderSystem.h"
 
 namespace ECSEngine
 {
@@ -43,8 +42,6 @@ private:
     SynchroWithRenderSystem FRenderingSystem;
 
     PhysicsUpdateSystem FPhysicsSystem;
-
-    RocketControllerSystem FRocketSystem;
 
     ColonyBuildingSystem FColonyBuildingSystem;
     ResourceProductionSystem FRawResourceProductionSystem;

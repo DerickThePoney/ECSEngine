@@ -5,6 +5,7 @@
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
+#include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
 #include "ECSGameplay_Common/OrientationModule.h"
 #include "ECSGameplay_Common/PositionModule.h"
@@ -20,9 +21,12 @@ SynchroWithRenderSystem::SynchroWithRenderSystem()
     RegisterDependency<PositionModule>(EEntityWorlds::STANDARD);
     RegisterDependency<OrientationModule>(EEntityWorlds::STANDARD);
 
-    RegisterDependency<ApparenceModule>(EEntityWorlds::RESOURCE_PROD);
-    RegisterDependency<PositionModule>(EEntityWorlds::RESOURCE_PROD);
-    RegisterDependency<OrientationModule>(EEntityWorlds::RESOURCE_PROD);
+    if (WorldManager::Instance().GetWorldIFP(EEntityWorlds::RESOURCE_PROD) != nullptr)
+    {
+        RegisterDependency<ApparenceModule>(EEntityWorlds::RESOURCE_PROD);
+        RegisterDependency<PositionModule>(EEntityWorlds::RESOURCE_PROD);
+        RegisterDependency<OrientationModule>(EEntityWorlds::RESOURCE_PROD);
+    }
 }
 
 SynchroWithRenderSystem::~SynchroWithRenderSystem()
@@ -57,7 +61,8 @@ void SynchroWithRenderSystem::VirtualUpdate()
     parent_type::VirtualUpdate();
 
     UpdateObjectsForRendering<EEntityWorlds::STANDARD>();
-    UpdateObjectsForRendering<EEntityWorlds::RESOURCE_PROD>();
+    if (WorldManager::Instance().GetWorldIFP(EEntityWorlds::RESOURCE_PROD) != nullptr)
+        UpdateObjectsForRendering<EEntityWorlds::RESOURCE_PROD>();
 }
 
 } // namespace ECSEngine

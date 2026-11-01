@@ -2,6 +2,7 @@
 
 #include "GameScenarioUpdater.h"
 
+#include "Application/SceneScenario.h"
 #include "Common/CameraManager.h"
 #include "Common/GenericMessageManager.h"
 #include "Common/ResourceHandle.h"
@@ -9,15 +10,15 @@
 #include "Common/TimeManager.h"
 #include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
-#include "ECSGameplay_Specific/CircularBuildingGrid.h"
-#include "ECSGameplay_Specific/EnergySystem.h"
-#include "ECSGameplay_Specific/MousePolicyManager.h"
-#include "ECSGameplay_Specific/ResourceManager.h"
+#include "CircularBuildingGrid.h"
+#include "EnergySystem.h"
+#include "MousePolicyManager.h"
+#include "ResourceManager.h"
 #include "ImGuiTools/ResourceCacheDebug.h"
-#include "NavMeshPathfindingManager.h"
+#include "ECSGameplay_Common/NavMeshPathfindingManager.h"
 #include "Physics/PhysicsAPI.h"
 #include "Physics/PhysicsEngine.h"
-#include "PhysicsJointSpawner.h"
+#include "ECSGameplay_Common/PhysicsJointSpawner.h"
 #include "Rendering/FinalCombinePass.h"
 #include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
@@ -27,8 +28,8 @@
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/MaterialManager.h"
 #include "RenderingCore/RenderPass.h"
-#include "SaveLoadManager.h"
-#include "SelectionManager.h"
+#include "ECSGameplay_Common/SaveLoadManager.h"
+#include "ECSGameplay_Common/SelectionManager.h"
 #include "UICore/RMLUIManager.h"
 
 namespace ECSEngine
@@ -106,7 +107,6 @@ void GameScenarioUpdater::Initialise()
     FColonyBuildingSystem.Init();
     FUserInterfaceSystem.Init();
     FPhysicsSystem.Init();
-    FRocketSystem.Init();
     PhysicsJointSpawner::CreateIFP();
 
     FScenario->Initialise();
@@ -122,7 +122,6 @@ void GameScenarioUpdater::Destroy()
 
     PhysicsJointSpawner::Instance().Finalize();
     PhysicsJointSpawner::Delete();
-    FRocketSystem.Destroy();
     FPhysicsSystem.Destroy();
     FUserInterfaceSystem.Destroy();
     FColonyBuildingSystem.Destroy();
@@ -189,8 +188,6 @@ void GameScenarioUpdater::GameplayUpdate()
         FColonyBuildingSystem.Update();
 
         ResourceManager::Instance().Update();
-
-        FRocketSystem.Update();
 
         FPhysicsSystem.Update();
 

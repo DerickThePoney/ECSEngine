@@ -30,6 +30,18 @@ def BuildBGFX(config, MSBUILD, tools, samples):
 
     return result.returncode
 
+def PrototypeExecutables():
+    import json
+    manifest_path = 'Script/Generation/prototypes.json'
+    with open(manifest_path, 'r', encoding='utf-8') as manifest_file:
+        prototypes = json.load(manifest_file)
+    executables = []
+    for prototype in prototypes:
+        executable = prototype.get('exe', prototype['name'])
+        if executable not in executables:
+            executables.append(executable)
+    return executables
+
 def BuildEngine(config, MSBUILD):
     print('BUILDING ECSEngine')
     sys.stdout.flush()
@@ -41,11 +53,24 @@ def BuildEngine(config, MSBUILD):
     if result.returncode != 0:
         return result.returncode
 
-    command = ['./tools/FBuild.exe', '-summary', 'Build-BuildingGame-x64-%s'%(config), 'Build-AssetCooker-x64-%s'%(config), 'Build-DataPacker-x64-%s'%(config)]
+    executables = PrototypeExecutables()
+    command = ['./tools/FBuild.exe', '-summary']
+    for executable in executables:
+        command.append('Build-%s-x64-%s' % (executable, config))
+    command.append('Build-AssetCooker-x64-%s' % config)
+    command.append('Build-DataPacker-x64-%s' % config)
 
     result = subprocess.run(command)
+    if result.returncode != 0:
+        return result.returncode
 
-    return result.returncode
+    for executable in executables:
+        exe_path = 'bin/%s-x64-%s.exe' % (executable, config)
+        if not os.path.isfile(exe_path):
+            print('Missing prototype executable: %s' % exe_path)
+            return 1
+
+    return 0
 
 def BuildEngineTools(config, MSBUILD):
     print('BUILDING ECSEngine')

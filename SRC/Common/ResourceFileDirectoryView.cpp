@@ -13,8 +13,9 @@
 
 namespace ECSEngine
 {
-ResourceFileDirectoryView::ResourceFileDirectoryView(const std::string& path)
+ResourceFileDirectoryView::ResourceFileDirectoryView(const std::string& path, const std::string& sharedPath)
     : FPath(path)
+    , FSharedPath(sharedPath)
 {
 }
 
@@ -35,7 +36,7 @@ u32 ResourceFileDirectoryView::GetRawResource(const Resource& r, c8* buffer)
 {
     auto itFind = FPathToFilename.find(r.FName);
     AlwaysCheckedAssert(itFind != FPathToFilename.end());
-    std::ifstream ifs(FPath + "\\" + r.FName, std::ios::binary);
+    std::ifstream ifs(itFind->second.FRoot + "\\" + r.FName, std::ios::binary);
     AssertRelease(ifs.good());
     ifs.read(buffer, itFind->second.FFilesize);
     return itFind->second.FFilesize;
@@ -53,7 +54,7 @@ u32 ResourceFileDirectoryView::GetRawResourceSize(const Resource& r)
 
     if (itFind != FPathToFilename.end())
     {
-        const std::filesystem::path absolute = std::filesystem::path(FPath) / r.FName;
+        const std::filesystem::path absolute = std::filesystem::path(itFind->second.FRoot) / r.FName;
         itFind->second.FFilesize = static_cast<u32>(std::filesystem::file_size(absolute));
         return itFind->second.FFilesize;
     }
@@ -66,28 +67,36 @@ std::string ResourceFileDirectoryView::GetResourceName(i32 num) const
     return "";
 }
 
-void ResourceFileDirectoryView::ListResources()
+void ResourceFileDirectoryView::AddResourcesFromRoot(const std::string& root)
 {
-    std::filesystem::recursive_directory_iterator itDir(FPath);
+    if (root.empty() || !std::filesystem::exists(root))
+        return;
+
+    std::filesystem::recursive_directory_iterator itDir(root);
     std::filesystem::recursive_directory_iterator itEnd;
-
-    const std::filesystem::path basePath(FPath);
-
-    FPathToFilename.clear();
 
     for (; itDir != itEnd; ++itDir)
     {
-        if (itDir->is_regular_file())
-        {
-            const std::filesystem::path absolute = itDir->path();
-            const std::filesystem::path path = std::filesystem::relative(absolute, FPath);
-            std::string filepath = path.string();
-            std::transform(filepath.begin(), filepath.end(), filepath.begin(), [](unsigned char c) { return std::tolower(c); });
-            AlwaysCheckedAssert(FPathToFilename.find(filepath) == FPathToFilename.end());
-            FilesystemRecord record{ path.filename().string(), static_cast<u32>(std::filesystem::file_size(absolute)) };
-            FPathToFilename[filepath] = record;
-        }
+        if (!itDir->is_regular_file())
+            continue;
+
+        const std::filesystem::path absolute = itDir->path();
+        const std::filesystem::path path = std::filesystem::relative(absolute, root);
+        std::string filepath = path.string();
+        std::transform(filepath.begin(), filepath.end(), filepath.begin(), [](unsigned char c) { return std::tolower(c); });
+        if (FPathToFilename.find(filepath) != FPathToFilename.end())
+            continue;
+
+        FilesystemRecord record{ path.filename().string(), root, static_cast<u32>(std::filesystem::file_size(absolute)) };
+        FPathToFilename[filepath] = record;
     }
+}
+
+void ResourceFileDirectoryView::ListResources()
+{
+    FPathToFilename.clear();
+    AddResourcesFromRoot(FPath);
+    AddResourcesFromRoot(FSharedPath);
 }
 
 void ResourceFileDirectoryView::ListResourceFiles(const std::string& parWildcardPattern, std::vector<std::string>& parOutFileList) const

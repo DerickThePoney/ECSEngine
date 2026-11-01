@@ -46,7 +46,7 @@ enum Type
 class SceneObjectsPickingRenderer;
 class EditorSceneRenderer;
 class EditorGridRenderer;
-class GameScenarioUpdater;
+class IScenarioUpdater;
 class SceneScenario;
 
 namespace Rendering
@@ -93,7 +93,7 @@ private:
     EditorCamera FEditorCamera;
     ScenarioEditorStatus::Type FState;
 
-    GameScenarioUpdater* FInGameScenarioPlayer;
+    IScenarioUpdater* FInGameScenarioPlayer;
 
     EditorSceneRenderer* FEditorSceneRenderer;
     SceneObjectsPickingRenderer* FEditorSceneObjectPickingRenderer;

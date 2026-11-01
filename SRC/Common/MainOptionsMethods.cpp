@@ -16,7 +16,7 @@ bool InitialiseGlobalCache()
     GlobalResourceCache::Instance().FCache = new ResourceCache(100, new DataPackDirectoryView(std::string(Configuration::AssetsDatapackDirectory) + ".datapack"));
 #else
     if (Options.NoDatapack)
-        GlobalResourceCache::Instance().FCache = new ResourceCache(100, new ResourceFileDirectoryView(Configuration::AssetsDirectory));
+        GlobalResourceCache::Instance().FCache = new ResourceCache(100, new ResourceFileDirectoryView(Configuration::AssetsDirectory, Configuration::SharedAssetsDirectory));
     else
         GlobalResourceCache::Instance().FCache = new ResourceCache(100, new DataPackDirectoryView(std::string(Configuration::AssetsDatapackDirectory) + ".datapack"));
 #endif

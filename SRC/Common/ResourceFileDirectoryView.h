@@ -6,13 +6,14 @@ namespace ECSEngine
 struct FilesystemRecord
 {
     std::string FFilename;
+    std::string FRoot;
     u32 FFilesize;
 };
 
 class ResourceFileDirectoryView final : public IResourceFile
 {
 public:
-    ResourceFileDirectoryView(const std::string& path);
+    ResourceFileDirectoryView(const std::string& path, const std::string& sharedPath = "");
     ~ResourceFileDirectoryView();
 
     bool Open() override;
@@ -30,9 +31,11 @@ public:
 
 private:
     void ListResources();
+    void AddResourcesFromRoot(const std::string& root);
 
 private:
     std::string FPath;
+    std::string FSharedPath;
     std::map<std::string, FilesystemRecord> FPathToFilename;
 };
 } // namespace ECSEngine

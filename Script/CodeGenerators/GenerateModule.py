@@ -2,12 +2,13 @@
 
 import sys
 import os
+import json
 import subprocess
 
 import argparse
 
-WORLD_DECLARATION_FILE_NAME = 'SRC/ECSGameplay_Common/WorldDeclaration.cpp'
 MODULE_LIST_FILE_NAME = 'ModuleList.inl'
+MAX_MODULE_NUMBER = 32
 
 Module_H_Code = """
 #pragma once
@@ -94,62 +95,61 @@ void {modulename}::SaveLoad(Chunk& parChunk)
 """
 
 
+def module_directory(where):
+    if where == 'Common':
+        return 'SRC/ECSGameplay_Common'
+    manifest_path = 'Script/Generation/prototypes.json'
+    with open(manifest_path, 'r', encoding='utf-8') as manifest_file:
+        prototypes = json.load(manifest_file)
+    for prototype in prototypes:
+        if prototype['name'] == where:
+            return 'SRC/Games/%s' % where
+    return None
+
+def count_declared_modules():
+    lists = ['SRC/ECSGameplay_Common/ModuleList.inl']
+    with open('Script/Generation/prototypes.json', 'r', encoding='utf-8') as manifest_file:
+        for prototype in json.load(manifest_file):
+            lists.append('SRC/Games/%s/ModuleList.inl' % prototype['name'])
+    count = 0
+    for path in lists:
+        with open(path, 'r', encoding='utf-8') as module_list:
+            for line in module_list:
+                if line.strip().startswith('DECLARE_MODULE_AND_TEMPLATE'):
+                    count += 1
+    return count
+
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w', '--where', type=str, help='Tells where to put the module (Specific, Common)', default='Specific')
+    parser.add_argument('-w', '--where', type=str, help='Common, or a prototype name from prototypes.json', required=True)
     parser.add_argument('-n', '--name', type=str, help='Module name', required=True)
 
     args = parser.parse_args()
 
-    projectName = args.where
-
-    if not (projectName == 'Specific' or projectName == 'Common'):
-        print('error in the name of the project')
+    directory = module_directory(args.where)
+    if directory is None:
+        print('Unknown module destination: %s' % args.where)
         return -1
 
-    if projectName == 'Specific':
-        projectName = 'ECSGameplay_Specific'
-    else:
-        projectName = 'ECSGameplay_Common'
-
     moduleName = args.name
-    if moduleName is None:
+    if moduleName is None or len(moduleName) == 0:
         print('Error in the module name')
         return -1
 
-    # write cpp
-    with open('SRC/%s/%s.cpp' % (projectName, moduleName), 'w') as f:
-        global Module_CPP_Code
-        res = Module_CPP_Code.format(modulename=moduleName)
-        f.write(res)
+    declared = count_declared_modules()
+    if declared + 1 > MAX_MODULE_NUMBER:
+        print('Adding %s would exceed MaxModuleNumber (%d)' % (moduleName, MAX_MODULE_NUMBER))
+        return -1
 
-    # write h
-    with open('SRC/%s/%s.h' % (projectName, moduleName), 'w') as f:
-        global Module_H_Code
-        res = Module_H_Code.format(modulename=moduleName)
-        f.write(res)
+    with open('%s/%s.cpp' % (directory, moduleName), 'w') as f:
+        f.write(Module_CPP_Code.format(modulename=moduleName))
 
-    # write the declaration
-    with open('SRC/%s/%s' % (projectName, MODULE_LIST_FILE_NAME), 'a') as f:
-        f.write('DECLARE_MODULE_AND_TEMPLATE(%s, %sTemplate)\n'% (moduleName, moduleName))
+    with open('%s/%s.h' % (directory, moduleName), 'w') as f:
+        f.write(Module_H_Code.format(modulename=moduleName))
 
-
-    lines=[]
-    with open('%s' % (WORLD_DECLARATION_FILE_NAME), 'r') as f:
-
-        added = False
-        for line in f:
-
-            if not added and 'namespace' in line:
-                lines.append('#include "%s/%s.h"\n\n' % (projectName, moduleName))
-                added = True
-
-            lines.append(line)
-
-    with open('%s' % (WORLD_DECLARATION_FILE_NAME), 'w') as f:
-        for line in lines:
-            f.write(line)
+    with open('%s/%s' % (directory, MODULE_LIST_FILE_NAME), 'a') as f:
+        f.write('DECLARE_MODULE_AND_TEMPLATE(%s, %sTemplate)\n' % (moduleName, moduleName))
 
     result = subprocess.run(['py', '-u', 'Script/Compil/BuildAll.py', '-sln'])
 

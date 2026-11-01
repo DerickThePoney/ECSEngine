@@ -6,7 +6,6 @@
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
-#include "ECSGameplay_Specific/GameplayFeedbackDrawer.h"
 #include "FontTextureManager.h"
 #include "GFXKeyHelper.h"
 #include "GFXOperator.h"
@@ -51,9 +50,6 @@ bool RenderingLoader::VirtualInitialise()
     Rendering::SkelettonManager::CreateIFP();
     Rendering::GFXRepresentationManager::CreateIFP();
 
-    GameplayFeedbackDrawer::CreateIFP();
-    GameplayFeedbackDrawer::Instance().Initialise();
-
     Rendering::GFXRepresentationDescriptorManager::CreateIFP();
     AssertRelease(Rendering::GFXRepresentationDescriptorManager::HasInstance());
     {
@@ -77,9 +73,6 @@ void RenderingLoader::VirtualShutdown()
     ILoader::VirtualShutdown();
 
     Rendering::GFXRepresentationDescriptorManager::Destroy();
-
-    GameplayFeedbackDrawer::Instance().Shutdown();
-    GameplayFeedbackDrawer::Destroy();
 
     Rendering::GFXRepresentationManager::Destroy();
     Rendering::SkelettonManager::Destroy();

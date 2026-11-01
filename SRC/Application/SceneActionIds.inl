@@ -2,3 +2,4 @@
 DECLARE_SCENE_ACTION(SceneActionPolygonalPattern)
 
 #include "ECSCore/SceneActionIds.inl"
+#include "Games/Generated/SceneActions.inl"

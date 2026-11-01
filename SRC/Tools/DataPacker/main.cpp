@@ -8,11 +8,6 @@
 #include "DataPack/DataPackWriter.h"
 #include "SoundCore/SoundResourceFileSystem.h"
 
-namespace ECSEngine
-{
-MainOptions Options;
-} // namespace ECSEngine
-
 void PackFiles(const char* parDirectory, const std::set<std::string>& parExtensions, ECSEngine::ResourceCache* parCache)
 {
     AssertRelease(parCache != nullptr);
@@ -37,6 +32,7 @@ void PackFiles(const char* parDirectory, const std::set<std::string>& parExtensi
 int main(int argc, char** argv)
 {
     ECSEngine::CallStack::InitializeSymbols();
+    ECSEngine::ReadMainCommandLine(argc, argv);
 #ifndef COMPILE_FINAL
     ECSEngine::Options.NoDatapack = true;
 #endif
