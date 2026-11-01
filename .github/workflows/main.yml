@@ -133,10 +133,21 @@ jobs:
       - name: List prototype release binaries
         id: prototypes
         shell: bash
-        run: py -c "import json,os; items=json.load(open('Script/Generation/prototypes.json',encoding='utf-8')); seen=[]; lines=[];
-[ (seen.append(exe), lines.append('bin/%s-x64-Release.exe'%exe)) for exe in (item.get('exe', item['name']) for item in items) if exe not in seen ];
-lines.append('bin/glfw3.dll');
-open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8').write('paths<<EOF\n'+'\n'.join(lines)+'\nEOF\n')"
+        run: |
+          py - <<'PY'
+          import json, os
+          items = json.load(open("Script/Generation/prototypes.json", encoding="utf-8"))
+          seen = []
+          lines = []
+          for item in items:
+              exe = item.get("exe", item["name"])
+              if exe not in seen:
+                  seen.append(exe)
+                  lines.append("bin/%s-x64-Release.exe" % exe)
+          lines.append("bin/glfw3.dll")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write("paths<<EOF\n" + "\n".join(lines) + "\nEOF\n")
+          PY
 
       - name: Upload Release build
         uses: actions/upload-artifact@v7
