@@ -6,7 +6,7 @@
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
-#include "GameScenarioUpdater.h"
+#include "ScenarioFactory.h"
 #include "ImGuiTools/SceneEditor.h"
 #include "Rendering/EditorGridRenderer.h"
 #include "Rendering/EditorSceneRenderer.h"
@@ -261,8 +261,7 @@ void ScenarioEditor::UpdateSceneEditorStatus()
             {
                 FState = ScenarioEditorStatus::PLAYING_SCENARIO;
                 AssertRelease(FInGameScenarioPlayer == nullptr);
-                FInGameScenarioPlayer = new GameScenarioUpdater();
-                FInGameScenarioPlayer->SetScenario("Scenes/" + FCurrentScenario->GetName() + ".scene", true);
+                FInGameScenarioPlayer = CreateScenario("Scenes/" + FCurrentScenario->GetName() + ".scene", true);
                 FInGameScenarioPlayer->Initialise();
             }
             else if (!isPlaying && FState != ScenarioEditorStatus::EDITING_SCENARIO)

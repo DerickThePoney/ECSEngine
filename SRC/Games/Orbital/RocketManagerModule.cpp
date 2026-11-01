@@ -8,7 +8,7 @@
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
-#include "ECSGameplaySpecificPropertyDrawers.h"
+#include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::RocketManagerModuleTemplate);

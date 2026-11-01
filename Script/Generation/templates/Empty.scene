@@ -1,0 +1,59 @@
+{
+    "value0": {
+        "Name": "Empty",
+        "SceneItemsIdGenerator": {
+            "NextIncrementalId": 1,
+            "ReusableIds": {
+                "container": []
+            }
+        },
+        "SceneItems": [
+            {
+                "key": 0,
+                "value": {
+                    "polymorphic_id": 1073741824,
+                    "ptr_wrapper": {
+                        "id": 2147483649,
+                        "data": {
+                            "Name": "Camera",
+                            "Id": 0,
+                            "Position": {
+                                "x": 0.0,
+                                "y": 15.0,
+                                "z": -20.0
+                            },
+                            "EulerAngles": {
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.6108652949333191
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "Actions": [
+            {
+                "polymorphic_id": 2147483649,
+                "polymorphic_name": "ECSEngine::SceneActionCreateMainCamera",
+                "ptr_wrapper": {
+                    "id": 2147483653,
+                    "data": {
+                        "value0": {
+                            "value0": {
+                                "Name": "Camera",
+                                "Started": false,
+                                "Finished": false
+                            },
+                            "SceneItemID": 0
+                        },
+                        "CameraName": "GameplayCamera",
+                        "Fov": 0.7330383062362671,
+                        "NearPlane": 0.10000000149011612,
+                        "FarPlane": 100.0
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -4,8 +4,7 @@
 
 #include "ApplicationSceneActions.h"
 #include "Common/Singleton.h"
-#include "ECSGameplay_Specific/InitializeTerrainSceneAction.h"
-#include "ECSGameplay_Specific/SpecificGameplaySceneActions.h"
+#include "ECSGameplay_Common/GameplaySceneActions.h"
 
 namespace ECSEngine
 {
@@ -59,7 +58,7 @@ void InitialiseFactory()
 #define DECLARE_SCENE_ACTION(TYPE)                                                                                                                                                 \
     TYPE* t##TYPE = new TYPE;                                                                                                                                                      \
     delete t##TYPE;
-#include "SceneActionIds.inl"
+#include "EngineSceneActionsToInstantiate.inl"
 #undef DECLARE_SCENE_ACTION
 
 #ifdef DECLARE_SCENE_ACTION_RECOVER

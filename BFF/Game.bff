@@ -42,13 +42,16 @@
 #include "Projects/Physics.bff"
 
 #include "Projects/ECSGameplay_Common.bff"
-#include "Projects/ECSGameplay_Specific.bff"
 
 #include "Projects/MiniaudioSoundEngine.bff"
 
 #include "Projects/Rendering.bff"
 
 #include "Projects/Launcher.bff"
+
+.EngineProjects = { 'Tracy', 'imgui', 'ImguiTools', 'DataPack', 'Common', 'Math', 'Application', 'ECSCore', 'SoundCore', 'RenderingCore', 'UICore', 'Physics', 'ECSGameplay_Common', 'MiniaudioSoundEngine', 'Rendering', 'Launcher' }
+
+#include "Generated/Prototypes.bff"
 #include "Projects/AssetCooker.bff"
 #include "Projects/DataPacker.bff"
 
@@ -88,7 +91,7 @@
 #include "Utils/BuildSolutionProjects.bff"
 
 {
-    .ProjectList = .'$GameName$Projects' + .AssetCookerProjects + .DataPackerProjects + .UnitTestsProjects
+    .ProjectList = .'$GameName$Projects' + .AssetCookerProjects + .DataPackerProjects + .UnitTestsProjects + .AllPrototypeLibraries + .AllPrototypeLauncherProjects
     #include "Utils/SolutionFile.bff"
 }
 
@@ -130,6 +133,15 @@ ForEach(.SolutionConfig in .SolutionConfigs)
         Alias('Build-$GameName$-$Platform$-$Config$')
         {
             .Targets = {'$GameName$-Exe-$Platform$-$Config$', 'GLFWCopy' }
+        }
+    }
+
+    ForEach(.PrototypeExe in .PrototypeExecutables)
+    {
+        .ExeName = .PrototypeExe
+        Alias('Build-$ExeName$-$Platform$-$Config$')
+        {
+            .Targets = { '$ExeName$-Exe-$Platform$-$Config$', 'GLFWCopy' }
         }
     }
 }

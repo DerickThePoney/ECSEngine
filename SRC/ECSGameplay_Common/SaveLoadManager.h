@@ -3,7 +3,6 @@
 
 namespace ECSEngine
 {
-class GameScenarioUpdater;
 class SaveLoadManager : public Singleton<SaveLoadManager>
 {
 public:
@@ -13,7 +12,8 @@ public:
     void GetSaveFilesList(std::vector<std::string>& outSaveFilesList);
 
     void Update();
-    void HandleSaveLoad(GameScenarioUpdater* sceneScenario);
+    template<typename T>
+    void HandleSaveLoad(T* sceneScenario);
 
     void RequestSave(const std::string& parFilename);
     void RequestLoad(const std::string& parFilename);
@@ -35,3 +35,5 @@ private:
     bool FRequestQuickLoad = false;
 };
 } // namespace ECSEngine
+
+#include "SaveLoadManager.inl"

@@ -6,14 +6,10 @@
 #include "Common/CallStack.h"
 #include "Common/MainOptions.h"
 
-namespace ECSEngine
-{
-MainOptions Options;
-}
-
 int main(int argc, char** argv)
 {
     ECSEngine::CallStack::InitializeSymbols();
+    ECSEngine::ReadMainCommandLine(argc, argv);
 #ifndef COMPILE_FINAL
     ECSEngine::Options.NoDatapack = true;
 #endif

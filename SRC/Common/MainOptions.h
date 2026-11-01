@@ -8,6 +8,8 @@ struct MainOptions
     bool NoSound = false;
 #ifndef COMPILE_FINAL
     bool NoDatapack = false;
+    bool AssetsDirectoryOverridden = false;
+    bool SharedAssetsDirectoryOverridden = false;
 #endif
 };
 extern MainOptions Options;
@@ -16,6 +18,7 @@ extern void ReadMainCommandLine(int argc, char** argv);
 namespace Configuration
 {
 extern const char* AssetsDirectory;
+extern const char* SharedAssetsDirectory;
 extern const char* SoundsDirectory;
 extern const char* AssetsDatapackDirectory;
 extern const char* SoundDatapackDirectory;

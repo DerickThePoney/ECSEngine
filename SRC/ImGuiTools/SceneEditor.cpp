@@ -89,7 +89,8 @@ void MainMenuBar(WindowsToShow& options, vec2& parOutMenuBarHeight, IOScene& par
         if (ImGui::BeginMenu("Gameplay"))
         {
             ImGui::MenuItem("Scene templates", NULL, &options.showEntityTemplateEditor);
-            ImGui::MenuItem("Gameplay rules", NULL, &options.showGameplayRulesEditor);
+            if (HasGameRulesEditor())
+                ImGui::MenuItem("Gameplay rules", NULL, &options.showGameplayRulesEditor);
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Physics"))
@@ -362,7 +363,7 @@ void DrawSceneEditorMainMenu(SceneScenario* parScene, WindowsToShow& parOutWindo
     if (parOutWindowsToShow.showUIStyleEditor)
         UIStyleEditor(&parOutWindowsToShow.showUIStyleEditor);
 
-    if (parOutWindowsToShow.showGameplayRulesEditor)
+    if (parOutWindowsToShow.showGameplayRulesEditor && HasGameRulesEditor())
         DrawGameRulesEditor(&parOutWindowsToShow.showGameplayRulesEditor, menuBarHeight.y);
 
     if (parOutWindowsToShow.showResourceCache)

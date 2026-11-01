@@ -5,8 +5,7 @@
 #include "Common/CameraManager.h"
 #include "Common/Frustum.h"
 #include "Common/IFeedbackDrawer.h"
-#include "ECSGameplay_Specific/GameplayConstants.h"
-#include "ECSGameplay_Specific/GameplayFeedbackDrawer.h"
+#include "RenderingCore/FeedbackDrawerRegistry.h"
 #include "GFXPickingRenderer.h"
 #include "OutlineRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
@@ -226,7 +225,8 @@ void GameRenderer::Render()
         SCOPED_PROFILE(GameRenderer_Render_FeedbackPass);
         FFeedbackCommandBuffer->SetViewTranform(view, proj);
 
-        GameplayFeedbackDrawer::Instance().DrawFeedback(FFeedbackCommandBuffer);
+        if (IFeedbackDrawer* feedbackDrawer = GetFeedbackDrawer())
+            feedbackDrawer->DrawFeedback(FFeedbackCommandBuffer);
         FFeedbackCommandBuffer->Submit();
     }
 

@@ -1,6 +1,6 @@
 ﻿#ifdef DECLARING_PARAMETERS
 #include "Common/RenderingHandles.h"
-#include "ECSGameplay_Specific/CircularGridAccessor.h"
+#include "ECSGameplay_Common/CircularGridAccessor.h"
 #include "EntityId.h"
 namespace ECSEngine
 {

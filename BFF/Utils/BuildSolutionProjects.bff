@@ -47,4 +47,10 @@
   .Projects   = .LauncherProjects
 ]
 
-.SolutionFolders = {.ExternalFolder, .CoreFolder, .RenderingFolder, .GameplayFolder, .ImGuiToolsFolder, .ToolsFolder, .SoundFolder, .LauncherFolder}
+.GameLaunchersFolder =
+[
+  .Path       = 'GameLaunchers'
+  .Projects   = .GameLaunchersProjects
+]
+
+.SolutionFolders = {.ExternalFolder, .CoreFolder, .RenderingFolder, .GameplayFolder, .ImGuiToolsFolder, .ToolsFolder, .SoundFolder, .LauncherFolder, .GameLaunchersFolder}

@@ -1,0 +1,60 @@
+#once
+
+.AllPrototypeLibraries = { 'Colony', 'Orbital' }
+.AllPrototypeLauncherProjects = { 'ColonyLauncher', 'OrbitalLauncher' }
+.PrototypeExecutables = { 'Orbital' }
+.OrbitalProjects = {}
+
+{
+    .ProjectName = 'Colony'
+    .ProjectPath = 'SRC/Games'
+    .AdditionnalIncludePaths = { 'SRC' }
+    .SolutionFolder = 'Gameplay'
+    .ExeName = 'BuildingGame'
+    #define USE_PRECOMPILED_HEADERS
+    .BuildTarget = { '$ProjectName$' }
+    #include "../Utils/MakeProjectStandard.bff"
+    #undef USE_PRECOMPILED_HEADERS
+}
+
+{
+    .ProjectName = 'ColonyLauncher'
+    .ProjectPath = 'SRC/Games'
+    .AdditionnalIncludePaths = { 'SRC' }
+    .SolutionFolder = 'GameLaunchers'
+    .ExeName = 'BuildingGame'
+    #define USE_PRECOMPILED_HEADERS
+    .BuildTarget = { '$ExeName$-Exe' }
+    #include "../Utils/MakeProjectStandard.bff"
+    #undef USE_PRECOMPILED_HEADERS
+}
+
+{
+    .ProjectName = 'Orbital'
+    .ProjectPath = 'SRC/Games'
+    .AdditionnalIncludePaths = { 'SRC' }
+    .SolutionFolder = 'Gameplay'
+    .ExeName = 'Orbital'
+    #define USE_PRECOMPILED_HEADERS
+    .BuildTarget = { '$ProjectName$' }
+    #include "../Utils/MakeProjectStandard.bff"
+    #undef USE_PRECOMPILED_HEADERS
+}
+
+{
+    .ProjectName = 'OrbitalLauncher'
+    .ProjectPath = 'SRC/Games'
+    .AdditionnalIncludePaths = { 'SRC' }
+    .SolutionFolder = 'GameLaunchers'
+    .ExeName = 'Orbital'
+    #define USE_PRECOMPILED_HEADERS
+    .BuildTarget = { '$ExeName$-Exe' }
+    #include "../Utils/MakeProjectStandard.bff"
+    #undef USE_PRECOMPILED_HEADERS
+}
+
+{
+    .ExeName = 'Orbital'
+    .ProjectList = .EngineProjects + { 'Orbital', 'OrbitalLauncher' }
+    #include "../Utils/Executable.bff"
+}
