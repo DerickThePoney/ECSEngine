@@ -23,6 +23,14 @@
 
 namespace ECSEngine
 {
+namespace
+{
+std::string ResourcePathOnDisk(const std::string& relativePath)
+{
+    return GlobalResourceCache::Instance().FCache->GetFileSystem()->GetContainingRoot(relativePath) + "\\" + relativePath;
+}
+} // namespace
+
 namespace ResourceCheck
 {
 bool HasFileChanged(const std::string& parFile)
@@ -59,7 +67,7 @@ void PrintSha1File(const std::string& parFile)
     i32 resSha1 = sha1digest(nullptr, &hexdigest[0], reinterpret_cast<const u8*>(resourceHandle->Buffer()), resourceHandle->Size());
     AssertRelease(resSha1 == 0);
 
-    std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + parFile + ".sha1", std::ofstream::binary);
+    std::ofstream ofstr(ResourcePathOnDisk(parFile) + ".sha1", std::ofstream::binary);
     AssertRelease(ofstr.good());
     ofstr.write(&hexdigest[0], 41);
 }
@@ -86,7 +94,7 @@ void CookMesh(const std::string& parMeshFile)
 
     std::shared_ptr<ResourceHandle> meshResourceHandle = GlobalResourceCache::Instance().FCache->GetResourceHandle(&meshResource);
     AssertRelease(meshResourceHandle != nullptr);
-    AssimpLoading::GenerateMesh(GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + parMeshFile, meshResourceHandle->Buffer(), meshResourceHandle->Size());
+    AssimpLoading::GenerateMesh(ResourcePathOnDisk(parMeshFile), meshResourceHandle->Buffer(), meshResourceHandle->Size());
 }
 } // namespace MeshCooking
 
@@ -168,7 +176,8 @@ void CookTexture(const std::string& parCookedTextureName, const ECSEngine::Rende
     std::wstring wideString = L"..\\External\\BGFX\\ToolBinaries\\texturecRelease.exe -f ";
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     const std::string& file = parTextureDescriptor.TextureFile();
-    std::wstring filename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + file);
+    const std::string root = GlobalResourceCache::Instance().FCache->GetFileSystem()->GetContainingRoot(file);
+    std::wstring filename = converter.from_bytes(root + "\\" + file);
 
     auto pos = file.find_last_of('\\');
     std::string path = "";
@@ -177,7 +186,7 @@ void CookTexture(const std::string& parCookedTextureName, const ECSEngine::Rende
         path = file.substr(0, pos + 1);
     }
 
-    std::wstring cookedFilename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + path + parCookedTextureName);
+    std::wstring cookedFilename = converter.from_bytes(root + "\\" + path + parCookedTextureName);
     wideString += filename + L" -o " + cookedFilename + L".ktx";
     if (parTextureDescriptor.MipMaps())
     {
@@ -235,7 +244,8 @@ void CookTextureBank(const std::string& parTextureBankFile)
     processes.reserve(textureBank.Descriptors().size());
     foreachitemconst(textureDesc, textureBank.Descriptors())
     {
-        if (!forcedUpdate && !ResourceCheck::HasFileChanged_PrintSha1File(textureDesc.second.TextureFile()))
+        const bool textureChanged = ResourceCheck::HasFileChanged_PrintSha1File(textureDesc.second.TextureFile());
+        if (!forcedUpdate && !textureChanged)
             continue;
         processes.push_back(PROCESS_INFORMATION());
         CookTexture(textureDesc.first, textureDesc.second, processes.back());
@@ -284,7 +294,8 @@ void CookFreeFormTextures(const std::string& parFreeFormTextures)
     {
         std::string file, name;
         istr >> file >> name;
-        if (!forcedUpdate && !ResourceCheck::HasFileChanged_PrintSha1File(file))
+        const bool textureChanged = !file.empty() && ResourceCheck::HasFileChanged_PrintSha1File(file);
+        if (file.empty() || (!forcedUpdate && !textureChanged))
             continue;
         processes.emplace_back();
         Rendering::TextureDescriptor desc(file, 0, false, false);
@@ -326,7 +337,8 @@ bool CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION
     // --varyingdef varying.def.sc -f vs_CircularBuilding.sc -o vs_CircularBuilding.bin -p s_5_0 -i ../../../../External/BGFX/bgfx/src/ --type vertex --platform windows -O 3
     std::wstring wideString = L"..\\External\\BGFX\\ToolBinaries\\shadercRelease.exe ";
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring filename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + parFileName);
+    const std::string root = GlobalResourceCache::Instance().FCache->GetFileSystem()->GetContainingRoot(parFileName);
+    std::wstring filename = converter.from_bytes(root + "\\" + parFileName);
 
     auto pos = parFileName.find_last_of('.');
     std::string fileNoExtension = "";
@@ -344,8 +356,8 @@ bool CompileShader(const std::string& parFileName, int type, PROCESS_INFORMATION
         fileNoPath = parFileName.substr(pos + 1);
     }
 
-    std::wstring cookedFilename = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + fileNoExtension + ".bin");
-    std::wstring pathW = converter.from_bytes(GlobalResourceCache::Instance().FCache->GetFileSystem()->GetBasePathName() + "\\" + path);
+    std::wstring cookedFilename = converter.from_bytes(root + "\\" + fileNoExtension + ".bin");
+    std::wstring pathW = converter.from_bytes(root + "\\" + path);
     wideString += L"--varyingdef " + pathW + L"varying.def.sc -f " + filename + L" -o " + cookedFilename + L" -i ..\\External\\BGFX\\bgfx\\src\\ --platform windows -O 3 --disasm ";
 
     if (type == 0)
