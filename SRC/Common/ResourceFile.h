@@ -16,6 +16,11 @@ public:
     virtual ~IResourceFile() {}
 
     virtual const std::string& GetBasePathName() const = 0;
+    virtual std::string GetContainingRoot(const std::string& relativePath) const
+    {
+        (void)relativePath;
+        return GetBasePathName();
+    }
     virtual const char* FileSystemInfo() const = 0;
 };
 } // namespace ECSEngine

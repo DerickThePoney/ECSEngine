@@ -26,6 +26,7 @@ public:
     bool FileExists(const std::string& parFileName) const override;
 
     const std::string& GetBasePathName() const override { return FPath; }
+    std::string GetContainingRoot(const std::string& relativePath) const override;
 
     const char* FileSystemInfo() const override { return "Directory system view"; };
 

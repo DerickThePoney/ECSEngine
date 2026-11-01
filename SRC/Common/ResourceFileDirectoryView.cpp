@@ -123,4 +123,12 @@ bool ResourceFileDirectoryView::FileExists(const std::string& parFileName) const
     return FPathToFilename.find(Lowercased(parFileName)) != FPathToFilename.end();
 }
 
+std::string ResourceFileDirectoryView::GetContainingRoot(const std::string& relativePath) const
+{
+    const auto itFind = FPathToFilename.find(Lowercased(relativePath));
+    if (itFind == FPathToFilename.end())
+        return FPath;
+    return itFind->second.FRoot;
+}
+
 } // namespace ECSEngine
