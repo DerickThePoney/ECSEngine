@@ -102,7 +102,6 @@ void OrbitalScenarioUpdater::Destroy()
 
 void OrbitalScenarioUpdater::RealtimeUpdate()
 {
-    FCameraMoverSystem.Update();
 }
 
 void OrbitalScenarioUpdater::GameplayUpdate()
@@ -138,6 +137,8 @@ void OrbitalScenarioUpdater::Render()
 {
     Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
     Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
+
+    FCameraMoverSystem.Update();
     Rendering::GameRenderer::Instance().Render();
 
     UI::RmlUiManager::Instance().Render();
