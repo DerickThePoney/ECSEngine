@@ -2,6 +2,7 @@
 #include "ECSGameplay_Common/IScenarioUpdater.h"
 #include "ECSGameplay_Common/PhysicsUpdateSystem.h"
 #include "ECSGameplay_Common/SynchroWithRenderSystem.h"
+#include "PlanetGravitySystem.h"
 #include "RocketCameraMoverSystem.h"
 #include "RocketControllerSystem.h"
 
@@ -34,5 +35,6 @@ private:
     SynchroWithRenderSystem FRenderingSystem;
     PhysicsUpdateSystem FPhysicsSystem;
     RocketControllerSystem FRocketSystem;
+    PlanetGravitySystem FPlanetGravitySystem;
 };
 } // namespace ECSEngine

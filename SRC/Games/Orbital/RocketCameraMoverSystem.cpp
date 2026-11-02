@@ -70,7 +70,8 @@ void RocketCameraMoverSystem::VirtualUpdate()
         return;
     const vec3 pivot = carrier->Position();
 
-    vec3 UpVector = vec3(0.f, 1.f, 0.f);
+    // Should use closest planet
+    vec3 UpVector = Normalize(Invert(rocket.LastTurnGravity()));
 
     // Stable axes of the orbit plane. Yaw is an angle in this plane.
     const vec3 reference = (fabsf(Dot(UpVector, vec3(0.f, 1.f, 0.f))) > 0.99f) ? vec3(1.f, 0.f, 0.f) : vec3(0.f, 1.f, 0.f);

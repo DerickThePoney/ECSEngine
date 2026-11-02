@@ -67,6 +67,7 @@ void OrbitalScenarioUpdater::Initialise()
     FRenderingSystem.Init();
     FPhysicsSystem.Init();
     FRocketSystem.Init();
+    FPlanetGravitySystem.Init();
     PhysicsJointSpawner::CreateIFP();
 
     FScenario->Initialise();
@@ -92,6 +93,7 @@ void OrbitalScenarioUpdater::Destroy()
     FPhysicsSystem.Destroy();
     FRenderingSystem.Destroy();
     FCameraMoverSystem.Destroy();
+    FPlanetGravitySystem.Destroy();
 
     Rendering::FinalCombinePass::Instance().Shutdown();
     Rendering::FinalCombinePass::Destroy();
@@ -112,6 +114,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
     AssertRelease(FScenario != nullptr);
     FScenario->Update();
     FRocketSystem.Update();
+    FPlanetGravitySystem.Update();
     FPhysicsSystem.Update();
 
     WorldManager::Instance().ProcessDestroyEntities();

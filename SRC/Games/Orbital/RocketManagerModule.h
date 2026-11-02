@@ -58,6 +58,9 @@ public:
     EntityId BodyId() const { return FBodyId; }
     EntityId NozzleId() const { return FNozzleId; }
 
+    const vec3& LastTurnGravity() const { return FLastTurnGravity; }
+    void SetLastTurnGravity(const vec3& Gravity) { FLastTurnGravity = Gravity; }
+
     Physics::PhysicsJointHandle NozzleJointHandle() const { return FJointHandle; }
 
 protected:
@@ -70,6 +73,8 @@ private:
     EntityId FNozzleId;
 
     Physics::PhysicsJointHandle FJointHandle;
+
+    vec3 FLastTurnGravity = vec3(0.f, 1.f, 0.f);
 
     Delegate<void(const Physics::PhysicsJointHandle&)> JointCreatedDelegate;
 };

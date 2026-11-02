@@ -1,1 +1,2 @@
 DECLARE_MODULE_AND_TEMPLATE(RocketManagerModule, RocketManagerModuleTemplate)
+DECLARE_MODULE_AND_TEMPLATE(PlanetGravityModule, PlanetGravityModuleTemplate)
