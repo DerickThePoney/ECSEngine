@@ -3,6 +3,7 @@
 import sys
 import os
 import os.path
+import json
 import subprocess
 from shutil import copyfile
 import zipfile
@@ -17,7 +18,17 @@ def clean():
 releaseFolder = '../Release'
 currentVersion = 0
 
-def Finalize():
+def GameExecutable(game):
+    manifest_path = os.path.join('Script', 'Generation', 'prototypes.json')
+    with open(manifest_path, 'r', encoding='utf-8') as manifest_file:
+        prototypes = json.load(manifest_file)
+    for prototype in prototypes:
+        if prototype['name'] == game:
+            return prototype.get('exe', prototype['name'])
+    print('Unknown game: %s' % game)
+    return None
+
+def Finalize(executable):
 
     if not os.path.isdir(releaseFolder):
         os.mkdir(releaseFolder)
@@ -37,7 +48,8 @@ def Finalize():
     try:
         zipFile = zipfile.ZipFile(buildFolder + ('/%d.%d.zip'%(currentVersion, currentMinorVersion)), mode='w', compression=zipfile.ZIP_LZMA)
 
-        zipFile.write('bin/BuildingGame-x64-Final.exe','BuildingGame-x64-Final.exe')
+        exe_file = '%s-x64-Final.exe' % executable
+        zipFile.write('bin/' + exe_file, exe_file)
         zipFile.write('bin/Assets.datapack','Assets.datapack')
         zipFile.write('bin/Sounds.datapack','Sounds.datapack')
         zipFile.write('bin/glfw3.dll','glfw3.dll')
@@ -50,7 +62,7 @@ def Finalize():
 
 
 
-def ProcessVersion():
+def ProcessVersion(game):
 
     print('Flush everything')
     ret = clean()
@@ -93,7 +105,7 @@ def ProcessVersion():
 
     print('Datapack')
     os.chdir('bin')
-    command = ['./DataPacker-x64-Release.exe']
+    command = ['./DataPacker-x64-Release.exe', '--game', game]
     ret = subprocess.run(command)
     if ret.returncode != 0:
         print('Datapack failed')
@@ -103,13 +115,20 @@ def ProcessVersion():
     return 0
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--game', default='Colony', help='Prototype to pack and zip. Default: Colony')
+    args = parser.parse_args()
 
-    ret = ProcessVersion()
+    executable = GameExecutable(args.game)
+    if executable is None:
+        return 1
+
+    ret = ProcessVersion(args.game)
     if(ret != 0):
         return ret
 
     print('Zipping up Version')
-    ret = Finalize()
+    ret = Finalize(executable)
 
     return ret
 

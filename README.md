@@ -210,22 +210,23 @@ py -u Script/Generation/GenerateData.py
 
 One run cooks meshes, textures, and shaders. Later runs skip files whose `.sha1` still matches.
 
-5. Pack (Colony + shared files, one datapack):
+5. Pack one game plus `Assets/Shared`. Run DataPacker from `bin/` or `build/`. The output names stay `Assets.datapack` and `Sounds.datapack`; sounds always come from `Assets/Shared/Sounds`. The default game is Colony.
 
 ```bash
 cd bin
-./DataPacker-x64-Release.exe
+./DataPacker-x64-Release.exe --game Colony
+./DataPacker-x64-Release.exe --game Orbital
 ```
 
-Produces `Assets.datapack` and `Sounds.datapack`. Orbital has no datapack; run it with `--nodatapack`. The Final release zip still ships `BuildingGame` only.
+`--assets` still overrides the game folder when both are passed. A Final game loads `Assets.datapack`, so a packed Orbital build is what `Orbital-x64-Final.exe` reads. Debug runs keep using `--nodatapack`.
 
 ### Release zip
 
 ```bash
-py -u Script/FinalBuild/FinalBuild.py
+py -u Script/FinalBuild/FinalBuild.py --game Colony
 ```
 
-Builds Final, cooks/packs, and writes a zip under `../Release/`.
+Builds every Final executable, cooks, packs the chosen game (default Colony), and writes a zip under `../Release/`. The zip contains that game's Final exe plus the two datapacks. `Colony` ships `BuildingGame-x64-Final.exe`. `Orbital` ships `Orbital-x64-Final.exe`.
 
 ## Run a game
 
