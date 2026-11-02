@@ -97,7 +97,7 @@ def ProcessVersion(game):
         return ret.returncode
 
     print('Generate all')
-    command = ['py', '-u', 'Script/Generation/GenerateData.py']
+    command = ['py', '-u', 'Script/Generation/GenerateData.py', '--game', game]
     ret = subprocess.run(command)
     if ret.returncode != 0:
         print('Generate data failed')
