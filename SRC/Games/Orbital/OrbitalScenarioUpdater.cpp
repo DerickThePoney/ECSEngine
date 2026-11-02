@@ -8,15 +8,18 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
 #include "Physics/PhysicsAPI.h"
 #include "Rendering/FinalCombinePass.h"
 #include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
+#include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GFXRepresentationManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
+#include "RenderingCore/MaterialManager.h"
 #include "UICore/RMLUIManager.h"
 
 namespace ECSEngine
@@ -129,7 +132,30 @@ void OrbitalScenarioUpdater::UIUpdate()
 void OrbitalScenarioUpdater::DebugRender()
 {
 #ifdef WITH_VISUAL_DEBUG
-    Physics::DrawDebugs();
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_DebugUpdate);
+        Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
+        DrawAdjustables();
+
+        Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
+        u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+        Camera* camera = CameraManager::Instance().GetCamera(camId);
+        buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
+        Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showBGFXDebugs, false, "show debug", "Rendering");
+        if (showBGFXDebugs)
+        {
+            bool dummy = showBGFXDebugs;
+            Rendering::BGFXRenderingBackend::Instance().DrawStats(&dummy);
+        }
+
+        buffer->Submit();
+        buffer->clear();
+        delete buffer;
+
+        Physics::DrawDebugs();
+    }
 #endif
 }
 
