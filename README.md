@@ -1,6 +1,6 @@
 # ECSEngine
 
-Windows C++ game engine built around a custom ECS, plus a sample game (`BuildingGame`).  
+Windows C++ game engine built around a custom ECS, plus two sample games: **Colony** (`BuildingGame`) and **Orbital**.  
 Rendering uses **BGFX**, UI mixes **imgui** / **RmlUi**, audio uses **miniaudio**, and profiling uses **Tracy**. Builds are driven by **FASTBuild** + MSVC.
 
 This is a **toy / learning engine**, not a production framework. A lot of the tech is unfinished, experimental, or mid-refactor — the repo exists mainly as a playground to try out new techniques (ECS design, physics, rendering, tooling, etc.). Expect rough edges, incomplete systems, and APIs that change when something more interesting comes along.
@@ -10,7 +10,7 @@ This is a **toy / learning engine**, not a production framework. A lot of the te
 What the codebase currently explores (inferred from `SRC/`; completeness varies):
 
 - **ECS / gameplay composition** — Entity worlds, templates, and composable **modules** (position, orientation, appearance, rigidbody, colliders, ownership links, …). New modules can be scaffolded with `GenerateModule.py`.
-- **Sample game systems** — Colony / building gameplay on a circular grid: construction, storage, recipe production, energy producers/consumers, selection UI, and feedback.
+- **Sample games** — **Colony** is the building game on a circular grid (construction, storage, recipe production, energy, selection UI). **Orbital** is a separate executable with the rocket and a free camera. Shared engine code is compiled once; each game links only its own gameplay library.
 - **Physics** — Custom rigid-body engine with island solving, contact generation, broadphase (AABB tree), and shapes: **box / sphere / capsule** (including OBB and mixed intersections).
 - **Pathfinding** — Navmesh-style requests over world polygons/obstacles (`NavMeshPathfindingManager`), plus circular-grid path graphs for colony movement.
 - **Rendering (BGFX)** — Multi-pass materials/programs, mesh drawing (including skinned poses), terrain / heightmap + quad-tree LOD, editor grid/scene views, ID-buffer picking, selection outlines, and a final combine pass.
@@ -29,7 +29,7 @@ What the codebase currently explores (inferred from `SRC/`; completeness varies)
 | `BFF/` | FASTBuild project definitions (libs, exes, solution generation) |
 | `Script/` | Python helpers: clone submodules, generate `fbuild.bff`, build, cook assets, release zip |
 | `External/` | Third-party deps (mostly git submodules: bgfx/bx/bimg, imgui, cereal, assimp, tracy, doctest, …) |
-| `Assets/` | Game content submodule (configs, meshes, sounds, …) |
+| `Assets/` | Content submodule. `Shared/` is meshes, shaders, sounds, and UI. `Colony/` and `Orbital/` hold each game's configs and scenes |
 | `tools/` | Bundled `FBuild.exe`, `Tracy.exe` |
 | `bin/` | Build outputs (generated) |
 | `build/` | Intermediates / generated VS solution (generated) |
@@ -39,12 +39,14 @@ What the codebase currently explores (inferred from `SRC/`; completeness varies)
 | Module | Role |
 |--------|------|
 | `ECSCore` | Entity/world/module core |
-| `ECSGameplay_Common` / `ECSGameplay_Specific` | Shared + game-specific gameplay modules |
+| `ECSGameplay_Common` | Gameplay modules shared by every prototype |
+| `Games/Colony`, `Games/Orbital` | Per-game modules, scenario, and loader |
+| `Games/ColonyLauncher`, `Games/OrbitalLauncher` | Which loaders and asset folder each executable boots with |
 | `Physics` | Physics (island solver / collision; inspired by qu3e) |
 | `Rendering` / `RenderingCore` | Scene rendering, picking, materials, BGFX backend |
 | `UICore` | UI layer (RmlUi integration) |
 | `SoundCore` / `MiniaudioSoundEngine` | Audio |
-| `Application` / `Launcher` | App loop, loaders, `BuildingGame` entry point |
+| `Application` / `Launcher` | App loop, loaders, and the shared `main` |
 | `Common` / `Math` / `DataPack` | Shared utilities, math, datapack I/O |
 | `imgui` / `ImGuiTools` | ImGui + editor tooling |
 | `Tools/AssetCooker` | Cooks assets into engine-ready data |
@@ -55,7 +57,8 @@ What the codebase currently explores (inferred from `SRC/`; completeness varies)
 
 | Executable | Description |
 |------------|-------------|
-| `bin/BuildingGame-x64-<Config>.exe` | Sample game / engine runner |
+| `bin/BuildingGame-x64-<Config>.exe` | Colony |
+| `bin/Orbital-x64-<Config>.exe` | Orbital |
 | `bin/AssetCooker-x64-<Config>.exe` | Asset cooking tool |
 | `bin/DataPacker-x64-<Config>.exe` | Datapack builder |
 | `bin/UnitTests-x64-<Config>.exe` | Unit tests |
@@ -153,7 +156,7 @@ py -u Script/Compil/BuildAll.py -b -c Release -s   # BGFX examples
 py -u Script/Compil/BuildAll.py -e -c Release
 ```
 
-This regenerates `fbuild.bff` from your local VS install, then builds `BuildingGame`, `AssetCooker`, and `DataPacker` into `bin/`.
+This regenerates `fbuild.bff` from your local VS install, then builds every executable listed in `Script/Generation/prototypes.json` (`BuildingGame` and `Orbital` today), plus `AssetCooker` and `DataPacker`, into `bin/`.
 
 Custom MSBuild path if needed:
 
@@ -169,6 +172,8 @@ py -u Script/Compil/BuildAll.py -sln
 
 Generates `build/ECSEngine.sln` (classic `.sln` + makefile-style `.vcxproj`s that call FASTBuild). Open it in Visual Studio; builds still go through `FBuild.exe`.
 
+Set the startup project to **ColonyLauncher** or **OrbitalLauncher** (solution folder **GameLaunchers**). Each one builds that game and launches it with `--editor --nodatapack`. The working directory is `build/`. The **Colony** and **Orbital** projects compile the gameplay libraries only.
+
 ### 4. Unit tests
 
 ```bash
@@ -183,23 +188,36 @@ py -u Script/Compil/BuildAll.py -a -c Release
 
 ## Assets pipeline
 
+Loose files are split by owner:
+
+| Folder | Contents |
+|--------|----------|
+| `Assets/Shared` | Meshes, shaders, textures, sounds, UI, fonts |
+| `Assets/Colony` | Colony configs and scenes (`testgameplay`) |
+| `Assets/Orbital` | Orbital configs and scenes (`TestPhysicsOneObject`) |
+
+A relative path such as `Meshes\...` or `2D\Textures\...` is resolved in the game folder first, then in `Assets/Shared`. Cooked outputs (`.gen`, `.ktx`, `.bin`, `.sha1`) are written next to the source file.
+
 1. Clone assets (`--assets` above).
-2. Build tools (`-e` or `-et`).
-3. Cook:
+2. Build tools (`-e` or `-et`). `GenerateData.py` runs the **Release** AssetCooker.
+3. Build BGFX tools once so `texturec` and `shaderc` exist (`BuildAll.py -b -c Release -t`).
+4. Cook:
 
 ```bash
 mkdir build   # GenerateData.py chdirs into build/
 py -u Script/Generation/GenerateData.py
 ```
 
-4. Pack:
+One run cooks meshes, textures, and shaders. Later runs skip files whose `.sha1` still matches.
+
+5. Pack (Colony + shared files, one datapack):
 
 ```bash
 cd bin
 ./DataPacker-x64-Release.exe
 ```
 
-Produces `Assets.datapack` and `Sounds.datapack`.
+Produces `Assets.datapack` and `Sounds.datapack`. Orbital has no datapack; run it with `--nodatapack`. The Final release zip still ships `BuildingGame` only.
 
 ### Release zip
 
@@ -209,38 +227,54 @@ py -u Script/FinalBuild/FinalBuild.py
 
 Builds Final, cooks/packs, and writes a zip under `../Release/`.
 
-## Run the game
+## Run a game
+
+From `bin/` or `build/` (both sit one level under the repo, so `..\Assets` resolves):
 
 ```bash
 cd bin
-./BuildingGame-x64-Release.exe
+./BuildingGame-x64-Debug.exe --nodatapack --editor
+./Orbital-x64-Debug.exe --nodatapack --editor
 ```
+
+`BuildingGame` loads `Assets/Colony` and starts `testgameplay`. `Orbital` loads `Assets/Orbital` and starts `TestPhysicsOneObject`. Both also read `Assets/Shared`.
 
 Useful flags (non-`Final` builds where noted):
 
 | Flag | Effect |
 |------|--------|
 | `--editor` | Enable editor mode |
-| `--nodatapack` | Load loose files from `Assets/` instead of datapacks |
+| `--nodatapack` | Load loose files instead of datapacks. Required for Orbital |
 | `--nosound` | Disable sound |
-
-Day-to-day iteration:
-
-```bash
-./BuildingGame-x64-Debug.exe --nodatapack --editor
-```
+| `--assets <dir>` | Use this game asset folder instead of the executable's default |
+| `--shared-assets <dir>` | Use this shared asset folder instead of `Assets/Shared` |
 
 Profile with a `Profile` build + `tools/Tracy.exe`.
+
+## Add a prototype
+
+`Script/Generation/prototypes.json` lists the games. To stamp another one (PascalCase name, sources under `SRC/Games/<Name>`, launcher under `SRC/Games/<Name>Launcher`, content under `Assets/<Name>`):
+
+```bash
+py -u Script/Generation/NewPrototype.py --name MyPrototype
+# --exe OtherName     # executable name, if it should not match the prototype
+# --register-only     # sources already exist; only update the manifest and FASTBuild files
+```
+
+The script regenerates `BFF/Generated/Prototypes.bff` and the shared id lists, then refreshes `fbuild.bff`. It does not compile. New prototypes boot the `STANDARD` and `CAMERA` worlds. Adding a world is a manual edit of `SRC/ECSCore/WorldIds.h`.
+
+Module, message, and scene-action ids are one list shared by every executable. Append new ids; do not reorder existing ones.
 
 ## Scaffold a gameplay module
 
 ```bash
-py -u Script/CodeGenerators/GenerateModule.py -n MyModule -w Specific
+py -u Script/CodeGenerators/GenerateModule.py -n MyModule -w Colony
 # -w Common   → SRC/ECSGameplay_Common
-# -w Specific → SRC/ECSGameplay_Specific (default)
+# -w Colony   → SRC/Games/Colony
+# -w Orbital  → SRC/Games/Orbital
 ```
 
-Creates header/source, registers the module, regenerates the solution.
+`-w` is required. It must be `Common` or a name from `prototypes.json`. The script creates the header and source, registers the module, and regenerates the solution.
 
 ## License
 
