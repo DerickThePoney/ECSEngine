@@ -9,7 +9,10 @@
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
+#include "ECSCore/ModuleAccessor.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
+#include "ECSGameplay_Common/RigidbodyModule.h"
+#include "Physics/PhysicsAPI.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::RocketManagerModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::RocketManagerModuleTemplate);
@@ -107,5 +110,61 @@ void RocketManagerModule::OnJointCreated(const Physics::PhysicsJointHandle& Hand
 {
     FJointHandle = Handle;
 }
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity) const
+{
+    const EntityId partIds[] = { FBodyId, FNozzleId };
+
+    vec3 weightedPosition{ 0.f };
+    vec3 weightedVelocity{ 0.f };
+    float totalMass = 0.f;
+
+    for (const EntityId& partId : partIds)
+    {
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        if (rigidbody == nullptr)
+        {
+            return false;
+        }
+
+        const Physics::PhysicsBodyHandle& bodyHandle = rigidbody->BodyHandle();
+        vec3 centerOfMass;
+        float mass = 0.f;
+        if (!Physics::GetBodyCenterOfMass(bodyHandle, centerOfMass) || !Physics::GetBodyMass(bodyHandle, mass))
+        {
+            return false;
+        }
+
+        weightedPosition = weightedPosition + centerOfMass * mass;
+        totalMass += mass;
+
+        if (OutVelocity != nullptr)
+        {
+            vec3 velocity;
+            if (!Physics::GetBodyVelocity(bodyHandle, velocity))
+            {
+                return false;
+            }
+            weightedVelocity = weightedVelocity + velocity * mass;
+        }
+    }
+
+    if (totalMass <= 0.f)
+    {
+        return false;
+    }
+
+    const float inverseTotalMass = 1.f / totalMass;
+    OutPosition = weightedPosition * inverseTotalMass;
+    if (OutVelocity != nullptr)
+    {
+        *OutVelocity = weightedVelocity * inverseTotalMass;
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ComputeCenterOfMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
+template bool RocketManagerModule::ComputeCenterOfMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
 
 } // namespace ECSEngine

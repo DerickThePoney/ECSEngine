@@ -47,9 +47,11 @@ public:
     bool SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, const vec3& RotationVelocity);
 
     bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position) const;
+    bool GetBodyCenterOfMass(const PhysicsBodyHandle& Handle, vec3& CenterOfMass) const;
     bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity) const;
     bool GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation) const;
     bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity) const;
+    bool GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass) const;
 
     // body forces and torques
     bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration);

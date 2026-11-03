@@ -67,6 +67,9 @@ public:
 
     Physics::PhysicsJointHandle NozzleJointHandle() const { return FJointHandle; }
 
+    template<typename RigidbodyAccessor>
+    bool ComputeCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity = nullptr) const;
+
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 

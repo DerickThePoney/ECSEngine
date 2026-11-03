@@ -30,7 +30,7 @@ void RocketUIController::VirtualUpdate()
     PlanetGravityModule& planetModule = *PlanetAccessor.begin();
     const RigidbodyModule* planetRigidbodyModule = accessHelpers.GetModule<RigidbodyModule>(planetModule.UnitId());
     vec3 PlanetPosition;
-    Physics::GetBodyPosition(planetRigidbodyModule->BodyHandle(), PlanetPosition);
+    Physics::GetBodyCenterOfMass(planetRigidbodyModule->BodyHandle(), PlanetPosition);
 
     ImGui::Begin("Rocket UI");
 
@@ -40,14 +40,15 @@ void RocketUIController::VirtualUpdate()
         ImGui::SeparatorText(std::format("Rocket {}", rocketIndex++).c_str());
         ImGui::Indent();
 
-        const RigidbodyModule* rocketBodyModule = accessHelpers.GetModule<RigidbodyModule>(rocketManager.BodyId());
-        AssertRelease(rocketBodyModule != nullptr);
-
         vec3 RocketPosition;
-        Physics::GetBodyPosition(rocketBodyModule->BodyHandle(), RocketPosition);
-
         vec3 RocketVelocity;
-        Physics::GetBodyVelocity(rocketBodyModule->BodyHandle(), RocketVelocity);
+        const bool hasVesselCenterOfMass = rocketManager.ComputeCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), RocketPosition, &RocketVelocity);
+        AssertRelease(hasVesselCenterOfMass);
+        if (!hasVesselCenterOfMass)
+        {
+            ImGui::Unindent();
+            continue;
+        }
 
         const vec3 PlanetToRocket = RocketPosition - PlanetPosition;
         const float LPlanetToRocket = Length(PlanetToRocket);
