@@ -4,11 +4,11 @@
 #include "RocketManagerModule.h"
 
 #include "Common/SavingSystemImplementation.h"
+#include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
-#include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::RocketManagerModuleTemplate);
@@ -39,6 +39,13 @@ void RocketManagerModuleTemplate::VirtualDrawEditor()
         FRocketNozzleTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketNozzleTemplateName);
     }
 
+    const auto OldTemplateCamera = FRocketCameraMoverTemplateName;
+    EDITOR_PROPERTY_ENTITY_TEMPLATE("Rocket Camera Mover", FRocketCameraMoverTemplate, FRocketCameraMoverTemplateName);
+    if (FRocketCameraMoverTemplateName != OldTemplateNozzle)
+    {
+        FRocketCameraMoverTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketCameraMoverTemplateName);
+    }
+
     FBallConfig.DrawInEditor();
 }
 
@@ -46,6 +53,7 @@ void RocketManagerModuleTemplate::VirtualPostLoad()
 {
     FRocketBodyTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketBodyTemplateName);
     FRocketNozzleTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketNozzleTemplateName);
+    FRocketCameraMoverTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketCameraMoverTemplateName);
 }
 
 IMPLEMENT_SAVELOAD_ABILITIES(RocketManagerModule);
@@ -88,6 +96,11 @@ void RocketManagerModule::VirtualInit(const EntityId& parUnitId, const ModulePar
     FNozzleId = EntityFactory::RequestCreateEntity(moduleTemplate->GetNozzleTemplate(), container);
 
     PhysicsJointSpawner::Instance().AddBallJointToSpawn(FBodyId, FNozzleId, JointConfig, &JointCreatedDelegate);
+
+    // Create camera mover template
+    ModuleParameters::ParameterContainer CamContainer = parParameters;
+    CamContainer.Set<ModuleParameters::TargetId>(parUnitId);
+    EntityFactory::RequestCreateEntity(moduleTemplate->GetRocketCameraMoverTemplate(), CamContainer);
 }
 
 void RocketManagerModule::OnJointCreated(const Physics::PhysicsJointHandle& Handle)

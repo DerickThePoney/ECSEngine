@@ -24,11 +24,13 @@ public:
     {
         PROPERTYFIELD(RocketBodyTemplateName, "");
         PROPERTYFIELD(RocketNozzleTemplateName, "");
+        PROPERTYFIELD(RocketCameraMoverTemplateName, "");
         PROPERTYFIELD(BallConfig, Physics::BallJointConfig{ })
     }
 
     const EntityTemplate* GetBodyTemplate() const { return FRocketBodyTemplate; }
     const EntityTemplate* GetNozzleTemplate() const { return FRocketNozzleTemplate; }
+    const EntityTemplate* GetRocketCameraMoverTemplate() const { return FRocketCameraMoverTemplate; }
     const Physics::BallJointConfig& GetJointConfig() const { return FBallConfig; }
 
 protected:
@@ -38,9 +40,11 @@ protected:
 private:
     std::string FRocketBodyTemplateName;
     std::string FRocketNozzleTemplateName;
+    std::string FRocketCameraMoverTemplateName;
 
     const EntityTemplate* FRocketBodyTemplate = nullptr;
     const EntityTemplate* FRocketNozzleTemplate = nullptr;
+    const EntityTemplate* FRocketCameraMoverTemplate = nullptr;
 
     Physics::BallJointConfig FBallConfig;
 };

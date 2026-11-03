@@ -8,6 +8,7 @@
 #include "ECSGameplay_Common/ScenarioFactory.h"
 #include "OrbitalScenarioUpdater.h"
 #include "PlanetGravityModule.h"
+#include "RocketCameraMoverModule.h"
 #include "RocketManagerModule.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::OrbitalLoader);
@@ -33,6 +34,11 @@ bool OrbitalLoader::VirtualInitialise()
     AssertRelease(world != nullptr);
     world->AddController<RocketManagerModule>();
     world->AddController<PlanetGravityModule>();
+
+    world = WorldManager::Instance().GetWorldIFP(EEntityWorlds::CAMERA);
+    AssertRelease(world != nullptr);
+    world->AddController<RocketCameraMoverModule>();
+
     SetScenarioFactory(&CreateOrbitalScenario);
     return true;
 }

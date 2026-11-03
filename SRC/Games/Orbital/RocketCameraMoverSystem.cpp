@@ -7,13 +7,13 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
-#include "ECSGameplay_Common/CameraMoverModule.h"
 #include "ECSGameplay_Common/OrientationModule.h"
 #include "ECSGameplay_Common/PositionModule.h"
 #include "RenderingCore/Carrier.h"
 #include "RenderingCore/GFXRepresentation.h"
 #include "RenderingCore/GFXRepresentationManager.h"
 #include "RenderingCore/GFXRepresentationProxy.h"
+#include "RocketCameraMoverModule.h"
 #include "RocketManagerModule.h"
 
 namespace ECSEngine
@@ -21,115 +21,107 @@ namespace ECSEngine
 
 RocketCameraMoverSystem::RocketCameraMoverSystem()
 {
-    RegisterDependency<CameraMoverModule>(EEntityWorlds::CAMERA);
+    RegisterDependency<RocketCameraMoverModule>(EEntityWorlds::CAMERA);
     RegisterDependency<PositionModule>(EEntityWorlds::CAMERA);
     RegisterDependency<OrientationModule>(EEntityWorlds::CAMERA);
 
     RegisterDependency<RocketManagerModule>(EEntityWorlds::STANDARD);
     RegisterDependency<ApparenceModule>(EEntityWorlds::STANDARD);
-    RegisterDependency<PositionModule>(EEntityWorlds::STANDARD);
-    RegisterDependency<OrientationModule>(EEntityWorlds::STANDARD);
 
     FMiddleMouseRotation.FMouseButton = MouseButtons::MOUSE_BUTTON_3;
     FMiddleMouseRotation.FInputType = EInputType::REPEATED;
-}
-
-void RocketCameraMoverSystem::VirtualInit()
-{
-    ModuleSystem::VirtualInit();
-    FOrbitInitialised = false;
 }
 
 void RocketCameraMoverSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
-    ModuleAccessor<CameraMoverModule> cameraMoverAccessor(EEntityWorlds::CAMERA);
+    ModuleAccessor<RocketCameraMoverModule> rocketCameraMoverAccessor(EEntityWorlds::CAMERA);
     ModuleAccessor<PositionModule> positionAccessor(EEntityWorlds::CAMERA);
     ModuleAccessor<OrientationModule> orientationAccessor(EEntityWorlds::CAMERA);
-    AssertRelease(cameraMoverAccessor.size() <= 1); // Pour l'instant on en prend qu'un !!
+    AssertRelease(rocketCameraMoverAccessor.size() <= 1); // Pour l'instant on en prend qu'un !!
 
     ModuleAccessor<RocketManagerModule> rocketManagerAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<ApparenceModule> appearanceAccessor(EEntityWorlds::STANDARD);
-    ModuleAccessor<PositionModule> rocketPositionAccessor(EEntityWorlds::STANDARD);
-    ModuleAccessor<OrientationModule> rocketOrientationAccessor(EEntityWorlds::STANDARD);
     AssertRelease(rocketManagerAccessor.size() <= 1); // Pour l'instant on en prend qu'un !!
 
     // Compute the pivot and UP vector
     if (rocketManagerAccessor.size() == 0)
         return;
-    const RocketManagerModule& rocket = *rocketManagerAccessor.begin();
-
-    ApparenceModule* appearance = appearanceAccessor[rocket.BodyId()];
-    if (appearance == nullptr || appearance->Proxy() == nullptr)
-        return;
-
-    Rendering::GFXRepresentation* gfx = Rendering::GFXRepresentationManager::Instance().GetGFX(appearance->Proxy()->Id());
-    const Rendering::Carrier* carrier = (gfx != nullptr) ? gfx->GetCarrier() : nullptr;
-    if (carrier == nullptr)
-        return;
-    const vec3 pivot = carrier->Position();
-
-    // Should use closest planet
-    vec3 UpVector = Normalize(Invert(rocket.LastTurnGravity()));
-
-    // Stable axes of the orbit plane. Yaw is an angle in this plane.
-    const vec3 reference = (fabsf(Dot(UpVector, vec3(0.f, 1.f, 0.f))) > 0.99f) ? vec3(1.f, 0.f, 0.f) : vec3(0.f, 1.f, 0.f);
-    const vec3 tangent = Normalize(Cross(reference, UpVector));
-    const vec3 bitangent = Normalize(Cross(UpVector, tangent));
 
     const float deltaTime = TimeManager::FrameDeltaTime();
-    foreachitem(moverModule, cameraMoverAccessor)
+    foreachitem(moverModule, rocketCameraMoverAccessor)
     {
+        const RocketManagerModule* rocket = rocketManagerAccessor[moverModule.TargetedRocket()];
+        AssertRelease(rocket != nullptr);
+
+        ApparenceModule* appearance = appearanceAccessor[rocket->BodyId()];
+        if (appearance == nullptr || appearance->Proxy() == nullptr)
+            return;
+
+        Rendering::GFXRepresentation* gfx = Rendering::GFXRepresentationManager::Instance().GetGFX(appearance->Proxy()->Id());
+        const Rendering::Carrier* carrier = (gfx != nullptr) ? gfx->GetCarrier() : nullptr;
+        if (carrier == nullptr)
+            return;
+        const vec3 pivot = carrier->Position();
+
+        // Should use closest planet
+        vec3 UpVector = Normalize(Invert(rocket->LastTurnGravity()));
+
+        // Yaw is an angle in the plane perpendicular to radial up.
+        // The first frame locks that angle to the placed camera. After that the yaw axis is
+        // projected onto the new plane. Rebuilding it from a fixed world axis flips 180 degrees
+        // once radial up leaves world +Y, which mirrors the view.
+        vec3 Tangent = moverModule.Tangent();
+        if (!moverModule.OrbitInitialised())
+        {
+            const vec3 reference = (fabsf(Dot(UpVector, vec3(0.f, 1.f, 0.f))) > 0.99f) ? vec3(1.f, 0.f, 0.f) : vec3(0.f, 1.f, 0.f);
+            Tangent = Normalize(Cross(reference, UpVector));
+            moverModule.SetOrbitInitialised(true);
+        }
+        else
+        {
+            const vec3 projected = Tangent - UpVector * Dot(Tangent, UpVector);
+            const float projectedLength = Length(projected);
+            if (projectedLength > 1e-4f)
+                Tangent = Normalize(projected);
+            else
+            {
+                const vec3 fallback = (fabsf(UpVector.x) < 0.9f) ? vec3(1.f, 0.f, 0.f) : vec3(0.f, 0.f, 1.f);
+                Tangent = Normalize(Cross(fallback, UpVector));
+            }
+        }
+        const vec3 bitangent = Normalize(Cross(UpVector, Tangent));
+        moverModule.SetTangent(Tangent);
+
         OrientationModule* cameraOrientationModule = orientationAccessor[moverModule.UnitId()];
         AssertRelease(cameraOrientationModule != nullptr);
         PositionModule* cameraPositionModule = positionAccessor[moverModule.UnitId()];
         AssertRelease(cameraPositionModule != nullptr);
 
-        if (!FOrbitInitialised)
-        {
-            const vec3 offset = cameraPositionModule->GetPosition3D() - pivot;
-            const float distance = Length(offset);
-
-            if (distance > 0.01f)
-            {
-                const vec3 direction = offset * 1.f / distance;
-                FDistance = distance;
-                FPitch = asinf(Clamp(Dot(direction, UpVector), -1.f, 1.f));
-                const vec3 horizontal = direction - UpVector * Sin(FPitch);
-                if (Length(horizontal) > 1e-4f)
-                {
-                    const vec3 flat = Normalize(horizontal);
-                    FYaw = atan2f(Dot(flat, bitangent), Dot(flat, tangent));
-                }
-            }
-            else
-            {
-                FDistance = 30.f;
-                FPitch = Radians(25.f);
-                FYaw = 0.f;
-            }
-            FOrbitInitialised = true;
-        }
-
+        float Distance = moverModule.Distance(), Pitch = moverModule.Pitch(), Yaw = moverModule.Yaw();
         // Pixels, not a normalized direction, and not scaled by delta time.
         if (FMiddleMouseRotation.Evaluate())
         {
             const vec2 delta = Input::GetMousePositionDelta();
             constexpr float sensitivity = 0.005f;
-            FYaw -= delta.x * sensitivity;
-            FPitch -= delta.y * sensitivity;
+            Yaw -= delta.x * sensitivity;
+            Pitch -= delta.y * sensitivity;
         }
-        FPitch = Clamp(FPitch, Radians(-80.f), Radians(80.f));
+        Pitch = Clamp(Pitch, Radians(-80.f), Radians(80.f));
         if (FMiddleMouseScroll.Evaluate())
         {
             const float scroll = Input::GetMouseScrollDelta().y;
-            FDistance *= expf(-scroll * 0.12f);
+            Distance *= expf(-scroll * 0.12f);
         }
-        FDistance = Clamp(FDistance, 5.f, 8000.f);
+        Distance = Clamp(Distance, 5.f, 8000.f);
 
-        const vec3 horizontal = (tangent * Cos(FYaw)) + (bitangent * Sin(FYaw));
-        const vec3 offset = (horizontal * (Cos(FPitch) * FDistance)) + (UpVector * (Sin(FPitch) * FDistance));
+        moverModule.SetDistance(Distance);
+        moverModule.SetPitch(Pitch);
+        moverModule.SetYaw(Yaw);
+
+        const vec3 horizontal = (Tangent * Cos(Yaw)) + (bitangent * Sin(Yaw));
+        const vec3 offset = (horizontal * (Cos(Pitch) * Distance)) + (UpVector * (Sin(Pitch) * Distance));
         const vec3 eye = pivot + offset;
 
         mat4 LookAtMatrix = LookAt(eye, pivot, UpVector);
