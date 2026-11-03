@@ -70,6 +70,8 @@ void OrbitalScenarioUpdater::Initialise()
     FPlanetGravitySystem.Init();
     PhysicsJointSpawner::CreateIFP();
 
+    FRocketUIController.Init();
+
     FScenario->Initialise();
 }
 
@@ -83,6 +85,8 @@ void OrbitalScenarioUpdater::Destroy()
         delete FScenario;
         FScenario = nullptr;
     }
+
+    FRocketUIController.Destroy();
 
     if (PhysicsJointSpawner::HasInstance())
     {
@@ -129,6 +133,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
 void OrbitalScenarioUpdater::UIUpdate()
 {
     Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
+    FRocketUIController.Update();
     UI::RmlUiManager::Instance().Update();
 }
 
@@ -152,6 +157,8 @@ void OrbitalScenarioUpdater::DebugRender()
             bool dummy = showBGFXDebugs;
             Rendering::BGFXRenderingBackend::Instance().DrawStats(&dummy);
         }
+
+        FRocketUIController.DrawOrbit(buffer, handle);
 
         buffer->Submit();
         buffer->clear();

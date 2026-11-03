@@ -5,6 +5,7 @@
 #include "PlanetGravitySystem.h"
 #include "RocketCameraMoverSystem.h"
 #include "RocketControllerSystem.h"
+#include "RocketUIController.h"
 
 namespace ECSEngine
 {
@@ -36,5 +37,7 @@ private:
     PhysicsUpdateSystem FPhysicsSystem;
     RocketControllerSystem FRocketSystem;
     PlanetGravitySystem FPlanetGravitySystem;
+
+    UI::RocketUIController FRocketUIController;
 };
 } // namespace ECSEngine

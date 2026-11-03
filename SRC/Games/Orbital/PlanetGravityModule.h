@@ -46,6 +46,8 @@ public:
     ~PlanetGravityModule();
 
     float PlanetGravityConstant() const { return FPlanetGravityConstant; }
+    float PlanetRadius() const;
+    float SurfaceGravity() const;
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters);

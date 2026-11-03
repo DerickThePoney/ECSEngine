@@ -31,7 +31,7 @@ RocketControllerSystem::RocketControllerSystem()
     FFireEngines.FInputType = EInputType::REPEATED;
 }
 
-static constexpr float MaxSteeringAngle = 50.f;
+static constexpr float MaxSteeringAngle = Radians(50.f);
 
 void RocketControllerSystem::VirtualUpdate()
 {
@@ -73,7 +73,7 @@ void RocketControllerSystem::VirtualUpdate()
             AssertRelease(NozzleBody != nullptr);
             quat BodyOrientation;
             Physics::GetBodyOrientation(NozzleBody->BodyHandle(), BodyOrientation);
-            vec3 PropulsionForce = (mat4(BodyOrientation) * vec4(0.f, 100.f, 0.f, 0.f)).xyz();
+            vec3 PropulsionForce = (mat4(BodyOrientation) * vec4(0.f, 50.f, 0.f, 0.f)).xyz();
             Physics::AddForceToBody(NozzleBody->BodyHandle(), PropulsionForce, false);
         }
     }

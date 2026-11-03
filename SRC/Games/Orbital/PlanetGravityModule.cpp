@@ -41,6 +41,18 @@ PlanetGravityModule::~PlanetGravityModule()
 {
 }
 
+float PlanetGravityModule::PlanetRadius() const
+{
+    const PlanetGravityModuleTemplate* const Temp = Template<PlanetGravityModuleTemplate>();
+    return Temp->PlanetRadius();
+}
+
+float PlanetGravityModule::SurfaceGravity() const
+{
+    const PlanetGravityModuleTemplate* const Temp = Template<PlanetGravityModuleTemplate>();
+    return Temp->SurfaceGravity();
+}
+
 void PlanetGravityModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
     parent_type::VirtualInit(parUnitId, parParameters);
