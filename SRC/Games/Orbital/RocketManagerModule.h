@@ -74,7 +74,7 @@ private:
 
     Physics::PhysicsJointHandle FJointHandle;
 
-    vec3 FLastTurnGravity = vec3(0.f, 1.f, 0.f);
+    vec3 FLastTurnGravity = vec3(0.f, -1.f, 0.f);
 
     Delegate<void(const Physics::PhysicsJointHandle&)> JointCreatedDelegate;
 };

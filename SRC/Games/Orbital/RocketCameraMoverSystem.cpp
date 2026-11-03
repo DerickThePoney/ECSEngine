@@ -75,7 +75,7 @@ void RocketCameraMoverSystem::VirtualUpdate()
 
     // Stable axes of the orbit plane. Yaw is an angle in this plane.
     const vec3 reference = (fabsf(Dot(UpVector, vec3(0.f, 1.f, 0.f))) > 0.99f) ? vec3(1.f, 0.f, 0.f) : vec3(0.f, 1.f, 0.f);
-    const vec3 tangent = Normalize(Cross(UpVector, reference));
+    const vec3 tangent = Normalize(Cross(reference, UpVector));
     const vec3 bitangent = Normalize(Cross(UpVector, tangent));
 
     const float deltaTime = TimeManager::FrameDeltaTime();
@@ -132,25 +132,14 @@ void RocketCameraMoverSystem::VirtualUpdate()
         const vec3 offset = (horizontal * (Cos(FPitch) * FDistance)) + (UpVector * (Sin(FPitch) * FDistance));
         const vec3 eye = pivot + offset;
 
-        const vec3 forward = Normalize(pivot - eye);
-        const vec3 rightRaw = Cross(UpVector, forward);
-        if (Dot(rightRaw, rightRaw) < 1.e-6f)
-            return;
+        mat4 LookAtMatrix = LookAt(eye, pivot, UpVector);
 
-        // Same column meaning as CameraMoverSystem: 0 right, 1 up, 2 look direction.
-        const vec3 right = Normalize(rightRaw);
-        const vec3 cameraUp = Cross(forward, right);
-        mat4 basis = mat4::Identity();
-        basis.SetColumn(0, vec4(right, 0.f));
-        basis.SetColumn(1, vec4(cameraUp, 0.f));
-        basis.SetColumn(2, vec4(forward, 0.f));
+        mat4 LookAtRotation = GetRotationAsMat4(LookAtMatrix);
         cameraPositionModule->SetPosition3D(eye);
-        cameraOrientationModule->SetOrientation(quat::FromMat4(basis));
+        cameraOrientationModule->SetOrientation(quat::FromMat4(Invert(LookAtRotation)));
 
-        mat4 world = basis;
-        world.SetColumn(3, vec4(eye, 1.f));
         Camera* camera = CameraManager::Instance().GetCamera(moverModule.CamId());
-        camera->SetWorldViewMatrix(Invert(world));
+        camera->SetWorldViewMatrix(LookAtMatrix);
     }
 }
 
