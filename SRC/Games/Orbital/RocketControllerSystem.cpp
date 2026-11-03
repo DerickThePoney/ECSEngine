@@ -65,7 +65,7 @@ void RocketControllerSystem::VirtualUpdate()
         if (FRight.Evaluate())
             TargetAngle.x -= MaxSteeringAngle;
 
-        Physics::SetBallTargetEulerAngles(NozzleJointHandle, true, TargetAngle, 15.f, 500.f);
+        Physics::SetBallTargetEulerAngles(NozzleJointHandle, true, TargetAngle, 15.f, (LengthSq(TargetAngle) > 0.f) ? 500.f : 0.1f);
 
         if (FFireEngines.Evaluate())
         {
