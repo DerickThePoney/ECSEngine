@@ -49,6 +49,17 @@ private:
     Physics::BallJointConfig FBallConfig;
 };
 
+enum class ESASMode : u8
+{
+    STABILITY,
+    PROGRADE,
+    RETROGRADE,
+    RADIALOUT,
+    RADIALIN,
+    NORMAL,
+    ANTINORMAL
+};
+
 class RocketManagerModule : public Module
 {
     DECLARE_MODULE(RocketManagerModule);
@@ -64,6 +75,27 @@ public:
 
     const vec3& LastTurnGravity() const { return FLastTurnGravity; }
     void SetLastTurnGravity(const vec3& Gravity) { FLastTurnGravity = Gravity; }
+
+    const bool EngineFiring() const { return FEngineFiring; }
+    void SetEngineFiring(const bool Value) { FEngineFiring = Value; }
+
+    const bool IsSteering() const { return FIsSteering; }
+    void SetIsSteering(const bool Value) { FIsSteering = Value; }
+
+    const vec3& TargetSteeringAngle() const { return FTargetSteeringAngle; }
+    void SetTargetSteeringAngle(const vec3& Value) { FTargetSteeringAngle = Value; }
+
+    bool SASActivated() const { return FSASActivated; }
+    bool WasSASActivated() const { return FWasSASActivated; }
+    void SetSASActivated(const bool Value);
+
+    bool HasSASTarget() const { return FHasSASTarget; }
+    const quat& SASTarget() const { return FSASTarget; }
+    void ClearSASTarget() { FHasSASTarget = false; }
+    void SetSASTarget(const quat& Target);
+
+    ESASMode SASMode() const { return FSASMode; }
+    void SetSASMode(const ESASMode mode) { FSASMode = mode; }
 
     Physics::PhysicsJointHandle NozzleJointHandle() const { return FJointHandle; }
 
@@ -82,6 +114,17 @@ private:
     Physics::PhysicsJointHandle FJointHandle;
 
     vec3 FLastTurnGravity = vec3(0.f, -1.f, 0.f);
+
+    vec3 FTargetSteeringAngle;
+
+    quat FSASTarget;
+    ESASMode FSASMode = ESASMode::STABILITY;
+    bool FSASActivated = false;
+    bool FWasSASActivated = false;
+    bool FHasSASTarget = false;
+
+    bool FEngineFiring = false;
+    bool FIsSteering = false;
 
     Delegate<void(const Physics::PhysicsJointHandle&)> JointCreatedDelegate;
 };

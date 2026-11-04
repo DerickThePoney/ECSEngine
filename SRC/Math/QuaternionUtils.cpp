@@ -32,4 +32,14 @@ quat AddVectorToQuaternion(const quat& inQuat, const vec3& ScaledVector)
     return inQuat + q;
 }
 
+quat Conjugate(const quat& q)
+{
+    return quat(-q.x, -q.y, -q.z, q.w);
+}
+
+quat Invert(const quat& q)
+{
+    return quat(-q.x, -q.y, -q.z, -q.w);
+}
+
 } // namespace ECSEngine

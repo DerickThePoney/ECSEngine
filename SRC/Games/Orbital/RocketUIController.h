@@ -11,15 +11,20 @@ protected:
     void VirtualUpdate() override;
 
 public:
-    void DrawOrbit(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material) const;
+    void DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material) const;
 
 private:
     std::vector<vec3> FOrbitPoints;
     vec3 FPeriapsis = vec3(0.f);
     vec3 FApoapsis = vec3(0.f);
+    vec3 FSASTargetOrigin;
+    vec3 FSASTargetDirection;
+
     bool FHasPeriapsis = false;
     bool FHasApoapsis = false;
     bool FDrawPredictedPath = true;
+    bool FDrawSASTarget = true;
+    bool FHasSASTargetDraw = false;
 };
 } // namespace UI
 } // namespace ECSEngine

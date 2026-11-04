@@ -35,7 +35,7 @@ void RocketUIController::VirtualUpdate()
     ImGui::Begin("Rocket UI");
 
     u32 rocketIndex = 0;
-    foreachitemconst(rocketManager, accessHelpers.Accessor<RocketManagerModule>())
+    foreachitem(rocketManager, accessHelpers.Accessor<RocketManagerModule>())
     {
         ImGui::SeparatorText(std::format("Rocket {}", rocketIndex++).c_str());
         ImGui::Indent();
@@ -85,6 +85,32 @@ void RocketUIController::VirtualUpdate()
 
         ImGui::Checkbox("Draw predicted trajectory", &FDrawPredictedPath);
 
+        ImGui::SeparatorText("Engine data");
+        ImGui::Text("Engine activated : %d", rocketManager.EngineFiring());
+
+        ImGui::SeparatorText("SAS data");
+        bool bSASActivated = rocketManager.SASActivated();
+        ImGui::Checkbox("SAS Activated", &bSASActivated);
+        rocketManager.SetSASActivated(bSASActivated);
+
+        int SASMode = (int)rocketManager.SASMode();
+        ImGui::RadioButton("Stability", &SASMode, 0);
+        ImGui::SameLine();
+        ImGui::RadioButton("Prograde", &SASMode, 1);
+        ImGui::SameLine();
+        ImGui::RadioButton("Retrograde", &SASMode, 2);
+
+        rocketManager.SetSASMode((ESASMode)SASMode);
+
+        ImGui::Checkbox("Draw SAS Target", &FDrawSASTarget);
+        if (bSASActivated && FDrawSASTarget && rocketManager.HasSASTarget())
+        {
+            const vec3 nose = (mat4(rocketManager.SASTarget()) * vec4(0.f, 1.f, 0.f, 0.f)).xyz();
+            FSASTargetOrigin = RocketPosition;
+            FSASTargetDirection = Normalize(nose);
+            FHasSASTargetDraw = true;
+        }
+
         if (FDrawPredictedPath)
         {
             const float mu = planetModule.PlanetGravityConstant();
@@ -127,7 +153,7 @@ void RocketUIController::VirtualUpdate()
     ImGui::End();
 }
 
-void RocketUIController::DrawOrbit(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material) const
+void RocketUIController::DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material) const
 {
     if (!FOrbitPoints.empty())
         buffer->DrawLines(material, FOrbitPoints.data(), (u32)FOrbitPoints.size(), 0xFFFFFF00u, true);
@@ -135,6 +161,9 @@ void RocketUIController::DrawOrbit(Rendering::DrawCommandBuffer* buffer, const R
         buffer->DrawDebugSphere(material, FPeriapsis, 10.f, 0xFF00FF00u);
     if (FHasApoapsis)
         buffer->DrawDebugSphere(material, FApoapsis, 10.f, 0xFF0000FFu);
+
+    if (FHasSASTargetDraw)
+        buffer->DrawDebugArrow(material, FSASTargetOrigin, FSASTargetDirection, 20.f, 0xFF00FFFFu);
 }
 } // namespace UI
 } // namespace ECSEngine

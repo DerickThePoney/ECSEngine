@@ -7,9 +7,9 @@
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
+#include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
-#include "ECSCore/ModuleAccessor.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
 #include "Physics/PhysicsAPI.h"
@@ -74,6 +74,22 @@ RocketManagerModule::RocketManagerModule()
 
 RocketManagerModule::~RocketManagerModule()
 {
+}
+
+void RocketManagerModule::SetSASActivated(const bool Value)
+{
+    FWasSASActivated = FSASActivated;
+    FSASActivated = Value;
+    if (FWasSASActivated && !FSASActivated)
+    {
+        ClearSASTarget();
+    }
+}
+
+void RocketManagerModule::SetSASTarget(const quat& Target)
+{
+    FSASTarget = Target;
+    FHasSASTarget = true;
 }
 
 void RocketManagerModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)

@@ -17,6 +17,8 @@ protected:
     KeyboardCommand FUp;
     KeyboardCommand FDown;
 
+    KeyboardCommand FSASToggle;
+
     KeyboardCommand FFireEngines;
 };
 } // namespace ECSEngine

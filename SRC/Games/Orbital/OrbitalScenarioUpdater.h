@@ -5,6 +5,9 @@
 #include "PlanetGravitySystem.h"
 #include "RocketCameraMoverSystem.h"
 #include "RocketControllerSystem.h"
+#include "RocketSASSystem.h"
+#include "RocketSteeringSystem.h"
+#include "RocketThrustSystem.h"
 #include "RocketUIController.h"
 
 namespace ECSEngine
@@ -35,7 +38,10 @@ private:
     RocketCameraMoverSystem FCameraMoverSystem;
     SynchroWithRenderSystem FRenderingSystem;
     PhysicsUpdateSystem FPhysicsSystem;
-    RocketControllerSystem FRocketSystem;
+    RocketControllerSystem FRocketControllerSystem;
+    RocketSteeringSystem FRocketSteeringSystem;
+    RocketThrustSystem FRocketThrustSystem;
+    RocketSASSystem FRocketSASSystem;
     PlanetGravitySystem FPlanetGravitySystem;
 
     UI::RocketUIController FRocketUIController;
