@@ -2,6 +2,7 @@
 
 #include "RocketSASSystem.h"
 
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
@@ -153,9 +154,9 @@ void RocketSASSystem::VirtualUpdate()
         vec3 Axis = vec3(qError.x, qError.y, qError.z);
         float Angle = Atan2(Length(Axis), qError.w) * 2;
 
-        constexpr float stiffness = 40.0f;
-        constexpr float damping = 80.f;
-        constexpr float maxTorque = 150.f;
+        ADJUSTABLE_DEBUG_PARAMETER_SINGLE(stiffness, 80.f, "Stiffness", "SAS", 15.f, 500.f);
+        ADJUSTABLE_DEBUG_PARAMETER_SINGLE(damping, 80.f, "Damping", "SAS", 15.f, 500.f);
+        ADJUSTABLE_DEBUG_PARAMETER_SINGLE(maxTorque, 300.f, "Max torque", "SAS", 15.f, 5000.f);
 
         vec3 Omega;
         Physics::GetBodyRotationVelocity(bodyRigidbody->BodyHandle(), Omega);
