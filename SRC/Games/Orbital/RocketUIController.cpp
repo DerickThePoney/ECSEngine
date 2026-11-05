@@ -94,15 +94,23 @@ void RocketUIController::VirtualUpdate()
         rocketManager.SetSASActivated(bSASActivated);
 
         int SASMode = (int)rocketManager.SASMode();
-        ImGui::RadioButton("Stability", &SASMode, 0);
+        ImGui::RadioButton("Stability", &SASMode, (int)ESASMode::STABILITY);
         ImGui::SameLine();
-        ImGui::RadioButton("Prograde", &SASMode, 1);
+        ImGui::RadioButton("Prograde", &SASMode, (int)ESASMode::PROGRADE);
         ImGui::SameLine();
-        ImGui::RadioButton("Retrograde", &SASMode, 2);
+        ImGui::RadioButton("Retrograde", &SASMode, (int)ESASMode::RETROGRADE);
+        ImGui::RadioButton("Radial out", &SASMode, (int)ESASMode::RADIALOUT);
+        ImGui::SameLine();
+        ImGui::RadioButton("Radial in", &SASMode, (int)ESASMode::RADIALIN);
+        ImGui::SameLine();
+        ImGui::RadioButton("Normal", &SASMode, (int)ESASMode::NORMAL);
+        ImGui::SameLine();
+        ImGui::RadioButton("Anti-normal", &SASMode, (int)ESASMode::ANTINORMAL);
 
         rocketManager.SetSASMode((ESASMode)SASMode);
 
         ImGui::Checkbox("Draw SAS Target", &FDrawSASTarget);
+        FHasSASTargetDraw = false;
         if (bSASActivated && FDrawSASTarget && rocketManager.HasSASTarget())
         {
             const vec3 nose = (mat4(rocketManager.SASTarget()) * vec4(0.f, 1.f, 0.f, 0.f)).xyz();

@@ -95,7 +95,13 @@ public:
     void SetSASTarget(const quat& Target);
 
     ESASMode SASMode() const { return FSASMode; }
-    void SetSASMode(const ESASMode mode) { FSASMode = mode; }
+    void SetSASMode(const ESASMode mode)
+    {
+        if (FSASMode == mode)
+            return;
+        FSASMode = mode;
+        ClearSASTarget();
+    }
 
     Physics::PhysicsJointHandle NozzleJointHandle() const { return FJointHandle; }
 
