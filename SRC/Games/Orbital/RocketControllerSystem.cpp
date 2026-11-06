@@ -5,7 +5,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
-#include "Physics/PhysicsAPI.h"
+#include "NozzleEngineModule.h"
 #include "RocketManagerModule.h"
 
 namespace ECSEngine
@@ -27,11 +27,21 @@ RocketControllerSystem::RocketControllerSystem()
     FDown.FKeyboardKey = InputKeyNames::INPUT_KEY_DOWN;
     FDown.FInputType = EInputType::REPEATED;
 
-    FFireEngines.FKeyboardKey = InputKeyNames::INPUT_KEY_SPACE;
-    FFireEngines.FInputType = EInputType::REPEATED;
+    FSASToggle.FKeyboardKey = InputKeyNames::INPUT_KEY_T;
+    FSASToggle.FInputType = EInputType::PRESSED;
+
+    FIncreaseThrottle.FKeyboardKey = InputKeyNames::INPUT_KEY_LEFT_SHIFT;
+    FIncreaseThrottle.FInputType = EInputType::REPEATED;
+    FDecreaseThrottle.FKeyboardKey = InputKeyNames::INPUT_KEY_LEFT_CONTROL;
+    FDecreaseThrottle.FInputType = EInputType::REPEATED;
+
+    FFullThrottle.FKeyboardKey = InputKeyNames::INPUT_KEY_W;
+    FFullThrottle.FInputType = EInputType::PRESSED;
+    FCutThrottle.FKeyboardKey = InputKeyNames::INPUT_KEY_X;
+    FCutThrottle.FInputType = EInputType::PRESSED;
 }
 
-static constexpr float MaxSteeringAngle = 50.f;
+static constexpr float MaxSteeringAngle = Radians(50.f);
 
 void RocketControllerSystem::VirtualUpdate()
 {
@@ -44,38 +54,54 @@ void RocketControllerSystem::VirtualUpdate()
 
     foreachitem(rocketManager, rocketManagerAccessor)
     {
-        // Handle joint orientation
-        Physics::PhysicsJointHandle NozzleJointHandle = rocketManager.NozzleJointHandle();
-        if (!NozzleJointHandle.IsValid())
-        {
-            continue;
-        }
-
         vec3 TargetAngle{ 0.f };
-
+        bool bIsSteering = false;
         if (FUp.Evaluate())
+        {
             TargetAngle.z += MaxSteeringAngle;
+            bIsSteering = true;
+        }
 
         if (FDown.Evaluate())
+        {
             TargetAngle.z -= MaxSteeringAngle;
+            bIsSteering = true;
+        }
 
         if (FLeft.Evaluate())
+        {
             TargetAngle.x += MaxSteeringAngle;
+            bIsSteering = true;
+        }
 
         if (FRight.Evaluate())
-            TargetAngle.x -= MaxSteeringAngle;
-
-        Physics::SetBallTargetEulerAngles(NozzleJointHandle, true, TargetAngle, 15.f, 500.f);
-
-        if (FFireEngines.Evaluate())
         {
-            RigidbodyModule* NozzleBody = rigidbodyAccessor[rocketManager.NozzleId()];
-            AssertRelease(NozzleBody != nullptr);
-            quat BodyOrientation;
-            Physics::GetBodyOrientation(NozzleBody->BodyHandle(), BodyOrientation);
-            vec3 PropulsionForce = (mat4(BodyOrientation) * vec4(0.f, 50.f, 0.f, 0.f)).xyz();
-            Physics::AddForceToBody(NozzleBody->BodyHandle(), PropulsionForce, true);
+            TargetAngle.x -= MaxSteeringAngle;
+            bIsSteering = true;
         }
+
+        rocketManager.SetTargetSteeringAngle(TargetAngle);
+        rocketManager.SetIsSteering(bIsSteering);
+
+        if (FFullThrottle.Evaluate())
+            rocketManager.SetRocketThrottle(1.f);
+        else if (FCutThrottle.Evaluate())
+            rocketManager.SetRocketThrottle(0.f);
+        else
+        {
+            float CurrentThrottle = rocketManager.RocketThrottle();
+            if (FIncreaseThrottle.Evaluate())
+                CurrentThrottle += 0.005f;
+            else if (FDecreaseThrottle.Evaluate())
+                CurrentThrottle -= 0.005f;
+
+            rocketManager.SetRocketThrottle(CurrentThrottle);
+        }
+
+        bool bSASActivated = rocketManager.SASActivated();
+        if (FSASToggle.Evaluate())
+            bSASActivated = !bSASActivated;
+        rocketManager.SetSASActivated(bSASActivated);
     }
 }
 } // namespace ECSEngine

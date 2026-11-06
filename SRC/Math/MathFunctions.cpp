@@ -7,11 +7,6 @@
 namespace ECSEngine
 {
 
-float Radians(const float parAngleDegree)
-{
-    return parAngleDegree * Pi() / 180.f;
-}
-
 vec3 Radians(const vec3& parV)
 {
     return vec3(Radians(parV.x), Radians(parV.y), Radians(parV.z));

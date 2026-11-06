@@ -205,10 +205,11 @@ A relative path such as `Meshes\...` or `2D\Textures\...` is resolved in the gam
 
 ```bash
 mkdir build   # GenerateData.py chdirs into build/
-py -u Script/Generation/GenerateData.py
+py -u Script/Generation/GenerateData.py --game Colony
+py -u Script/Generation/GenerateData.py --game Orbital
 ```
 
-One run cooks meshes, textures, and shaders. Later runs skip files whose `.sha1` still matches.
+`--game` chooses the prototype folder (`Assets/Colony`, `Assets/Orbital`, …). Shared files are always included. The default is Colony. One run cooks that game's meshes, textures, and shaders. Later runs skip files whose `.sha1` still matches.
 
 5. Pack one game plus `Assets/Shared`. Run DataPacker from `bin/` or `build/`. The output names stay `Assets.datapack` and `Sounds.datapack`; sounds always come from `Assets/Shared/Sounds`. The default game is Colony.
 

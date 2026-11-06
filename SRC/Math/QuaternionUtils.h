@@ -10,4 +10,7 @@ quat Normalize(const quat& parQ);
 quat Lerp(const quat& A, const quat& B, const float t);
 
 quat AddVectorToQuaternion(const quat& inQuat, const vec3& ScaledVector);
+
+quat Conjugate(const quat& q);
+quat Invert(const quat& q);
 } // namespace ECSEngine

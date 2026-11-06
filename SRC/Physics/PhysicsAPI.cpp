@@ -119,6 +119,12 @@ bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position)
     return Engine.GetBodyPosition(Handle, Position);
 }
 
+bool GetBodyCenterOfMass(const PhysicsBodyHandle& Handle, vec3& CenterOfMass)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyCenterOfMass(Handle, CenterOfMass);
+}
+
 bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
@@ -135,6 +141,12 @@ bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelo
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
     return Engine.GetBodyRotationVelocity(Handle, RotationVelocity);
+}
+
+bool GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyMass(Handle, Mass);
 }
 
 #pragma endregion GettersAndSetterForBodies

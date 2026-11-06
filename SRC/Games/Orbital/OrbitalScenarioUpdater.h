@@ -1,9 +1,14 @@
 #pragma once
-#include "ECSGameplay_Common/CameraMoverSystem.h"
 #include "ECSGameplay_Common/IScenarioUpdater.h"
 #include "ECSGameplay_Common/PhysicsUpdateSystem.h"
 #include "ECSGameplay_Common/SynchroWithRenderSystem.h"
+#include "PlanetGravitySystem.h"
+#include "RocketCameraMoverSystem.h"
 #include "RocketControllerSystem.h"
+#include "RocketSASSystem.h"
+#include "RocketSteeringSystem.h"
+#include "RocketThrustSystem.h"
+#include "RocketUIController.h"
 
 namespace ECSEngine
 {
@@ -30,9 +35,15 @@ private:
     SceneScenario* FScenario = nullptr;
     std::string FScenarioFileName;
 
-    CameraMoverSystem FCameraMoverSystem;
+    RocketCameraMoverSystem FCameraMoverSystem;
     SynchroWithRenderSystem FRenderingSystem;
     PhysicsUpdateSystem FPhysicsSystem;
-    RocketControllerSystem FRocketSystem;
+    RocketControllerSystem FRocketControllerSystem;
+    RocketSteeringSystem FRocketSteeringSystem;
+    RocketThrustSystem FRocketThrustSystem;
+    RocketSASSystem FRocketSASSystem;
+    PlanetGravitySystem FPlanetGravitySystem;
+
+    UI::RocketUIController FRocketUIController;
 };
 } // namespace ECSEngine

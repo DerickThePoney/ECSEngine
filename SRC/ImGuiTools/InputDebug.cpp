@@ -37,8 +37,14 @@ void InputDebug(bool* shouldBeOpen)
 
     forrange(i, InputKeyNames::INPUT_KEY_COMMA, InputKeyNames::INPUT_KEY_RIGHT_BRACKET)
     {
+        // Key codes are not contiguous (58, 60, 62-64). glfwGetKeyName returns null or "" for those,
+        // and Checkbox asserts on an empty id.
+        const char* keyName = GLFWWrapper::GetKeyName((InputKeyNames::Type)i);
+        if (keyName == nullptr || keyName[0] == '\0')
+            continue;
+
         keyboardButtonState = Input::GetButtonDown((InputKeyNames::Type)i);
-        ImGui::Checkbox(GLFWWrapper::GetKeyName((InputKeyNames::Type)i), &keyboardButtonState);
+        ImGui::Checkbox(keyName, &keyboardButtonState);
 
         if ((i - InputKeyNames::INPUT_KEY_A) % 5 != 0 || i == InputKeyNames::INPUT_KEY_A)
         {

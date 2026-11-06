@@ -248,6 +248,18 @@ bool PhysicsEngine::GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Posit
     return true;
 }
 
+bool PhysicsEngine::GetBodyCenterOfMass(const PhysicsBodyHandle& Handle, vec3& CenterOfMass) const
+{
+    const RigidBody* body = GetRigidBody(Handle);
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    CenterOfMass = body->FCenterOfMassWorld;
+    return true;
+}
+
 bool PhysicsEngine::GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity) const
 {
     const RigidBody* body = GetRigidBody(Handle);
@@ -281,6 +293,18 @@ bool PhysicsEngine::GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec
     }
 
     RotationVelocity = body->FRotationVelocity;
+    return true;
+}
+
+bool PhysicsEngine::GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass) const
+{
+    const RigidBody* body = GetRigidBody(Handle);
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    Mass = body->FMass;
     return true;
 }
 

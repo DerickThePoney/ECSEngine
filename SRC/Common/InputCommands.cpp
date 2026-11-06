@@ -2,6 +2,8 @@
 
 #include "InputCommands.h"
 
+#include "RenderingCore/GLFWWrapper.h"
+
 namespace ECSEngine
 {
 namespace EInputType
@@ -28,13 +30,14 @@ namespace
 {
 bool EvaluateButton(const InputKeyNames::Type parKey, const EInputType::Type parType)
 {
-    const bool buttonIsDown = Input::GetButtonDown(parKey);
+    const InputKeyNames::Type key = GLFWWrapper::PhysicalKeyForBinding(parKey);
+    const bool buttonIsDown = Input::GetButtonDown(key);
     switch (parType)
     {
     case EInputType::PRESSED:
-        return Input::GetButtonHasChanged(parKey) && buttonIsDown;
+        return Input::GetButtonHasChanged(key) && buttonIsDown;
     case EInputType::RELEASED:
-        return Input::GetButtonHasChanged(parKey) && !buttonIsDown;
+        return Input::GetButtonHasChanged(key) && !buttonIsDown;
     case EInputType::REPEATED:
         return buttonIsDown;
     default:

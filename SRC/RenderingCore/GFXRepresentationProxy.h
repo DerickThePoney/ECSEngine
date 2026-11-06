@@ -25,6 +25,8 @@ public:
         GFXRepresentationManager::Instance().PushMessage(FId, parKey, parData, parTime);
     }
 
+    u32 Id() const { return FId; }
+
 private:
     u32 FId = -1;
 };

@@ -6,7 +6,10 @@
 #include "ECSCore/WorldIds.h"
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Common/ScenarioFactory.h"
+#include "NozzleEngineModule.h"
 #include "OrbitalScenarioUpdater.h"
+#include "PlanetGravityModule.h"
+#include "RocketCameraMoverModule.h"
 #include "RocketManagerModule.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::OrbitalLoader);
@@ -22,7 +25,7 @@ IScenarioUpdater* CreateOrbitalScenario(const std::string& scenarioFile, bool fo
     scene->SetScenario(scenarioFile, forceReload);
     return scene;
 }
-}
+} // namespace
 
 bool OrbitalLoader::VirtualInitialise()
 {
@@ -31,6 +34,13 @@ bool OrbitalLoader::VirtualInitialise()
     EntityWorld* world = WorldManager::Instance().GetWorldIFP(EEntityWorlds::STANDARD);
     AssertRelease(world != nullptr);
     world->AddController<RocketManagerModule>();
+    world->AddController<PlanetGravityModule>();
+    world->AddController<NozzleEngineModule>();
+
+    world = WorldManager::Instance().GetWorldIFP(EEntityWorlds::CAMERA);
+    AssertRelease(world != nullptr);
+    world->AddController<RocketCameraMoverModule>();
+
     SetScenarioFactory(&CreateOrbitalScenario);
     return true;
 }

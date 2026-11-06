@@ -8,15 +8,18 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
 #include "Physics/PhysicsAPI.h"
 #include "Rendering/FinalCombinePass.h"
 #include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
+#include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GFXRepresentationManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
+#include "RenderingCore/MaterialManager.h"
 #include "UICore/RMLUIManager.h"
 
 namespace ECSEngine
@@ -63,8 +66,14 @@ void OrbitalScenarioUpdater::Initialise()
     FCameraMoverSystem.Init();
     FRenderingSystem.Init();
     FPhysicsSystem.Init();
-    FRocketSystem.Init();
+    FRocketControllerSystem.Init();
+    FRocketSteeringSystem.Init();
+    FRocketThrustSystem.Init();
+    FRocketSASSystem.Init();
+    FPlanetGravitySystem.Init();
     PhysicsJointSpawner::CreateIFP();
+
+    FRocketUIController.Init();
 
     FScenario->Initialise();
 }
@@ -80,15 +89,21 @@ void OrbitalScenarioUpdater::Destroy()
         FScenario = nullptr;
     }
 
+    FRocketUIController.Destroy();
+
     if (PhysicsJointSpawner::HasInstance())
     {
         PhysicsJointSpawner::Instance().Finalize();
         PhysicsJointSpawner::Delete();
     }
-    FRocketSystem.Destroy();
+    FRocketSASSystem.Destroy();
+    FRocketThrustSystem.Destroy();
+    FRocketSteeringSystem.Destroy();
+    FRocketControllerSystem.Destroy();
     FPhysicsSystem.Destroy();
     FRenderingSystem.Destroy();
     FCameraMoverSystem.Destroy();
+    FPlanetGravitySystem.Destroy();
 
     Rendering::FinalCombinePass::Instance().Shutdown();
     Rendering::FinalCombinePass::Destroy();
@@ -102,14 +117,17 @@ void OrbitalScenarioUpdater::Destroy()
 
 void OrbitalScenarioUpdater::RealtimeUpdate()
 {
-    FCameraMoverSystem.Update();
+    FRocketControllerSystem.Update();
 }
 
 void OrbitalScenarioUpdater::GameplayUpdate()
 {
     AssertRelease(FScenario != nullptr);
     FScenario->Update();
-    FRocketSystem.Update();
+    FRocketSteeringSystem.Update();
+    FRocketThrustSystem.Update();
+    FRocketSASSystem.Update();
+    FPlanetGravitySystem.Update();
     FPhysicsSystem.Update();
 
     WorldManager::Instance().ProcessDestroyEntities();
@@ -124,13 +142,39 @@ void OrbitalScenarioUpdater::GameplayUpdate()
 void OrbitalScenarioUpdater::UIUpdate()
 {
     Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
+    FRocketUIController.Update();
     UI::RmlUiManager::Instance().Update();
 }
 
 void OrbitalScenarioUpdater::DebugRender()
 {
 #ifdef WITH_VISUAL_DEBUG
-    Physics::DrawDebugs();
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_DebugUpdate);
+        Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
+        DrawAdjustables();
+
+        Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
+        u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+        Camera* camera = CameraManager::Instance().GetCamera(camId);
+        buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
+        Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showBGFXDebugs, false, "show debug", "Rendering");
+        if (showBGFXDebugs)
+        {
+            bool dummy = showBGFXDebugs;
+            Rendering::BGFXRenderingBackend::Instance().DrawStats(&dummy);
+        }
+
+        FRocketUIController.DrawDebug(buffer, handle);
+
+        buffer->Submit();
+        buffer->clear();
+        delete buffer;
+
+        Physics::DrawDebugs();
+    }
 #endif
 }
 
@@ -138,6 +182,8 @@ void OrbitalScenarioUpdater::Render()
 {
     Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
     Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
+
+    FCameraMoverSystem.Update();
     Rendering::GameRenderer::Instance().Render();
 
     UI::RmlUiManager::Instance().Render();

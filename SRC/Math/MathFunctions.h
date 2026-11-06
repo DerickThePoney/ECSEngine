@@ -8,7 +8,11 @@ constexpr float Pi()
     return 3.14159265358979323846264338327950288f;
 }
 
-float Radians(const float parAngleDegree);
+constexpr float Radians(const float parAngleDegree)
+{
+    return parAngleDegree * Pi() / 180.f;
+}
+
 vec3 Radians(const vec3& parV);
 float Degree(const float parAngleRadian);
 vec3 Degree(const vec3& parV);
