@@ -87,6 +87,9 @@ void RocketUIController::VirtualUpdate()
 
         ImGui::SeparatorText("Engine data");
         ImGui::Text("Engine activated : %d", rocketManager.EngineFiring());
+        float CurrentThrottle = rocketManager.RocketThrottle();
+        ImGui::SliderFloat("Rocket throttle", &CurrentThrottle, 0.f, 1.f);
+        rocketManager.SetRocketThrottle(CurrentThrottle);
 
         ImGui::SeparatorText("SAS data");
         bool bSASActivated = rocketManager.SASActivated();
