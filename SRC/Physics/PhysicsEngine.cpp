@@ -308,6 +308,21 @@ bool PhysicsEngine::GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass) co
     return true;
 }
 
+bool PhysicsEngine::SetBodyMass(const PhysicsBodyHandle& Handle, const float Mass)
+{
+    RigidBody* body = GetRigidBody(Handle);
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    body->FMass = Mass;
+    SetupMassProperties(body, body->GetTransform(), false);
+    UpdateInertiaTransform(body);
+
+    return true;
+}
+
 #pragma endregion BodyGettersAndSetters
 
 #pragma region ForcesAndTorques
@@ -418,16 +433,16 @@ struct CompoundMassProperties
     mat3 InertiaAboutCoM; // body axes, about CoM
 };
 
-CompoundMassProperties ComputeCompoundMassProperties(const PhysicsBodyConfig& BodyConfig)
+CompoundMassProperties ComputeCompoundMassProperties(const std::vector<CollisionShape>& BodyCollisionShapes, const float Density)
 {
     CompoundMassProperties Result;
 
     std::vector<float> masses;
     std::vector<vec3> centers;
 
-    foreachitemconst(shape, BodyConfig.FShapes)
+    foreachitemconst(shape, BodyCollisionShapes)
     {
-        float m_i = shape.ComputeMass(BodyConfig.FDensity);
+        float m_i = shape.ComputeMass(Density);
         vec3 c_i = shape.GetCenter();
 
         masses.push_back(m_i);
@@ -442,9 +457,9 @@ CompoundMassProperties ComputeCompoundMassProperties(const PhysicsBodyConfig& Bo
     else
         Result.CenterOfMassLocal = vec3(0.f); // or equal-weight average of centers
 
-    forrange(i, 0, BodyConfig.FShapes.size())
+    forrange(i, 0, BodyCollisionShapes.size())
     {
-        const CollisionShape& shape = BodyConfig.FShapes[i];
+        const CollisionShape& shape = BodyCollisionShapes[i];
 
         mat3 I_i = shape.ComputeInertiaTensor(masses[i]);
         vec3 r = centers[i] - Result.CenterOfMassLocal;
@@ -466,20 +481,13 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     Body->FPosition = Transform.Column(3).xyz();
     Body->FOrientation = quat::FromMat4(Transform);
 
+    Body->FCollisionShapes = BodyConfig.FShapes;
+
     if (Body->FMoveabilityType == EPhysicsMoveability::PHYICS_ENABLED)
     {
-        CompoundMassProperties MassProps = ComputeCompoundMassProperties(BodyConfig);
-        Body->FMass = (BodyConfig.FAutoComputeMass) ? MassProps.Mass : BodyConfig.FMass;
-        Body->FInvMass = (Body->FMass != 0.f) ? 1.f / Body->FMass : 1.f;
-
-        Body->FInertiaTensor = MassProps.InertiaAboutCoM;
-        if (!BodyConfig.FAutoComputeMass && MassProps.Mass > 0.f)
-        {
-            Body->FInertiaTensor *= Body->FMass / MassProps.Mass;
-        }
-        Body->FInverseInertiaTensor = Invert(Body->FInertiaTensor);
-        Body->FCenterOfMassLocal = MassProps.CenterOfMassLocal;
-        Body->FCenterOfMassWorld = (Transform * vec4::MakeHomogeneousPositionVec4(Body->FCenterOfMassLocal)).xyz();
+        Body->FMass = BodyConfig.FMass;
+        Body->FDensity = BodyConfig.FDensity;
+        SetupMassProperties(Body, Transform, BodyConfig.FAutoComputeMass);
     }
     else
     {
@@ -490,8 +498,6 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
         Body->FCenterOfMassLocal = vec3();
         Body->FCenterOfMassWorld = Transform.Column(3).xyz();
     }
-
-    Body->FCollisionShapes = BodyConfig.FShapes;
 
     // Init damping coefficients
     Body->FLinearDamping = BodyConfig.FLinearDamping;
@@ -510,6 +516,22 @@ void PhysicsEngine::InitializeBody(RigidBody* Body, const mat4& Transform, const
     Body->FGenerateContactEvents = BodyConfig.FGenerateContactEvents;
 
     Body->SetAwake(true);
+}
+
+void PhysicsEngine::SetupMassProperties(RigidBody* Body, const mat4& Transform, bool bAutocomputeMass)
+{
+    CompoundMassProperties MassProps = ComputeCompoundMassProperties(Body->FCollisionShapes, Body->FDensity);
+    Body->FMass = (bAutocomputeMass) ? MassProps.Mass : Body->FMass;
+    Body->FInvMass = (Body->FMass != 0.f) ? 1.f / Body->FMass : 1.f;
+
+    Body->FInertiaTensor = MassProps.InertiaAboutCoM;
+    if (!bAutocomputeMass && MassProps.Mass > 0.f)
+    {
+        Body->FInertiaTensor *= Body->FMass / MassProps.Mass;
+    }
+    Body->FInverseInertiaTensor = Invert(Body->FInertiaTensor);
+    Body->FCenterOfMassLocal = MassProps.CenterOfMassLocal;
+    Body->FCenterOfMassWorld = (Transform * vec4::MakeHomogeneousPositionVec4(Body->FCenterOfMassLocal)).xyz();
 }
 
 void PhysicsEngine::UpdateInertiaTransform(RigidBody* Body)

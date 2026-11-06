@@ -149,6 +149,12 @@ bool GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass)
     return Engine.GetBodyMass(Handle, Mass);
 }
 
+bool SetBodyMass(const PhysicsBodyHandle& Handle, const float Mass)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.SetBodyMass(Handle, Mass);
+}
+
 #pragma endregion GettersAndSetterForBodies
 
 #pragma region ForcesTorquesAndImpulses
