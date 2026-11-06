@@ -5,7 +5,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
-#include "Physics/PhysicsAPI.h"
+#include "NozzleEngineModule.h"
 #include "RocketManagerModule.h"
 
 namespace ECSEngine
@@ -30,8 +30,15 @@ RocketControllerSystem::RocketControllerSystem()
     FSASToggle.FKeyboardKey = InputKeyNames::INPUT_KEY_T;
     FSASToggle.FInputType = EInputType::PRESSED;
 
-    FFireEngines.FKeyboardKey = InputKeyNames::INPUT_KEY_SPACE;
-    FFireEngines.FInputType = EInputType::PRESSED;
+    FIncreaseThrottle.FKeyboardKey = InputKeyNames::INPUT_KEY_LEFT_SHIFT;
+    FIncreaseThrottle.FInputType = EInputType::REPEATED;
+    FDecreaseThrottle.FKeyboardKey = InputKeyNames::INPUT_KEY_LEFT_CONTROL;
+    FDecreaseThrottle.FInputType = EInputType::REPEATED;
+
+    FFullThrottle.FKeyboardKey = InputKeyNames::INPUT_KEY_W;
+    FFullThrottle.FInputType = EInputType::PRESSED;
+    FCutThrottle.FKeyboardKey = InputKeyNames::INPUT_KEY_X;
+    FCutThrottle.FInputType = EInputType::PRESSED;
 }
 
 static constexpr float MaxSteeringAngle = Radians(50.f);
@@ -76,10 +83,20 @@ void RocketControllerSystem::VirtualUpdate()
         rocketManager.SetTargetSteeringAngle(TargetAngle);
         rocketManager.SetIsSteering(bIsSteering);
 
-        bool bFiringEngine = rocketManager.EngineFiring();
-        if (FFireEngines.Evaluate())
-            bFiringEngine = !bFiringEngine;
-        rocketManager.SetEngineFiring(bFiringEngine);
+        if (FFullThrottle.Evaluate())
+            rocketManager.SetRocketThrottle(1.f);
+        else if (FCutThrottle.Evaluate())
+            rocketManager.SetRocketThrottle(0.f);
+        else
+        {
+            float CurrentThrottle = rocketManager.RocketThrottle();
+            if (FIncreaseThrottle.Evaluate())
+                CurrentThrottle += 0.005f;
+            else if (FDecreaseThrottle.Evaluate())
+                CurrentThrottle -= 0.005f;
+
+            rocketManager.SetRocketThrottle(CurrentThrottle);
+        }
 
         bool bSASActivated = rocketManager.SASActivated();
         if (FSASToggle.Evaluate())

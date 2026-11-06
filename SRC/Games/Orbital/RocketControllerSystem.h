@@ -19,6 +19,9 @@ protected:
 
     KeyboardCommand FSASToggle;
 
-    KeyboardCommand FFireEngines;
+    KeyboardCommand FIncreaseThrottle;
+    KeyboardCommand FDecreaseThrottle;
+    KeyboardCommand FFullThrottle;
+    KeyboardCommand FCutThrottle;
 };
 } // namespace ECSEngine

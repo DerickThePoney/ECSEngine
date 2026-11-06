@@ -76,8 +76,9 @@ public:
     const vec3& LastTurnGravity() const { return FLastTurnGravity; }
     void SetLastTurnGravity(const vec3& Gravity) { FLastTurnGravity = Gravity; }
 
-    const bool EngineFiring() const { return FEngineFiring; }
-    void SetEngineFiring(const bool Value) { FEngineFiring = Value; }
+    const bool EngineFiring() const { return FRocketThrottle > 0.f; }
+    float RocketThrottle() const { return FRocketThrottle; }
+    void SetRocketThrottle(const float Value);
 
     const bool IsSteering() const { return FIsSteering; }
     void SetIsSteering(const bool Value) { FIsSteering = Value; }
@@ -125,11 +126,13 @@ private:
 
     quat FSASTarget;
     ESASMode FSASMode = ESASMode::STABILITY;
+
+    float FRocketThrottle = 0.f;
+
     bool FSASActivated = false;
     bool FWasSASActivated = false;
     bool FHasSASTarget = false;
 
-    bool FEngineFiring = false;
     bool FIsSteering = false;
 
     Delegate<void(const Physics::PhysicsJointHandle&)> JointCreatedDelegate;

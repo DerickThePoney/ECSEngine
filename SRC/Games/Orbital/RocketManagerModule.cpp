@@ -76,6 +76,11 @@ RocketManagerModule::~RocketManagerModule()
 {
 }
 
+void RocketManagerModule::SetRocketThrottle(const float Value)
+{
+    FRocketThrottle = Clamp01(Value);
+}
+
 void RocketManagerModule::SetSASActivated(const bool Value)
 {
     FWasSASActivated = FSASActivated;
