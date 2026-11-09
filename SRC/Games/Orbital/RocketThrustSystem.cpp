@@ -57,14 +57,16 @@ void RocketThrustSystem::VirtualUpdate()
 
         // burn fuel and update body mass
         const float CurrentRemainingFuelMass = bodyTank->CurrentRemainingFuelMass();
-        const float FuelFlow = nozzleEngine->FuelFlow();
-        bodyTank->SetCurrentRemainingFuelMass(Max(0.f, CurrentRemainingFuelMass - FuelFlow * DT));
+        const float FuelFlow = nozzleEngine->FuelFlow() * DT;
+        bodyTank->SetCurrentRemainingFuelMass(Max(0.f, CurrentRemainingFuelMass - FuelFlow));
+
+        const float ConsumptionRatio = (FuelFlow > 1e-6f) ? Clamp01((CurrentRemainingFuelMass - bodyTank->CurrentRemainingFuelMass()) / FuelFlow) : 0.f;
 
         RigidbodyModule* BodyBody = rigidbodyAccessor[rocketManager.BodyId()];
         AssertRelease(BodyBody != nullptr);
         // TODO figure out a way of setting up the dry mass
 
-        const float Prop = nozzleEngine->Throttle() * nozzleEngine->MaxThrust();
+        const float Prop = ConsumptionRatio * nozzleEngine->Throttle() * nozzleEngine->MaxThrust();
         vec3 PropulsionForce = (mat4(BodyOrientation) * vec4(0.f, Prop, 0.f, 0.f)).xyz();
         Physics::AddForceToBody(NozzleBody->BodyHandle(), PropulsionForce, false);
     }
