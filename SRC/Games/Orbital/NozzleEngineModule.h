@@ -51,6 +51,8 @@ public:
     float ISP() const;
     bool OffOnBoosters() const;
 
+    float FuelFlow() const;
+
     float Throttle() const { return FThrottle; }
     void SetThrottle(float Value);
 

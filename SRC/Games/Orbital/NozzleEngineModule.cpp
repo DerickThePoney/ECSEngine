@@ -72,6 +72,11 @@ bool NozzleEngineModule::OffOnBoosters() const
     return Temp->OffOnBoosters();
 }
 
+float NozzleEngineModule::FuelFlow() const
+{
+    return FThrottle * MaxThrust() / (ISP() * 9.80665);
+}
+
 void NozzleEngineModule::SetThrottle(float Value)
 {
     if (OffOnBoosters())

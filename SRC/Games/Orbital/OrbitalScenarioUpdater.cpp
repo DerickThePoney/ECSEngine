@@ -71,6 +71,7 @@ void OrbitalScenarioUpdater::Initialise()
     FRocketThrustSystem.Init();
     FRocketSASSystem.Init();
     FPlanetGravitySystem.Init();
+    FRocketMassSystem.Init();
     PhysicsJointSpawner::CreateIFP();
 
     FRocketUIController.Init();
@@ -96,6 +97,7 @@ void OrbitalScenarioUpdater::Destroy()
         PhysicsJointSpawner::Instance().Finalize();
         PhysicsJointSpawner::Delete();
     }
+    FRocketMassSystem.Destroy();
     FRocketSASSystem.Destroy();
     FRocketThrustSystem.Destroy();
     FRocketSteeringSystem.Destroy();
@@ -124,6 +126,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
 {
     AssertRelease(FScenario != nullptr);
     FScenario->Update();
+    FRocketMassSystem.Update();
     FRocketSteeringSystem.Update();
     FRocketThrustSystem.Update();
     FRocketSASSystem.Update();

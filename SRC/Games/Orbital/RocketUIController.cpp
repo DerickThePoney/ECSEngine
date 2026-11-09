@@ -5,6 +5,7 @@
 #include "ECSCore/ScopedModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
+#include "FuelTankModule.h"
 #include "Physics/PhysicsAPI.h"
 #include "PlanetGravityModule.h"
 #include "RenderingCore/DrawCommands.h"
@@ -14,8 +15,10 @@ namespace ECSEngine
 {
 namespace UI
 {
-using AccessHelpers =
-      ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds::STANDARD>, MC<RigidbodyModule, EEntityWorlds::STANDARD>, MC<PlanetGravityModule, EEntityWorlds::STANDARD>>;
+using AccessHelpers = ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds::STANDARD>,
+      MC<RigidbodyModule, EEntityWorlds::STANDARD>,
+      MC<PlanetGravityModule, EEntityWorlds::STANDARD>,
+      MC<FuelTankModule, EEntityWorlds::STANDARD>>;
 
 void RocketUIController::VirtualUpdate()
 {
@@ -90,6 +93,11 @@ void RocketUIController::VirtualUpdate()
         float CurrentThrottle = rocketManager.RocketThrottle();
         ImGui::SliderFloat("Rocket throttle", &CurrentThrottle, 0.f, 1.f);
         rocketManager.SetRocketThrottle(CurrentThrottle);
+
+        FuelTankModule* fuelTank = accessHelpers.GetModule<FuelTankModule>(rocketManager.BodyId());
+        AssertRelease(fuelTank != nullptr);
+        float Dummy = fuelTank->CurrentRemainingFuelMass();
+        ImGui::SliderFloat("Remaining fuel", &Dummy, 0.f, fuelTank->GetMaxFuelMass());
 
         ImGui::SeparatorText("SAS data");
         bool bSASActivated = rocketManager.SASActivated();

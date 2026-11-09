@@ -5,6 +5,7 @@
 #include "PlanetGravitySystem.h"
 #include "RocketCameraMoverSystem.h"
 #include "RocketControllerSystem.h"
+#include "RocketMassSystem.h"
 #include "RocketSASSystem.h"
 #include "RocketSteeringSystem.h"
 #include "RocketThrustSystem.h"
@@ -43,6 +44,7 @@ private:
     RocketThrustSystem FRocketThrustSystem;
     RocketSASSystem FRocketSASSystem;
     PlanetGravitySystem FPlanetGravitySystem;
+    RocketMassSystem FRocketMassSystem;
 
     UI::RocketUIController FRocketUIController;
 };
