@@ -165,7 +165,7 @@ public:
     template<typename T>                                                                                                                                                           \
     inline Vector2<T> operator OP(const T parB, const Vector2<T>& parA)                                                                                                            \
     {                                                                                                                                                                              \
-        return Vector2<T>(parB OP parA.x, parB OP parA.x);                                                                                                                                                       \
+        return Vector2<T>(parB OP parA.x, parB OP parA.y);                                                                                                                                                       \
     }
 
 MAKE_EXTERN_OP(+);
