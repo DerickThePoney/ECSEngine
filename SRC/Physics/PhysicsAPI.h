@@ -25,6 +25,8 @@ void ShutdownPhysics();
 
 // Physics update
 void UpdatePhysics();
+
+bool ShiftWorld(const vec3& Delta);
 // TODO BACKWARD UPDATE
 
 // Body creation/destruction

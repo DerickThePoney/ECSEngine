@@ -71,6 +71,11 @@ void UpdatePhysics()
     PhysicsEngine::Instance().UpdatePhysics(TimeManager::GameplayDeltaTime());
 }
 
+bool ShiftWorld(const vec3& Delta)
+{
+    return PhysicsEngine::Instance().ShiftWorld(Delta);
+}
+
 PhysicsContactEventManager& GetContactEventManager()
 {
     return PhysicsEngine::Instance().ContactEventManager();

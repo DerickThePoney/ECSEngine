@@ -30,6 +30,7 @@ public:
     void Cleanup();
 
     void UpdatePhysics(float parDeltaTime);
+    bool ShiftWorld(const vec3& Delta);
 
     const PhysicsEngineConfiguration& Config() const { return FConfig; }
     void SetConfig(const PhysicsEngineConfiguration& NewConfig) { FConfig = NewConfig; }

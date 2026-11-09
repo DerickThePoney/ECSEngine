@@ -235,6 +235,15 @@ AABB3f AABBTree::GetFatAABB3f(const PhysicsBodyHandle& parHandle) const
     return Node->FAABB;
 }
 
+void AABBTree::TranslateTree(const vec3& Delta)
+{
+    foreachitem(node, FNodes)
+    {
+        node->FAABB.SetMax(node->FAABB.Max() + Delta);
+        node->FAABB.SetMin(node->FAABB.Min() + Delta);
+    }
+}
+
 #ifdef PERFORM_SECURITY_CHECKS
 void AABBTree::DebugTree()
 {

@@ -97,6 +97,35 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
     ClearContactEvents();
 }
 
+bool PhysicsEngine::ShiftWorld(const vec3& Delta)
+{
+    if (!FConfig.FbEnableOriginShift)
+    {
+        AssertNotReachedMsg("Can't shift the world if the option is not activated !");
+        return false;
+    }
+
+    AlwaysCheckedAssert(FMovedBodies.empty() && FContactEventsCount == 0);
+
+    if (LengthSq(Delta) < 1e-6f)
+        return false;
+
+    foreachitem(body, FRigidbodies)
+    {
+        if (body == nullptr)
+            continue;
+
+        body->FPosition += Delta;
+        body->FCenterOfMassWorld += Delta;
+    }
+
+    FBroadPhase.TranslateTree(Delta);
+
+    FContactManager.TranslateContacts(Delta);
+
+    return true;
+}
+
 const PhysicsBodyHandle PhysicsEngine::CreateNewPhysicsBody(const mat4& Transform, const PhysicsBodyConfig& BodyConfig)
 {
     PhysicsBodyHandle newHandle;
