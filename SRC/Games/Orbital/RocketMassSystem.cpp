@@ -33,7 +33,7 @@ void RocketMassSystem::VirtualUpdate()
             float DryMass = 0.f;
             if (Physics::GetBodyMass(tankBody->BodyHandle(), DryMass))
             {
-                fuelTank.SetDrayMass(DryMass);
+                fuelTank.SetDryMass(DryMass);
             }
         }
 
