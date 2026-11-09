@@ -10,7 +10,7 @@ namespace ECSEngine
  ****************************/
 #pragma pack(push, 1)
 template<typename T>
-struct alignas(4) Vector2
+struct alignas(alignof(T)) Vector2
 {
 public:
     Vector2() = default;
@@ -180,7 +180,7 @@ MAKE_EXTERN_OP(*);
  ****************************/
 
 template<typename T>
-struct alignas(4) Vector3
+struct alignas(alignof(T)) Vector3
 {
 public:
     Vector3() = default;
@@ -383,7 +383,7 @@ MAKE_EXTERN_OP(*);
  ****************************/
 
 template<typename T>
-struct alignas(4) Vector4
+struct alignas(alignof(T)) Vector4
 {
 public:
     Vector4() = default;
