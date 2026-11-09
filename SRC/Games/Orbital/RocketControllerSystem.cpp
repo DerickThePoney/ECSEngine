@@ -2,10 +2,10 @@
 
 #include "RocketControllerSystem.h"
 
+#include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
-#include "NozzleEngineModule.h"
 #include "RocketManagerModule.h"
 
 namespace ECSEngine
@@ -52,6 +52,7 @@ void RocketControllerSystem::VirtualUpdate()
 
     AssertRelease(rocketManagerAccessor.size() <= 1); // Pour l'instant on en prend qu'un !!
 
+    const float DT = TimeManager::FrameDeltaTime();
     foreachitem(rocketManager, rocketManagerAccessor)
     {
         vec3 TargetAngle{ 0.f };
@@ -91,9 +92,9 @@ void RocketControllerSystem::VirtualUpdate()
         {
             float CurrentThrottle = rocketManager.RocketThrottle();
             if (FIncreaseThrottle.Evaluate())
-                CurrentThrottle += 0.005f;
+                CurrentThrottle += 0.3f * DT;
             else if (FDecreaseThrottle.Evaluate())
-                CurrentThrottle -= 0.005f;
+                CurrentThrottle -= 0.3f * DT;
 
             rocketManager.SetRocketThrottle(CurrentThrottle);
         }
