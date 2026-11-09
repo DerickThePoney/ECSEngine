@@ -6,6 +6,7 @@
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
 #include "FuelTankModule.h"
+#include "NozzleEngineModule.h"
 #include "Physics/PhysicsAPI.h"
 #include "PlanetGravityModule.h"
 #include "RenderingCore/DrawCommands.h"
@@ -18,7 +19,8 @@ namespace UI
 using AccessHelpers = ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds::STANDARD>,
       MC<RigidbodyModule, EEntityWorlds::STANDARD>,
       MC<PlanetGravityModule, EEntityWorlds::STANDARD>,
-      MC<FuelTankModule, EEntityWorlds::STANDARD>>;
+      MC<FuelTankModule, EEntityWorlds::STANDARD>,
+      MC<NozzleEngineModule, EEntityWorlds::STANDARD>>;
 
 void RocketUIController::VirtualUpdate()
 {
@@ -96,8 +98,21 @@ void RocketUIController::VirtualUpdate()
 
         FuelTankModule* fuelTank = accessHelpers.GetModule<FuelTankModule>(rocketManager.BodyId());
         AssertRelease(fuelTank != nullptr);
-        float Dummy = fuelTank->CurrentRemainingFuelMass();
-        ImGui::SliderFloat("Remaining fuel", &Dummy, 0.f, fuelTank->GetMaxFuelMass());
+        float RemainingFuelMass = fuelTank->CurrentRemainingFuelMass();
+        ImGui::ProgressBar(RemainingFuelMass / fuelTank->GetMaxFuelMass(), vec2(-1.f, 0.f), std::format("Remaining fuel mass {}", RemainingFuelMass).c_str());
+
+        // get a better way to sample the actual rocket mass.
+        float Mass = 0.f;
+        RigidbodyModule* bodyModule = accessHelpers.GetModule<RigidbodyModule>(rocketManager.BodyId());
+        AssertRelease(bodyModule != nullptr);
+        Physics::GetBodyMass(bodyModule->BodyHandle(), Mass);
+
+        NozzleEngineModule* nozzleEngine = accessHelpers.GetModule<NozzleEngineModule>(rocketManager.NozzleId());
+        AssertRelease(nozzleEngine != nullptr);
+        const float TWR = CurrentThrottle * nozzleEngine->MaxThrust() / (Mass * Length(rocketManager.LastTurnGravity()));
+        const float RemainingDV = nozzleEngine->ISP() * 9.80665 * log((RemainingFuelMass + fuelTank->DryMass()) / fuelTank->DryMass());
+        ImGui::Text("Thrust to weight ratio: %.3f", TWR);
+        ImGui::Text("Remaining DV: %.3f", RemainingDV);
 
         ImGui::SeparatorText("SAS data");
         bool bSASActivated = rocketManager.SASActivated();
