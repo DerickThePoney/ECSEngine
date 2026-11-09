@@ -57,7 +57,7 @@ float FuelTankModule::GetMaxFuelMass() const
     return Temp->MaxFuelMass();
 }
 
-void FuelTankModule::SetDrayMass(const float Value)
+void FuelTankModule::SetDryMass(const float Value)
 {
     if (!FDryMassSet)
     {

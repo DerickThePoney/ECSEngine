@@ -47,7 +47,7 @@ public:
     float GetMaxFuelMass() const;
 
     float DryMass() const { return FDryMass; }
-    void SetDrayMass(const float Value);
+    void SetDryMass(const float Value);
     bool DryMassSet() const { return FDryMassSet; }
 
     bool IsTankEmpty() const;
