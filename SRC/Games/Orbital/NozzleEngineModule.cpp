@@ -27,8 +27,8 @@ void NozzleEngineModuleTemplate::VirtualDrawEditor()
         FMaxThrust = 0.f;
 
     EDITOR_PROPERTY_SIMPLE("Specific Impulse", FISP);
-    if (FISP < 0.f)
-        FISP = 0.f;
+    if (FISP < 1.f)
+        FISP = 1.f;
 
     EDITOR_PROPERTY_BOOL("Is a booster", FOffOnBoosters);
 }
