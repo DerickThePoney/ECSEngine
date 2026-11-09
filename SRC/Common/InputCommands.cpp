@@ -2,8 +2,6 @@
 
 #include "InputCommands.h"
 
-#include "RenderingCore/GLFWWrapper.h"
-
 namespace ECSEngine
 {
 namespace EInputType
@@ -30,7 +28,7 @@ namespace
 {
 bool EvaluateButton(const InputKeyNames::Type parKey, const EInputType::Type parType)
 {
-    const InputKeyNames::Type key = GLFWWrapper::PhysicalKeyForBinding(parKey);
+    const InputKeyNames::Type key = Input::PhysicalKeyForBinding(parKey);
     const bool buttonIsDown = Input::GetButtonDown(key);
     switch (parType)
     {

@@ -217,6 +217,26 @@ private:
 namespace Input
 {
 
+namespace
+{
+InputKeyNames::Type IdentityPhysicalKey(InputKeyNames::Type parKey)
+{
+    return parKey;
+}
+
+PhysicalKeyForBindingFn sPhysicalKeyForBinding = &IdentityPhysicalKey;
+} // namespace
+
+void SetPhysicalKeyForBinding(PhysicalKeyForBindingFn parFn)
+{
+    sPhysicalKeyForBinding = parFn != nullptr ? parFn : &IdentityPhysicalKey;
+}
+
+InputKeyNames::Type PhysicalKeyForBinding(InputKeyNames::Type parKey)
+{
+    return sPhysicalKeyForBinding(parKey);
+}
+
 void Initialise(const u32 parNbKeyboardKeys, const vec2& parMousePosition, const u32 parNbMouseButtons)
 {
     InputManager::CreateIFP();
@@ -230,6 +250,7 @@ void EndFrame()
 
 void Shutdown()
 {
+    SetPhysicalKeyForBinding(nullptr);
     InputManager::Instance().Shutdown();
     InputManager::Destroy();
 }

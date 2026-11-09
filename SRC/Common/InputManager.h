@@ -57,9 +57,15 @@ const char* ToString(const Type parValue);
 
 namespace Input
 {
+using PhysicalKeyForBindingFn = InputKeyNames::Type (*)(InputKeyNames::Type);
+
 void Initialise(const u32 parNbKeyboardKeys, const vec2& parMousePosition, const u32 parNbMouseButtons);
 void EndFrame();
 void Shutdown();
+
+// Defaults to the key unchanged. RenderingCore installs the GLFW layout remap once a window exists.
+void SetPhysicalKeyForBinding(PhysicalKeyForBindingFn parFn);
+InputKeyNames::Type PhysicalKeyForBinding(InputKeyNames::Type parKey);
 
 void SetMousePosition(const vec2& parMousePosition);
 void SetMouseScrollDelta(const vec2& parMouseScrollDelta);
