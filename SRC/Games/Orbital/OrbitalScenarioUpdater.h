@@ -2,6 +2,7 @@
 #include "ECSGameplay_Common/IScenarioUpdater.h"
 #include "ECSGameplay_Common/PhysicsUpdateSystem.h"
 #include "ECSGameplay_Common/SynchroWithRenderSystem.h"
+#include "PhysicsFloatingOriginSystem.h"
 #include "PlanetGravitySystem.h"
 #include "RocketCameraMoverSystem.h"
 #include "RocketControllerSystem.h"
@@ -36,6 +37,7 @@ private:
     SceneScenario* FScenario = nullptr;
     std::string FScenarioFileName;
 
+    PhysicsFloatingOriginSystem FFloatingOriginSystem;
     RocketCameraMoverSystem FCameraMoverSystem;
     SynchroWithRenderSystem FRenderingSystem;
     PhysicsUpdateSystem FPhysicsSystem;
