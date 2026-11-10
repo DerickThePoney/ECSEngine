@@ -45,7 +45,7 @@ inline __forceinline T Length(const VecType<T>& A)
 template<template<typename> typename VecType, typename T>
 inline __forceinline T ooLength(const VecType<T>& A)
 {
-    return 1.f / sqrt(LengthSq(A));
+    return T(1) / sqrt(LengthSq(A));
 }
 
 template<template<typename> typename VecType, typename T>
