@@ -85,6 +85,14 @@ public:
 
     const T& GetCurrentValue() const { return FKeyframes[0].Value; }
 
+    void Shift(const vec3& Delta)
+    {
+        foreachitem(kf, FKeyframes)
+        {
+            kf.Value += Delta;
+        }
+    }
+
 private:
     float FCurrentTime = -1.f;
     u32 FKeyframesCount = 1;
