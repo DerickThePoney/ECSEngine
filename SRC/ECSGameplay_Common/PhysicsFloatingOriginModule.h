@@ -42,10 +42,15 @@ public:
     const dvec3& Origin() const { return FOrigin; }
     void SetOrigin(const dvec3& Value) { FOrigin = Value; }
 
-    const double BubbleRadius() const;
+    double BubbleRadius() const { return FBubbleRadius; }
+    void SetBubbleRadius(double Radius);
+
+protected:
+    void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
 private:
     dvec3 FOrigin;
+    double FBubbleRadius = 2000.0;
 };
 
 } // namespace ECSEngine

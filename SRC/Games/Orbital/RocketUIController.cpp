@@ -2,14 +2,18 @@
 
 #include "RocketUIController.h"
 
+#include "Common/CameraManager.h"
 #include "ECSCore/ScopedModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
+#include "ECSGameplay_Common/PhysicsFloatingOriginModule.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
 #include "FuelTankModule.h"
 #include "NozzleEngineModule.h"
 #include "Physics/PhysicsAPI.h"
+#include "Physics/PhysicsEngineConfiguration.h"
 #include "PlanetGravityModule.h"
 #include "RenderingCore/DrawCommands.h"
+#include "RocketCameraMoverModule.h"
 #include "RocketManagerModule.h"
 
 namespace ECSEngine
@@ -20,7 +24,9 @@ using AccessHelpers = ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds
       MC<RigidbodyModule, EEntityWorlds::STANDARD>,
       MC<PlanetGravityModule, EEntityWorlds::STANDARD>,
       MC<FuelTankModule, EEntityWorlds::STANDARD>,
-      MC<NozzleEngineModule, EEntityWorlds::STANDARD>>;
+      MC<NozzleEngineModule, EEntityWorlds::STANDARD>,
+      MC<PhysicsFloatingOriginModule, EEntityWorlds::STANDARD>,
+      MC<RocketCameraMoverModule, EEntityWorlds::CAMERA>>;
 
 void RocketUIController::VirtualUpdate()
 {
@@ -181,6 +187,41 @@ void RocketUIController::VirtualUpdate()
                 FHasApoapsis = true;
             }
         }
+
+        PhysicsFloatingOriginModule* origin = accessHelpers.GetModule<PhysicsFloatingOriginModule>(rocketManager.UnitId());
+        if (origin != nullptr)
+        {
+            ImGui::SeparatorText("Floating origin");
+            ImGui::Text("Origin shift enabled : %s", Physics::GetConfig().FbEnableOriginShift ? "yes" : "no");
+
+            const dvec3& absoluteOrigin = origin->Origin();
+            ImGui::Text("Origin : %.3f %.3f %.3f", absoluteOrigin.x, absoluteOrigin.y, absoluteOrigin.z);
+            ImGui::Text("Local vessel COM : %.3f %.3f %.3f", RocketPosition.x, RocketPosition.y, RocketPosition.z);
+            ImGui::Text("Distance to local zero : %.3f m", Length(RocketPosition));
+
+            float bubbleRadius = static_cast<float>(origin->BubbleRadius());
+            if (ImGui::SliderFloat("Bubble radius", &bubbleRadius, 50.f, 20000.f, "%.0f m"))
+                origin->SetBubbleRadius(bubbleRadius);
+            FOriginBubbleRadius = bubbleRadius;
+
+            ImGui::Text("Planet local COM : %.3f %.3f %.3f", PlanetPosition.x, PlanetPosition.y, PlanetPosition.z);
+
+            foreachitem(mover, accessHelpers.Accessor<RocketCameraMoverModule>())
+            {
+                if (mover.TargetedRocket() != rocketManager.UnitId())
+                    continue;
+
+                ImGui::Text("Camera distance : %.3f m", mover.Distance());
+                const Camera* camera = CameraManager::Instance().GetCamera(mover.CamId());
+                if (camera != nullptr)
+                {
+                    ImGui::Text("Near plane : %.4f", camera->Near());
+                    ImGui::Text("Far plane : %.1f", camera->Far());
+                }
+            }
+
+            ImGui::Checkbox("Draw origin bubble", &FDrawOriginBubble);
+        }
         ImGui::Unindent();
     }
 
@@ -198,6 +239,13 @@ void RocketUIController::DrawDebug(Rendering::DrawCommandBuffer* buffer, const R
 
     if (FHasSASTargetDraw)
         buffer->DrawDebugArrow(material, FSASTargetOrigin, FSASTargetDirection, 20.f, 0xFF00FFFFu);
+
+    if (FDrawOriginBubble)
+    {
+        constexpr float originMarkerRadius = 5.f;
+        buffer->DrawDebugSphere(material, vec3(0.f), FOriginBubbleRadius, 0xFF00FFFFu);
+        buffer->DrawDebugSphere(material, vec3(0.f), originMarkerRadius, 0xFFFFFFFFu);
+    }
 }
 } // namespace UI
 } // namespace ECSEngine

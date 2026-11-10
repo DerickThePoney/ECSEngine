@@ -5,6 +5,7 @@
 
 #include "Common/SavingSystemImplementation.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
+#include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::PhysicsFloatingOriginModuleTemplate);
@@ -36,10 +37,14 @@ void PhysicsFloatingOriginModule::SaveLoad(Chunk& parChunk)
     parent_type::SaveLoad(parChunk);
 
     parChunk & FOrigin;
+
+    if (!isWriting)
+        SetBubbleRadius(Template<PhysicsFloatingOriginModuleTemplate>()->BubbleRadius());
 }
 
 PhysicsFloatingOriginModule::PhysicsFloatingOriginModule()
     : Module()
+    , FOrigin(0.0)
 {
 }
 
@@ -47,10 +52,21 @@ PhysicsFloatingOriginModule::~PhysicsFloatingOriginModule()
 {
 }
 
-const double PhysicsFloatingOriginModule::BubbleRadius() const
+void PhysicsFloatingOriginModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
 {
+    parent_type::VirtualInit(parUnitId, parParameters);
+
     const PhysicsFloatingOriginModuleTemplate* const Temp = Template<PhysicsFloatingOriginModuleTemplate>();
-    return Temp->BubbleRadius();
+    SetBubbleRadius(Temp->BubbleRadius());
+}
+
+void PhysicsFloatingOriginModule::SetBubbleRadius(double Radius)
+{
+    if (Radius < 50.0)
+        Radius = 50.0;
+    if (Radius > 20000.0)
+        Radius = 20000.0;
+    FBubbleRadius = Radius;
 }
 
 } // namespace ECSEngine
