@@ -57,6 +57,15 @@ void SaveLoad<SavingSystem::SaveChunk, float, true>(SavingSystem::SaveChunk& par
 }
 
 template<>
+void SaveLoad<SavingSystem::SaveChunk, double, true>(SavingSystem::SaveChunk& parChunk, double& parValue)
+{
+    u32 id = typeid(double).hash_code();
+    u32 size = sizeof(double);
+    u8* data = reinterpret_cast<u8*>(&parValue);
+    parChunk.GetBuffer().WriteData(id, size, data);
+}
+
+template<>
 void SaveLoad<SavingSystem::SaveChunk, vec3, true>(SavingSystem::SaveChunk& parChunk, vec3& parValue)
 {
     u32 id = typeid(vec3).hash_code();
@@ -151,6 +160,13 @@ void SaveLoad<SavingSystem::ReadChunk, float, false>(SavingSystem::ReadChunk& pa
 {
     u8* data = reinterpret_cast<u8*>(&parValue);
     GenericLoad(parChunk, data, typeid(float).hash_code(), sizeof(float));
+}
+
+template<>
+void SaveLoad<SavingSystem::ReadChunk, double, false>(SavingSystem::ReadChunk& parChunk, double& parValue)
+{
+    u8* data = reinterpret_cast<u8*>(&parValue);
+    GenericLoad(parChunk, data, typeid(double).hash_code(), sizeof(double));
 }
 
 template<>
