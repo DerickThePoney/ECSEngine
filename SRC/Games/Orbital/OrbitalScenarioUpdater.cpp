@@ -73,6 +73,8 @@ void OrbitalScenarioUpdater::Initialise()
     FRocketSASSystem.Init();
     FPlanetGravitySystem.Init();
     FRocketMassSystem.Init();
+    FPlanetOrbitSystem.Init();
+
     PhysicsJointSpawner::CreateIFP();
 
     FRocketUIController.Init();
@@ -108,6 +110,7 @@ void OrbitalScenarioUpdater::Destroy()
     FRenderingSystem.Destroy();
     FCameraMoverSystem.Destroy();
     FPlanetGravitySystem.Destroy();
+    FPlanetOrbitSystem.Destroy();
 
     Rendering::FinalCombinePass::Instance().Shutdown();
     Rendering::FinalCombinePass::Destroy();
@@ -133,6 +136,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
     FRocketSteeringSystem.Update();
     FRocketThrustSystem.Update();
     FRocketSASSystem.Update();
+    FPlanetOrbitSystem.Update();
     FPlanetGravitySystem.Update();
     FPhysicsSystem.Update();
 

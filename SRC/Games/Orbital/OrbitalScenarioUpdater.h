@@ -4,6 +4,7 @@
 #include "ECSGameplay_Common/SynchroWithRenderSystem.h"
 #include "PhysicsFloatingOriginSystem.h"
 #include "PlanetGravitySystem.h"
+#include "PlanetOrbitalPathFollowingSystem.h"
 #include "RocketCameraMoverSystem.h"
 #include "RocketControllerSystem.h"
 #include "RocketMassSystem.h"
@@ -47,6 +48,7 @@ private:
     RocketSASSystem FRocketSASSystem;
     PlanetGravitySystem FPlanetGravitySystem;
     RocketMassSystem FRocketMassSystem;
+    PlanetOrbitalPathFollowingSystem FPlanetOrbitSystem;
 
     UI::RocketUIController FRocketUIController;
 };
