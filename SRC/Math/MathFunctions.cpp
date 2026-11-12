@@ -37,9 +37,19 @@ float Cos(float x)
     return cosf(x);
 }
 
+double Cos(double x)
+{
+    return cos(x);
+}
+
 float Sin(float x)
 {
     return sinf(x);
+}
+
+double Sin(double x)
+{
+    return sin(x);
 }
 
 bool IsNan(float x)

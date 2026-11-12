@@ -40,7 +40,9 @@ vec3 Clamp(const vec3& a, const vec3& m, const vec3& M);
 
 float Atan2(float x, float y);
 float Cos(float x);
+double Cos(double x);
 float Sin(float x);
+double Sin(double x);
 bool IsNan(float x);
 
 inline float Sign(float a)
