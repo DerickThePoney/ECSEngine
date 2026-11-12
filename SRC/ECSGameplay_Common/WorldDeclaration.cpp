@@ -9,6 +9,7 @@
 #include "ECSCore/WorldIds.h"
 #include "ECSCore/WorldManager.h"
 #include "OrientationModule.h"
+#include "PhysicsFloatingOriginModule.h"
 #include "PositionModule.h"
 #include "RigidbodyModule.h"
 #include "brigand/algorithms/for_each.hpp"
@@ -16,7 +17,12 @@
 
 namespace ECSEngine
 {
-using StandardControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::ApparenceModule, ECSEngine::RigidbodyModule, ECSEngine::BoxColliderModule>;
+using StandardControllers = brigand::list<ECSEngine::PositionModule,
+      ECSEngine::OrientationModule,
+      ECSEngine::ApparenceModule,
+      ECSEngine::RigidbodyModule,
+      ECSEngine::BoxColliderModule,
+      ECSEngine::PhysicsFloatingOriginModule>;
 
 using CameraControllers = brigand::list<ECSEngine::PositionModule, ECSEngine::OrientationModule, ECSEngine::CameraMoverModule>;
 

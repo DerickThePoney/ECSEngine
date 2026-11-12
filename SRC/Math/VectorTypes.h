@@ -14,6 +14,7 @@ struct Vector3;
 using vec3 = Vector3<float>;
 using uvec3 = Vector3<u32>;
 using ivec3 = Vector3<i32>;
+using dvec3 = Vector3<double>;
 
 template<typename T>
 struct Vector4;
@@ -21,4 +22,4 @@ using vec4 = Vector4<float>;
 using uvec4 = Vector4<u32>;
 using ivec4 = Vector4<i32>;
 
-}
+} // namespace ECSEngine

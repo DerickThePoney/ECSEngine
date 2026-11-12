@@ -42,6 +42,17 @@ void GFXRepresentationManager::Update(float parCurrentTime)
     SkelettonManager::Instance().UpdateSkinningMatrices();
 }
 
+void GFXRepresentationManager::ShiftRepresentations(const vec3& Delta)
+{
+    foreachitem(idGFXpair, FGFXRepresentations)
+    {
+        if (idGFXpair.second == nullptr)
+            continue;
+
+        idGFXpair.second->Shift(Delta);
+    }
+}
+
 void GFXRepresentationManager::OnGameplayFrameEnded()
 {
     FGameplayFrameEnded = true;

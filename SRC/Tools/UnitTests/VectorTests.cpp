@@ -4,6 +4,31 @@
 #include "Math/VectorUtils.h"
 #include "doctest.h"
 
+#include <limits>
+#include <type_traits>
+
+static_assert(sizeof(ECSEngine::vec2) == sizeof(float) * 2);
+static_assert(alignof(ECSEngine::vec2) == alignof(float));
+static_assert(sizeof(ECSEngine::vec3) == sizeof(float) * 3);
+static_assert(alignof(ECSEngine::vec3) == alignof(float));
+static_assert(sizeof(ECSEngine::vec4) == sizeof(float) * 4);
+static_assert(alignof(ECSEngine::vec4) == alignof(float));
+static_assert(sizeof(ECSEngine::dvec3) == sizeof(double) * 3);
+static_assert(alignof(ECSEngine::dvec3) == alignof(double));
+
+static_assert(std::is_same_v<decltype(ECSEngine::Dot(ECSEngine::vec3{}, ECSEngine::vec3{})), float>);
+static_assert(std::is_same_v<decltype(ECSEngine::Length(ECSEngine::vec3{})), float>);
+static_assert(std::is_same_v<decltype(ECSEngine::LengthSq(ECSEngine::vec3{})), float>);
+static_assert(std::is_same_v<decltype(ECSEngine::ooLength(ECSEngine::vec3{})), float>);
+static_assert(std::is_same_v<decltype(ECSEngine::Normalize(ECSEngine::vec3{})), ECSEngine::vec3>);
+
+static_assert(std::is_same_v<decltype(ECSEngine::Dot(ECSEngine::dvec3{}, ECSEngine::dvec3{})), double>);
+static_assert(std::is_same_v<decltype(ECSEngine::Length(ECSEngine::dvec3{})), double>);
+static_assert(std::is_same_v<decltype(ECSEngine::LengthSq(ECSEngine::dvec3{})), double>);
+static_assert(std::is_same_v<decltype(ECSEngine::ooLength(ECSEngine::dvec3{})), double>);
+static_assert(std::is_same_v<decltype(ECSEngine::Normalize(ECSEngine::dvec3{})), ECSEngine::dvec3>);
+static_assert(std::is_same_v<decltype(ECSEngine::Cross(ECSEngine::dvec3{}, ECSEngine::dvec3{})), ECSEngine::dvec3>);
+
 template<typename VecType>
 void Vec2UnitTests()
 {
@@ -228,9 +253,7 @@ void Vec3UnitTests()
         VecType test1(2.f, 2.f, 3.0f);
         VecType test2 = test1;
 
-        CHECK(test1.x == 2.f);
-        CHECK(test1.y == 2.f);
-        CHECK(test1.z == 3.f);
+        CHECK(test2 == test1);
     }
 
     {
@@ -394,10 +417,7 @@ void Vec4UnitTests()
         VecType test1(2.f, 2.f, 3.0f, 5.0f);
         VecType test2 = test1;
 
-        CHECK(test1.x == 2.f);
-        CHECK(test1.y == 2.f);
-        CHECK(test1.z == 3.f);
-        CHECK(test1.w == 5.f);
+        CHECK(test2 == test1);
     }
 
     {
@@ -509,6 +529,21 @@ TEST_SUITE("Vector tests")
             CHECK(abs(length - 1.f) < 1.e-3);
         }
 
+        SUBCASE("Vec2 scalar on the left")
+        {
+            const ECSEngine::vec2 value(2.f, 4.f);
+            const ECSEngine::vec2 subtracted = 8.f - value;
+            CHECK(subtracted.x == 6.f);
+            CHECK(subtracted.y == 4.f);
+
+            const ECSEngine::vec2 divided = 8.f / value;
+            CHECK(divided.x == 4.f);
+            CHECK(divided.y == 2.f);
+
+            CHECK(!ECSEngine::IsNan(value));
+            CHECK(ECSEngine::IsNan(ECSEngine::vec2(std::numeric_limits<float>::quiet_NaN(), 1.f)));
+        }
+
         SUBCASE("Vec2 int")
         {
             Vec2UnitTests<ECSEngine::ivec2>();
@@ -576,6 +611,45 @@ TEST_SUITE("Vector tests")
             CHECK(div2.z == 1.f);
         }
 
+        SUBCASE("Vec3 length, normalize and component ops")
+        {
+            const ECSEngine::vec3 triple(3.f, 4.f, 0.f);
+            CHECK(ECSEngine::Length(triple) == 5.f);
+            CHECK(ECSEngine::ooLength(triple) * ECSEngine::Length(triple) == doctest::Approx(1.f));
+
+            const ECSEngine::vec3 axis = ECSEngine::Normalize(ECSEngine::vec3(0.f, 5.f, 0.f));
+            CHECK(axis == ECSEngine::vec3(0.f, 1.f, 0.f));
+
+            const ECSEngine::vec3 from(0.f, 0.f, 0.f);
+            const ECSEngine::vec3 to(10.f, 0.f, -10.f);
+            CHECK(ECSEngine::Lerp(from, to, 0.f) == from);
+            CHECK(ECSEngine::Lerp(from, to, 1.f) == to);
+            CHECK(ECSEngine::Lerp(from, to, 0.5f) == ECSEngine::vec3(5.f, 0.f, -5.f));
+
+            const ECSEngine::vec3 low(1.f, 5.f, -2.f);
+            const ECSEngine::vec3 high(3.f, 4.f, 0.f);
+            CHECK(ECSEngine::VecMin(low, high) == ECSEngine::vec3(1.f, 4.f, -2.f));
+            CHECK(ECSEngine::VecMax(low, high) == ECSEngine::vec3(3.f, 5.f, 0.f));
+            CHECK(ECSEngine::Abs(ECSEngine::vec3(-1.f, 2.f, -3.f)) == ECSEngine::vec3(1.f, 2.f, 3.f));
+            CHECK(ECSEngine::Invert(ECSEngine::vec3(1.f, -2.f, 3.f)) == ECSEngine::vec3(-1.f, 2.f, -3.f));
+
+            const ECSEngine::vec3 indexed(4.f, 5.f, 6.f);
+            CHECK(indexed[0] == 4.f);
+            CHECK(indexed[1] == 5.f);
+            CHECK(indexed[2] == 6.f);
+
+            ECSEngine::vec3 accumulated(1.f, 2.f, 3.f);
+            accumulated += 1.f;
+            accumulated *= 2.f;
+            CHECK(accumulated == ECSEngine::vec3(4.f, 6.f, 8.f));
+
+            const ECSEngine::vec3 fromVec2(ECSEngine::vec2(4.f, 5.f));
+            CHECK(fromVec2 == ECSEngine::vec3(4.f, 5.f, 0.f));
+
+            CHECK(!ECSEngine::IsNan(indexed));
+            CHECK(ECSEngine::IsNan(ECSEngine::vec3(1.f, std::numeric_limits<float>::quiet_NaN(), 3.f)));
+        }
+
         SUBCASE("Vec3 int")
         {
             Vec3UnitTests<ECSEngine::ivec3>();
@@ -608,6 +682,22 @@ TEST_SUITE("Vector tests")
             CHECK(abs(length - 1.f) < 1.e-3);
         }
 
+        SUBCASE("Vec4 length and w-preserving invert")
+        {
+            const ECSEngine::vec4 triple(1.f, 2.f, 2.f, 4.f);
+            CHECK(ECSEngine::Length(triple) == 5.f);
+
+            const ECSEngine::vec4 built(ECSEngine::vec3(1.f, 2.f, 3.f));
+            CHECK(built == ECSEngine::vec4(1.f, 2.f, 3.f, 0.f));
+            CHECK(built[3] == 0.f);
+
+            const ECSEngine::vec4 flipped = ECSEngine::Invert(ECSEngine::vec4(1.f, 2.f, 3.f, 4.f));
+            CHECK(flipped == ECSEngine::vec4(-1.f, -2.f, -3.f, 4.f));
+
+            CHECK(!ECSEngine::IsNan(built));
+            CHECK(ECSEngine::IsNan(ECSEngine::vec4(1.f, 2.f, 3.f, std::numeric_limits<float>::quiet_NaN())));
+        }
+
         SUBCASE("Vec4 int")
         {
             Vec4UnitTests<ECSEngine::ivec4>();
@@ -616,6 +706,48 @@ TEST_SUITE("Vector tests")
         SUBCASE("Vec4 uint")
         {
             Vec4UnitTests<ECSEngine::uvec4>();
+        }
+    }
+
+    TEST_CASE("Dvec3 tests")
+    {
+        SUBCASE("Same arithmetic as vec3")
+        {
+            Vec3UnitTests<ECSEngine::dvec3>();
+        }
+
+        SUBCASE("Double precision")
+        {
+            const ECSEngine::dvec3 origin(1.0e10, -2.0e10, 3.0e10);
+            const ECSEngine::dvec3 delta(0.25, -0.5, 0.125);
+            const ECSEngine::dvec3 sum = origin + delta;
+            CHECK(sum.x - origin.x == 0.25);
+            CHECK(sum.y - origin.y == -0.5);
+            CHECK(sum.z - origin.z == 0.125);
+            CHECK(static_cast<float>(origin.x) + 0.25f == static_cast<float>(origin.x));
+
+            const double pastFloat = 16777217.0;
+            const ECSEngine::dvec3 wide(pastFloat, 0.0, 0.0);
+            CHECK(ECSEngine::Length(wide) == pastFloat);
+            CHECK(ECSEngine::LengthSq(wide) == pastFloat * pastFloat);
+            CHECK(ECSEngine::ooLength(wide) * pastFloat == doctest::Approx(1.0));
+            CHECK(static_cast<float>(pastFloat) != pastFloat);
+
+            const ECSEngine::dvec3 triple(3.0, 4.0, 0.0);
+            CHECK(ECSEngine::Length(triple) == 5.0);
+            CHECK(ECSEngine::Dot(triple, ECSEngine::dvec3(1.0, 1.0, 1.0)) == 7.0);
+
+            const ECSEngine::dvec3 axis = ECSEngine::Normalize(ECSEngine::dvec3(0.0, 5.0, 0.0));
+            CHECK(axis == ECSEngine::dvec3(0.0, 1.0, 0.0));
+
+            const ECSEngine::dvec3 crossed = ECSEngine::Cross(ECSEngine::dvec3(1.0, 0.0, 0.0), ECSEngine::dvec3(0.0, 1.0, 0.0));
+            CHECK(crossed == ECSEngine::dvec3(0.0, 0.0, 1.0));
+
+            const ECSEngine::dvec3 absolute = ECSEngine::Abs(ECSEngine::dvec3(-pastFloat, 0.0, -4.0));
+            CHECK(absolute.x == pastFloat);
+            CHECK(absolute.z == 4.0);
+
+            CHECK((8.0 - ECSEngine::dvec3(2.0, 4.0, 8.0)) == ECSEngine::dvec3(6.0, 4.0, 0.0));
         }
     }
 }

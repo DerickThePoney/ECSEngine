@@ -30,6 +30,7 @@ public:
     void Cleanup();
 
     void UpdatePhysics(float parDeltaTime);
+    bool ShiftWorld(const vec3& Delta);
 
     const PhysicsEngineConfiguration& Config() const { return FConfig; }
     void SetConfig(const PhysicsEngineConfiguration& NewConfig) { FConfig = NewConfig; }
@@ -47,9 +48,12 @@ public:
     bool SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, const vec3& RotationVelocity);
 
     bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position) const;
+    bool GetBodyCenterOfMass(const PhysicsBodyHandle& Handle, vec3& CenterOfMass) const;
     bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity) const;
     bool GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation) const;
     bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity) const;
+    bool GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass) const;
+    bool SetBodyMass(const PhysicsBodyHandle& Handle, const float Mass);
 
     // body forces and torques
     bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration);
@@ -76,6 +80,7 @@ public:
 
 private:
     void InitializeBody(RigidBody* Body, const mat4& Transform, const PhysicsBodyConfig& BodyConfig);
+    void SetupMassProperties(RigidBody* Body, const mat4& Transform, bool bAutocomputeMass);
 
     void UpdateInertiaTransform(RigidBody* Body);
 

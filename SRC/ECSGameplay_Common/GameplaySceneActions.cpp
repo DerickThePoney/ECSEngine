@@ -643,7 +643,7 @@ bool SpawnJoinedEntitiesSceneAction::VirtualDrawInSceneEditor(Rendering::DrawCom
         }
     }
 
-    return false;
+    return true;
 }
 
 } // namespace ECSEngine

@@ -56,6 +56,11 @@ AABB3f BroadPhase::GetFatAABB3f(const PhysicsBodyHandle& handle) const
     return FTree.GetFatAABB3f(handle);
 }
 
+void BroadPhase::TranslateTree(const vec3& Delta)
+{
+    FTree.TranslateTree(Delta);
+}
+
 void BroadPhase::Raycast(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& parLeafsHit)
 {
     FTree.RaycastTree(parRay, parLeafsHit);

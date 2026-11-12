@@ -22,6 +22,11 @@ void Carrier::Update(const float parCurrentTime)
     FLocalToWorld = Translation(FPosition.GetCurrentValue()) * (mat4)FOrientation.GetCurrentValue();
 }
 
+void Carrier::Shift(const vec3& Delta)
+{
+    FPosition.Shift(Delta);
+}
+
 void Carrier::PushNewFullKeyframe(const vec3& parNewPosition, const quat& parNewOrientation, const float parTime)
 {
     FPosition.AddNewKeyframe(parNewPosition, parTime);

@@ -72,6 +72,12 @@ void PhysicsConfigurationEditor::DrawEditor(bool* parOpen, float parMenuBarHeigh
         bHasChanged = true;
     }
 
+    ImGui::SeparatorText("Floating origin configuration");
+    if (ImGui::Checkbox("Use floating origin", &Config.FbEnableOriginShift))
+    {
+        bHasChanged = true;
+    }
+
     ImGui::SeparatorText("Contact solver configuration");
     if (ImGui::CollapsingHeader("Collision Layers"))
     {

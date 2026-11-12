@@ -17,6 +17,8 @@ struct PhysicsEngineConfiguration
     float FBaumgarte = 0.3f;
     float FPenetrationSlop = 0.01f;
 
+    bool FbEnableOriginShift = false;
+
     LayersArray FLayers;
     u32 FNumLayers = 0;
 
@@ -31,6 +33,7 @@ struct PhysicsEngineConfiguration
         PROPERTYFIELD(SolverIterations, 10);
         PROPERTYFIELD(Baumgarte, 0.3f);
         PROPERTYFIELD(PenetrationSlop, 0.01f);
+        PROPERTYFIELD(bEnableOriginShift, false);
         PROPERTYFIELD(Layers, LayersArray());
         PROPERTYFIELD(NumLayers, 0);
     }

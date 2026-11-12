@@ -10,6 +10,7 @@
 
 #include "BGFXRenderingBackend.h"
 #include "Common/InputManager.h"
+#include "GLFWWrapper.h"
 #include "ImguiRenderer.h"
 
 namespace ECSEngine
@@ -420,6 +421,7 @@ void GLFWDisplayWindowHandler::Init()
     glfwGetCursorPos(FWindow, &mouse_x, &mouse_y);
 
     Input::Initialise(InputKeyNames::INPUT_KEY_LAST, vec2((float)mouse_x, (float)mouse_y), MouseButtons::MOUSE_BUTTON_LAST);
+    Input::SetPhysicalKeyForBinding(&GLFWWrapper::PhysicalKeyForBinding);
 
     InitJoysticks();
 }

@@ -156,6 +156,19 @@ void ContactManager::CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroad
     }
 }
 
+void ContactManager::TranslateContacts(const vec3& Delta)
+{
+    Contact* Current = FContactList;
+    while (Current != nullptr)
+    {
+        foreachitem(point, Current->FManifold.FContactPoints)
+        {
+            point.FPosition += Delta;
+        }
+        Current = Current->FNext;
+    }
+}
+
 void ContactManager::AddPotentialContactPair(const PhysicsBodyHandle& first, const PhysicsBodyHandle& second)
 {
     // 1. check if contact doesn't exist or shouldn't happen
