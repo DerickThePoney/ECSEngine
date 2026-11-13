@@ -30,11 +30,19 @@ RocketCameraMoverSystem::RocketCameraMoverSystem()
 
     FMiddleMouseRotation.FMouseButton = MouseButtons::MOUSE_BUTTON_3;
     FMiddleMouseRotation.FInputType = EInputType::REPEATED;
+
+    FCameraModeChange.FKeyboardKey = InputKeyNames::INPUT_KEY_M;
+    FCameraModeChange.FInputType = EInputType::PRESSED;
 }
 
 void RocketCameraMoverSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
+
+    if (FCameraModeChange.Evaluate())
+    {
+        FCameraMode = (ECameraMode)(((u8)FCameraMode + 1) % (u8)ECameraMode::LENGTH);
+    }
 
     ModuleAccessor<RocketCameraMoverModule> rocketCameraMoverAccessor(EEntityWorlds::CAMERA);
     ModuleAccessor<PositionModule> positionAccessor(EEntityWorlds::CAMERA);
