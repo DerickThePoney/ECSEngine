@@ -11,19 +11,25 @@ enum class ECameraMode : u8
     LENGTH
 };
 
-class RocketCameraMoverSystem : public ModuleSystem
+class OrbitalCameraMoverSystem : public ModuleSystem
 {
 public:
-    RocketCameraMoverSystem();
+    OrbitalCameraMoverSystem();
 
 protected:
     void VirtualUpdate() override;
 
 private:
+    void UpdateRocketChase();
+    void UpdateMapMode();
+
     MouseButtonCommand FMiddleMouseRotation;
     MouseScrollCommand FMiddleMouseScroll;
 
     KeyboardCommand FMapModeChange;
     ECameraMode FCameraMode = ECameraMode::ROCKET_CHASE;
+
+    float FStoredNear = 0.1f;
+    bool FMapNearActive = false;
 };
 } // namespace ECSEngine

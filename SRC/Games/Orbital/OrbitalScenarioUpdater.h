@@ -5,7 +5,7 @@
 #include "PhysicsFloatingOriginSystem.h"
 #include "PlanetGravitySystem.h"
 #include "PlanetOrbitalPathFollowingSystem.h"
-#include "RocketCameraMoverSystem.h"
+#include "OrbitalCameraMoverSystem.h"
 #include "RocketControllerSystem.h"
 #include "RocketMassSystem.h"
 #include "RocketSASSystem.h"
@@ -39,7 +39,7 @@ private:
     std::string FScenarioFileName;
 
     PhysicsFloatingOriginSystem FFloatingOriginSystem;
-    RocketCameraMoverSystem FCameraMoverSystem;
+    OrbitalCameraMoverSystem FCameraMoverSystem;
     SynchroWithRenderSystem FRenderingSystem;
     PhysicsUpdateSystem FPhysicsSystem;
     RocketControllerSystem FRocketControllerSystem;
