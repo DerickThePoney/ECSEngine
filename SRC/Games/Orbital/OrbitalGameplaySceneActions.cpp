@@ -9,6 +9,7 @@
 #include "ECSCore/ModuleParameters.h"
 #include "ECSGameplay_Common/ApparenceModule.h"
 #include "OrbitalPathFollowerModule.h"
+#include "PlanetarySOIManager.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GFXRepresentation.h"
 #include "RenderingCore/GFXRepresentationDescriptor.h"
@@ -104,6 +105,7 @@ void CreateSolarSystemSceneAction::VirtualStart()
     container.Set<ModuleParameters::EulerAnglesXYZ>(FSceneItem->GetEulerAngles());
 
     EntityId PlanetId = EntityFactory::RequestCreateEntity(FPlanetTemplate, container);
+    PlanetarySOIManager::Instance().RegisterPlanet(PlanetId, EntityId());
 
     const OrbitalPathFollowerModuleTemplate* const PathFollowerTemplate = (OrbitalPathFollowerModuleTemplate*)FMoonTemplate->GetModuleTemplate<OrbitalPathFollowerModule>();
     AssertRelease(PathFollowerTemplate != nullptr);
@@ -112,7 +114,9 @@ void CreateSolarSystemSceneAction::VirtualStart()
           PlanetPosition + PathFollowerTemplate->OrbitRadius() * vec3{ Cos(PathFollowerTemplate->OrbitPhase()), 0.f, Sin(PathFollowerTemplate->OrbitPhase()) });
     container.Set<ModuleParameters::OwnerId>(PlanetId);
 
-    EntityFactory::RequestCreateEntity(FMoonTemplate, container);
+    EntityId MoonId = EntityFactory::RequestCreateEntity(FMoonTemplate, container);
+
+    PlanetarySOIManager::Instance().RegisterPlanet(MoonId, PlanetId);
 
     Finish();
 }

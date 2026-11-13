@@ -43,22 +43,24 @@ void PlanetGravitySystem::VirtualUpdate()
 
         vec3 gravityAcceleration{ 0.f };
 
-        foreachitemconst(planetGravity, planetGravityAccessor)
-        {
-            const RigidbodyModule* const planetRB = rigidbodyAccessor[planetGravity.UnitId()];
-            AssertRelease(planetRB != nullptr);
+        const EntityId& CurrentTargetGravity = rocket.CurrentGravityTarget();
 
-            vec3 planetPosition;
-            const bool hasPlanetCenter = Physics::GetBodyCenterOfMass(planetRB->BodyHandle(), planetPosition);
-            AssertRelease(hasPlanetCenter);
-            if (!hasPlanetCenter)
-                continue;
+        const PlanetGravityModule* planetGravity = planetGravityAccessor[CurrentTargetGravity];
+        AssertRelease(planetGravity);
 
-            vec3 r = vesselPosition - planetPosition;
-            const float lr = Length(r);
-            const float lr_3 = lr * lr * lr;
-            gravityAcceleration -= planetGravity.PlanetGravityConstant() * r / lr_3;
-        }
+        const RigidbodyModule* const planetRB = rigidbodyAccessor[planetGravity->UnitId()];
+        AssertRelease(planetRB != nullptr);
+
+        vec3 planetPosition;
+        const bool hasPlanetCenter = Physics::GetBodyCenterOfMass(planetRB->BodyHandle(), planetPosition);
+        AssertRelease(hasPlanetCenter);
+        if (!hasPlanetCenter)
+            continue;
+
+        vec3 r = vesselPosition - planetPosition;
+        const float lr = Length(r);
+        const float lr_3 = lr * lr * lr;
+        gravityAcceleration -= planetGravity->PlanetGravityConstant() * r / lr_3;
 
         // Hackos
         rocket.SetLastTurnGravity(gravityAcceleration);

@@ -58,15 +58,16 @@ void ComputeSASTarget(RocketManagerModule& rocketManager, ModuleAccessor<Rigidbo
     Physics::GetBodyPosition(bodyRigidbody->BodyHandle(), rocketPosition);
     Physics::GetBodyVelocity(bodyRigidbody->BodyHandle(), rocketVelocity);
 
-    if (planetAccessor.size() != 1)
-        return;
-
-    const PlanetGravityModule& planet = *planetAccessor.begin();
-    const RigidbodyModule* planetBody = rigidbodyAccessor[planet.UnitId()];
+    const PlanetGravityModule* planet = planetAccessor[rocketManager.CurrentGravityTarget()];
+    AssertRelease(planet != nullptr);
+    const RigidbodyModule* planetBody = rigidbodyAccessor[planet->UnitId()];
     AssertRelease(planetBody != nullptr);
 
     vec3 planetPosition;
+    vec3 planetVelocity;
     Physics::GetBodyCenterOfMass(planetBody->BodyHandle(), planetPosition);
+    Physics::GetBodyVelocity(planetBody->BodyHandle(), planetVelocity);
+    rocketVelocity -= planetVelocity;
 
     const vec3 radialOut = rocketPosition - planetPosition;
     const vec3 orbitNormal = Cross(radialOut, rocketVelocity);

@@ -104,6 +104,9 @@ public:
         ClearSASTarget();
     }
 
+    const EntityId& CurrentGravityTarget() const { return FCurrentGravityTarget; }
+    void SetCurrentGravityTarget(const EntityId& Value) { FCurrentGravityTarget = Value; }
+
     Physics::PhysicsJointHandle NozzleJointHandle() const { return FJointHandle; }
 
     template<typename RigidbodyAccessor>
@@ -128,6 +131,8 @@ private:
     ESASMode FSASMode = ESASMode::STABILITY;
 
     float FRocketThrottle = 0.f;
+
+    EntityId FCurrentGravityTarget;
 
     bool FSASActivated = false;
     bool FWasSASActivated = false;

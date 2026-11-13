@@ -34,15 +34,6 @@ void RocketUIController::VirtualUpdate()
 
     AccessHelpers accessHelpers;
 
-    auto& PlanetAccessor = accessHelpers.Accessor<PlanetGravityModule>();
-    if (PlanetAccessor.size() == 0 || PlanetAccessor.size() > 1)
-        return;
-
-    PlanetGravityModule& planetModule = *PlanetAccessor.begin();
-    const RigidbodyModule* planetRigidbodyModule = accessHelpers.GetModule<RigidbodyModule>(planetModule.UnitId());
-    vec3 PlanetPosition;
-    Physics::GetBodyCenterOfMass(planetRigidbodyModule->BodyHandle(), PlanetPosition);
-
     ImGui::Begin("Rocket UI");
 
     u32 rocketIndex = 0;
@@ -50,6 +41,19 @@ void RocketUIController::VirtualUpdate()
     {
         ImGui::SeparatorText(std::format("Rocket {}", rocketIndex++).c_str());
         ImGui::Indent();
+
+        if (!rocketManager.CurrentGravityTarget().Valid())
+        {
+            ImGui::Unindent();
+            continue;
+        }
+
+        const PlanetGravityModule* planetModule = accessHelpers.GetModule<PlanetGravityModule>(rocketManager.CurrentGravityTarget());
+        const RigidbodyModule* planetRigidbodyModule = accessHelpers.GetModule<RigidbodyModule>(planetModule->UnitId());
+        vec3 PlanetPosition;
+        vec3 PlanetVelocity;
+        Physics::GetBodyCenterOfMass(planetRigidbodyModule->BodyHandle(), PlanetPosition);
+        Physics::GetBodyVelocity(planetRigidbodyModule->BodyHandle(), PlanetVelocity);
 
         vec3 RocketPosition;
         vec3 RocketVelocity;
@@ -61,10 +65,12 @@ void RocketUIController::VirtualUpdate()
             continue;
         }
 
+        RocketVelocity -= PlanetVelocity;
+
         const vec3 PlanetToRocket = RocketPosition - PlanetPosition;
         const float LPlanetToRocket = Length(PlanetToRocket);
         const vec3 UpDirection = Normalize(PlanetToRocket);
-        const float Altitude = LPlanetToRocket - planetModule.PlanetRadius();
+        const float Altitude = LPlanetToRocket - planetModule->PlanetRadius();
         const float VerticalSpeed = Dot(RocketVelocity, UpDirection);
         const float HorizontalSpeed = Length(RocketVelocity - VerticalSpeed * UpDirection);
 
@@ -74,15 +80,15 @@ void RocketUIController::VirtualUpdate()
         ImGui::Text("Horizontal speed : %.3f m/s", HorizontalSpeed);
 
         const float rocketSpeedSq = LengthSq(RocketVelocity);
-        const float energy = 0.5f * rocketSpeedSq - planetModule.PlanetGravityConstant() / LPlanetToRocket; // ε
+        const float energy = 0.5f * rocketSpeedSq - planetModule->PlanetGravityConstant() / LPlanetToRocket; // ε
         const vec3 h = Cross(PlanetToRocket, RocketVelocity); // specific angular momentum
         const float hSq = Dot(h, h);
-        const float eccentricity = sqrtf(1.f + 2.f * energy * hSq / (planetModule.PlanetGravityConstant() * planetModule.PlanetGravityConstant()));
-        const float semiMajor = -planetModule.PlanetGravityConstant() / (2.f * energy); // a, negative on a hyperbola
+        const float eccentricity = sqrtf(1.f + 2.f * energy * hSq / (planetModule->PlanetGravityConstant() * planetModule->PlanetGravityConstant()));
+        const float semiMajor = -planetModule->PlanetGravityConstant() / (2.f * energy); // a, negative on a hyperbola
         const float periapsisRadius = semiMajor * (1.f - eccentricity);
-        const float periapsisAltitude = periapsisRadius - planetModule.PlanetRadius();
+        const float periapsisAltitude = periapsisRadius - planetModule->PlanetRadius();
 
-        const float apoapsisAltitude = semiMajor * (1.f + eccentricity) - planetModule.PlanetRadius();
+        const float apoapsisAltitude = semiMajor * (1.f + eccentricity) - planetModule->PlanetRadius();
 
         ImGui::SeparatorText("Trajectory data");
         ImGui::Text("Energy : %.3f", energy);
@@ -153,7 +159,7 @@ void RocketUIController::VirtualUpdate()
 
         if (FDrawPredictedPath)
         {
-            const float mu = planetModule.PlanetGravityConstant();
+            const float mu = planetModule->PlanetGravityConstant();
             const vec3 eVec = Cross(RocketVelocity, h) * (1.f / mu) - UpDirection;
             vec3 periDir;
             if (LengthSq(eVec) < 1.e-8f)

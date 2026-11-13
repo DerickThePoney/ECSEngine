@@ -12,6 +12,7 @@
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
 #include "Physics/PhysicsAPI.h"
+#include "PlanetarySOIManager.h"
 #include "Rendering/FinalCombinePass.h"
 #include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
@@ -75,6 +76,8 @@ void OrbitalScenarioUpdater::Initialise()
     FRocketMassSystem.Init();
     FPlanetOrbitSystem.Init();
 
+    PlanetarySOIManager::CreateIFP();
+
     PhysicsJointSpawner::CreateIFP();
 
     FRocketUIController.Init();
@@ -94,6 +97,8 @@ void OrbitalScenarioUpdater::Destroy()
     }
 
     FRocketUIController.Destroy();
+
+    PlanetarySOIManager::Destroy();
 
     if (PhysicsJointSpawner::HasInstance())
     {
@@ -131,6 +136,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
 {
     AssertRelease(FScenario != nullptr);
     FFloatingOriginSystem.Update();
+    PlanetarySOIManager::Instance().Update();
     FScenario->Update();
     FRocketMassSystem.Update();
     FRocketSteeringSystem.Update();
