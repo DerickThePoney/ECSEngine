@@ -8,6 +8,7 @@
 #include "OrbitalPathFollowerModule.h"
 #include "Physics/PhysicsAPI.h"
 #include "PlanetGravityModule.h"
+#include "RenderingCore/DrawCommands.h"
 #include "RocketManagerModule.h"
 
 namespace ECSEngine
@@ -135,6 +136,31 @@ void PlanetarySOIManager::Update()
     }
 
     rocketManager.SetCurrentGravityTarget(RocketGravity);
+}
+
+void PlanetarySOIManager::DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material)
+{
+    if (!FbInitialized)
+        return;
+
+    using DrawAccessHelpers = ScopedModuleAccessor<MC<RigidbodyModule, EEntityWorlds::STANDARD>>;
+    DrawAccessHelpers accessHelpers;
+
+    foreachitem(node, FPlanetNodes)
+    {
+        if (node.FSOIRadius <= 0.f)
+            continue;
+
+        const RigidbodyModule* body = accessHelpers.GetModule<RigidbodyModule>(node.FPlanetId);
+        if (body == nullptr)
+            continue;
+
+        vec3 centerOfMass;
+        if (!Physics::GetBodyCenterOfMass(body->BodyHandle(), centerOfMass))
+            continue;
+
+        buffer->DrawDebugSphere(material, centerOfMass, node.FSOIRadius, 0xFFFF8800u);
+    }
 }
 
 } // namespace ECSEngine

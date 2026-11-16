@@ -184,6 +184,9 @@ void OrbitalScenarioUpdater::DebugRender()
         }
 
         FRocketUIController.DrawDebug(buffer, handle);
+        FPlanetOrbitSystem.DrawDebug(buffer, handle);
+        FCameraMoverSystem.DrawDebug(buffer, handle);
+        PlanetarySOIManager::Instance().DrawDebug(buffer, handle);
 
         buffer->Submit();
         buffer->clear();

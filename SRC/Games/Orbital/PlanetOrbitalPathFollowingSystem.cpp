@@ -9,6 +9,7 @@
 #include "OrbitalPathFollowerModule.h"
 #include "Physics/PhysicsAPI.h"
 #include "PlanetGravityModule.h"
+#include "RenderingCore/DrawCommands.h"
 
 namespace ECSEngine
 {
@@ -77,5 +78,41 @@ void PlanetOrbitalPathFollowingSystem::VirtualUpdate()
         Physics::SetBodyPosition(body->BodyHandle(), NewPosition);
         Physics::SetBodyVelocity(body->BodyHandle(), NewVelocity);
     }
+}
+
+void PlanetOrbitalPathFollowingSystem::DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material)
+{
+    FOrbitRings.clear();
+
+    LockControllers();
+
+    ModuleAccessor<OrbitalPathFollowerModule> pathFollowerAccessor(EEntityWorlds::STANDARD);
+    ModuleAccessor<RigidbodyModule> rigidbodyAccessor(EEntityWorlds::STANDARD);
+
+    foreachitem(pathFollower, pathFollowerAccessor)
+    {
+        RigidbodyModule* parentBody = rigidbodyAccessor[pathFollower.ParentObject()];
+        if (parentBody == nullptr)
+            continue;
+
+        vec3 parentPosition;
+        if (!Physics::GetBodyPosition(parentBody->BodyHandle(), parentPosition))
+            continue;
+
+        constexpr u32 sampleCount = 64;
+        std::vector<vec3> points(sampleCount);
+        const float radius = pathFollower.OrbitRadius();
+        for (u32 i = 0; i < sampleCount; ++i)
+        {
+            const float theta = (float)i / (float)sampleCount * 2.f * Pi();
+            points[i] = parentPosition + radius * vec3(Cos(theta), 0.f, Sin(theta));
+        }
+        FOrbitRings.push_back(std::move(points));
+    }
+
+    UnlockControllers();
+
+    for (const std::vector<vec3>& points : FOrbitRings)
+        buffer->DrawLines(material, points.data(), (u32)points.size(), 0xFF66CCFFu, true);
 }
 } // namespace ECSEngine

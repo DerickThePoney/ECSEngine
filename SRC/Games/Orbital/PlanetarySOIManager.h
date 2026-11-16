@@ -5,6 +5,11 @@
 
 namespace ECSEngine
 {
+namespace Rendering
+{
+class DrawCommandBuffer;
+class MaterialInstanceHandle;
+} // namespace Rendering
 
 struct PlanetNode
 {
@@ -25,7 +30,7 @@ public:
 
     void Update();
 
-    /*void DrawDebug();*/
+    void DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material);
 
 private:
     void Initialize();

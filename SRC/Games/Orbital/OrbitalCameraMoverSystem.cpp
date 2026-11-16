@@ -13,6 +13,7 @@
 #include "Physics/PhysicsAPI.h"
 #include "PlanetGravityModule.h"
 #include "RenderingCore/Carrier.h"
+#include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GFXRepresentation.h"
 #include "RenderingCore/GFXRepresentationManager.h"
 #include "RenderingCore/GFXRepresentationProxy.h"
@@ -264,6 +265,27 @@ void OrbitalCameraMoverSystem::UpdateMapMode()
         }
         camera->SetNear(Max(0.1f, distance * 1.e-3f));
     }
+}
+
+void OrbitalCameraMoverSystem::DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material)
+{
+    if (FCameraMode != ECameraMode::MAP_MODE)
+        return;
+
+    LockControllers();
+
+    ModuleAccessor<RocketManagerModule> rocketManagerAccessor(EEntityWorlds::STANDARD);
+    ModuleAccessor<RigidbodyModule> rigidbodyAccessor(EEntityWorlds::STANDARD);
+
+    foreachitem(rocket, rocketManagerAccessor)
+    {
+        vec3 rocketPosition;
+        if (!rocket.ComputeCenterOfMass(rigidbodyAccessor, rocketPosition))
+            continue;
+        buffer->DrawDebugSphere(material, rocketPosition, 200.f, 0xFFFFFFFFu);
+    }
+
+    UnlockControllers();
 }
 
 } // namespace ECSEngine

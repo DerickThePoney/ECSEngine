@@ -4,6 +4,12 @@
 
 namespace ECSEngine
 {
+namespace Rendering
+{
+class DrawCommandBuffer;
+class MaterialInstanceHandle;
+} // namespace Rendering
+
 enum class ECameraMode : u8
 {
     ROCKET_CHASE,
@@ -15,6 +21,9 @@ class OrbitalCameraMoverSystem : public ModuleSystem
 {
 public:
     OrbitalCameraMoverSystem();
+
+    ECameraMode CameraMode() const { return FCameraMode; }
+    void DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material);
 
 protected:
     void VirtualUpdate() override;
