@@ -83,6 +83,9 @@ void PlanetarySOIManager::Update()
     UpdateAccessHelpers accessHelpers;
 
     AssertRelease(accessHelpers.Accessor<RocketManagerModule>().size() <= 1);
+    if (accessHelpers.Accessor<RocketManagerModule>().size() == 0)
+        return;
+
     RocketManagerModule& rocketManager = *accessHelpers.Accessor<RocketManagerModule>().begin();
     vec3 RocketPosition;
     rocketManager.ComputeCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), RocketPosition);

@@ -61,7 +61,7 @@ void PlanetGravitySystem::VirtualUpdate()
             continue;
 
         vec3 r = vesselPosition - planetPosition;
-        const float lr = Length(r);
+        const float lr = Max(Length(r), 1.f);
         const float lr_3 = lr * lr * lr;
         gravityAcceleration -= planetGravity->PlanetGravityConstant() * r / lr_3;
 
