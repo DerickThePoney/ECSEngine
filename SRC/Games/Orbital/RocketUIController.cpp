@@ -9,6 +9,7 @@
 #include "ECSGameplay_Common/RigidbodyModule.h"
 #include "FuelTankModule.h"
 #include "NozzleEngineModule.h"
+#include "OrbitalPathFollowerModule.h"
 #include "Physics/PhysicsAPI.h"
 #include "Physics/PhysicsEngineConfiguration.h"
 #include "PlanetGravityModule.h"
@@ -99,6 +100,7 @@ void RocketUIController::VirtualUpdate()
 
         FHasPeriapsis = false;
         FHasApoapsis = false;
+        FHasTransferBurn = false;
         FOrbitPoints.clear();
 
         ImGui::Checkbox("Draw predicted trajectory", &FDrawPredictedPath);
@@ -195,6 +197,42 @@ void RocketUIController::VirtualUpdate()
             }
         }
 
+        const float transferRadius = LPlanetToRocket;
+        if (transferRadius > planetModule->PlanetRadius())
+        {
+            foreachitem(follower, accessHelpers.Accessor<OrbitalPathFollowerModule>())
+            {
+                if (follower.ParentObject() != rocketManager.CurrentGravityTarget())
+                    continue;
+
+                const float moonOrbitRadius = follower.OrbitRadius();
+                if (transferRadius >= moonOrbitRadius)
+                    continue;
+
+                const RigidbodyModule* moonBody = accessHelpers.GetModule<RigidbodyModule>(follower.UnitId());
+                if (moonBody == nullptr)
+                    continue;
+
+                vec3 moonPosition;
+                if (!Physics::GetBodyCenterOfMass(moonBody->BodyHandle(), moonPosition))
+                    continue;
+
+                vec3 moonOffset = moonPosition - PlanetPosition;
+                moonOffset.y = 0.f;
+                if (LengthSq(moonOffset) < 1.f)
+                    continue;
+
+                const vec3 moonDir = Normalize(moonOffset);
+                const float phase = Pi() * (1.f - powf((transferRadius + moonOrbitRadius) / (2.f * moonOrbitRadius), 1.5f));
+                const float c = Cos(phase);
+                const float s = Sin(phase);
+                const vec3 burnDir(moonDir.x * c + moonDir.z * s, 0.f, moonDir.z * c - moonDir.x * s);
+                FTransferBurn = PlanetPosition + Normalize(burnDir) * transferRadius;
+                FHasTransferBurn = true;
+                break;
+            }
+        }
+
         PhysicsFloatingOriginModule* origin = accessHelpers.GetModule<PhysicsFloatingOriginModule>(rocketManager.UnitId());
         if (origin != nullptr)
         {
@@ -243,6 +281,8 @@ void RocketUIController::DrawDebug(Rendering::DrawCommandBuffer* buffer, const R
         buffer->DrawDebugSphere(material, FPeriapsis, 10.f, 0xFF00FF00u);
     if (FHasApoapsis)
         buffer->DrawDebugSphere(material, FApoapsis, 10.f, 0xFF0000FFu);
+    if (FHasTransferBurn)
+        buffer->DrawDebugSphere(material, FTransferBurn, 150.f, 0xFF44FF88u);
 
     if (FHasSASTargetDraw)
         buffer->DrawDebugArrow(material, FSASTargetOrigin, FSASTargetDirection, 20.f, 0xFF00FFFFu);
