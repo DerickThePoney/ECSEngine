@@ -26,6 +26,7 @@ using AccessHelpers = ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds
       MC<FuelTankModule, EEntityWorlds::STANDARD>,
       MC<NozzleEngineModule, EEntityWorlds::STANDARD>,
       MC<PhysicsFloatingOriginModule, EEntityWorlds::STANDARD>,
+      MC<OrbitalPathFollowerModule, EEntityWorlds::STANDARD>,
       MC<RocketCameraMoverModule, EEntityWorlds::CAMERA>>;
 
 void RocketUIController::VirtualUpdate()
@@ -34,7 +35,7 @@ void RocketUIController::VirtualUpdate()
 
     AccessHelpers accessHelpers;
 
-    ImGui::Begin("Rocket UI");
+    ImGui::Begin("Rocket UI", (bool*)0, ImGuiWindowFlags_AlwaysAutoResize);
 
     u32 rocketIndex = 0;
     foreachitem(rocketManager, accessHelpers.Accessor<RocketManagerModule>())
