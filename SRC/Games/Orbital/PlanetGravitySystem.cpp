@@ -5,6 +5,7 @@
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
+#include "OrbitalPathFollowerModule.h"
 #include "Physics/PhysicsAPI.h"
 #include "PlanetGravityModule.h"
 #include "RocketManagerModule.h"
@@ -18,6 +19,7 @@ void PlanetGravitySystem::VirtualInit()
     RegisterDependency<RigidbodyModule>(EEntityWorlds::STANDARD);
     RegisterDependency<PlanetGravityModule>(EEntityWorlds::STANDARD);
     RegisterDependency<RocketManagerModule>(EEntityWorlds::STANDARD);
+    RegisterDependency<OrbitalPathFollowerModule>(EEntityWorlds::STANDARD);
 }
 
 void PlanetGravitySystem::VirtualUpdate()
@@ -27,6 +29,7 @@ void PlanetGravitySystem::VirtualUpdate()
     ModuleAccessor<RocketManagerModule> rocketManagerAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<RigidbodyModule> rigidbodyAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<PlanetGravityModule> planetGravityAccessor(EEntityWorlds::STANDARD);
+    ModuleAccessor<OrbitalPathFollowerModule> orbitFollowerAccessor(EEntityWorlds::STANDARD);
 
     foreachitem(rocket, rocketManagerAccessor)
     {
@@ -48,7 +51,7 @@ void PlanetGravitySystem::VirtualUpdate()
         const PlanetGravityModule* planetGravity = planetGravityAccessor[CurrentTargetGravity];
         AssertRelease(planetGravity);
 
-        const RigidbodyModule* const planetRB = rigidbodyAccessor[planetGravity->UnitId()];
+        const RigidbodyModule* const planetRB = rigidbodyAccessor[CurrentTargetGravity];
         AssertRelease(planetRB != nullptr);
 
         vec3 planetPosition;
@@ -64,6 +67,23 @@ void PlanetGravitySystem::VirtualUpdate()
 
         // Hackos
         rocket.SetLastTurnGravity(gravityAcceleration);
+
+        const OrbitalPathFollowerModule* const orbitFollowerModule = orbitFollowerAccessor[CurrentTargetGravity];
+        if (orbitFollowerModule != nullptr)
+        {
+            EntityId ParentPlanet = orbitFollowerModule->ParentObject();
+            AssertRelease(ParentPlanet.Valid());
+
+            const RigidbodyModule* const parentPlanetRB = rigidbodyAccessor[ParentPlanet];
+            AssertRelease(parentPlanetRB != nullptr);
+
+            vec3 parentPlanetPosition;
+            const bool hasPlanetCenter = Physics::GetBodyCenterOfMass(parentPlanetRB->BodyHandle(), parentPlanetPosition);
+            AssertRelease(hasPlanetCenter);
+
+            vec3 Offset = planetPosition - parentPlanetPosition;
+            gravityAcceleration -= float(orbitFollowerModule->MeanMotion() * orbitFollowerModule->MeanMotion()) * Offset;
+        }
 
         Physics::AddForceToBody(bodyRB->BodyHandle(), gravityAcceleration, true);
         Physics::AddForceToBody(nozzleRB->BodyHandle(), gravityAcceleration, true);
