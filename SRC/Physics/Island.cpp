@@ -83,7 +83,7 @@ void Island::Initialise()
         CS.Normal = C->FContactNormal;
         CS.TangentVectors[0] = C->FContactTangents[0];
         CS.TangentVectors[1] = C->FContactTangents[1];
-        i32 MaxContactsToWrite = Min(C->FManifold.FContactPoints.size(), 8);
+        i32 MaxContactsToWrite = Min(C->FManifold.FContactPoints.size(), (std::size_t)8);
         CS.NumberOfContacts = MaxContactsToWrite;
 
         forrange(i, 0, MaxContactsToWrite)

@@ -32,6 +32,11 @@ float Atan2(float x, float y)
     return atan2f(x, y);
 }
 
+double Atan2(double x, double y)
+{
+    return atan2(x, y);
+}
+
 float Cos(float x)
 {
     return cosf(x);

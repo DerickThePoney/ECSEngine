@@ -17,21 +17,26 @@ vec3 Radians(const vec3& parV);
 float Degree(const float parAngleRadian);
 vec3 Degree(const vec3& parV);
 
-inline float Min(float a, float b)
+template<typename T>
+T Min(T a, T b)
 {
     return (a <= b) ? a : b;
 }
-inline float Max(float a, float b)
+
+template<typename T>
+T Max(T a, T b)
 {
     return (a >= b) ? a : b;
 }
 
-inline float Clamp(float a, float m, float M)
+template<typename T>
+T Clamp(T a, T m, T M)
 {
     return Min(Max(a, m), M);
 }
 
-inline float Clamp01(float a)
+template<typename T>
+T Clamp01(T a)
 {
     return Min(Max(a, 0.f), 1.f);
 }
@@ -39,6 +44,7 @@ inline float Clamp01(float a)
 vec3 Clamp(const vec3& a, const vec3& m, const vec3& M);
 
 float Atan2(float x, float y);
+double Atan2(double x, double y);
 float Cos(float x);
 double Cos(double x);
 float Sin(float x);
