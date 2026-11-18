@@ -3,9 +3,14 @@
 
 namespace ECSEngine
 {
+constexpr double Pi_dbl()
+{
+    return 3.14159265358979323846264338327950288;
+}
+
 constexpr float Pi()
 {
-    return 3.14159265358979323846264338327950288f;
+    return float(Pi_dbl());
 }
 
 constexpr float Radians(const float parAngleDegree)
