@@ -39,15 +39,22 @@ public:
 
     const dvec3& Position() const { return FPosition; }
     const dvec3& Velocity() const { return FVelocity; }
+    const vec3& OffsetBody() const { return FOffsetBody; }
+    const vec3& OffsetNozzle() const { return FOffsetNozzle; }
 
     void SetPosition(const dvec3& Value) { FPosition = Value; }
     void SetVelocity(const dvec3& Value) { FVelocity = Value; }
+    void SetOffsetBody(const vec3& Value) { FOffsetBody = Value; }
+    void SetOffsetNozzle(const vec3& Value) { FOffsetNozzle = Value; }
 
 private:
     KeplerPropagatorState FState;
 
     dvec3 FPosition;
     dvec3 FVelocity;
+
+    vec3 FOffsetBody;
+    vec3 FOffsetNozzle;
 };
 
 } // namespace ECSEngine
