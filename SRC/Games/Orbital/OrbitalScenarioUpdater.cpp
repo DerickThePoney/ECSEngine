@@ -21,6 +21,7 @@
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
 #include "RenderingCore/MaterialManager.h"
+#include "TimeWarpManager.h"
 #include "UICore/RMLUIManager.h"
 
 namespace ECSEngine
@@ -80,6 +81,9 @@ void OrbitalScenarioUpdater::Initialise()
 
     PhysicsJointSpawner::CreateIFP();
 
+    TimeWarpManager::CreateIFP();
+    TimeWarpManager::Instance().Initialize();
+
     FRocketUIController.Init();
 
     FScenario->Initialise();
@@ -98,6 +102,7 @@ void OrbitalScenarioUpdater::Destroy()
 
     FRocketUIController.Destroy();
 
+    TimeWarpManager::Destroy();
     PlanetarySOIManager::Destroy();
 
     if (PhysicsJointSpawner::HasInstance())
