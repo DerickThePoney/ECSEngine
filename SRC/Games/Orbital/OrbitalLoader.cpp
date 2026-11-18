@@ -7,6 +7,7 @@
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Common/ScenarioFactory.h"
 #include "FuelTankModule.h"
+#include "KeplerWarpModule.h"
 #include "MapModeCameraMoverModule.h"
 #include "NozzleEngineModule.h"
 #include "OrbitalPathFollowerModule.h"
@@ -41,6 +42,7 @@ bool OrbitalLoader::VirtualInitialise()
     world->AddController<NozzleEngineModule>();
     world->AddController<FuelTankModule>();
     world->AddController<OrbitalPathFollowerModule>();
+    world->AddController<KeplerWarpModule>();
 
     world = WorldManager::Instance().GetWorldIFP(EEntityWorlds::CAMERA);
     AssertRelease(world != nullptr);
