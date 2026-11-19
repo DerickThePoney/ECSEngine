@@ -41,7 +41,8 @@ void TimeWarpManager::Initialize()
     {
         FillDefault(FTimeWarpConfig);
 
-        std::ofstream ofstr(GlobalResourceCache::Instance().FCache->GetBasePath() + Filename);
+        const std::string fullFilename = GlobalResourceCache::Instance().FCache->GetBasePath() + "\\" + Filename;
+        std::ofstream ofstr(fullFilename);
         cereal::JSONOutputArchive archive(ofstr);
         archive(NAMEDPROPERTY("TimeWarpConfig", FTimeWarpConfig));
     }
