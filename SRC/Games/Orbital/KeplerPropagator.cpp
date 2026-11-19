@@ -61,7 +61,8 @@ bool KeplerPropagator::TryCapture(KeplerPropagatorState& OutState, const dvec3& 
     // Ellipse case
     if (OutState.FOrbitalEnergy < 0)
     {
-        OutState.FMeanMotion = sqrt(Mu / pow(OutState.FSemiMajor, 3));
+        const double a = OutState.FSemiMajor;
+        OutState.FMeanMotion = sqrt(Mu / (a * a * a));
         double cosE = Clamp((OutState.FEccentricity + cosv) / (1 + OutState.FEccentricity * cosv), -1.0, 1.0);
         double sinE = sqrt(1 - OutState.FEccentricity * OutState.FEccentricity) * sinv / (1 + OutState.FEccentricity * cosv);
 
@@ -70,8 +71,9 @@ bool KeplerPropagator::TryCapture(KeplerPropagatorState& OutState, const dvec3& 
     }
     else
     {
-        // Hyperbola case
-        OutState.FMeanMotion = sqrt(-Mu / pow(OutState.FSemiMajor, 3));
+        // Hyperbola case (a < 0): use a*a*a, not pow(a, 3) — pow(negative, 3.0) is NaN
+        const double a = OutState.FSemiMajor;
+        OutState.FMeanMotion = sqrt(-Mu / (a * a * a));
         double coshH = (OutState.FEccentricity + cosv) / (1 + OutState.FEccentricity * cosv);
         double H = acosh(coshH);
         if (sinv < 0.0)
@@ -181,7 +183,8 @@ bool KeplerPropagator::Advance(KeplerPropagatorState& InOutState, double Dt, dve
         if (abs(eCoshHMinus1) < DenomFloor)
             return fail();
 
-        cosNu = (coshH - e) / eCoshHMinus1;
+        // cos ν = (e - cosh H) / (e cosh H - 1)  (not (cosh H - e)/...)
+        cosNu = (e - coshH) / eCoshHMinus1;
         sinNu = sqrt(Max(0.0, e * e - 1.0)) * sinhH / eCoshHMinus1;
         rho = a * (1.0 - e * coshH); // a < 0, rho > 0
     }
