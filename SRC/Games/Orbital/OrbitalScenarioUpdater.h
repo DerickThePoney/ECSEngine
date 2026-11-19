@@ -2,10 +2,11 @@
 #include "ECSGameplay_Common/IScenarioUpdater.h"
 #include "ECSGameplay_Common/PhysicsUpdateSystem.h"
 #include "ECSGameplay_Common/SynchroWithRenderSystem.h"
+#include "KeplerWarpFollowerSystem.h"
+#include "OrbitalCameraMoverSystem.h"
 #include "PhysicsFloatingOriginSystem.h"
 #include "PlanetGravitySystem.h"
 #include "PlanetOrbitalPathFollowingSystem.h"
-#include "OrbitalCameraMoverSystem.h"
 #include "RocketControllerSystem.h"
 #include "RocketMassSystem.h"
 #include "RocketSASSystem.h"
@@ -49,6 +50,7 @@ private:
     PlanetGravitySystem FPlanetGravitySystem;
     RocketMassSystem FRocketMassSystem;
     PlanetOrbitalPathFollowingSystem FPlanetOrbitSystem;
+    KeplerWarpFollowerSystem FKeplerWarpFollowerSystem;
 
     UI::RocketUIController FRocketUIController;
 };

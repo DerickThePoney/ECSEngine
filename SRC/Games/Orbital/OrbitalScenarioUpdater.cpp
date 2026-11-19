@@ -76,6 +76,7 @@ void OrbitalScenarioUpdater::Initialise()
     FPlanetGravitySystem.Init();
     FRocketMassSystem.Init();
     FPlanetOrbitSystem.Init();
+    FKeplerWarpFollowerSystem.Init();
 
     PlanetarySOIManager::CreateIFP();
 
@@ -121,6 +122,7 @@ void OrbitalScenarioUpdater::Destroy()
     FCameraMoverSystem.Destroy();
     FPlanetGravitySystem.Destroy();
     FPlanetOrbitSystem.Destroy();
+    FKeplerWarpFollowerSystem.Destroy();
 
     Rendering::FinalCombinePass::Instance().Shutdown();
     Rendering::FinalCombinePass::Destroy();
@@ -143,13 +145,24 @@ void OrbitalScenarioUpdater::GameplayUpdate()
     FFloatingOriginSystem.Update();
     PlanetarySOIManager::Instance().Update();
     FScenario->Update();
-    FRocketMassSystem.Update();
-    FRocketSteeringSystem.Update();
-    FRocketThrustSystem.Update();
-    FRocketSASSystem.Update();
-    FPlanetOrbitSystem.Update();
-    FPlanetGravitySystem.Update();
-    FPhysicsSystem.Update();
+
+    bool bIsWarping = TimeWarpManager::Instance().CurrentTimeWarpMultiplier() > 1;
+    if (bIsWarping)
+    {
+        FPlanetOrbitSystem.Update();
+        FKeplerWarpFollowerSystem.Update();
+    }
+    else
+    {
+        FKeplerWarpFollowerSystem.Update();
+        FRocketMassSystem.Update();
+        FRocketSteeringSystem.Update();
+        FRocketThrustSystem.Update();
+        FRocketSASSystem.Update();
+        FPlanetOrbitSystem.Update();
+        FPlanetGravitySystem.Update();
+        FPhysicsSystem.Update();
+    }
 
     WorldManager::Instance().ProcessDestroyEntities();
     WorldManager::Instance().ProcessWithEntitiesCreation();
