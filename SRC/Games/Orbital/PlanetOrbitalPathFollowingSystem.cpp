@@ -10,6 +10,7 @@
 #include "Physics/PhysicsAPI.h"
 #include "PlanetGravityModule.h"
 #include "RenderingCore/DrawCommands.h"
+#include "TimeWarpManager.h"
 
 namespace ECSEngine
 {
@@ -28,7 +29,7 @@ void PlanetOrbitalPathFollowingSystem::VirtualUpdate()
     ModuleAccessor<PlanetGravityModule> planetGravityAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<RigidbodyModule> rigidbodyAccessor(EEntityWorlds::STANDARD);
 
-    const float DT = TimeManager::GameplayDeltaTime();
+    const double DT = (double)TimeManager::GameplayDeltaTime() * TimeWarpManager::Instance().CurrentTimeWarpMultiplier();
 
     foreachitem(pathFollower, pathFollowerAccessor)
     {

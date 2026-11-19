@@ -76,4 +76,5 @@ void TimeWarpManager::SetTimeWarpIndex(const u32 Value)
     AssertRelease(Value >= 0 && Value < FTimeWarpConfig.size());
     FCurrentTimeWarpIndex = Value;
 }
+
 } // namespace ECSEngine
