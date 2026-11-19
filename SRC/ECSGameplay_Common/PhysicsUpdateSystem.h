@@ -11,9 +11,11 @@ public:
     PhysicsUpdateSystem();
     ~PhysicsUpdateSystem();
 
-    void SyncTransformsFromPhysics();
+    void ExternalSyncTransformsFromPhysics();
 
 protected:
     void VirtualUpdate() override;
+
+    void SyncTransformsFromPhysics();
 };
 } // namespace ECSEngine

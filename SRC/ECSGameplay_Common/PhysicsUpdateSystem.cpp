@@ -27,6 +27,13 @@ PhysicsUpdateSystem::~PhysicsUpdateSystem()
 {
 }
 
+void PhysicsUpdateSystem::ExternalSyncTransformsFromPhysics()
+{
+    LockControllers();
+    SyncTransformsFromPhysics();
+    UnlockControllers();
+}
+
 void PhysicsUpdateSystem::SyncTransformsFromPhysics()
 {
     ModuleAccessor<RigidbodyModule> RigidBodyAccessor(EEntityWorlds::STANDARD);
