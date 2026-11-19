@@ -14,28 +14,29 @@ namespace ECSEngine
 {
 namespace SASHelpers
 {
-quat OrientationFromNose(const vec3& noseDirection, const vec3& radialOut, const vec3& orbitNormal)
+// Point the body +Y axis at noseDirection with the smallest rotation from `reference`
+// (preserves roll / avoids the scenic SO(3) path when only pointing matters).
+quat OrientationAlignNose(const vec3& noseDirection, const quat& reference)
 {
-    const vec3 nose = Normalize(noseDirection);
+    const vec3 desired = Normalize(noseDirection);
+    const vec3 current = Normalize((mat4(reference) * vec4(0.f, 1.f, 0.f, 0.f)).xyz());
+    const float d = Clamp(Dot(current, desired), -1.f, 1.f);
+    if (d > 0.999999f)
+        return reference;
 
-    vec3 hint = radialOut;
-    vec3 side = Cross(nose, hint);
-    if (LengthSq(side) < 0.02f * LengthSq(hint))
+    vec3 axis;
+    float angle;
+    if (d < -0.999999f)
     {
-        hint = orbitNormal;
-        side = Cross(nose, hint);
+        axis = Normalize((mat4(reference) * vec4(1.f, 0.f, 0.f, 0.f)).xyz());
+        angle = Pi();
     }
-    if (LengthSq(side) < 1.e-8f)
+    else
     {
-        const vec3 fallback = (fabsf(nose.x) < 0.9f) ? vec3(1.f, 0.f, 0.f) : vec3(0.f, 0.f, 1.f);
-        side = Cross(nose, fallback);
+        axis = Normalize(Cross(current, desired));
+        angle = acosf(d);
     }
-
-    side = Normalize(side);
-    const vec3 dorsal = Normalize(Cross(side, nose));
-
-    const mat4 basis(vec4::MakeHomogeneousDirectionVec4(side), vec4::MakeHomogeneousDirectionVec4(nose), vec4::MakeHomogeneousDirectionVec4(dorsal), vec4(0.f, 0.f, 0.f, 1.f));
-    return Quaternionf::FromMat4(basis);
+    return quat(axis, angle) * reference;
 }
 
 void ComputeSASTarget(RocketManagerModule& rocketManager, ModuleAccessor<RigidbodyModule>& rigidbodyAccessor, ModuleAccessor<PlanetGravityModule>& planetAccessor)
@@ -107,7 +108,13 @@ void ComputeSASTarget(RocketManagerModule& rocketManager, ModuleAccessor<Rigidbo
         return;
     }
 
-    rocketManager.SetSASTarget(OrientationFromNose(TargetDirection, radialOut, orbitNormal));
+    quat reference;
+    if (rocketManager.HasSASTarget())
+        reference = rocketManager.SASTarget();
+    else
+        Physics::GetBodyOrientation(bodyRigidbody->BodyHandle(), reference);
+
+    rocketManager.SetSASTarget(OrientationAlignNose(TargetDirection, reference));
 }
 } // namespace SASHelpers
 
@@ -155,15 +162,24 @@ void RocketSASSystem::VirtualUpdate()
         vec3 Axis = vec3(qError.x, qError.y, qError.z);
         float Angle = Atan2(Length(Axis), qError.w) * 2;
 
-        ADJUSTABLE_DEBUG_PARAMETER_SINGLE(stiffness, 80.f, "Stiffness", "SAS", 15.f, 500.f);
-        ADJUSTABLE_DEBUG_PARAMETER_SINGLE(damping, 80.f, "Damping", "SAS", 15.f, 500.f);
+        // Millington arrive-align: desiredω = min(maxAngSpeed, Angle/timeToTarget).
+        // Near target this matches old PD (stiffness=gain/timeToTarget, damping=gain);
+        // far away it cruises at maxAngSpeed instead of seeking harder with angle.
+        ADJUSTABLE_DEBUG_PARAMETER_SINGLE(maxAngSpeed, 2.f, "Max ang speed", "SAS", 0.1f, 10.f);
+        ADJUSTABLE_DEBUG_PARAMETER_SINGLE(timeToTarget, 1.f, "Arrive time to target", "SAS", 0.1f, 5.f);
+        ADJUSTABLE_DEBUG_PARAMETER_SINGLE(arriveGain, 80.f, "Arrive gain", "SAS", 15.f, 500.f);
+        ADJUSTABLE_DEBUG_PARAMETER_SINGLE(targetRadius, 0.02f, "Arrive target radius", "SAS", 0.f, 0.2f);
         ADJUSTABLE_DEBUG_PARAMETER_SINGLE(maxTorque, 300.f, "Max torque", "SAS", 15.f, 5000.f);
 
         vec3 Omega;
         Physics::GetBodyRotationVelocity(bodyRigidbody->BodyHandle(), Omega);
-        vec3 torque = -damping * Omega;
-        if (LengthSq(Axis) > 1.e-8f)
-            torque += stiffness * Angle * Normalize(Axis);
+
+        vec3 desiredOmega(0.f);
+        const float ttt = Max(timeToTarget, 1.e-3f);
+        if (LengthSq(Axis) > 1.e-8f && Angle > targetRadius)
+            desiredOmega = Normalize(Axis) * Min(maxAngSpeed, Angle / ttt);
+
+        vec3 torque = arriveGain * (desiredOmega - Omega);
         if (Length(torque) > maxTorque)
             torque = Normalize(torque) * maxTorque;
 
