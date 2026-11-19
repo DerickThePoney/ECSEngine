@@ -159,7 +159,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
         FPlanetOrbitSystem.Update();
         FKeplerWarpAdvanceSystem.Update();
         FFloatingOriginSystem.Update();
-        FPhysicsSystem.SyncTransformsFromPhysics();
+        FPhysicsSystem.ExternalSyncTransformsFromPhysics();
     }
     else
     {

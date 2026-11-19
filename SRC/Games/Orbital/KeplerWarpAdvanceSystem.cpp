@@ -43,6 +43,12 @@ void KeplerWarpAdvanceSystem::VirtualUpdate()
         if (!RocketState.FbActive)
             continue;
 
+        if (keplerModule->SkipAdvanceOnce())
+        {
+            keplerModule->SetSkipAdvanceOnce(false);
+            continue;
+        }
+
         const EntityId& PlanetId = rocket.CurrentGravityTarget();
         if (!PlanetId.Valid())
             continue;
@@ -69,6 +75,7 @@ void KeplerWarpAdvanceSystem::VirtualUpdate()
 
         const dvec3 newComPosD = comRelativePos + comPlanetPosD;
         const dvec3 newComVelD = comRelativeVel + comPlanetVelD;
+
         keplerModule->SetPosition(newComPosD);
         keplerModule->SetVelocity(newComVelD);
 

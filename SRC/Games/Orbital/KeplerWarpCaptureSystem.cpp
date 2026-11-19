@@ -58,14 +58,16 @@ void KeplerWarpCaptureSystem::VirtualUpdate()
         if (bJustExited)
         {
             RocketState.FbActive = false;
+            keplerModule->SetCapturedParent(EntityId());
             continue;
         }
 
-        if (!bJustEntered && RocketState.FbActive)
-            continue;
-
         const EntityId& PlanetId = rocket.CurrentGravityTarget();
         if (!PlanetId.Valid())
+            continue;
+
+        const bool bParentChanged = RocketState.FbActive && keplerModule->CapturedParent() != PlanetId;
+        if (!bJustEntered && RocketState.FbActive && !bParentChanged)
             continue;
 
         const PlanetGravityModule* const planetGravity = planetGravityAccessor[PlanetId];
@@ -112,9 +114,19 @@ void KeplerWarpCaptureSystem::VirtualUpdate()
         keplerModule->SetOffsetBody(bodyPos - comPos);
         keplerModule->SetOffsetNozzle(nozzlePos - comPos);
 
-        if (!KeplerPropagator::TryCapture(RocketState, comPlanetPosD, comPlanetVelD, comPosD, comVelD, planetGravity->PlanetGravityConstant()))
+        const bool bCaptured = KeplerPropagator::TryCapture(RocketState, comPlanetPosD, comPlanetVelD, comPosD, comVelD, planetGravity->PlanetGravityConstant());
+
+        if (!bCaptured)
         {
+            keplerModule->SetCapturedParent(EntityId());
+            keplerModule->SetSkipAdvanceOnce(false);
             TimeWarpManager::Instance().SetTimeWarpIndex(0);
+        }
+        else
+        {
+            keplerModule->SetCapturedParent(PlanetId);
+            // Same-tick Advance after capture was jumping; hold pose until next tick
+            keplerModule->SetSkipAdvanceOnce(true);
         }
     }
 }
