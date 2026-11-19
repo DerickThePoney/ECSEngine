@@ -25,6 +25,7 @@ void ShutdownPhysics();
 
 // Physics update
 void UpdatePhysics();
+void FlushMovedBodies();
 
 bool ShiftWorld(const vec3& Delta);
 // TODO BACKWARD UPDATE

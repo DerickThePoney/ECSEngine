@@ -80,7 +80,15 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         UpdateInertiaTransform(body);
     }
 
-    // Update moved bodies
+    FlushMovedBodies();
+
+    // Dispatch contact events
+    FContactEventManager.DispatchContactEvents(FContactEvents, FContactEventsCount);
+    ClearContactEvents();
+}
+
+void PhysicsEngine::FlushMovedBodies()
+{
     foreachitem(movedBody, FMovedBodies)
     {
         RigidBody* body = GetRigidBody(movedBody.Handle);
@@ -91,10 +99,6 @@ void PhysicsEngine::UpdatePhysics(float parDeltaTime)
         FBroadPhase.MoveBody(body, movedBody.Displacement);
     }
     FMovedBodies.clear();
-
-    // Dispatch contact events
-    FContactEventManager.DispatchContactEvents(FContactEvents, FContactEventsCount);
-    ClearContactEvents();
 }
 
 bool PhysicsEngine::ShiftWorld(const vec3& Delta)
@@ -105,7 +109,8 @@ bool PhysicsEngine::ShiftWorld(const vec3& Delta)
         return false;
     }
 
-    AlwaysCheckedAssert(FMovedBodies.empty() && FContactEventsCount == 0);
+    FlushMovedBodies();
+    AlwaysCheckedAssert(FContactEventsCount == 0);
 
     if (LengthSq(Delta) < 1e-6f)
         return false;

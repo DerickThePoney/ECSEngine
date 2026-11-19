@@ -5,7 +5,6 @@
 #include "Common/TimeManager.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
-#include "ECSGameplay_Common/PositionModule.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
 #include "KeplerWarpModule.h"
 #include "Physics/PhysicsAPI.h"
@@ -20,7 +19,6 @@ KeplerWarpAdvanceSystem::KeplerWarpAdvanceSystem()
     RegisterDependency<RocketManagerModule>(EEntityWorlds::STANDARD);
     RegisterDependency<RigidbodyModule>(EEntityWorlds::STANDARD);
     RegisterDependency<KeplerWarpModule>(EEntityWorlds::STANDARD);
-    RegisterDependency<PositionModule>(EEntityWorlds::STANDARD);
 }
 
 void KeplerWarpAdvanceSystem::VirtualUpdate()
@@ -34,7 +32,6 @@ void KeplerWarpAdvanceSystem::VirtualUpdate()
     ModuleAccessor<RocketManagerModule> rocketAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<KeplerWarpModule> keplerWarpAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<RigidbodyModule> rigidbodyAccessor(EEntityWorlds::STANDARD);
-    ModuleAccessor<PositionModule> positionAccessor(EEntityWorlds::STANDARD);
 
     const double DT = TimeManager::GameplayDeltaTime() * CurrentTimeWarpMult;
     foreachitem(rocket, rocketAccessor)
@@ -86,18 +83,10 @@ void KeplerWarpAdvanceSystem::VirtualUpdate()
         const RigidbodyModule* const nozzleBody = rigidbodyAccessor[rocket.NozzleId()];
         AssertRelease(nozzleBody != nullptr);
 
-        PositionModule* const bodyPosMod = positionAccessor[rocket.BodyId()];
-        AssertRelease(bodyPosMod != nullptr);
-
-        PositionModule* const nozzlePosMod = positionAccessor[rocket.NozzleId()];
-        AssertRelease(nozzlePosMod != nullptr);
-
         Physics::SetBodyPosition(bodyBody->BodyHandle(), bodyPos);
         Physics::SetBodyVelocity(bodyBody->BodyHandle(), newComVel);
         Physics::SetBodyPosition(nozzleBody->BodyHandle(), nozzlePos);
         Physics::SetBodyVelocity(nozzleBody->BodyHandle(), newComVel);
-        bodyPosMod->SetPosition3D(bodyPos);
-        nozzlePosMod->SetPosition3D(nozzlePos);
     }
 }
 

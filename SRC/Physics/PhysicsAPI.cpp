@@ -71,6 +71,11 @@ void UpdatePhysics()
     PhysicsEngine::Instance().UpdatePhysics(TimeManager::GameplayDeltaTime());
 }
 
+void FlushMovedBodies()
+{
+    PhysicsEngine::Instance().FlushMovedBodies();
+}
+
 bool ShiftWorld(const vec3& Delta)
 {
     return PhysicsEngine::Instance().ShiftWorld(Delta);

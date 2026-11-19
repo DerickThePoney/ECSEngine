@@ -11,6 +11,8 @@ public:
     PhysicsUpdateSystem();
     ~PhysicsUpdateSystem();
 
+    void SyncTransformsFromPhysics();
+
 protected:
     void VirtualUpdate() override;
 };

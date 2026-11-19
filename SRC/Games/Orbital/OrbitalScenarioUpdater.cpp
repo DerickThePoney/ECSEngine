@@ -144,17 +144,22 @@ void OrbitalScenarioUpdater::RealtimeUpdate()
 void OrbitalScenarioUpdater::GameplayUpdate()
 {
     AssertRelease(FScenario != nullptr);
-    FFloatingOriginSystem.Update();
+
+    const bool bIsWarping = TimeWarpManager::Instance().CurrentTimeWarpMultiplier() > 1;
+    if (!bIsWarping)
+        FFloatingOriginSystem.Update();
+
     PlanetarySOIManager::Instance().Update();
     FScenario->Update();
 
-    bool bIsWarping = TimeWarpManager::Instance().CurrentTimeWarpMultiplier() > 1;
     if (bIsWarping)
     {
-        // Capture at t, moon to t+dt, ship Advance using parent at t+dt
+        // Capture at t, moon to t+dt, ship Advance using parent at t+dt, then rebase
         FKeplerWarpCaptureSystem.Update();
         FPlanetOrbitSystem.Update();
         FKeplerWarpAdvanceSystem.Update();
+        FFloatingOriginSystem.Update();
+        FPhysicsSystem.SyncTransformsFromPhysics();
     }
     else
     {

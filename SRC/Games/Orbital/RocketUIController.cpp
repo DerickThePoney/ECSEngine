@@ -16,6 +16,7 @@
 #include "RenderingCore/DrawCommands.h"
 #include "RocketCameraMoverModule.h"
 #include "RocketManagerModule.h"
+#include "TimeWarpManager.h"
 
 namespace ECSEngine
 {
@@ -80,6 +81,7 @@ void RocketUIController::VirtualUpdate()
         ImGui::Text("Altitude : %.3f m", Altitude);
         ImGui::Text("Vertical speed : %.3f m/s", VerticalSpeed);
         ImGui::Text("Horizontal speed : %.3f m/s", HorizontalSpeed);
+        ImGui::Text("Warp : %ux", TimeWarpManager::Instance().CurrentTimeWarpMultiplier());
 
         const float rocketSpeedSq = LengthSq(RocketVelocity);
         const float energy = 0.5f * rocketSpeedSq - planetModule->PlanetGravityConstant() / LPlanetToRocket; // ε

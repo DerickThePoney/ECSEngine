@@ -7,6 +7,7 @@
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
 #include "RocketManagerModule.h"
+#include "TimeWarpManager.h"
 
 namespace ECSEngine
 {
@@ -39,6 +40,11 @@ RocketControllerSystem::RocketControllerSystem()
     FFullThrottle.FInputType = EInputType::PRESSED;
     FCutThrottle.FKeyboardKey = InputKeyNames::INPUT_KEY_X;
     FCutThrottle.FInputType = EInputType::PRESSED;
+
+    FIncreaseTimeWarp.FKeyboardKey = InputKeyNames::INPUT_KEY_PAGE_UP;
+    FIncreaseTimeWarp.FInputType = EInputType::PRESSED;
+    FDecreaseTimeWarp.FKeyboardKey = InputKeyNames::INPUT_KEY_PAGE_DOWN;
+    FDecreaseTimeWarp.FInputType = EInputType::PRESSED;
 }
 
 static constexpr float MaxSteeringAngle = Radians(50.f);
@@ -103,6 +109,19 @@ void RocketControllerSystem::VirtualUpdate()
         if (FSASToggle.Evaluate())
             bSASActivated = !bSASActivated;
         rocketManager.SetSASActivated(bSASActivated);
+
+        if (rocketManager.RocketThrottle() > 0.f)
+        {
+            TimeWarpManager::Instance().SetTimeWarpIndex(0);
+        }
+        else
+        {
+            if (FIncreaseTimeWarp.Evaluate())
+                TimeWarpManager::Instance().IncrementTimeWarpIndex();
+            if (FDecreaseTimeWarp.Evaluate())
+                TimeWarpManager::Instance().DecrementTimeWarpIndex();
+        }
     }
 }
 } // namespace ECSEngine
+

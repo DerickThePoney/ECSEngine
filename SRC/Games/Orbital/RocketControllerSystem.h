@@ -23,5 +23,8 @@ protected:
     KeyboardCommand FDecreaseThrottle;
     KeyboardCommand FFullThrottle;
     KeyboardCommand FCutThrottle;
+
+    KeyboardCommand FIncreaseTimeWarp;
+    KeyboardCommand FDecreaseTimeWarp;
 };
 } // namespace ECSEngine

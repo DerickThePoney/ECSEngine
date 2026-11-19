@@ -30,6 +30,7 @@ public:
     void Cleanup();
 
     void UpdatePhysics(float parDeltaTime);
+    void FlushMovedBodies();
     bool ShiftWorld(const vec3& Delta);
 
     const PhysicsEngineConfiguration& Config() const { return FConfig; }
