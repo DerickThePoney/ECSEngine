@@ -76,7 +76,8 @@ void OrbitalScenarioUpdater::Initialise()
     FPlanetGravitySystem.Init();
     FRocketMassSystem.Init();
     FPlanetOrbitSystem.Init();
-    FKeplerWarpFollowerSystem.Init();
+    FKeplerWarpCaptureSystem.Init();
+    FKeplerWarpAdvanceSystem.Init();
 
     PlanetarySOIManager::CreateIFP();
 
@@ -122,7 +123,8 @@ void OrbitalScenarioUpdater::Destroy()
     FCameraMoverSystem.Destroy();
     FPlanetGravitySystem.Destroy();
     FPlanetOrbitSystem.Destroy();
-    FKeplerWarpFollowerSystem.Destroy();
+    FKeplerWarpCaptureSystem.Destroy();
+    FKeplerWarpAdvanceSystem.Destroy();
 
     Rendering::FinalCombinePass::Instance().Shutdown();
     Rendering::FinalCombinePass::Destroy();
@@ -149,12 +151,14 @@ void OrbitalScenarioUpdater::GameplayUpdate()
     bool bIsWarping = TimeWarpManager::Instance().CurrentTimeWarpMultiplier() > 1;
     if (bIsWarping)
     {
+        // Capture at t, moon to t+dt, ship Advance using parent at t+dt
+        FKeplerWarpCaptureSystem.Update();
         FPlanetOrbitSystem.Update();
-        FKeplerWarpFollowerSystem.Update();
+        FKeplerWarpAdvanceSystem.Update();
     }
     else
     {
-        FKeplerWarpFollowerSystem.Update();
+        FKeplerWarpCaptureSystem.Update(); // exit edge clears FbActive
         FRocketMassSystem.Update();
         FRocketSteeringSystem.Update();
         FRocketThrustSystem.Update();

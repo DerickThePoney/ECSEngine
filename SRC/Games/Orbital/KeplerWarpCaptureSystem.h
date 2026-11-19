@@ -3,10 +3,10 @@
 
 namespace ECSEngine
 {
-class KeplerWarpFollowerSystem : public ModuleSystem
+class KeplerWarpCaptureSystem : public ModuleSystem
 {
 public:
-    KeplerWarpFollowerSystem();
+    KeplerWarpCaptureSystem();
 
 protected:
     void VirtualUpdate() override;
