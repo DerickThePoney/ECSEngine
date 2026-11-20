@@ -71,20 +71,20 @@ void PlanetarySOIManager::Initialize()
 using UpdateAccessHelpers =
       ScopedModuleAccessor<MC<PlanetGravityModule, EEntityWorlds::STANDARD>, MC<RigidbodyModule, EEntityWorlds::STANDARD>, MC<RocketManagerModule, EEntityWorlds::STANDARD>>;
 
-void PlanetarySOIManager::Update()
+bool PlanetarySOIManager::Update()
 {
     if (!FbInitialized)
     {
         Initialize();
         if (!FbInitialized)
-            return;
+            return false;
     }
 
     UpdateAccessHelpers accessHelpers;
 
     AssertRelease(accessHelpers.Accessor<RocketManagerModule>().size() <= 1);
     if (accessHelpers.Accessor<RocketManagerModule>().size() == 0)
-        return;
+        return false;
 
     RocketManagerModule& rocketManager = *accessHelpers.Accessor<RocketManagerModule>().begin();
     vec3 RocketPosition;
@@ -138,7 +138,9 @@ void PlanetarySOIManager::Update()
         }
     }
 
+    const bool bChanged = rocketManager.CurrentGravityTarget() != RocketGravity;
     rocketManager.SetCurrentGravityTarget(RocketGravity);
+    return bChanged;
 }
 
 void PlanetarySOIManager::DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material)

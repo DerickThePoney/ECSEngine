@@ -18,8 +18,12 @@ public:
 
     void DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material);
 
+    void ExternalAdvanceBy(const double DT);
+
 protected:
     void VirtualUpdate() override;
+
+    void AdvanceBy(const double DT);
 
 private:
     std::vector<std::vector<vec3>> FOrbitRings;

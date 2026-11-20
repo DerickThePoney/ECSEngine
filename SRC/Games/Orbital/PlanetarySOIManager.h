@@ -28,7 +28,7 @@ class PlanetarySOIManager : public Singleton<PlanetarySOIManager>
 public:
     void RegisterPlanet(const EntityId& PlanetId, const EntityId& ParentPlanet);
 
-    void Update();
+    bool Update();
 
     void DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material);
 

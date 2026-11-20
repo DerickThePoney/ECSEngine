@@ -145,6 +145,8 @@ void OrbitalScenarioUpdater::GameplayUpdate()
 {
     AssertRelease(FScenario != nullptr);
 
+    TimeWarpManager::Instance().ClampToAltitude();
+
     const bool bIsWarping = TimeWarpManager::Instance().CurrentTimeWarpMultiplier() > 1;
     if (!bIsWarping)
         FFloatingOriginSystem.Update();
@@ -154,10 +156,41 @@ void OrbitalScenarioUpdater::GameplayUpdate()
 
     if (bIsWarping)
     {
-        // Capture at t, moon to t+dt, ship Advance using parent at t+dt, then rebase
         FKeplerWarpCaptureSystem.Update();
-        FPlanetOrbitSystem.Update();
-        FKeplerWarpAdvanceSystem.Update();
+
+        u32 WarpMultiplier = TimeWarpManager::Instance().CurrentTimeWarpMultiplier();
+        double InitialRemainingDT = TimeManager::GameplayDeltaTime() * WarpMultiplier;
+        double RemainingDT = InitialRemainingDT;
+        bool bIgnoreSkipAdvance = false;
+        while (RemainingDT > 0 && WarpMultiplier > 1)
+        {
+            double step = Min(RemainingDT, 1.0);
+            FPlanetOrbitSystem.ExternalAdvanceBy(step);
+            FKeplerWarpAdvanceSystem.ExternalAdvanceBy(step, bIgnoreSkipAdvance);
+            bIgnoreSkipAdvance = false;
+            if (PlanetarySOIManager::Instance().Update())
+            {
+                // parent changed, recapture
+                FKeplerWarpCaptureSystem.Update();
+                bIgnoreSkipAdvance = true;
+            }
+            TimeWarpManager::Instance().ClampToAltitude();
+            u32 NewWarpMultiplier = TimeWarpManager::Instance().CurrentTimeWarpMultiplier();
+
+            if (NewWarpMultiplier == 1)
+                break;
+
+            RemainingDT -= step;
+
+            if (NewWarpMultiplier != WarpMultiplier)
+            {
+                WarpMultiplier = NewWarpMultiplier;
+                double NewInitialRemainingDT = TimeManager::GameplayDeltaTime() * WarpMultiplier;
+                RemainingDT = RemainingDT * NewInitialRemainingDT / InitialRemainingDT;
+                InitialRemainingDT = NewInitialRemainingDT;
+            }
+        }
+
         FFloatingOriginSystem.Update();
         FPhysicsSystem.ExternalSyncTransformsFromPhysics();
     }

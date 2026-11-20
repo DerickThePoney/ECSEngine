@@ -25,11 +25,16 @@ void PlanetOrbitalPathFollowingSystem::VirtualUpdate()
 {
     ModuleSystem::VirtualUpdate();
 
+    const double DT = (double)TimeManager::GameplayDeltaTime();
+
+    AdvanceBy(DT);
+}
+
+void PlanetOrbitalPathFollowingSystem::AdvanceBy(const double DT)
+{
     ModuleAccessor<OrbitalPathFollowerModule> pathFollowerAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<PlanetGravityModule> planetGravityAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<RigidbodyModule> rigidbodyAccessor(EEntityWorlds::STANDARD);
-
-    const double DT = (double)TimeManager::GameplayDeltaTime() * TimeWarpManager::Instance().CurrentTimeWarpMultiplier();
 
     foreachitem(pathFollower, pathFollowerAccessor)
     {
@@ -81,6 +86,13 @@ void PlanetOrbitalPathFollowingSystem::VirtualUpdate()
     }
 }
 
+void PlanetOrbitalPathFollowingSystem::ExternalAdvanceBy(const double DT)
+{
+    LockControllers();
+    AdvanceBy(DT);
+    UnlockControllers();
+}
+
 void PlanetOrbitalPathFollowingSystem::DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material)
 {
     FOrbitRings.clear();
@@ -116,4 +128,5 @@ void PlanetOrbitalPathFollowingSystem::DrawDebug(Rendering::DrawCommandBuffer* b
     for (const std::vector<vec3>& points : FOrbitRings)
         buffer->DrawLines(material, points.data(), (u32)points.size(), 0xFF66CCFFu, true);
 }
+
 } // namespace ECSEngine
