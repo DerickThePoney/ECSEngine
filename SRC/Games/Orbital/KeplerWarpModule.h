@@ -42,14 +42,12 @@ public:
     const vec3& OffsetBody() const { return FOffsetBody; }
     const vec3& OffsetNozzle() const { return FOffsetNozzle; }
     const EntityId& CapturedParent() const { return FCapturedParent; }
-    bool SkipAdvanceOnce() const { return FbSkipAdvanceOnce; }
 
     void SetPosition(const dvec3& Value) { FPosition = Value; }
     void SetVelocity(const dvec3& Value) { FVelocity = Value; }
     void SetOffsetBody(const vec3& Value) { FOffsetBody = Value; }
     void SetOffsetNozzle(const vec3& Value) { FOffsetNozzle = Value; }
     void SetCapturedParent(const EntityId& Value) { FCapturedParent = Value; }
-    void SetSkipAdvanceOnce(bool Value) { FbSkipAdvanceOnce = Value; }
 
 private:
     KeplerPropagatorState FState;
@@ -60,7 +58,6 @@ private:
     vec3 FOffsetBody;
     vec3 FOffsetNozzle;
     EntityId FCapturedParent;
-    bool FbSkipAdvanceOnce = false;
 };
 
 } // namespace ECSEngine

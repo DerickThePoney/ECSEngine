@@ -21,10 +21,10 @@ KeplerWarpAdvanceSystem::KeplerWarpAdvanceSystem()
     RegisterDependency<KeplerWarpModule>(EEntityWorlds::STANDARD);
 }
 
-void KeplerWarpAdvanceSystem::ExternalAdvanceBy(const double DT, bool bIgnoreSkipAdvance)
+void KeplerWarpAdvanceSystem::ExternalAdvanceBy(const double DT)
 {
     LockControllers();
-    AdvanceBy(DT, bIgnoreSkipAdvance);
+    AdvanceBy(DT);
     UnlockControllers();
 }
 
@@ -38,10 +38,10 @@ void KeplerWarpAdvanceSystem::VirtualUpdate()
 
     AssertNotReached();
     const double DT = TimeManager::GameplayDeltaTime() * CurrentTimeWarpMult;
-    AdvanceBy(DT, false);
+    AdvanceBy(DT);
 }
 
-void KeplerWarpAdvanceSystem::AdvanceBy(const double DT, bool bIgnoreSkipAdvance)
+void KeplerWarpAdvanceSystem::AdvanceBy(const double DT)
 {
     ModuleAccessor<RocketManagerModule> rocketAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<KeplerWarpModule> keplerWarpAccessor(EEntityWorlds::STANDARD);
@@ -55,14 +55,6 @@ void KeplerWarpAdvanceSystem::AdvanceBy(const double DT, bool bIgnoreSkipAdvance
         KeplerPropagatorState& RocketState = keplerModule->KeplerState();
         if (!RocketState.FbActive)
             continue;
-
-        if (!bIgnoreSkipAdvance && keplerModule->SkipAdvanceOnce())
-        {
-            keplerModule->SetSkipAdvanceOnce(false);
-            continue;
-        }
-
-        keplerModule->SetSkipAdvanceOnce(false);
 
         const EntityId& PlanetId = rocket.CurrentGravityTarget();
         if (!PlanetId.Valid())

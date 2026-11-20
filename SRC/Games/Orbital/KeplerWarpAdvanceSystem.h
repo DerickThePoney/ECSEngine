@@ -8,11 +8,11 @@ class KeplerWarpAdvanceSystem : public ModuleSystem
 public:
     KeplerWarpAdvanceSystem();
 
-    void ExternalAdvanceBy(const double DT, bool bIgnoreSkipAdvance);
+    void ExternalAdvanceBy(const double DT);
 
 protected:
     void VirtualUpdate() override;
 
-    void AdvanceBy(const double DT, bool bIgnoreSkipAdvance);
+    void AdvanceBy(const double DT);
 };
 } // namespace ECSEngine

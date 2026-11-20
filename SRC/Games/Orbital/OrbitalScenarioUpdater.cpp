@@ -161,18 +161,15 @@ void OrbitalScenarioUpdater::GameplayUpdate()
         u32 WarpMultiplier = TimeWarpManager::Instance().CurrentTimeWarpMultiplier();
         double InitialRemainingDT = TimeManager::GameplayDeltaTime() * WarpMultiplier;
         double RemainingDT = InitialRemainingDT;
-        bool bIgnoreSkipAdvance = false;
         while (RemainingDT > 0 && WarpMultiplier > 1)
         {
             double step = Min(RemainingDT, 1.0);
             FPlanetOrbitSystem.ExternalAdvanceBy(step);
-            FKeplerWarpAdvanceSystem.ExternalAdvanceBy(step, bIgnoreSkipAdvance);
-            bIgnoreSkipAdvance = false;
+            FKeplerWarpAdvanceSystem.ExternalAdvanceBy(step);
             if (PlanetarySOIManager::Instance().Update())
             {
                 // parent changed, recapture
                 FKeplerWarpCaptureSystem.Update();
-                bIgnoreSkipAdvance = true;
             }
             TimeWarpManager::Instance().ClampToAltitude();
             u32 NewWarpMultiplier = TimeWarpManager::Instance().CurrentTimeWarpMultiplier();

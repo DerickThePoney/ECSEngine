@@ -119,14 +119,11 @@ void KeplerWarpCaptureSystem::VirtualUpdate()
         if (!bCaptured)
         {
             keplerModule->SetCapturedParent(EntityId());
-            keplerModule->SetSkipAdvanceOnce(false);
             TimeWarpManager::Instance().SetTimeWarpIndex(0);
         }
         else
         {
             keplerModule->SetCapturedParent(PlanetId);
-            // Same-tick Advance after capture was jumping; hold pose until next tick
-            keplerModule->SetSkipAdvanceOnce(true);
         }
     }
 }
