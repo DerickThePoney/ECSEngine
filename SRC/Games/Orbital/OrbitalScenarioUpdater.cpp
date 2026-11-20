@@ -143,6 +143,8 @@ void OrbitalScenarioUpdater::RealtimeUpdate()
 
 void OrbitalScenarioUpdater::GameplayUpdate()
 {
+    SCOPED_PROFILE_SIMPLE;
+
     AssertRelease(FScenario != nullptr);
 
     TimeWarpManager::Instance().ClampToAltitude();
@@ -156,6 +158,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
 
     if (bIsWarping)
     {
+        SCOPED_PROFILE(OrbitalScenarioUpdater::GameplayUpdate::TimeWarping);
         FKeplerWarpCaptureSystem.Update();
 
         u32 WarpMultiplier = TimeWarpManager::Instance().CurrentTimeWarpMultiplier();
@@ -193,6 +196,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
     }
     else
     {
+        SCOPED_PROFILE(OrbitalScenarioUpdater::GameplayUpdate::PhysicsAdvance);
         FKeplerWarpCaptureSystem.Update(); // exit edge clears FbActive
         FRocketMassSystem.Update();
         FRocketSteeringSystem.Update();
