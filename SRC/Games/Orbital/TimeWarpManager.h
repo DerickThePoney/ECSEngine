@@ -7,12 +7,12 @@ namespace ECSEngine
 struct TimeWarpEntry
 {
     u32 FMultiplier = 1;
-    float FMinAltitude = 0.f;
+    float FMinAltitudeRatio = 0.f;
 
     SERIALIZE()
     {
         PROPERTYFIELD(Multiplier, 1);
-        PROPERTYFIELD(MinAltitude, 0.f);
+        PROPERTYFIELD(MinAltitudeRatio, 0.f);
     }
 };
 
@@ -23,12 +23,14 @@ public:
 
     u32 CurrentTimeWarpIndex() const { return FCurrentTimeWarpIndex; }
     u32 CurrentTimeWarpMultiplier() const;
-    float CurrentTimeWarpAltitudeCap() const;
+    float CurrentTimeWarpAltitudeCapRatio() const;
 
     void IncrementTimeWarpIndex();
     void DecrementTimeWarpIndex();
 
     void SetTimeWarpIndex(const u32 Value);
+
+    void ClampToAltitude();
 
 private:
     u32 FCurrentTimeWarpIndex = 0;

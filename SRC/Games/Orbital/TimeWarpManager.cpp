@@ -5,6 +5,12 @@
 #include "Common/Resource.h"
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
+#include "ECSCore/ScopedModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
+#include "ECSGameplay_Common/RigidbodyModule.h"
+#include "Physics/PhysicsAPI.h"
+#include "PlanetGravityModule.h"
+#include "RocketManagerModule.h"
 
 #include <fstream>
 
@@ -15,11 +21,17 @@ void FillDefault(std::vector<TimeWarpEntry>& WarpConfig)
     WarpConfig.clear();
     WarpConfig.resize(7);
 
+    WarpConfig[1].FMinAltitudeRatio = 0.05f;
     WarpConfig[1].FMultiplier = 5;
+    WarpConfig[2].FMinAltitudeRatio = 0.2f;
     WarpConfig[2].FMultiplier = 10;
+    WarpConfig[3].FMinAltitudeRatio = 0.5f;
     WarpConfig[3].FMultiplier = 50;
+    WarpConfig[4].FMinAltitudeRatio = 1.f;
     WarpConfig[4].FMultiplier = 100;
+    WarpConfig[5].FMinAltitudeRatio = 2.f;
     WarpConfig[5].FMultiplier = 1000;
+    WarpConfig[6].FMinAltitudeRatio = 5.f;
     WarpConfig[6].FMultiplier = 10000;
 }
 
@@ -54,10 +66,10 @@ u32 TimeWarpManager::CurrentTimeWarpMultiplier() const
     return FTimeWarpConfig[FCurrentTimeWarpIndex].FMultiplier;
 }
 
-float TimeWarpManager::CurrentTimeWarpAltitudeCap() const
+float TimeWarpManager::CurrentTimeWarpAltitudeCapRatio() const
 {
     AssertRelease(FCurrentTimeWarpIndex >= 0 && FCurrentTimeWarpIndex < FTimeWarpConfig.size());
-    return FTimeWarpConfig[FCurrentTimeWarpIndex].FMinAltitude;
+    return FTimeWarpConfig[FCurrentTimeWarpIndex].FMinAltitudeRatio;
 }
 
 void TimeWarpManager::IncrementTimeWarpIndex()
@@ -76,6 +88,50 @@ void TimeWarpManager::SetTimeWarpIndex(const u32 Value)
 {
     AssertRelease(Value >= 0 && Value < FTimeWarpConfig.size());
     FCurrentTimeWarpIndex = Value;
+}
+
+using AccessHelpers =
+      ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds::STANDARD>, MC<RigidbodyModule, EEntityWorlds::STANDARD>, MC<PlanetGravityModule, EEntityWorlds::STANDARD>>;
+
+void TimeWarpManager::ClampToAltitude()
+{
+    AccessHelpers accessHelpers;
+
+    AssertRelease(accessHelpers.Accessor<RocketManagerModule>().size() <= 1);
+    if (accessHelpers.Accessor<RocketManagerModule>().size() == 0)
+        return;
+
+    if (CurrentTimeWarpMultiplier() == 1)
+        return;
+
+    RocketManagerModule& rocket = *accessHelpers.Accessor<RocketManagerModule>().begin();
+    if (!rocket.CurrentGravityTarget().Valid())
+        return;
+
+    vec3 comPosition;
+    rocket.ComputeCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), comPosition);
+
+    const PlanetGravityModule* const planetGravity = accessHelpers.GetModule<PlanetGravityModule>(rocket.CurrentGravityTarget());
+    AssertRelease(planetGravity != nullptr);
+
+    const RigidbodyModule* const planetBody = accessHelpers.GetModule<RigidbodyModule>(rocket.CurrentGravityTarget());
+    AssertRelease(planetBody != nullptr);
+
+    vec3 planetComPos;
+    if (!Physics::GetBodyCenterOfMass(planetBody->BodyHandle(), planetComPos))
+    {
+        return;
+    }
+
+    const float Altitude = Length(comPosition - planetComPos) - planetGravity->PlanetRadius();
+
+    while (CurrentTimeWarpIndex() > 0)
+    {
+        const float AltCap = planetGravity->PlanetRadius() * CurrentTimeWarpAltitudeCapRatio();
+        if (Altitude >= AltCap)
+            break;
+        DecrementTimeWarpIndex();
+    }
 }
 
 } // namespace ECSEngine
