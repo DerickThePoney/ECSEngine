@@ -3,6 +3,7 @@
 #include "RocketUIController.h"
 
 #include "Common/CameraManager.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/ScopedModuleAccessor.h"
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/PhysicsFloatingOriginModule.h"
@@ -289,7 +290,8 @@ void RocketUIController::DrawDebug(Rendering::DrawCommandBuffer* buffer, const R
     if (FHasSASTargetDraw)
         buffer->DrawDebugArrow(material, FSASTargetOrigin, FSASTargetDirection, 20.f, 0xFF00FFFFu);
 
-    if (FDrawOriginBubble)
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(drawOriginBubble, false, "Draw floating point origin", "Physics/Floating Point Origin");
+    if (drawOriginBubble)
     {
         constexpr float originMarkerRadius = 5.f;
         buffer->DrawDebugSphere(material, vec3(0.f), FOriginBubbleRadius, 0xFF00FFFFu);
