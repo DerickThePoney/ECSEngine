@@ -12,6 +12,7 @@
 #include "NozzleEngineModule.h"
 #include "OrbitalPathFollowerModule.h"
 #include "OrbitalScenarioUpdater.h"
+#include "PlanetAtmosphereModule.h"
 #include "PlanetGravityModule.h"
 #include "RocketCameraMoverModule.h"
 #include "RocketManagerModule.h"
@@ -39,6 +40,7 @@ bool OrbitalLoader::VirtualInitialise()
     AssertRelease(world != nullptr);
     world->AddController<RocketManagerModule>();
     world->AddController<PlanetGravityModule>();
+    world->AddController<PlanetAtmosphereModule>();
     world->AddController<NozzleEngineModule>();
     world->AddController<FuelTankModule>();
     world->AddController<OrbitalPathFollowerModule>();
