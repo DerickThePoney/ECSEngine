@@ -47,6 +47,8 @@ void PlanetGravitySystem::VirtualUpdate()
         vec3 gravityAcceleration{ 0.f };
 
         const EntityId& CurrentTargetGravity = rocket.CurrentGravityTarget();
+        if (!CurrentTargetGravity.Valid())
+            continue;
 
         const PlanetGravityModule* planetGravity = planetGravityAccessor[CurrentTargetGravity];
         AssertRelease(planetGravity);
