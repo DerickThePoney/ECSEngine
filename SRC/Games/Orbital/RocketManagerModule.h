@@ -26,12 +26,19 @@ public:
         PROPERTYFIELD(RocketNozzleTemplateName, "");
         PROPERTYFIELD(RocketCameraMoverTemplateName, "");
         PROPERTYFIELD(BallConfig, Physics::BallJointConfig{ })
+        PROPERTYFIELD(AxialDragArea, 0.f);
+        PROPERTYFIELD(BroadsideDragArea, 0.f);
+        PROPERTYFIELD(Weathercock, 0.f);
     }
 
     const EntityTemplate* GetBodyTemplate() const { return FRocketBodyTemplate; }
     const EntityTemplate* GetNozzleTemplate() const { return FRocketNozzleTemplate; }
     const EntityTemplate* GetRocketCameraMoverTemplate() const { return FRocketCameraMoverTemplate; }
     const Physics::BallJointConfig& GetJointConfig() const { return FBallConfig; }
+
+    float AxialDragArea() const { return FAxialDragArea; }
+    float BroadsideDragArea() const { return FBroadsideDragArea; }
+    float Weathercock() const { return FWeathercock; }
 
 protected:
     void VirtualDrawEditor() override;
@@ -47,6 +54,10 @@ private:
     const EntityTemplate* FRocketCameraMoverTemplate = nullptr;
 
     Physics::BallJointConfig FBallConfig;
+
+    float FAxialDragArea = 0.f;
+    float FBroadsideDragArea = 0.f;
+    float FWeathercock = 0.f;
 };
 
 enum class ESASMode : u8
@@ -108,6 +119,10 @@ public:
     void SetCurrentGravityTarget(const EntityId& Value) { FCurrentGravityTarget = Value; }
 
     Physics::PhysicsJointHandle NozzleJointHandle() const { return FJointHandle; }
+
+    float AxialDragArea() const;
+    float BroadsideDragArea() const;
+    float Weathercock() const;
 
     template<typename RigidbodyAccessor>
     bool ComputeCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity = nullptr) const;

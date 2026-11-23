@@ -50,6 +50,10 @@ void RocketManagerModuleTemplate::VirtualDrawEditor()
     }
 
     FBallConfig.DrawInEditor();
+
+    EDITOR_PROPERTY_SIMPLE("Axial drag area", FAxialDragArea);
+    EDITOR_PROPERTY_SIMPLE("Broadside drag area", FBroadsideDragArea);
+    EDITOR_PROPERTY_SIMPLE("Weathercock", FWeathercock);
 }
 
 void RocketManagerModuleTemplate::VirtualPostLoad()
@@ -74,6 +78,24 @@ RocketManagerModule::RocketManagerModule()
 
 RocketManagerModule::~RocketManagerModule()
 {
+}
+
+float RocketManagerModule::AxialDragArea() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->AxialDragArea();
+}
+
+float RocketManagerModule::BroadsideDragArea() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->BroadsideDragArea();
+}
+
+float RocketManagerModule::Weathercock() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->Weathercock();
 }
 
 void RocketManagerModule::SetRocketThrottle(const float Value)
