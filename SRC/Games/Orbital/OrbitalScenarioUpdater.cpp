@@ -73,6 +73,7 @@ void OrbitalScenarioUpdater::Initialise()
     FRocketSteeringSystem.Init();
     FRocketThrustSystem.Init();
     FRocketSASSystem.Init();
+    FRocketDragSystem.Init();
     FPlanetGravitySystem.Init();
     FRocketMassSystem.Init();
     FPlanetOrbitSystem.Init();
@@ -115,6 +116,7 @@ void OrbitalScenarioUpdater::Destroy()
     FFloatingOriginSystem.Destroy();
     FRocketMassSystem.Destroy();
     FRocketSASSystem.Destroy();
+    FRocketDragSystem.Destroy();
     FRocketThrustSystem.Destroy();
     FRocketSteeringSystem.Destroy();
     FRocketControllerSystem.Destroy();
@@ -202,6 +204,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
         FRocketSteeringSystem.Update();
         FRocketThrustSystem.Update();
         FRocketSASSystem.Update();
+        FRocketDragSystem.Update();
         FPlanetOrbitSystem.Update();
         FPlanetGravitySystem.Update();
         FPhysicsSystem.Update();

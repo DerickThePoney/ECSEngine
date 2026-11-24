@@ -9,6 +9,7 @@
 #include "PlanetGravitySystem.h"
 #include "PlanetOrbitalPathFollowingSystem.h"
 #include "RocketControllerSystem.h"
+#include "RocketDragSystem.h"
 #include "RocketMassSystem.h"
 #include "RocketSASSystem.h"
 #include "RocketSteeringSystem.h"
@@ -48,6 +49,7 @@ private:
     RocketSteeringSystem FRocketSteeringSystem;
     RocketThrustSystem FRocketThrustSystem;
     RocketSASSystem FRocketSASSystem;
+    RocketDragSystem FRocketDragSystem;
     PlanetGravitySystem FPlanetGravitySystem;
     RocketMassSystem FRocketMassSystem;
     PlanetOrbitalPathFollowingSystem FPlanetOrbitSystem;
