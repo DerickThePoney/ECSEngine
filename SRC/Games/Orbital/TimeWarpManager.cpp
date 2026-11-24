@@ -9,6 +9,7 @@
 #include "ECSCore/WorldIds.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
 #include "Physics/PhysicsAPI.h"
+#include "PlanetAtmosphereModule.h"
 #include "PlanetGravityModule.h"
 #include "RocketManagerModule.h"
 
@@ -90,8 +91,10 @@ void TimeWarpManager::SetTimeWarpIndex(const u32 Value)
     FCurrentTimeWarpIndex = Value;
 }
 
-using AccessHelpers =
-      ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds::STANDARD>, MC<RigidbodyModule, EEntityWorlds::STANDARD>, MC<PlanetGravityModule, EEntityWorlds::STANDARD>>;
+using AccessHelpers = ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds::STANDARD>,
+      MC<RigidbodyModule, EEntityWorlds::STANDARD>,
+      MC<PlanetGravityModule, EEntityWorlds::STANDARD>,
+      MC<PlanetAtmosphereModule, EEntityWorlds::STANDARD>>;
 
 void TimeWarpManager::ClampToAltitude()
 {
@@ -123,11 +126,18 @@ void TimeWarpManager::ClampToAltitude()
         return;
     }
 
+    float AtmosphereHeight = 0.f;
+    const PlanetAtmosphereModule* const planetAtmosphere = accessHelpers.GetModule<PlanetAtmosphereModule>(rocket.CurrentGravityTarget());
+    if (planetAtmosphere != nullptr)
+    {
+        AtmosphereHeight = planetAtmosphere->AtmosphereHeight();
+    }
+
     const float Altitude = Length(comPosition - planetComPos) - planetGravity->PlanetRadius();
 
     while (CurrentTimeWarpIndex() > 0)
     {
-        const float AltCap = planetGravity->PlanetRadius() * CurrentTimeWarpAltitudeCapRatio();
+        const float AltCap = planetGravity->PlanetRadius() * CurrentTimeWarpAltitudeCapRatio() + AtmosphereHeight;
         if (Altitude >= AltCap)
             break;
         DecrementTimeWarpIndex();
