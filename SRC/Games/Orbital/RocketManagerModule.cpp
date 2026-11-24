@@ -49,7 +49,12 @@ void RocketManagerModuleTemplate::VirtualDrawEditor()
         FRocketCameraMoverTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketCameraMoverTemplateName);
     }
 
-    FBallConfig.DrawInEditor();
+    if (ImGui::CollapsingHeader("Ball Joint Config"))
+    {
+        ImGui::Indent();
+        FBallConfig.DrawInEditor();
+        ImGui::Unindent();
+    }
 
     EDITOR_PROPERTY_SIMPLE("Axial drag area", FAxialDragArea);
     EDITOR_PROPERTY_SIMPLE("Broadside drag area", FBroadsideDragArea);
