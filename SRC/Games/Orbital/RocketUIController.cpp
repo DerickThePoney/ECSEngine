@@ -13,6 +13,7 @@
 #include "OrbitalPathFollowerModule.h"
 #include "Physics/PhysicsAPI.h"
 #include "Physics/PhysicsEngineConfiguration.h"
+#include "PlanetAtmosphereModule.h"
 #include "PlanetGravityModule.h"
 #include "RenderingCore/DrawCommands.h"
 #include "RocketCameraMoverModule.h"
@@ -26,6 +27,7 @@ namespace UI
 using AccessHelpers = ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds::STANDARD>,
       MC<RigidbodyModule, EEntityWorlds::STANDARD>,
       MC<PlanetGravityModule, EEntityWorlds::STANDARD>,
+      MC<PlanetAtmosphereModule, EEntityWorlds::STANDARD>,
       MC<FuelTankModule, EEntityWorlds::STANDARD>,
       MC<NozzleEngineModule, EEntityWorlds::STANDARD>,
       MC<PhysicsFloatingOriginModule, EEntityWorlds::STANDARD>,
@@ -83,6 +85,20 @@ void RocketUIController::VirtualUpdate()
         ImGui::Text("Vertical speed : %.3f m/s", VerticalSpeed);
         ImGui::Text("Horizontal speed : %.3f m/s", HorizontalSpeed);
         ImGui::Text("Warp : %ux", TimeWarpManager::Instance().CurrentTimeWarpMultiplier());
+
+        const PlanetAtmosphereModule* atmosphereModule = accessHelpers.GetModule<PlanetAtmosphereModule>(rocketManager.CurrentGravityTarget());
+        const float rho = (atmosphereModule != nullptr) ? atmosphereModule->DensityAt(Max(0.f, Altitude)) : 0.f;
+        if (rho > 0.f)
+        {
+            const float dynamicPressure = 0.5f * rho * LengthSq(RocketVelocity);
+            ImGui::Text("In atmosphere");
+            ImGui::Text("Air density : %.5f kg/m3", rho);
+            ImGui::Text("Dynamic pressure : %.3f Pa", dynamicPressure);
+        }
+        else
+        {
+            ImGui::Text("In space");
+        }
 
         const float rocketSpeedSq = LengthSq(RocketVelocity);
         const float energy = 0.5f * rocketSpeedSq - planetModule->PlanetGravityConstant() / LPlanetToRocket; // ε
