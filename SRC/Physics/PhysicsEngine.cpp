@@ -350,6 +350,11 @@ bool PhysicsEngine::SetBodyMass(const PhysicsBodyHandle& Handle, const float Mas
         return false;
     }
 
+    if (body->FMass == Mass)
+    {
+        return true;
+    }
+
     body->FMass = Mass;
     SetupMassProperties(body, body->GetTransform(), false);
     UpdateInertiaTransform(body);
