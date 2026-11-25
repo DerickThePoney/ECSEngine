@@ -88,6 +88,25 @@ void PhysicsJointSpawner::VirtualUpdate()
     }
 
     HingeJointToSpawn.clear();
+
+    foreachitemconst(record, WeldJointToSpawn)
+    {
+        RigidbodyModule* EntityABodyModule = rigidBodies[record.A];
+        if (EntityABodyModule == nullptr)
+            continue;
+
+        RigidbodyModule* EntityBBodyModule = rigidBodies[record.B];
+        if (EntityBBodyModule == nullptr)
+            continue;
+
+        Physics::PhysicsJointHandle Handle = Physics::CreateWeldJoint(EntityABodyModule->BodyHandle(), EntityBBodyModule->BodyHandle(), record.Config);
+        if (record.Callback != nullptr)
+        {
+            (*record.Callback)(Handle);
+        }
+    }
+
+    WeldJointToSpawn.clear();
 }
 
 void PhysicsJointSpawner::AddDistanceJointToSpawn(const EntityId& EntityA,
@@ -115,5 +134,14 @@ void PhysicsJointSpawner::AddHingeJointToSpawn(const EntityId& EntityA,
 {
     HingeJointRecord record{ .A = EntityA, .B = EntityB, .Config = Config, .Callback = Callback };
     HingeJointToSpawn.emplace_back(record);
+}
+
+void PhysicsJointSpawner::AddWeldJointToSpawn(const EntityId& EntityA,
+      const EntityId& EntityB,
+      const Physics::WeldJointConfig& Config,
+      OnJointCreatedCallback* Callback /*= nullptr*/)
+{
+    WeldJointRecord record{ .A = EntityA, .B = EntityB, .Config = Config, .Callback = Callback };
+    WeldJointToSpawn.emplace_back(record);
 }
 } // namespace ECSEngine

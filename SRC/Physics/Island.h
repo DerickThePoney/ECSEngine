@@ -22,6 +22,7 @@ class Island
     friend class DistanceJointBatch;
     friend class BallJointBatch;
     friend class HingeJointBatch;
+    friend class WeldJointBatch;
 
 public:
     void Initialise();

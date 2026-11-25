@@ -13,6 +13,7 @@ enum class EJointType : u8
     DISTANCE,
     BALL,
     HINGE,
+    WELD,
     LENGTH
 };
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "JointsConfig.h"
+#include "Math/Quaternion.h"
 #include "Math/VectorTypes.h"
 #include "PhysicsBodyHandle.h"
 #include "PhysicsJointHandle.h"
@@ -48,6 +49,18 @@ struct BallJoint : public JointBase
     vec3 FMotorImpulse;
 
     void Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const BallJointConfig& Config);
+};
+
+struct WeldJoint : public JointBase
+{
+    WeldJointConfig FConfig;
+
+    quat FBindRelative = quat(0.f, 0.f, 0.f, 1.f);
+
+    vec3 FPointImpulse;
+    vec3 FAngularImpulse;
+
+    void Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const WeldJointConfig& Config);
 };
 
 enum class EHingeLimitState : u8

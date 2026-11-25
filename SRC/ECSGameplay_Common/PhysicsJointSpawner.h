@@ -23,6 +23,7 @@ public:
     void AddDistanceJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::DistanceJointConfig& Config, OnJointCreatedCallback* Callback = nullptr);
     void AddBallJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::BallJointConfig& Config, OnJointCreatedCallback* Callback = nullptr);
     void AddHingeJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::HingeJointConfig& Config, OnJointCreatedCallback* Callback = nullptr);
+    void AddWeldJointToSpawn(const EntityId& EntityA, const EntityId& EntityB, const Physics::WeldJointConfig& Config, OnJointCreatedCallback* Callback = nullptr);
 
 private:
     struct DistanceJointRecord
@@ -51,5 +52,14 @@ private:
         OnJointCreatedCallback* Callback = nullptr;
     };
     std::vector<HingeJointRecord> HingeJointToSpawn;
+
+    struct WeldJointRecord
+    {
+        EntityId A;
+        EntityId B;
+        Physics::WeldJointConfig Config;
+        OnJointCreatedCallback* Callback = nullptr;
+    };
+    std::vector<WeldJointRecord> WeldJointToSpawn;
 };
 } // namespace ECSEngine

@@ -12,6 +12,7 @@ struct PhysicsJointHandle;
 struct DistanceJointConfig;
 struct BallJointConfig;
 struct HingeJointConfig;
+struct WeldJointConfig;
 class PhysicsCollisionPresetManager;
 class PhysicsContactEventManager;
 
@@ -60,6 +61,7 @@ bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Rotat
 const PhysicsJointHandle CreateDistanceJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const DistanceJointConfig& Config);
 const PhysicsJointHandle CreateBallJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const BallJointConfig& Config);
 const PhysicsJointHandle CreateHingeJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const HingeJointConfig& Config);
+const PhysicsJointHandle CreateWeldJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const WeldJointConfig& Config);
 
 void DestroyJoint(const PhysicsJointHandle& JointHandle);
 

@@ -222,6 +222,12 @@ const PhysicsJointHandle CreateHingeJoint(const PhysicsBodyHandle& HandleA, cons
     return Engine.JointsManager().CreateHingeJoint(HandleA, HandleB, Config);
 }
 
+const PhysicsJointHandle CreateWeldJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const WeldJointConfig& Config)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.JointsManager().CreateWeldJoint(HandleA, HandleB, Config);
+}
+
 void DestroyJoint(const PhysicsJointHandle& JointHandle)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();

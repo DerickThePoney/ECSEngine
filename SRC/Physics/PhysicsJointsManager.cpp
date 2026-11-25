@@ -126,6 +126,17 @@ PhysicsJointHandle PhysicsJointsManager::CreateHingeJoint(const PhysicsBodyHandl
     return CreateJoint(BodyA, BodyB, FHingeJoints, Config, EJointType::HINGE, FHingeJointsIdGenerator);
 }
 
+PhysicsJointHandle PhysicsJointsManager::CreateWeldJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const WeldJointConfig& Config)
+{
+    if (BodyA == BodyB)
+    {
+        LOG_ERROR("Nice try young padawan. But attaching the same body to the same joint is not supported !");
+        return PhysicsJointHandle{ };
+    }
+
+    return CreateJoint(BodyA, BodyB, FWeldJoints, Config, EJointType::WELD, FWeldJointsIdGenerator);
+}
+
 template<typename Container>
 void DestroyJointTemplate(const PhysicsJointHandle& Handle, Container& JointContainer, IdGenerator& Generator, EJointType JointType)
 {
@@ -210,6 +221,11 @@ void PhysicsJointsManager::DestroyJoint(const PhysicsJointHandle& Handle)
         DestroyJointTemplate(Handle, FHingeJoints, FHingeJointsIdGenerator, EJointType::HINGE);
         break;
     }
+    case EJointType::WELD:
+    {
+        DestroyJointTemplate(Handle, FWeldJoints, FWeldJointsIdGenerator, EJointType::WELD);
+        break;
+    }
     default:
         AssertNotReached();
     }
@@ -249,6 +265,15 @@ JointBase* PhysicsJointsManager::GetJoint(const PhysicsJointHandle& Handle)
         return &FHingeJoints[Handle.FIndex].Joint;
         break;
     }
+    case EJointType::WELD:
+    {
+        if (Handle.FIndex >= FWeldJoints.size())
+            return nullptr;
+        if (FWeldJoints[Handle.FIndex].Handle != Handle)
+            return nullptr;
+        return &FWeldJoints[Handle.FIndex].Joint;
+        break;
+    }
     default:
         AssertNotReached();
     }
@@ -269,6 +294,11 @@ void PhysicsJointsManager::PreUpdate()
     }
 
     foreachitem(joint, FHingeJoints)
+    {
+        joint.Joint.bIsland = false;
+    }
+
+    foreachitem(joint, FWeldJoints)
     {
         joint.Joint.bIsland = false;
     }
@@ -455,6 +485,21 @@ void DrawConeLimit(Rendering::DrawCommandBuffer* Buffer, const Rendering::Materi
             Lines.DrawLine(Buffer, Material, Pivot, End, Color);
     }
     Lines.DrawPolyline(Buffer, Material, std::move(Ring), Color, true);
+}
+
+void DrawWeldJointDebug(Rendering::DrawCommandBuffer* Buffer, const Rendering::MaterialInstanceHandle& Material, JointDebugLineScratch& Lines, const WeldJoint& Joint,
+                        const RigidBody* BodyA, const RigidBody* BodyB, const JointDebugDrawFlags& Flags, u32 AnchorColor, u32 ImpulseColor)
+{
+    const vec3 AnchorA = JointWorldAnchor(BodyA, Joint.FConfig.FCommon.FAnchorALocal);
+    const vec3 AnchorB = JointWorldAnchor(BodyB, Joint.FConfig.FCommon.FAnchorBLocal);
+    DrawAnchorPair(Buffer, Material, Lines, AnchorA, AnchorB, AnchorColor);
+
+    if (Flags.bDrawImpulses)
+    {
+        const vec3 Mid = (AnchorA + AnchorB) * 0.5f;
+        DrawImpulseArrow(Buffer, Material, Mid, Joint.FPointImpulse, Flags.ImpulseArrowScale, ImpulseColor);
+        DrawImpulseArrow(Buffer, Material, Mid, Joint.FAngularImpulse, Flags.ImpulseArrowScale, ImpulseColor);
+    }
 }
 
 void DrawDistanceJointDebug(Rendering::DrawCommandBuffer* Buffer, const Rendering::MaterialInstanceHandle& Material, JointDebugLineScratch& Lines, const DistanceJoint& Joint,
@@ -678,6 +723,17 @@ void PhysicsJointsManager::DebugDrawJoints()
         if (BodyA == nullptr || BodyB == nullptr)
             continue;
         DrawHingeJointDebug(Buffer, Material, Lines, Record.Joint, BodyA, BodyB, Flags, AnchorColor, AxisColor, LimitColor, LimitActiveColor, MotorColor, ImpulseColor);
+    }
+
+    foreachitemconst(Record, FWeldJoints)
+    {
+        if (!Record.Joint.FBodyA.IsValid() || !Record.Joint.FBodyB.IsValid())
+            continue;
+        const RigidBody* BodyA = Engine.GetRigidBody(Record.Joint.FBodyA);
+        const RigidBody* BodyB = Engine.GetRigidBody(Record.Joint.FBodyB);
+        if (BodyA == nullptr || BodyB == nullptr)
+            continue;
+        DrawWeldJointDebug(Buffer, Material, Lines, Record.Joint, BodyA, BodyB, Flags, AnchorColor, ImpulseColor);
     }
 
     Buffer->Submit();

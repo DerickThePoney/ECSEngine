@@ -61,6 +61,23 @@ void BallJoint::Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHand
     FMotorImpulse = vec3{ };
 }
 
+void WeldJoint::Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const WeldJointConfig& Config)
+{
+    JointBase::Initialize(BodyA, BodyB);
+    FConfig = Config;
+    FPointImpulse = vec3();
+    FAngularImpulse = vec3();
+
+    RigidBody* bodyA = PhysicsEngine::Instance().GetRigidBody(BodyA);
+    RigidBody* bodyB = PhysicsEngine::Instance().GetRigidBody(BodyB);
+    AssertRelease(bodyA && bodyB);
+
+    const quat qA = bodyA->FOrientation;
+    const quat qB = bodyB->FOrientation;
+    const quat qAInv(-qA.x, -qA.y, -qA.z, qA.w);
+    FBindRelative = qAInv * qB;
+}
+
 void HingeJoint::Initialize(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const HingeJointConfig& Config)
 {
     JointBase::Initialize(BodyA, BodyB);
