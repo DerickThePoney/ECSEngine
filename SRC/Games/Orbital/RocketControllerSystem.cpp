@@ -45,6 +45,9 @@ RocketControllerSystem::RocketControllerSystem()
     FIncreaseTimeWarp.FInputType = EInputType::PRESSED;
     FDecreaseTimeWarp.FKeyboardKey = InputKeyNames::INPUT_KEY_PAGE_DOWN;
     FDecreaseTimeWarp.FInputType = EInputType::PRESSED;
+
+    FStage.FKeyboardKey = InputKeyNames::INPUT_KEY_SPACE;
+    FStage.FInputType = EInputType::PRESSED;
 }
 
 static constexpr float MaxSteeringAngle = Radians(50.f);
@@ -121,7 +124,14 @@ void RocketControllerSystem::VirtualUpdate()
             if (FDecreaseTimeWarp.Evaluate())
                 TimeWarpManager::Instance().DecrementTimeWarpIndex();
         }
+
+        if (TimeWarpManager::Instance().CurrentTimeWarpMultiplier() == 1)
+        {
+            if (FStage.Evaluate())
+            {
+                // TODO
+            }
+        }
     }
 }
 } // namespace ECSEngine
-

@@ -26,5 +26,7 @@ protected:
 
     KeyboardCommand FIncreaseTimeWarp;
     KeyboardCommand FDecreaseTimeWarp;
+
+    KeyboardCommand FStage;
 };
 } // namespace ECSEngine

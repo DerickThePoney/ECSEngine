@@ -121,6 +121,10 @@ public:
     const Physics::PhysicsJointHandle ActiveEngineJointHandle() const;
     const EntityId RootId() const;
 
+    bool WantsStaging() const { return FbWantsStaging; }
+    void SetStaging(bool Value) { FbWantsStaging = Value; }
+    bool Stage();
+
     template<typename RigidbodyAccessor>
     void SetPositionAndVelocityForAllPartsUsingOffsets(const RigidbodyAccessor& Rigidbodies,
           const vec3& CoMPosition,
@@ -150,6 +154,7 @@ protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
     i32 ActiveEnginePartIndex() const;
+    i32 NextDecouplerIndex() const;
 
 private:
     RocketPartGroup FActive;
@@ -171,6 +176,7 @@ private:
     bool FHasSASTarget = false;
 
     bool FIsSteering = false;
+    bool FbWantsStaging = false;
 };
 
 } // namespace ECSEngine

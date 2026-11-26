@@ -158,11 +158,51 @@ const EntityId RocketManagerModule::RootId() const
     return FActive.FParts[0].FId;
 }
 
+bool RocketManagerModule::Stage()
+{
+    if (!FbWantsStaging)
+        return false;
+
+    i32 DecouplerIndex = NextDecouplerIndex();
+    if (DecouplerIndex == -1)
+        return false;
+
+    RocketPartGroup& newDebrisGroup = FDebris.emplace_back();
+    forrange(i, DecouplerIndex, FActive.FParts.size())
+    {
+        newDebrisGroup.FParts.push_back(FActive.FParts[i]);
+    }
+    FActive.FParts.resize(DecouplerIndex);
+
+    RocketPart& RootDebrisPart = newDebrisGroup.FParts[0];
+    RootDebrisPart.FParent = -1;
+
+    // Destroy the joint
+    Physics::DestroyJoint(RootDebrisPart.FJointHandle);
+
+    // Apply the separation speed
+
+    return true;
+}
+
 i32 RocketManagerModule::ActiveEnginePartIndex() const
 {
     reverseforrange(i, 0, FActive.FParts.size())
     {
         if (FActive.FParts[i].FRole == ERocketPartRole::ENGINE)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+i32 RocketManagerModule::NextDecouplerIndex() const
+{
+    reverseforrange(i, 0, FActive.FParts.size())
+    {
+        if (FActive.FParts[i].FbDecoupler)
         {
             return i;
         }
