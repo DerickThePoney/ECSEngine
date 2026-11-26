@@ -11,7 +11,10 @@
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
+#include "ECSCore/EntityTemplate.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
+#include "FuelTankModule.h"
+#include "NozzleEngineModule.h"
 #include "Physics/PhysicsAPI.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::RocketManagerModuleTemplate);
@@ -48,6 +51,40 @@ void RocketManagerModuleTemplate::VirtualDrawEditor()
 void RocketManagerModuleTemplate::VirtualPostLoad()
 {
     FRocketCameraMoverTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketCameraMoverTemplateName);
+
+    const std::vector<RocketPartRecipe>& parts = FRecipe.FRocketPartRecipes;
+    forrange(i, 0, parts.size())
+    {
+        const RocketPartRecipe& part = parts[i];
+        AssertReleaseMsg(part.FEntityTemplate != nullptr, std::format("Rocket part {} has no entity template", i).c_str());
+        if (part.FEntityTemplate == nullptr)
+            continue;
+
+        if (i == 0)
+        {
+            AssertReleaseMsg(part.FJointType == ERocketPartJoint::NONE, "Rocket part 0 must have no joint");
+        }
+        else
+        {
+            AssertReleaseMsg(part.FJointType != ERocketPartJoint::NONE, std::format("Rocket part {} must have a joint", i).c_str());
+        }
+
+        if (part.FRole == ERocketPartRole::ENGINE)
+        {
+            AssertReleaseMsg(part.FEntityTemplate->HasModule<NozzleEngineModule>(), std::format("Rocket part {} is an engine without a NozzleEngineModule", i).c_str());
+
+            const bool bTankIndexInRange = part.FFuelTankIndex >= 0 && static_cast<size_t>(part.FFuelTankIndex) < parts.size();
+            AssertReleaseMsg(bTankIndexInRange, std::format("Rocket part {} fuel tank index is out of range", i).c_str());
+            if (bTankIndexInRange)
+            {
+                AssertReleaseMsg(parts[part.FFuelTankIndex].FRole == ERocketPartRole::FUEL_TANK, std::format("Rocket part {} does not drain a fuel tank", i).c_str());
+            }
+        }
+        else if (part.FRole == ERocketPartRole::FUEL_TANK)
+        {
+            AssertReleaseMsg(part.FEntityTemplate->HasModule<FuelTankModule>(), std::format("Rocket part {} is a fuel tank without a FuelTankModule", i).c_str());
+        }
+    }
 }
 
 IMPLEMENT_SAVELOAD_ABILITIES(RocketManagerModule);
