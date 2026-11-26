@@ -731,6 +731,76 @@ bool PhysicsEngine::Raycast(const RaycastQuery& Query, RaycastHit& outHit)
 }
 
 #ifdef PERFORM_SECURITY_CHECKS
+namespace
+{
+// DrawLines stores a raw pointer and reads it on Submit. The batches have to outlive the command buffer.
+struct CapsuleDebugLineScratch
+{
+    std::list<std::vector<vec3>> Batches;
+
+    void DrawPolyline(Rendering::DrawCommandBuffer* Buffer, const Rendering::MaterialInstanceHandle& Material, std::vector<vec3>&& Verts, u32 Color, bool bClose)
+    {
+        Batches.push_back(std::move(Verts));
+        const std::vector<vec3>& Stored = Batches.back();
+        Buffer->DrawLines(Material, Stored.data(), (u32)Stored.size(), Color, bClose);
+    }
+};
+
+void DrawWireCapsule(Rendering::DrawCommandBuffer* Buffer, const Rendering::MaterialInstanceHandle& Material, CapsuleDebugLineScratch& Lines, const vec3& EndA, const vec3& EndB,
+      float Radius, u32 Color)
+{
+    const vec3 Segment = EndB - EndA;
+    const float SegmentLength = Length(Segment);
+    if (SegmentLength <= 1.e-6f)
+    {
+        Buffer->DrawDebugSphere(Material, EndA, Radius, Color);
+        return;
+    }
+
+    const vec3 Axis = Segment / SegmentLength;
+    const vec3 Fallback = (fabsf(Axis.y) < 0.9f) ? vec3(0.f, 1.f, 0.f) : vec3(1.f, 0.f, 0.f);
+    const vec3 U = Normalize(Cross(Axis, Fallback));
+    const vec3 V = Cross(Axis, U);
+    const vec3 Radials[4] = { U, V, Invert(U), Invert(V) };
+
+    constexpr int RingCount = 16;
+    std::vector<vec3> RingA;
+    std::vector<vec3> RingB;
+    RingA.reserve(RingCount);
+    RingB.reserve(RingCount);
+    for (int i = 0; i < RingCount; ++i)
+    {
+        const float Phi = (2.f * Pi() * (float)i) / (float)RingCount;
+        const vec3 Radial = (U * cosf(Phi) + V * sinf(Phi)) * Radius;
+        RingA.push_back(EndA + Radial);
+        RingB.push_back(EndB + Radial);
+    }
+    Lines.DrawPolyline(Buffer, Material, std::move(RingA), Color, true);
+    Lines.DrawPolyline(Buffer, Material, std::move(RingB), Color, true);
+
+    constexpr int ArcSegments = 4;
+    for (const vec3& Radial : Radials)
+    {
+        Lines.DrawPolyline(Buffer, Material, std::vector<vec3>{ EndA + Radial * Radius, EndB + Radial * Radius }, Color, false);
+
+        std::vector<vec3> ArcA;
+        std::vector<vec3> ArcB;
+        ArcA.reserve(ArcSegments + 1);
+        ArcB.reserve(ArcSegments + 1);
+        for (int s = 0; s <= ArcSegments; ++s)
+        {
+            const float T = (Pi() * 0.5f * (float)s) / (float)ArcSegments;
+            const float CosT = cosf(T);
+            const float SinT = sinf(T);
+            ArcA.push_back(EndA + Radial * (Radius * CosT) - Axis * (Radius * SinT));
+            ArcB.push_back(EndB + Radial * (Radius * CosT) + Axis * (Radius * SinT));
+        }
+        Lines.DrawPolyline(Buffer, Material, std::move(ArcA), Color, false);
+        Lines.DrawPolyline(Buffer, Material, std::move(ArcB), Color, false);
+    }
+}
+} // namespace
+
 void PhysicsEngine::DrawDebug()
 {
     DrawDebugInternal();
@@ -752,6 +822,7 @@ void PhysicsEngine::DrawDebugInternal()
         Camera* camera = CameraManager::Instance().GetCamera(camId);
         buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
         Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+        CapsuleDebugLineScratch CapsuleLines;
 
         static const u32 DynamicShapeColor = ColorUtils::ConvertToU32(vec4(0.f, 1.f, 0.f, 1.f));
         static const u32 StaticShapeColor = ColorUtils::ConvertToU32(vec4(1.f, 0.f, 0.f, 1.f));
@@ -799,17 +870,17 @@ void PhysicsEngine::DrawDebugInternal()
                 case ECollisionShape::CAPSULE:
                 {
                     const mat4 Tr = body->GetTransform();
-                    const vec4 CapsuleCenter = (Tr * vec4::MakeHomogeneousPositionVec4(shape.GetCenter()));
-                    const vec4 CapsuleAxis = Tr.Column(1);
+                    const vec3 CapsuleCenter = (Tr * vec4::MakeHomogeneousPositionVec4(shape.GetCenter())).xyz();
                     const float HalfLength = shape.GetHalfLength();
                     const float Radius = shape.GetRadius();
+                    if (HalfLength <= 0.f)
+                    {
+                        buffer->DrawDebugSphere(handle, CapsuleCenter, Radius, ShapeColor);
+                        break;
+                    }
 
-                    const vec4 Ac = CapsuleCenter - CapsuleAxis * HalfLength;
-                    const vec4 Bc = CapsuleCenter + CapsuleAxis * HalfLength;
-
-                    buffer->DrawDebugSphere(handle, Ac.xyz(), shape.GetRadius(), ShapeColor);
-                    buffer->DrawDebugSphere(handle, Bc.xyz(), shape.GetRadius(), ShapeColor);
-
+                    const vec3 AxisOffset = (Tr * vec4::MakeHomogeneousDirectionVec4(vec3(0.f, HalfLength, 0.f))).xyz();
+                    DrawWireCapsule(buffer, handle, CapsuleLines, CapsuleCenter - AxisOffset, CapsuleCenter + AxisOffset, Radius, ShapeColor);
                     break;
                 }
                 default:
