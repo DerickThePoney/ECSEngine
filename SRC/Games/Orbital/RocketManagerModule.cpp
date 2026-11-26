@@ -6,12 +6,12 @@
 #include "Common/SavingSystemImplementation.h"
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSCore/EntityFactory.h"
+#include "ECSCore/EntityTemplate.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
 #include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
-#include "ECSCore/EntityTemplate.h"
 #include "ECSGameplay_Common/RigidbodyModule.h"
 #include "FuelTankModule.h"
 #include "NozzleEngineModule.h"
@@ -51,6 +51,8 @@ void RocketManagerModuleTemplate::VirtualDrawEditor()
 void RocketManagerModuleTemplate::VirtualPostLoad()
 {
     FRocketCameraMoverTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketCameraMoverTemplateName);
+
+    FRecipe.FetchEntityTemplates();
 
     const std::vector<RocketPartRecipe>& parts = FRecipe.FRocketPartRecipes;
     forrange(i, 0, parts.size())

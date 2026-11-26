@@ -59,6 +59,8 @@ struct RocketRecipe
 
     void DrawInEditor();
 
+    void FetchEntityTemplates();
+
     SERIALIZE() { PROPERTYFIELD(RocketPartRecipes, std::vector<RocketPartRecipe>()); }
 };
 } // namespace ECSEngine

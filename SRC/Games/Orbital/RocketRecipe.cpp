@@ -76,7 +76,15 @@ void RocketRecipe::DrawInEditor()
             ImGui::PopID();
         }
     };
-    EDITOR_PROPERTY_COMPLEXVECTOR(RocketPartRecipe, "##RocketRecipe", FRocketPartRecipes, false, drawPartRecipe, true);
+    EDITOR_PROPERTY_COMPLEXVECTOR(RocketPartRecipe, "##RocketRecipe", FRocketPartRecipes, false, drawPartRecipe, false);
+}
+
+void RocketRecipe::FetchEntityTemplates()
+{
+    foreachitem(part, FRocketPartRecipes)
+    {
+        part.FetchEntityTemplate();
+    }
 }
 
 } // namespace ECSEngine
