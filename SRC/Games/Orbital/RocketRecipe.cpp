@@ -65,4 +65,18 @@ void RocketPartRecipe::DrawInEditor()
     }
 }
 
+void RocketRecipe::DrawInEditor()
+{
+    auto drawPartRecipe = [](std::string& parName, RocketPartRecipe& parValue)
+    {
+        if (ImGui::CollapsingHeader(parName.c_str()))
+        {
+            ImGui::PushID(ImGui::GetID(&parValue));
+            parValue.DrawInEditor();
+            ImGui::PopID();
+        }
+    };
+    EDITOR_PROPERTY_COMPLEXVECTOR(RocketPartRecipe, "##RocketRecipe", FRocketPartRecipes, false, drawPartRecipe, true);
+}
+
 } // namespace ECSEngine

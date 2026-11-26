@@ -130,21 +130,19 @@ void RocketUIController::VirtualUpdate()
         ImGui::SliderFloat("Rocket throttle", &CurrentThrottle, 0.f, 1.f);
         rocketManager.SetRocketThrottle(CurrentThrottle);
 
-        FuelTankModule* fuelTank = accessHelpers.GetModule<FuelTankModule>(rocketManager.BodyId());
+        FuelTankModule* fuelTank = accessHelpers.GetModule<FuelTankModule>(rocketManager.ActiveEngineFuelTank());
         AssertRelease(fuelTank != nullptr);
         float RemainingFuelMass = fuelTank->CurrentRemainingFuelMass();
         ImGui::ProgressBar(RemainingFuelMass / fuelTank->GetMaxFuelMass(), vec2(-1.f, 0.f), std::format("Remaining fuel mass {}", RemainingFuelMass).c_str());
 
         // get a better way to sample the actual rocket mass.
         float Mass = 0.f;
-        RigidbodyModule* bodyModule = accessHelpers.GetModule<RigidbodyModule>(rocketManager.BodyId());
-        AssertRelease(bodyModule != nullptr);
-        Physics::GetBodyMass(bodyModule->BodyHandle(), Mass);
+        rocketManager.ComputeTotalMass(accessHelpers.Accessor<RigidbodyModule>(), Mass);
 
-        NozzleEngineModule* nozzleEngine = accessHelpers.GetModule<NozzleEngineModule>(rocketManager.NozzleId());
+        NozzleEngineModule* nozzleEngine = accessHelpers.GetModule<NozzleEngineModule>(rocketManager.ActiveEngine());
         AssertRelease(nozzleEngine != nullptr);
         const float TWR = CurrentThrottle * nozzleEngine->MaxThrust() / (Mass * Length(rocketManager.LastTurnGravity()));
-        const float RemainingDV = nozzleEngine->ISP() * 9.80665 * log((RemainingFuelMass + fuelTank->DryMass()) / fuelTank->DryMass());
+        const float RemainingDV = nozzleEngine->ISP() * 9.80665 * log(Mass / (Mass - RemainingFuelMass));
         ImGui::Text("Thrust to weight ratio: %.3f", TWR);
         ImGui::Text("Remaining DV: %.3f", RemainingDV);
 

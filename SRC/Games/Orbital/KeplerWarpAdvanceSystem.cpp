@@ -88,19 +88,8 @@ void KeplerWarpAdvanceSystem::AdvanceBy(const double DT)
 
         const vec3 newComPos(newComPosD.x, newComPosD.y, newComPosD.z);
         const vec3 newComVel(newComVelD.x, newComVelD.y, newComVelD.z);
-        const vec3 bodyPos = newComPos + keplerModule->OffsetBody();
-        const vec3 nozzlePos = newComPos + keplerModule->OffsetNozzle();
 
-        const RigidbodyModule* const bodyBody = rigidbodyAccessor[rocket.BodyId()];
-        AssertRelease(bodyBody != nullptr);
-
-        const RigidbodyModule* const nozzleBody = rigidbodyAccessor[rocket.NozzleId()];
-        AssertRelease(nozzleBody != nullptr);
-
-        Physics::SetBodyPosition(bodyBody->BodyHandle(), bodyPos);
-        Physics::SetBodyVelocity(bodyBody->BodyHandle(), newComVel);
-        Physics::SetBodyPosition(nozzleBody->BodyHandle(), nozzlePos);
-        Physics::SetBodyVelocity(nozzleBody->BodyHandle(), newComVel);
+        rocket.SetPositionAndVelocityForAllPartsUsingOffsets(rigidbodyAccessor, newComPos, newComVel, keplerModule->PartsOffsetConst());
     }
 }
 

@@ -1,5 +1,6 @@
 
 #pragma once
+#include "Common/MemoryView.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "KeplerPropagator.h"
@@ -39,14 +40,18 @@ public:
 
     const dvec3& Position() const { return FPosition; }
     const dvec3& Velocity() const { return FVelocity; }
-    const vec3& OffsetBody() const { return FOffsetBody; }
-    const vec3& OffsetNozzle() const { return FOffsetNozzle; }
     const EntityId& CapturedParent() const { return FCapturedParent; }
+
+    const MemoryView<const vec3> PartsOffsetConst() const { return MemoryView(FPartsOffset.data(), FPartsOffset.size()); }
+    MemoryView<vec3> PartsOffset() { return MemoryView(FPartsOffset.data(), FPartsOffset.size()); }
+    void SetPartsSize(const u32 size)
+    {
+        FPartsOffset.clear();
+        FPartsOffset.resize(size);
+    }
 
     void SetPosition(const dvec3& Value) { FPosition = Value; }
     void SetVelocity(const dvec3& Value) { FVelocity = Value; }
-    void SetOffsetBody(const vec3& Value) { FOffsetBody = Value; }
-    void SetOffsetNozzle(const vec3& Value) { FOffsetNozzle = Value; }
     void SetCapturedParent(const EntityId& Value) { FCapturedParent = Value; }
 
 private:
@@ -55,8 +60,7 @@ private:
     dvec3 FPosition;
     dvec3 FVelocity;
 
-    vec3 FOffsetBody;
-    vec3 FOffsetNozzle;
+    std::vector<vec3> FPartsOffset;
     EntityId FCapturedParent;
 };
 

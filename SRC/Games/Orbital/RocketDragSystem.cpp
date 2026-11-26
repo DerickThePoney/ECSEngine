@@ -79,11 +79,12 @@ void RocketDragSystem::VirtualUpdate()
         const float speed = sqrt(speedSq);
         const vec3 vHat = vRel / speed;
 
-        const RigidbodyModule* bodyBody = rigidbodyAccessor[rocketManager.BodyId()];
-        AssertRelease(bodyBody != nullptr);
+        const EntityId RootId = rocketManager.RootId();
+        const RigidbodyModule* rootBody = rigidbodyAccessor[RootId];
+        AssertRelease(rootBody != nullptr);
 
         quat bodyOrientation;
-        bool bBodyOrientation = Physics::GetBodyOrientation(bodyBody->BodyHandle(), bodyOrientation);
+        bool bBodyOrientation = Physics::GetBodyOrientation(rootBody->BodyHandle(), bodyOrientation);
         AssertRelease(bBodyOrientation);
 
         // get the nose direction
@@ -96,23 +97,17 @@ void RocketDragSystem::VirtualUpdate()
         const vec3 DragForce = -q * presentedArea * vHat;
 
         // Computing drag accelleration and apply
-        const RigidbodyModule* nozzleBody = rigidbodyAccessor[rocketManager.NozzleId()];
-        AssertRelease(nozzleBody != nullptr);
+        float mass = 0.f;
+        if (!rocketManager.ComputeTotalMass(rigidbodyAccessor, mass))
+            continue;
 
-        float bodyMass, nozzleMass;
-        bool bBodyMass = Physics::GetBodyMass(bodyBody->BodyHandle(), bodyMass);
-        bool bNozzleMass = Physics::GetBodyMass(nozzleBody->BodyHandle(), nozzleMass);
-        AssertRelease(bBodyMass && bNozzleMass);
-
-        const float mass = bodyMass + nozzleMass;
         const vec3 DragAcceleration = DragForce / mass;
 
-        Physics::AddForceToBody(bodyBody->BodyHandle(), DragAcceleration, true);
-        Physics::AddForceToBody(nozzleBody->BodyHandle(), DragAcceleration, true);
+        rocketManager.ApplyForceToAllBodies(rigidbodyAccessor, DragAcceleration, true);
 
         // Compute weathercock
         const vec3 weathercockTorque = rocketManager.Weathercock() * q * presentedArea * Cross(Nose, vHat);
-        Physics::AddTorqueToBody(bodyBody->BodyHandle(), weathercockTorque);
+        Physics::AddTorqueToBody(rootBody->BodyHandle(), weathercockTorque);
     }
 }
 } // namespace ECSEngine

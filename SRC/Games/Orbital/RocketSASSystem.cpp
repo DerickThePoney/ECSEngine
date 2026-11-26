@@ -46,18 +46,17 @@ void ComputeSASTarget(RocketManagerModule& rocketManager, ModuleAccessor<Rigidbo
         if (rocketManager.HasSASTarget())
             return;
 
-        const RigidbodyModule* bodyRigidbody = rigidbodyAccessor[rocketManager.BodyId()];
+        const RigidbodyModule* rootBody = rigidbodyAccessor[rocketManager.RootId()];
         quat target;
-        Physics::GetBodyOrientation(bodyRigidbody->BodyHandle(), target);
+        Physics::GetBodyOrientation(rootBody->BodyHandle(), target);
         rocketManager.SetSASTarget(target);
         return;
     }
 
-    const RigidbodyModule* bodyRigidbody = rigidbodyAccessor[rocketManager.BodyId()];
+    const RigidbodyModule* rootBody = rigidbodyAccessor[rocketManager.RootId()];
     vec3 rocketPosition;
     vec3 rocketVelocity;
-    Physics::GetBodyPosition(bodyRigidbody->BodyHandle(), rocketPosition);
-    Physics::GetBodyVelocity(bodyRigidbody->BodyHandle(), rocketVelocity);
+    rocketManager.ComputeCenterOfMass(rigidbodyAccessor, rocketPosition, &rocketVelocity);
 
     const PlanetGravityModule* planet = planetAccessor[rocketManager.CurrentGravityTarget()];
     AssertRelease(planet != nullptr);
@@ -112,7 +111,7 @@ void ComputeSASTarget(RocketManagerModule& rocketManager, ModuleAccessor<Rigidbo
     if (rocketManager.HasSASTarget())
         reference = rocketManager.SASTarget();
     else
-        Physics::GetBodyOrientation(bodyRigidbody->BodyHandle(), reference);
+        Physics::GetBodyOrientation(rootBody->BodyHandle(), reference);
 
     rocketManager.SetSASTarget(OrientationAlignNose(TargetDirection, reference));
 }
@@ -149,9 +148,9 @@ void RocketSASSystem::VirtualUpdate()
             continue;
 
         // Steer towards target
-        const RigidbodyModule* bodyRigidbody = rigidbodyAccessor[rocketManager.BodyId()];
+        const RigidbodyModule* rootBody = rigidbodyAccessor[rocketManager.RootId()];
         quat qCurrent;
-        Physics::GetBodyOrientation(bodyRigidbody->BodyHandle(), qCurrent);
+        Physics::GetBodyOrientation(rootBody->BodyHandle(), qCurrent);
         quat qError = rocketManager.SASTarget() * Conjugate(qCurrent);
 
         if (qError.w < 0)
@@ -172,7 +171,7 @@ void RocketSASSystem::VirtualUpdate()
         ADJUSTABLE_DEBUG_PARAMETER_SINGLE(maxTorque, 300.f, "Max torque", "SAS", 15.f, 5000.f);
 
         vec3 Omega;
-        Physics::GetBodyRotationVelocity(bodyRigidbody->BodyHandle(), Omega);
+        Physics::GetBodyRotationVelocity(rootBody->BodyHandle(), Omega);
 
         vec3 desiredOmega(0.f);
         const float ttt = Max(timeToTarget, 1.e-3f);
@@ -183,7 +182,7 @@ void RocketSASSystem::VirtualUpdate()
         if (Length(torque) > maxTorque)
             torque = Normalize(torque) * maxTorque;
 
-        Physics::AddTorqueToBody(bodyRigidbody->BodyHandle(), torque);
+        Physics::AddTorqueToBody(rootBody->BodyHandle(), torque);
     }
 }
 } // namespace ECSEngine

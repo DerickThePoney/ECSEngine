@@ -169,7 +169,7 @@ void OrbitalCameraMoverSystem::UpdateRocketChase()
         AssertRelease(rocket != nullptr);
 
         vec3 pivot;
-        if (!CarrierPosition(appearanceAccessor[rocket->BodyId()], pivot))
+        if (!CarrierPosition(appearanceAccessor[rocket->RootId()], pivot))
             return;
 
         // Should use closest planet

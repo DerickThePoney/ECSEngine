@@ -25,7 +25,7 @@ void RocketSteeringSystem::VirtualUpdate()
     foreachitemconst(rocketManager, rocketManagerAccessor)
     {
         // Handle joint orientation
-        Physics::PhysicsJointHandle NozzleJointHandle = rocketManager.NozzleJointHandle();
+        Physics::PhysicsJointHandle NozzleJointHandle = rocketManager.ActiveEngineJointHandle();
         if (!NozzleJointHandle.IsValid())
         {
             continue;

@@ -28,32 +28,16 @@ Module* RocketManagerModuleTemplate::CreateInstance(const EntityId& parUnitId, c
 
 void RocketManagerModuleTemplate::VirtualDrawEditor()
 {
-    const auto OldTemplateBody = FRocketBodyTemplateName;
-    EDITOR_PROPERTY_ENTITY_TEMPLATE("Rocket body", FRocketBodyTemplate, FRocketBodyTemplateName);
-    if (FRocketBodyTemplateName != OldTemplateBody)
+    if (ImGui::CollapsingHeader("Rocket recipe"))
     {
-        FRocketBodyTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketBodyTemplateName);
-    }
-
-    const auto OldTemplateNozzle = FRocketNozzleTemplateName;
-    EDITOR_PROPERTY_ENTITY_TEMPLATE("Rocket Nozzle", FRocketNozzleTemplate, FRocketNozzleTemplateName);
-    if (FRocketNozzleTemplateName != OldTemplateNozzle)
-    {
-        FRocketNozzleTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketNozzleTemplateName);
+        FRecipe.DrawInEditor();
     }
 
     const auto OldTemplateCamera = FRocketCameraMoverTemplateName;
     EDITOR_PROPERTY_ENTITY_TEMPLATE("Rocket Camera Mover", FRocketCameraMoverTemplate, FRocketCameraMoverTemplateName);
-    if (FRocketCameraMoverTemplateName != OldTemplateNozzle)
+    if (FRocketCameraMoverTemplateName != OldTemplateCamera)
     {
         FRocketCameraMoverTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketCameraMoverTemplateName);
-    }
-
-    if (ImGui::CollapsingHeader("Ball Joint Config"))
-    {
-        ImGui::Indent();
-        FBallConfig.DrawInEditor();
-        ImGui::Unindent();
     }
 
     EDITOR_PROPERTY_SIMPLE("Axial drag area", FAxialDragArea);
@@ -63,8 +47,6 @@ void RocketManagerModuleTemplate::VirtualDrawEditor()
 
 void RocketManagerModuleTemplate::VirtualPostLoad()
 {
-    FRocketBodyTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketBodyTemplateName);
-    FRocketNozzleTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketNozzleTemplateName);
     FRocketCameraMoverTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketCameraMoverTemplateName);
 }
 
@@ -77,7 +59,6 @@ void RocketManagerModule::SaveLoad(Chunk& parChunk)
 
 RocketManagerModule::RocketManagerModule()
     : Module()
-    , JointCreatedDelegate(DELEGATE(&RocketManagerModule::OnJointCreated, *this))
 {
 }
 
@@ -101,6 +82,54 @@ float RocketManagerModule::Weathercock() const
 {
     const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
     return Temp->Weathercock();
+}
+
+const EntityId RocketManagerModule::ActiveEngine() const
+{
+    i32 EngineIndex = ActiveEnginePartIndex();
+    if (EngineIndex == -1)
+        return EntityId();
+
+    return FActive.FParts[EngineIndex].FId;
+}
+
+const EntityId RocketManagerModule::ActiveEngineFuelTank() const
+{
+    i32 EngineIndex = ActiveEnginePartIndex();
+    if (EngineIndex == -1)
+        return EntityId();
+
+    i32 TankIndex = FActive.FParts[EngineIndex].FFuelTankIndex;
+    AssertRelease(TankIndex >= 0 && TankIndex < FActive.FParts.size());
+    return FActive.FParts[TankIndex].FId;
+}
+
+const Physics::PhysicsJointHandle RocketManagerModule::ActiveEngineJointHandle() const
+{
+    i32 EngineIndex = ActiveEnginePartIndex();
+    if (EngineIndex == -1)
+        return Physics::PhysicsJointHandle();
+
+    return FActive.FParts[EngineIndex].FJointHandle;
+}
+
+const EntityId RocketManagerModule::RootId() const
+{
+    AssertRelease(FActive.FParts.size() > 0);
+    return FActive.FParts[0].FId;
+}
+
+i32 RocketManagerModule::ActiveEnginePartIndex() const
+{
+    reverseforrange(i, 0, FActive.FParts.size())
+    {
+        if (FActive.FParts[i].FRole == ERocketPartRole::ENGINE)
+        {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 void RocketManagerModule::SetRocketThrottle(const float Value)
@@ -133,20 +162,8 @@ void RocketManagerModule::VirtualInit(const EntityId& parUnitId, const ModulePar
 
     const RocketManagerModuleTemplate* moduleTemplate = Template<RocketManagerModuleTemplate>();
 
-    // Create the body
-    ModuleParameters::ParameterContainer container = parParameters;
-    FBodyId = EntityFactory::RequestCreateEntity(moduleTemplate->GetBodyTemplate(), container);
-
-    // compute nozzle position
-    const Physics::BallJointConfig& JointConfig = moduleTemplate->GetJointConfig();
-    const mat4 R = EulerAnglesXYZ(EulerAngles.x, EulerAngles.y, EulerAngles.z); // rotation only
-    const vec3 n = Normalize((R * vec4::MakeHomogeneousDirectionVec4(vec3(0.f, -1.f, 0.f))).xyz());
-    const vec3 NozzlePosition = Position + (R * vec4::MakeHomogeneousDirectionVec4(JointConfig.FCommon.FAnchorALocal - JointConfig.FCommon.FAnchorBLocal)).xyz();
-    container.Set<ModuleParameters::Position>(NozzlePosition);
-
-    FNozzleId = EntityFactory::RequestCreateEntity(moduleTemplate->GetNozzleTemplate(), container);
-
-    PhysicsJointSpawner::Instance().AddBallJointToSpawn(FBodyId, FNozzleId, JointConfig, &JointCreatedDelegate);
+    // Create the rocket
+    RocketRuntime::BuildRocketRuntime(FActive, moduleTemplate->Recipe(), Position, EulerAngles);
 
     // Create camera mover template
     ModuleParameters::ParameterContainer CamContainer = parParameters;
@@ -154,22 +171,69 @@ void RocketManagerModule::VirtualInit(const EntityId& parUnitId, const ModulePar
     EntityFactory::RequestCreateEntity(moduleTemplate->GetRocketCameraMoverTemplate(), CamContainer);
 }
 
-void RocketManagerModule::OnJointCreated(const Physics::PhysicsJointHandle& Handle)
+template<typename RigidbodyAccessor>
+void RocketManagerModule::SetPositionAndVelocityForAllPartsUsingOffsets(const RigidbodyAccessor& Rigidbodies,
+      const vec3& CoMPosition,
+      const vec3& CoMVelocity,
+      const MemoryView<const vec3>& parts) const
 {
-    FJointHandle = Handle;
+    AssertRelease(parts.size() == FActive.FParts.size());
+
+    forrange(i, 0, FActive.FParts.size())
+    {
+        const EntityId& partId = FActive.FParts[i].FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        bool bSuccess = Physics::SetBodyPosition(rigidbody->BodyHandle(), CoMPosition + parts[i]);
+        AssertRelease(bSuccess);
+
+        bSuccess = Physics::SetBodyVelocity(rigidbody->BodyHandle(), CoMVelocity);
+        AssertRelease(bSuccess);
+    }
 }
+
+template void RocketManagerModule::SetPositionAndVelocityForAllPartsUsingOffsets<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      const vec3&,
+      const vec3&,
+      const MemoryView<const vec3>&) const;
+
+template<typename RigidbodyAccessor>
+void RocketManagerModule::ComputePartOffsetAndClearRotationVelocity(const RigidbodyAccessor& Rigidbodies, const vec3& CoMPosition, MemoryView<vec3>& parts) const
+{
+    AssertRelease(parts.size() == FActive.FParts.size());
+
+    forrange(i, 0, FActive.FParts.size())
+    {
+        const EntityId& partId = FActive.FParts[i].FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        vec3 partPos;
+        bool bSuccess = Physics::GetBodyPosition(rigidbody->BodyHandle(), partPos);
+        AssertRelease(bSuccess);
+
+        bSuccess = Physics::SetBodyRotationVelocity(rigidbody->BodyHandle(), vec3{ 0.f });
+        AssertRelease(bSuccess);
+
+        parts[i] = partPos - CoMPosition;
+    }
+}
+
+template void RocketManagerModule::ComputePartOffsetAndClearRotationVelocity<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      const vec3& CoMPosition,
+      MemoryView<vec3>& parts) const;
 
 template<typename RigidbodyAccessor>
 bool RocketManagerModule::ComputeCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity) const
 {
-    const EntityId partIds[] = { FBodyId, FNozzleId };
-
     vec3 weightedPosition{ 0.f };
     vec3 weightedVelocity{ 0.f };
     float totalMass = 0.f;
 
-    for (const EntityId& partId : partIds)
+    for (const RocketPart& part : FActive.FParts)
     {
+        const EntityId& partId = part.FId;
         const RigidbodyModule* const rigidbody = Rigidbodies[partId];
         if (rigidbody == nullptr)
         {
@@ -214,5 +278,47 @@ bool RocketManagerModule::ComputeCenterOfMass(const RigidbodyAccessor& Rigidbodi
 
 template bool RocketManagerModule::ComputeCenterOfMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
 template bool RocketManagerModule::ComputeCenterOfMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const
+{
+    OutMass = 0.f;
+    foreachitemconst(part, FActive.FParts)
+    {
+        const EntityId& partId = part.FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        float Mass = 0.f;
+        if (!Physics::GetBodyMass(rigidbody->BodyHandle(), Mass))
+        {
+            return false;
+        }
+        OutMass += Mass;
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ComputeTotalMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, float& OutMass) const;
+template bool RocketManagerModule::ComputeTotalMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, float& OutMass) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyForceToAllBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Force, const bool bTreatAsAcceleration) const
+{
+    for (const RocketPart& part : FActive.FParts)
+    {
+        const EntityId& partId = part.FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        if (!Physics::AddForceToBody(rigidbody->BodyHandle(), Force, bTreatAsAcceleration))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ApplyForceToAllBodies<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const vec3&, const bool) const;
 
 } // namespace ECSEngine

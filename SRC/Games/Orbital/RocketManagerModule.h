@@ -1,9 +1,12 @@
 
 #pragma once
+#include "Common/MemoryView.h"
 #include "ECSCore/Module.h"
 #include "ECSCore/ModuleTemplate.h"
 #include "Physics/JointsConfig.h"
 #include "Physics/PhysicsJointHandle.h"
+#include "RocketPartRuntime.h"
+#include "RocketRecipe.h"
 
 namespace ECSEngine
 {
@@ -22,19 +25,16 @@ public:
 
     SERIALIZE()
     {
-        PROPERTYFIELD(RocketBodyTemplateName, "");
-        PROPERTYFIELD(RocketNozzleTemplateName, "");
+        PROPERTYFIELD(Recipe, RocketRecipe{ });
         PROPERTYFIELD(RocketCameraMoverTemplateName, "");
-        PROPERTYFIELD(BallConfig, Physics::BallJointConfig{ })
         PROPERTYFIELD(AxialDragArea, 0.f);
         PROPERTYFIELD(BroadsideDragArea, 0.f);
         PROPERTYFIELD(Weathercock, 0.f);
     }
 
-    const EntityTemplate* GetBodyTemplate() const { return FRocketBodyTemplate; }
-    const EntityTemplate* GetNozzleTemplate() const { return FRocketNozzleTemplate; }
+    const RocketRecipe& Recipe() const { return FRecipe; }
+
     const EntityTemplate* GetRocketCameraMoverTemplate() const { return FRocketCameraMoverTemplate; }
-    const Physics::BallJointConfig& GetJointConfig() const { return FBallConfig; }
 
     float AxialDragArea() const { return FAxialDragArea; }
     float BroadsideDragArea() const { return FBroadsideDragArea; }
@@ -45,15 +45,10 @@ protected:
     void VirtualPostLoad() override;
 
 private:
-    std::string FRocketBodyTemplateName;
-    std::string FRocketNozzleTemplateName;
+    RocketRecipe FRecipe;
+
     std::string FRocketCameraMoverTemplateName;
-
-    const EntityTemplate* FRocketBodyTemplate = nullptr;
-    const EntityTemplate* FRocketNozzleTemplate = nullptr;
     const EntityTemplate* FRocketCameraMoverTemplate = nullptr;
-
-    Physics::BallJointConfig FBallConfig;
 
     float FAxialDragArea = 0.f;
     float FBroadsideDragArea = 0.f;
@@ -80,9 +75,6 @@ class RocketManagerModule : public Module
 public:
     RocketManagerModule();
     ~RocketManagerModule();
-
-    EntityId BodyId() const { return FBodyId; }
-    EntityId NozzleId() const { return FNozzleId; }
 
     const vec3& LastTurnGravity() const { return FLastTurnGravity; }
     void SetLastTurnGravity(const vec3& Gravity) { FLastTurnGravity = Gravity; }
@@ -118,25 +110,42 @@ public:
     const EntityId& CurrentGravityTarget() const { return FCurrentGravityTarget; }
     void SetCurrentGravityTarget(const EntityId& Value) { FCurrentGravityTarget = Value; }
 
-    Physics::PhysicsJointHandle NozzleJointHandle() const { return FJointHandle; }
-
     float AxialDragArea() const;
     float BroadsideDragArea() const;
     float Weathercock() const;
 
+    u32 ActivePartsSize() const { return FActive.FParts.size(); }
+
+    const EntityId ActiveEngine() const;
+    const EntityId ActiveEngineFuelTank() const;
+    const Physics::PhysicsJointHandle ActiveEngineJointHandle() const;
+    const EntityId RootId() const;
+
+    template<typename RigidbodyAccessor>
+    void SetPositionAndVelocityForAllPartsUsingOffsets(const RigidbodyAccessor& Rigidbodies,
+          const vec3& CoMPosition,
+          const vec3& CoMVelocity,
+          const MemoryView<const vec3>& parts) const;
+
+    template<typename RigidbodyAccessor>
+    void ComputePartOffsetAndClearRotationVelocity(const RigidbodyAccessor& Rigidbodies, const vec3& CoMPosition, MemoryView<vec3>& parts) const;
+
     template<typename RigidbodyAccessor>
     bool ComputeCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity = nullptr) const;
+
+    template<typename RigidbodyAccessor>
+    bool ComputeTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const;
+
+    template<typename RigidbodyAccessor>
+    bool ApplyForceToAllBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Force, const bool bTreatAsAcceleration) const;
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
 
-    void OnJointCreated(const Physics::PhysicsJointHandle& Handle);
+    i32 ActiveEnginePartIndex() const;
 
 private:
-    EntityId FBodyId;
-    EntityId FNozzleId;
-
-    Physics::PhysicsJointHandle FJointHandle;
+    RocketPartGroup FActive;
 
     vec3 FLastTurnGravity = vec3(0.f, -1.f, 0.f);
 
@@ -154,8 +163,6 @@ private:
     bool FHasSASTarget = false;
 
     bool FIsSteering = false;
-
-    Delegate<void(const Physics::PhysicsJointHandle&)> JointCreatedDelegate;
 };
 
 } // namespace ECSEngine

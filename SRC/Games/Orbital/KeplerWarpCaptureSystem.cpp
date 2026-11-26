@@ -90,29 +90,14 @@ void KeplerWarpCaptureSystem::VirtualUpdate()
         if (!rocket.ComputeCenterOfMass(rigidbodyAccessor, comPos, &comVel))
             continue;
 
-        const RigidbodyModule* const bodyBody = rigidbodyAccessor[rocket.BodyId()];
-        AssertRelease(bodyBody != nullptr);
-
-        const RigidbodyModule* const nozzleBody = rigidbodyAccessor[rocket.NozzleId()];
-        AssertRelease(nozzleBody != nullptr);
-
-        vec3 bodyPos, nozzlePos;
-        bool bSuccess = Physics::GetBodyPosition(bodyBody->BodyHandle(), bodyPos);
-        AssertRelease(bSuccess);
-        bSuccess = Physics::GetBodyPosition(nozzleBody->BodyHandle(), nozzlePos);
-        AssertRelease(bSuccess);
-
-        bSuccess = Physics::SetBodyRotationVelocity(bodyBody->BodyHandle(), vec3{ 0.f });
-        AssertRelease(bSuccess);
-        bSuccess = Physics::SetBodyRotationVelocity(nozzleBody->BodyHandle(), vec3{ 0.f });
-        AssertRelease(bSuccess);
+        keplerModule->SetPartsSize(rocket.ActivePartsSize());
+        auto parts = keplerModule->PartsOffset();
+        rocket.ComputePartOffsetAndClearRotationVelocity(rigidbodyAccessor, comPos, parts);
 
         const dvec3 comPosD(comPos.x, comPos.y, comPos.z);
         const dvec3 comVelD(comVel.x, comVel.y, comVel.z);
         keplerModule->SetPosition(comPosD);
         keplerModule->SetVelocity(comVelD);
-        keplerModule->SetOffsetBody(bodyPos - comPos);
-        keplerModule->SetOffsetNozzle(nozzlePos - comPos);
 
         const bool bCaptured = KeplerPropagator::TryCapture(RocketState, comPlanetPosD, comPlanetVelD, comPosD, comVelD, planetGravity->PlanetGravityConstant());
 

@@ -34,13 +34,18 @@ void RocketThrustSystem::VirtualUpdate()
     const float DT = TimeManager::GameplayDeltaTime();
     foreachitemconst(rocketManager, rocketManagerAccessor)
     {
-        FuelTankModule* bodyTank = bodyTankAccessor[rocketManager.BodyId()];
-        AssertRelease(bodyTank != nullptr);
-
-        if (bodyTank->IsTankEmpty())
+        const EntityId EngineId = rocketManager.ActiveEngine();
+        if (!EngineId.Valid())
             continue;
 
-        NozzleEngineModule* nozzleEngine = nozzleEngineAccessor[rocketManager.NozzleId()];
+        const EntityId FuelTankId = rocketManager.ActiveEngineFuelTank();
+        FuelTankModule* fuelTankBody = bodyTankAccessor[FuelTankId];
+        AssertRelease(fuelTankBody != nullptr);
+
+        if (fuelTankBody->IsTankEmpty())
+            continue;
+
+        NozzleEngineModule* nozzleEngine = nozzleEngineAccessor[EngineId];
         AssertRelease(nozzleEngine != nullptr);
         nozzleEngine->SetThrottle(rocketManager.RocketThrottle());
 
@@ -49,22 +54,18 @@ void RocketThrustSystem::VirtualUpdate()
             continue;
         }
 
-        RigidbodyModule* NozzleBody = rigidbodyAccessor[rocketManager.NozzleId()];
+        RigidbodyModule* NozzleBody = rigidbodyAccessor[EngineId];
         AssertRelease(NozzleBody != nullptr);
 
         quat BodyOrientation;
         Physics::GetBodyOrientation(NozzleBody->BodyHandle(), BodyOrientation);
 
         // burn fuel and update body mass
-        const float CurrentRemainingFuelMass = bodyTank->CurrentRemainingFuelMass();
+        const float CurrentRemainingFuelMass = fuelTankBody->CurrentRemainingFuelMass();
         const float FuelFlow = nozzleEngine->FuelFlow() * DT;
-        bodyTank->SetCurrentRemainingFuelMass(Max(0.f, CurrentRemainingFuelMass - FuelFlow));
+        fuelTankBody->SetCurrentRemainingFuelMass(Max(0.f, CurrentRemainingFuelMass - FuelFlow));
 
-        const float ConsumptionRatio = (FuelFlow > 1e-6f) ? Clamp01((CurrentRemainingFuelMass - bodyTank->CurrentRemainingFuelMass()) / FuelFlow) : 0.f;
-
-        RigidbodyModule* BodyBody = rigidbodyAccessor[rocketManager.BodyId()];
-        AssertRelease(BodyBody != nullptr);
-        // TODO figure out a way of setting up the dry mass
+        const float ConsumptionRatio = (FuelFlow > 1e-6f) ? Clamp01((CurrentRemainingFuelMass - fuelTankBody->CurrentRemainingFuelMass()) / FuelFlow) : 0.f;
 
         const float Prop = ConsumptionRatio * nozzleEngine->Throttle() * nozzleEngine->MaxThrust();
         vec3 PropulsionForce = (mat4(BodyOrientation) * vec4(0.f, Prop, 0.f, 0.f)).xyz();

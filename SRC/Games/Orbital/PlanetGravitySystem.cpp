@@ -33,11 +33,6 @@ void PlanetGravitySystem::VirtualUpdate()
 
     foreachitem(rocket, rocketManagerAccessor)
     {
-        const RigidbodyModule* const bodyRB = rigidbodyAccessor[rocket.BodyId()];
-        AssertRelease(bodyRB != nullptr);
-        const RigidbodyModule* const nozzleRB = rigidbodyAccessor[rocket.NozzleId()];
-        AssertRelease(nozzleRB != nullptr);
-
         vec3 vesselPosition;
         const bool hasVesselCenterOfMass = rocket.ComputeCenterOfMass(rigidbodyAccessor, vesselPosition);
         AssertRelease(hasVesselCenterOfMass);
@@ -87,8 +82,7 @@ void PlanetGravitySystem::VirtualUpdate()
             gravityAcceleration -= float(orbitFollowerModule->MeanMotion() * orbitFollowerModule->MeanMotion()) * Offset;
         }
 
-        Physics::AddForceToBody(bodyRB->BodyHandle(), gravityAcceleration, true);
-        Physics::AddForceToBody(nozzleRB->BodyHandle(), gravityAcceleration, true);
+        rocket.ApplyForceToAllBodies(rigidbodyAccessor, gravityAcceleration, true);
     }
 }
 } // namespace ECSEngine
