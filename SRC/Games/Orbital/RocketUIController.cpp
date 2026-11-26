@@ -281,8 +281,6 @@ void RocketUIController::VirtualUpdate()
                     ImGui::Text("Far plane : %.1f", camera->Far());
                 }
             }
-
-            ImGui::Checkbox("Draw origin bubble", &FDrawOriginBubble);
         }
         ImGui::Unindent();
     }

@@ -27,7 +27,6 @@ private:
     bool FDrawPredictedPath = true;
     bool FDrawSASTarget = true;
     bool FHasSASTargetDraw = false;
-    bool FDrawOriginBubble = false;
     float FOriginBubbleRadius = 2000.f;
 };
 } // namespace UI
