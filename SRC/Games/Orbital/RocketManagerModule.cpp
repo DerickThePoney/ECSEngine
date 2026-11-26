@@ -4,6 +4,7 @@
 #include "RocketManagerModule.h"
 
 #include "Common/SavingSystemImplementation.h"
+#include "Common/TimeManager.h"
 #include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSCore/EntityFactory.h"
 #include "ECSCore/EntityTemplate.h"
@@ -158,13 +159,21 @@ const EntityId RocketManagerModule::RootId() const
     return FActive.FParts[0].FId;
 }
 
-bool RocketManagerModule::Stage()
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::Stage(const RigidbodyAccessor& Rigidbodies)
 {
     if (!FbWantsStaging)
         return false;
+    FbWantsStaging = false;
 
     i32 DecouplerIndex = NextDecouplerIndex();
     if (DecouplerIndex == -1)
+        return false;
+
+    const RigidbodyModule* RootBody = Rigidbodies[FActive.FParts[DecouplerIndex - 1].FId];
+    AssertRelease(RootBody != nullptr);
+    quat Orientation;
+    if (!Physics::GetBodyOrientation(RootBody->BodyHandle(), Orientation))
         return false;
 
     RocketPartGroup& newDebrisGroup = FDebris.emplace_back();
@@ -174,6 +183,12 @@ bool RocketManagerModule::Stage()
     }
     FActive.FParts.resize(DecouplerIndex);
 
+    foreachitem(part, newDebrisGroup.FParts)
+    {
+        part.FParent -= DecouplerIndex;
+        if (part.FRole == ERocketPartRole::ENGINE)
+            part.FFuelTankIndex -= DecouplerIndex;
+    }
     RocketPart& RootDebrisPart = newDebrisGroup.FParts[0];
     RootDebrisPart.FParent = -1;
 
@@ -181,9 +196,15 @@ bool RocketManagerModule::Stage()
     Physics::DestroyJoint(RootDebrisPart.FJointHandle);
 
     // Apply the separation speed
+    const vec3 SeparationVelocity = RootDebrisPart.FSeparationSpeed * ((mat4)Orientation).Column(1).xyz();
+
+    ApplyImpulseToAllActiveBodies(Rigidbodies, SeparationVelocity, true);
+    ApplyImpulseToAllBodiesInGroup(Rigidbodies, newDebrisGroup, Invert(SeparationVelocity), true);
 
     return true;
 }
+
+template bool RocketManagerModule::Stage<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&);
 
 i32 RocketManagerModule::ActiveEnginePartIndex() const
 {
@@ -483,6 +504,55 @@ bool RocketManagerModule::ApplyForceToAllBodiesInGroup(const RigidbodyAccessor& 
 }
 
 template bool RocketManagerModule::ApplyForceToAllBodiesInGroup<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      const RocketPartGroup&,
+      const vec3&,
+      const bool) const;
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyImpulseToAllActiveBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Impulse, const bool bTreatAsVelocityChange) const
+{
+    return ApplyImpulseToAllBodiesInGroup(Rigidbodies, FActive, Impulse, bTreatAsVelocityChange);
+}
+
+template bool RocketManagerModule::ApplyImpulseToAllActiveBodies<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const vec3&, const bool) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyImpulseToAllBodiesInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, const vec3& Impulse, const bool bTreatAsVelocityChange) const
+{
+    AssertRelease(DebrisIndex < FDebris.size());
+    return ApplyImpulseToAllBodiesInGroup(Rigidbodies, FDebris[DebrisIndex], Impulse, bTreatAsVelocityChange);
+}
+
+template bool RocketManagerModule::ApplyImpulseToAllBodiesInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      u32,
+      const vec3&,
+      const bool) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyImpulseToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies,
+      const RocketPartGroup& Group,
+      const vec3& Impulse,
+      const bool bTreatAsVelocityChange) const
+{
+    for (const RocketPart& part : Group.FParts)
+    {
+        const EntityId& partId = part.FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        if (!Physics::AddImpulseToBody(rigidbody->BodyHandle(), Impulse, bTreatAsVelocityChange))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ApplyImpulseToAllBodiesInGroup<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
       const RocketPartGroup&,
       const vec3&,
       const bool) const;

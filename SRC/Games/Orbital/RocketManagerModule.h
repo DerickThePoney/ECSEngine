@@ -123,7 +123,9 @@ public:
 
     bool WantsStaging() const { return FbWantsStaging; }
     void SetStaging(bool Value) { FbWantsStaging = Value; }
-    bool Stage();
+
+    template<typename RigidbodyAccessor>
+    bool Stage(const RigidbodyAccessor& Rigidbodies);
 
     u32 DebrisCount() const { return FDebris.size(); }
 
@@ -154,6 +156,12 @@ public:
     template<typename RigidbodyAccessor>
     bool ApplyForceToAllBodiesInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, const vec3& Force, const bool bTreatAsAcceleration) const;
 
+    template<typename RigidbodyAccessor>
+    bool ApplyImpulseToAllActiveBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Impulse, const bool bTreatAsVelocityChange) const;
+
+    template<typename RigidbodyAccessor>
+    bool ApplyImpulseToAllBodiesInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, const vec3& Impulse, const bool bTreatAsVelocityChange) const;
+
 private:
     template<typename RigidbodyAccessor>
     bool ComputeCenterOfMassInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, vec3& OutPosition, vec3* OutVelocity) const;
@@ -163,6 +171,9 @@ private:
 
     template<typename RigidbodyAccessor>
     bool ApplyForceToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, const vec3& Force, const bool bTreatAsAcceleration) const;
+
+    template<typename RigidbodyAccessor>
+    bool ApplyImpulseToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, const vec3& Impulse, const bool bTreatAsVelocityChange) const;
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
