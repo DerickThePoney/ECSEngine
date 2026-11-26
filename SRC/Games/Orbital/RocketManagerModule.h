@@ -125,6 +125,8 @@ public:
     void SetStaging(bool Value) { FbWantsStaging = Value; }
     bool Stage();
 
+    u32 DebrisCount() const { return FDebris.size(); }
+
     template<typename RigidbodyAccessor>
     void SetPositionAndVelocityForAllPartsUsingOffsets(const RigidbodyAccessor& Rigidbodies,
           const vec3& CoMPosition,
@@ -135,10 +137,16 @@ public:
     void ComputePartOffsetAndClearRotationVelocity(const RigidbodyAccessor& Rigidbodies, const vec3& CoMPosition, MemoryView<vec3>& parts) const;
 
     template<typename RigidbodyAccessor>
-    bool ComputeCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity = nullptr) const;
+    bool ComputeActiveCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity = nullptr) const;
 
     template<typename RigidbodyAccessor>
-    bool ComputeTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const;
+    bool ComputeCenterOfMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, vec3& OutPosition, vec3* OutVelocity = nullptr) const;
+
+    template<typename RigidbodyAccessor>
+    bool ComputeActiveTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const;
+
+    template<typename RigidbodyAccessor>
+    bool ComputeTotalMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, float& OutMass) const;
 
     template<typename RigidbodyAccessor>
     bool ApplyForceToAllActiveBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Force, const bool bTreatAsAcceleration) const;
@@ -148,7 +156,13 @@ public:
 
 private:
     template<typename RigidbodyAccessor>
-    bool ApplyForceToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& RocketPartGroup, const vec3& Force, const bool bTreatAsAcceleration) const;
+    bool ComputeCenterOfMassInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, vec3& OutPosition, vec3* OutVelocity) const;
+
+    template<typename RigidbodyAccessor>
+    bool ComputeTotalMassInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, float& OutMass) const;
+
+    template<typename RigidbodyAccessor>
+    bool ApplyForceToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, const vec3& Force, const bool bTreatAsAcceleration) const;
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;

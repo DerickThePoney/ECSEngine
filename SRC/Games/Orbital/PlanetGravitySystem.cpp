@@ -34,7 +34,7 @@ void PlanetGravitySystem::VirtualUpdate()
     foreachitem(rocket, rocketManagerAccessor)
     {
         vec3 vesselPosition;
-        const bool hasVesselCenterOfMass = rocket.ComputeCenterOfMass(rigidbodyAccessor, vesselPosition);
+        const bool hasVesselCenterOfMass = rocket.ComputeActiveCenterOfMass(rigidbodyAccessor, vesselPosition);
         AssertRelease(hasVesselCenterOfMass);
         if (!hasVesselCenterOfMass)
             continue;

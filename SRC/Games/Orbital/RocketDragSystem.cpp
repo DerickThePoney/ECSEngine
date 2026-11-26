@@ -45,7 +45,7 @@ void RocketDragSystem::VirtualUpdate()
 
         // Get rocket COM and Vel
         vec3 rocketCom, rocketVel;
-        bool bRocketComAndVel = rocketManager.ComputeCenterOfMass(rigidbodyAccessor, rocketCom, &rocketVel);
+        bool bRocketComAndVel = rocketManager.ComputeActiveCenterOfMass(rigidbodyAccessor, rocketCom, &rocketVel);
         AssertRelease(bRocketComAndVel);
 
         const RigidbodyModule* planetBody = rigidbodyAccessor[parentId];
@@ -98,7 +98,7 @@ void RocketDragSystem::VirtualUpdate()
 
         // Computing drag accelleration and apply
         float mass = 0.f;
-        if (!rocketManager.ComputeTotalMass(rigidbodyAccessor, mass))
+        if (!rocketManager.ComputeActiveTotalMass(rigidbodyAccessor, mass))
             continue;
 
         const vec3 DragAcceleration = DragForce / mass;

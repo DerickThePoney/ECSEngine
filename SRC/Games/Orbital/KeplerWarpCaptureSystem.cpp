@@ -87,7 +87,7 @@ void KeplerWarpCaptureSystem::VirtualUpdate()
         const dvec3 comPlanetVelD(comPlanetVel.x, comPlanetVel.y, comPlanetVel.z);
 
         vec3 comPos, comVel;
-        if (!rocket.ComputeCenterOfMass(rigidbodyAccessor, comPos, &comVel))
+        if (!rocket.ComputeActiveCenterOfMass(rigidbodyAccessor, comPos, &comVel))
             continue;
 
         keplerModule->SetPartsSize(rocket.ActivePartsSize());

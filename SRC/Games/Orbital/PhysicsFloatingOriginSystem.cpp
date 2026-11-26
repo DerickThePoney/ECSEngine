@@ -40,7 +40,7 @@ void PhysicsFloatingOriginSystem::VirtualUpdate()
         AssertRelease(rocketManager != nullptr);
 
         vec3 rocketCOM;
-        if (!rocketManager->ComputeCenterOfMass(rigidbodyAccessor, rocketCOM))
+        if (!rocketManager->ComputeActiveCenterOfMass(rigidbodyAccessor, rocketCOM))
             continue;
 
         if (Length(rocketCOM) <= floatingOrigin.BubbleRadius())

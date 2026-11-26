@@ -56,7 +56,7 @@ void ComputeSASTarget(RocketManagerModule& rocketManager, ModuleAccessor<Rigidbo
     const RigidbodyModule* rootBody = rigidbodyAccessor[rocketManager.RootId()];
     vec3 rocketPosition;
     vec3 rocketVelocity;
-    rocketManager.ComputeCenterOfMass(rigidbodyAccessor, rocketPosition, &rocketVelocity);
+    rocketManager.ComputeActiveCenterOfMass(rigidbodyAccessor, rocketPosition, &rocketVelocity);
 
     const PlanetGravityModule* planet = planetAccessor[rocketManager.CurrentGravityTarget()];
     AssertRelease(planet != nullptr);

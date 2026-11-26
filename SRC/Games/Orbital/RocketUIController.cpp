@@ -63,7 +63,7 @@ void RocketUIController::VirtualUpdate()
 
         vec3 RocketPosition;
         vec3 RocketVelocity;
-        const bool hasVesselCenterOfMass = rocketManager.ComputeCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), RocketPosition, &RocketVelocity);
+        const bool hasVesselCenterOfMass = rocketManager.ComputeActiveCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), RocketPosition, &RocketVelocity);
         AssertRelease(hasVesselCenterOfMass);
         if (!hasVesselCenterOfMass)
         {
@@ -137,7 +137,7 @@ void RocketUIController::VirtualUpdate()
 
         // get a better way to sample the actual rocket mass.
         float Mass = 0.f;
-        rocketManager.ComputeTotalMass(accessHelpers.Accessor<RigidbodyModule>(), Mass);
+        rocketManager.ComputeActiveTotalMass(accessHelpers.Accessor<RigidbodyModule>(), Mass);
 
         NozzleEngineModule* nozzleEngine = accessHelpers.GetModule<NozzleEngineModule>(rocketManager.ActiveEngine());
         AssertRelease(nozzleEngine != nullptr);

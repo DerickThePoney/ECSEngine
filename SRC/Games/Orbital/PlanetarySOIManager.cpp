@@ -88,7 +88,7 @@ bool PlanetarySOIManager::Update()
 
     RocketManagerModule& rocketManager = *accessHelpers.Accessor<RocketManagerModule>().begin();
     vec3 RocketPosition;
-    rocketManager.ComputeCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), RocketPosition);
+    rocketManager.ComputeActiveCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), RocketPosition);
 
     EntityId RocketGravity = rocketManager.CurrentGravityTarget();
     if (!RocketGravity.Valid())

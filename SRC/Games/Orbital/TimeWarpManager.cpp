@@ -112,7 +112,7 @@ void TimeWarpManager::ClampToAltitude()
         return;
 
     vec3 comPosition;
-    rocket.ComputeCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), comPosition);
+    rocket.ComputeActiveCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), comPosition);
 
     const PlanetGravityModule* const planetGravity = accessHelpers.GetModule<PlanetGravityModule>(rocket.CurrentGravityTarget());
     AssertRelease(planetGravity != nullptr);

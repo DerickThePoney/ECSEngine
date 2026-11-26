@@ -280,7 +280,7 @@ void OrbitalCameraMoverSystem::DrawDebug(Rendering::DrawCommandBuffer* buffer, c
     foreachitem(rocket, rocketManagerAccessor)
     {
         vec3 rocketPosition;
-        if (!rocket.ComputeCenterOfMass(rigidbodyAccessor, rocketPosition))
+        if (!rocket.ComputeActiveCenterOfMass(rigidbodyAccessor, rocketPosition))
             continue;
         buffer->DrawDebugSphere(material, rocketPosition, 200.f, 0xFFFFFFFFu);
     }

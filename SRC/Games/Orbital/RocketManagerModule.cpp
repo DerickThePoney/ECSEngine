@@ -250,6 +250,10 @@ void RocketManagerModule::VirtualInit(const EntityId& parUnitId, const ModulePar
     EntityFactory::RequestCreateEntity(moduleTemplate->GetRocketCameraMoverTemplate(), CamContainer);
 }
 
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
 template<typename RigidbodyAccessor>
 void RocketManagerModule::SetPositionAndVelocityForAllPartsUsingOffsets(const RigidbodyAccessor& Rigidbodies,
       const vec3& CoMPosition,
@@ -277,6 +281,10 @@ template void RocketManagerModule::SetPositionAndVelocityForAllPartsUsingOffsets
       const vec3&,
       const MemoryView<const vec3>&) const;
 
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
 template<typename RigidbodyAccessor>
 void RocketManagerModule::ComputePartOffsetAndClearRotationVelocity(const RigidbodyAccessor& Rigidbodies, const vec3& CoMPosition, MemoryView<vec3>& parts) const
 {
@@ -303,14 +311,40 @@ template void RocketManagerModule::ComputePartOffsetAndClearRotationVelocity<Mod
       const vec3& CoMPosition,
       MemoryView<vec3>& parts) const;
 
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
 template<typename RigidbodyAccessor>
-bool RocketManagerModule::ComputeCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity) const
+bool RocketManagerModule::ComputeActiveCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity) const
+{
+    return ComputeCenterOfMassInGroup(Rigidbodies, FActive, OutPosition, OutVelocity);
+}
+
+template bool RocketManagerModule::ComputeActiveCenterOfMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
+template bool RocketManagerModule::ComputeActiveCenterOfMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeCenterOfMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, vec3& OutPosition, vec3* OutVelocity) const
+{
+    AssertRelease(DebrisIndex < FDebris.size());
+    return ComputeCenterOfMassInGroup(Rigidbodies, FDebris[DebrisIndex], OutPosition, OutVelocity);
+}
+
+template bool RocketManagerModule::ComputeCenterOfMassInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, vec3&, vec3*) const;
+template bool RocketManagerModule::ComputeCenterOfMassInDebrisIndex<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&,
+      u32,
+      vec3&,
+      vec3*) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeCenterOfMassInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, vec3& OutPosition, vec3* OutVelocity) const
 {
     vec3 weightedPosition{ 0.f };
     vec3 weightedVelocity{ 0.f };
     float totalMass = 0.f;
 
-    for (const RocketPart& part : FActive.FParts)
+    for (const RocketPart& part : Group.FParts)
     {
         const EntityId& partId = part.FId;
         const RigidbodyModule* const rigidbody = Rigidbodies[partId];
@@ -355,14 +389,42 @@ bool RocketManagerModule::ComputeCenterOfMass(const RigidbodyAccessor& Rigidbodi
     return true;
 }
 
-template bool RocketManagerModule::ComputeCenterOfMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
-template bool RocketManagerModule::ComputeCenterOfMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
+template bool RocketManagerModule::ComputeCenterOfMassInGroup<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const RocketPartGroup&, vec3&, vec3*) const;
+template bool RocketManagerModule::ComputeCenterOfMassInGroup<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&,
+      const RocketPartGroup&,
+      vec3&,
+      vec3*) const;
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
 
 template<typename RigidbodyAccessor>
-bool RocketManagerModule::ComputeTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const
+bool RocketManagerModule::ComputeActiveTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const
+{
+    return ComputeTotalMassInGroup(Rigidbodies, FActive, OutMass);
+}
+
+template bool RocketManagerModule::ComputeActiveTotalMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, float& OutMass) const;
+template bool RocketManagerModule::ComputeActiveTotalMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, float& OutMass) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeTotalMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, float& OutMass) const
+{
+    AssertRelease(DebrisIndex < FDebris.size());
+    return ComputeTotalMassInGroup(Rigidbodies, FDebris[DebrisIndex], OutMass);
+}
+
+template bool RocketManagerModule::ComputeTotalMassInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, float& OutMass) const;
+template bool RocketManagerModule::ComputeTotalMassInDebrisIndex<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&,
+      u32,
+      float& OutMass) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeTotalMassInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, float& OutMass) const
 {
     OutMass = 0.f;
-    foreachitemconst(part, FActive.FParts)
+    foreachitemconst(part, Group.FParts)
     {
         const EntityId& partId = part.FId;
         const RigidbodyModule* const rigidbody = Rigidbodies[partId];
@@ -378,8 +440,10 @@ bool RocketManagerModule::ComputeTotalMass(const RigidbodyAccessor& Rigidbodies,
     return true;
 }
 
-template bool RocketManagerModule::ComputeTotalMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, float& OutMass) const;
-template bool RocketManagerModule::ComputeTotalMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, float& OutMass) const;
+template bool RocketManagerModule::ComputeTotalMassInGroup<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const RocketPartGroup&, float& OutMass) const;
+template bool RocketManagerModule::ComputeTotalMassInGroup<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&,
+      const RocketPartGroup&,
+      float& OutMass) const;
 
 /********************************************************************************************/
 /********************************************************************************************/
@@ -402,12 +466,9 @@ bool RocketManagerModule::ApplyForceToAllBodiesInDebrisIndex(const RigidbodyAcce
 template bool RocketManagerModule::ApplyForceToAllBodiesInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, const vec3&, const bool) const;
 
 template<typename RigidbodyAccessor>
-bool RocketManagerModule::ApplyForceToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies,
-      const RocketPartGroup& RocketPartGroup,
-      const vec3& Force,
-      const bool bTreatAsAcceleration) const
+bool RocketManagerModule::ApplyForceToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, const vec3& Force, const bool bTreatAsAcceleration) const
 {
-    for (const RocketPart& part : RocketPartGroup.FParts)
+    for (const RocketPart& part : Group.FParts)
     {
         const EntityId& partId = part.FId;
         const RigidbodyModule* const rigidbody = Rigidbodies[partId];
