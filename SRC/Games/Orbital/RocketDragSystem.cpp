@@ -103,7 +103,7 @@ void RocketDragSystem::VirtualUpdate()
 
         const vec3 DragAcceleration = DragForce / mass;
 
-        rocketManager.ApplyForceToAllBodies(rigidbodyAccessor, DragAcceleration, true);
+        rocketManager.ApplyForceToAllActiveBodies(rigidbodyAccessor, DragAcceleration, true);
 
         // Compute weathercock
         const vec3 weathercockTorque = rocketManager.Weathercock() * q * presentedArea * Cross(Nose, vHat);

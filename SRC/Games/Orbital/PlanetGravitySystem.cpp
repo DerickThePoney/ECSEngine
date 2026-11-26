@@ -82,7 +82,7 @@ void PlanetGravitySystem::VirtualUpdate()
             gravityAcceleration -= float(orbitFollowerModule->MeanMotion() * orbitFollowerModule->MeanMotion()) * Offset;
         }
 
-        rocket.ApplyForceToAllBodies(rigidbodyAccessor, gravityAcceleration, true);
+        rocket.ApplyForceToAllActiveBodies(rigidbodyAccessor, gravityAcceleration, true);
     }
 }
 } // namespace ECSEngine

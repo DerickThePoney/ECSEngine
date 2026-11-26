@@ -341,10 +341,33 @@ bool RocketManagerModule::ComputeTotalMass(const RigidbodyAccessor& Rigidbodies,
 template bool RocketManagerModule::ComputeTotalMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, float& OutMass) const;
 template bool RocketManagerModule::ComputeTotalMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, float& OutMass) const;
 
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
 template<typename RigidbodyAccessor>
-bool RocketManagerModule::ApplyForceToAllBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Force, const bool bTreatAsAcceleration) const
+bool RocketManagerModule::ApplyForceToAllActiveBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Force, const bool bTreatAsAcceleration) const
 {
-    for (const RocketPart& part : FActive.FParts)
+    return ApplyForceToAllBodiesInGroup(Rigidbodies, FActive, Force, bTreatAsAcceleration);
+}
+
+template bool RocketManagerModule::ApplyForceToAllActiveBodies<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const vec3&, const bool) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyForceToAllBodiesInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, const vec3& Force, const bool bTreatAsAcceleration) const
+{
+    AssertRelease(DebrisIndex < FDebris.size());
+    return ApplyForceToAllBodiesInGroup(Rigidbodies, FDebris[DebrisIndex], Force, bTreatAsAcceleration);
+}
+
+template bool RocketManagerModule::ApplyForceToAllBodiesInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, const vec3&, const bool) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyForceToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies,
+      const RocketPartGroup& RocketPartGroup,
+      const vec3& Force,
+      const bool bTreatAsAcceleration) const
+{
+    for (const RocketPart& part : RocketPartGroup.FParts)
     {
         const EntityId& partId = part.FId;
         const RigidbodyModule* const rigidbody = Rigidbodies[partId];
@@ -358,6 +381,9 @@ bool RocketManagerModule::ApplyForceToAllBodies(const RigidbodyAccessor& Rigidbo
     return true;
 }
 
-template bool RocketManagerModule::ApplyForceToAllBodies<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const vec3&, const bool) const;
+template bool RocketManagerModule::ApplyForceToAllBodiesInGroup<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      const RocketPartGroup&,
+      const vec3&,
+      const bool) const;
 
 } // namespace ECSEngine

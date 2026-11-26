@@ -137,7 +137,14 @@ public:
     bool ComputeTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const;
 
     template<typename RigidbodyAccessor>
-    bool ApplyForceToAllBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Force, const bool bTreatAsAcceleration) const;
+    bool ApplyForceToAllActiveBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Force, const bool bTreatAsAcceleration) const;
+
+    template<typename RigidbodyAccessor>
+    bool ApplyForceToAllBodiesInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, const vec3& Force, const bool bTreatAsAcceleration) const;
+
+private:
+    template<typename RigidbodyAccessor>
+    bool ApplyForceToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& RocketPartGroup, const vec3& Force, const bool bTreatAsAcceleration) const;
 
 protected:
     void VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters) override;
@@ -146,6 +153,7 @@ protected:
 
 private:
     RocketPartGroup FActive;
+    std::vector<RocketPartGroup> FDebris;
 
     vec3 FLastTurnGravity = vec3(0.f, -1.f, 0.f);
 
