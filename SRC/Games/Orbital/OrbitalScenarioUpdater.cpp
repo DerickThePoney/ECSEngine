@@ -8,15 +8,20 @@
 #include "Common/ResourceCache.h"
 #include "Common/ResourceHandle.h"
 #include "Common/TimeManager.h"
+#include "ECSCore/AdjustableDebugParameters.h"
 #include "ECSCore/WorldManager.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
 #include "Physics/PhysicsAPI.h"
+#include "PlanetarySOIManager.h"
 #include "Rendering/FinalCombinePass.h"
 #include "Rendering/GameRenderer.h"
 #include "RenderingCore/BGFXRenderingBackend.h"
+#include "RenderingCore/DrawCommands.h"
 #include "RenderingCore/GFXRepresentationManager.h"
 #include "RenderingCore/GLFWDisplayWindowHandler.h"
 #include "RenderingCore/ImguiRenderer.h"
+#include "RenderingCore/MaterialManager.h"
+#include "TimeWarpManager.h"
 #include "UICore/RMLUIManager.h"
 
 namespace ECSEngine
@@ -60,11 +65,31 @@ void OrbitalScenarioUpdater::Initialise()
     Rendering::FinalCombinePass::Instance().Initialise();
 
     AssertRelease(FScenario != nullptr);
+    FFloatingOriginSystem.Init();
     FCameraMoverSystem.Init();
     FRenderingSystem.Init();
     FPhysicsSystem.Init();
-    FRocketSystem.Init();
+    FRocketControllerSystem.Init();
+    FRocketSteeringSystem.Init();
+    FRocketThrustSystem.Init();
+    FRocketSASSystem.Init();
+    FRocketDragSystem.Init();
+    FDebrisLifetimeSystem.Init();
+    FPlanetGravitySystem.Init();
+    FRocketMassSystem.Init();
+    FRocketStagingSystem.Init();
+    FPlanetOrbitSystem.Init();
+    FKeplerWarpCaptureSystem.Init();
+    FKeplerWarpAdvanceSystem.Init();
+
+    PlanetarySOIManager::CreateIFP();
+
     PhysicsJointSpawner::CreateIFP();
+
+    TimeWarpManager::CreateIFP();
+    TimeWarpManager::Instance().Initialize();
+
+    FRocketUIController.Init();
 
     FScenario->Initialise();
 }
@@ -80,15 +105,32 @@ void OrbitalScenarioUpdater::Destroy()
         FScenario = nullptr;
     }
 
+    FRocketUIController.Destroy();
+
+    TimeWarpManager::Destroy();
+    PlanetarySOIManager::Destroy();
+
     if (PhysicsJointSpawner::HasInstance())
     {
         PhysicsJointSpawner::Instance().Finalize();
         PhysicsJointSpawner::Delete();
     }
-    FRocketSystem.Destroy();
+    FFloatingOriginSystem.Destroy();
+    FRocketMassSystem.Destroy();
+    FRocketStagingSystem.Destroy();
+    FRocketSASSystem.Destroy();
+    FRocketDragSystem.Destroy();
+    FDebrisLifetimeSystem.Destroy();
+    FRocketThrustSystem.Destroy();
+    FRocketSteeringSystem.Destroy();
+    FRocketControllerSystem.Destroy();
     FPhysicsSystem.Destroy();
     FRenderingSystem.Destroy();
     FCameraMoverSystem.Destroy();
+    FPlanetGravitySystem.Destroy();
+    FPlanetOrbitSystem.Destroy();
+    FKeplerWarpCaptureSystem.Destroy();
+    FKeplerWarpAdvanceSystem.Destroy();
 
     Rendering::FinalCombinePass::Instance().Shutdown();
     Rendering::FinalCombinePass::Destroy();
@@ -102,15 +144,79 @@ void OrbitalScenarioUpdater::Destroy()
 
 void OrbitalScenarioUpdater::RealtimeUpdate()
 {
-    FCameraMoverSystem.Update();
+    FRocketControllerSystem.Update();
 }
 
 void OrbitalScenarioUpdater::GameplayUpdate()
 {
+    SCOPED_PROFILE_SIMPLE;
+
     AssertRelease(FScenario != nullptr);
+
+    TimeWarpManager::Instance().ClampToAltitude();
+
+    const bool bIsWarping = TimeWarpManager::Instance().CurrentTimeWarpMultiplier() > 1;
+    if (!bIsWarping)
+        FFloatingOriginSystem.Update();
+
+    PlanetarySOIManager::Instance().Update();
     FScenario->Update();
-    FRocketSystem.Update();
-    FPhysicsSystem.Update();
+
+    // Before rails capture and before thrust, drag, and gravity.
+    FDebrisLifetimeSystem.Update();
+
+    if (bIsWarping)
+    {
+        SCOPED_PROFILE(OrbitalScenarioUpdater::GameplayUpdate::TimeWarping);
+        FKeplerWarpCaptureSystem.Update();
+
+        u32 WarpMultiplier = TimeWarpManager::Instance().CurrentTimeWarpMultiplier();
+        double InitialRemainingDT = TimeManager::GameplayDeltaTime() * WarpMultiplier;
+        double RemainingDT = InitialRemainingDT;
+        while (RemainingDT > 0 && WarpMultiplier > 1)
+        {
+            double step = Min(RemainingDT, 1.0);
+            FPlanetOrbitSystem.ExternalAdvanceBy(step);
+            FKeplerWarpAdvanceSystem.ExternalAdvanceBy(step);
+            if (PlanetarySOIManager::Instance().Update())
+            {
+                // parent changed, recapture
+                FKeplerWarpCaptureSystem.Update();
+            }
+            TimeWarpManager::Instance().ClampToAltitude();
+            u32 NewWarpMultiplier = TimeWarpManager::Instance().CurrentTimeWarpMultiplier();
+
+            if (NewWarpMultiplier == 1)
+                break;
+
+            RemainingDT -= step;
+
+            if (NewWarpMultiplier != WarpMultiplier)
+            {
+                WarpMultiplier = NewWarpMultiplier;
+                double NewInitialRemainingDT = TimeManager::GameplayDeltaTime() * WarpMultiplier;
+                RemainingDT = RemainingDT * NewInitialRemainingDT / InitialRemainingDT;
+                InitialRemainingDT = NewInitialRemainingDT;
+            }
+        }
+
+        FFloatingOriginSystem.Update();
+        FPhysicsSystem.ExternalSyncTransformsFromPhysics();
+    }
+    else
+    {
+        SCOPED_PROFILE(OrbitalScenarioUpdater::GameplayUpdate::PhysicsAdvance);
+        FKeplerWarpCaptureSystem.Update(); // exit edge clears FbActive
+        FRocketStagingSystem.Update();
+        FRocketMassSystem.Update();
+        FRocketSteeringSystem.Update();
+        FRocketThrustSystem.Update();
+        FRocketSASSystem.Update();
+        FRocketDragSystem.Update();
+        FPlanetOrbitSystem.Update();
+        FPlanetGravitySystem.Update();
+        FPhysicsSystem.Update();
+    }
 
     WorldManager::Instance().ProcessDestroyEntities();
     WorldManager::Instance().ProcessWithEntitiesCreation();
@@ -124,13 +230,42 @@ void OrbitalScenarioUpdater::GameplayUpdate()
 void OrbitalScenarioUpdater::UIUpdate()
 {
     Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_UI_PASS);
+    FRocketUIController.Update();
     UI::RmlUiManager::Instance().Update();
 }
 
 void OrbitalScenarioUpdater::DebugRender()
 {
 #ifdef WITH_VISUAL_DEBUG
-    Physics::DrawDebugs();
+    {
+        SCOPED_PROFILE(GameScenarioUpdater_DebugUpdate);
+        Rendering::ImGUI::SetImGuiContext(Rendering::RenderPassId::IMGUI_DEBUG_PASS);
+        DrawAdjustables();
+
+        Rendering::DrawCommandBuffer* buffer = Rendering::BGFXRenderingBackend::Instance().CreateCommandBuffer(Rendering::RenderPassId::DEBUG_PASS);
+        u32 camId = CameraManager::Instance().CreateCameraIFN("GameplayCamera");
+        Camera* camera = CameraManager::Instance().GetCamera(camId);
+        buffer->SetViewTranform(camera->GetWorldViewMatrix(), camera->GetProjectionMatrix(Rendering::GLFWDisplayWindowHandler::Instance().AspectRatio()));
+        Rendering::MaterialInstanceHandle handle = Rendering::MaterialManager::CreateMaterialInstanceIFN("materials\\vertexcolormaterial.material");
+
+        ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(showBGFXDebugs, false, "show debug", "Rendering");
+        if (showBGFXDebugs)
+        {
+            bool dummy = showBGFXDebugs;
+            Rendering::BGFXRenderingBackend::Instance().DrawStats(&dummy);
+        }
+
+        FRocketUIController.DrawDebug(buffer, handle);
+        FPlanetOrbitSystem.DrawDebug(buffer, handle);
+        FCameraMoverSystem.DrawDebug(buffer, handle);
+        PlanetarySOIManager::Instance().DrawDebug(buffer, handle);
+
+        buffer->Submit();
+        buffer->clear();
+        delete buffer;
+
+        Physics::DrawDebugs();
+    }
 #endif
 }
 
@@ -138,6 +273,8 @@ void OrbitalScenarioUpdater::Render()
 {
     Rendering::GFXRepresentationManager::Instance().OnGameplayFrameEnded();
     Rendering::GFXRepresentationManager::Instance().Update(TimeManager::FrameStartTime());
+
+    FCameraMoverSystem.Update();
     Rendering::GameRenderer::Instance().Render();
 
     UI::RmlUiManager::Instance().Render();

@@ -71,6 +71,16 @@ void UpdatePhysics()
     PhysicsEngine::Instance().UpdatePhysics(TimeManager::GameplayDeltaTime());
 }
 
+void FlushMovedBodies()
+{
+    PhysicsEngine::Instance().FlushMovedBodies();
+}
+
+bool ShiftWorld(const vec3& Delta)
+{
+    return PhysicsEngine::Instance().ShiftWorld(Delta);
+}
+
 PhysicsContactEventManager& GetContactEventManager()
 {
     return PhysicsEngine::Instance().ContactEventManager();
@@ -119,6 +129,12 @@ bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position)
     return Engine.GetBodyPosition(Handle, Position);
 }
 
+bool GetBodyCenterOfMass(const PhysicsBodyHandle& Handle, vec3& CenterOfMass)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyCenterOfMass(Handle, CenterOfMass);
+}
+
 bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
@@ -135,6 +151,24 @@ bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelo
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
     return Engine.GetBodyRotationVelocity(Handle, RotationVelocity);
+}
+
+bool GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyMass(Handle, Mass);
+}
+
+bool GetBodyInertiaWorld(const PhysicsBodyHandle& Handle, mat3& OutInertia)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyInertiaWorld(Handle, OutInertia);
+}
+
+bool SetBodyMass(const PhysicsBodyHandle& Handle, const float Mass)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.SetBodyMass(Handle, Mass);
 }
 
 #pragma endregion GettersAndSetterForBodies
@@ -192,6 +226,12 @@ const PhysicsJointHandle CreateHingeJoint(const PhysicsBodyHandle& HandleA, cons
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();
     return Engine.JointsManager().CreateHingeJoint(HandleA, HandleB, Config);
+}
+
+const PhysicsJointHandle CreateWeldJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const WeldJointConfig& Config)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.JointsManager().CreateWeldJoint(HandleA, HandleB, Config);
 }
 
 void DestroyJoint(const PhysicsJointHandle& JointHandle)

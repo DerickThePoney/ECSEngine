@@ -235,6 +235,42 @@ private:
 };
 
 template<>
+class PropertyDrawer<double>
+{
+public:
+    PropertyDrawer(const std::string& parPropertyName, double* parProperty, bool parUseLimits, double parMin, double parMax)
+        : FName(parPropertyName)
+        , FProperty(parProperty)
+        , FUseLimits(parUseLimits)
+        , FMin(parMin)
+        , FMax(parMax)
+    {
+    }
+
+    void ShowProperty()
+    {
+        const vec2 availableSize = ImGui::GetContentRegionAvail();
+        ImGui::SetNextItemWidth(availableSize.x * 0.4f);
+
+        if (FUseLimits)
+        {
+            ImGui::DragScalar(FName.c_str(), ImGuiDataType_Double, FProperty, 0.1f * (FMax - FMin), &FMin, &FMax);
+        }
+        else
+        {
+            ImGui::InputScalar(FName.c_str(), ImGuiDataType_Double, FProperty);
+        }
+    }
+
+private:
+    std::string FName;
+    double* FProperty = nullptr;
+    bool FUseLimits;
+    double FMin;
+    double FMax;
+};
+
+template<>
 class PropertyDrawer<i32>
 {
 public:

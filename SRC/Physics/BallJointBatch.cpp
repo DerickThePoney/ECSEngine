@@ -102,7 +102,7 @@ void BallJointBatch::PreSolve(Island* island, float dt)
                     const float C = S.coneAngle - J->FConfig.FMaxConeAngle;
                     const float K = Dot(S.coneAxis, S.IA * S.coneAxis) + Dot(S.coneAxis, S.IB * S.coneAxis);
                     S.coneM_eff = (fabsf(K) < 1e-3f) ? 0.f : 1.f / K;
-                    S.coneBias = (C < JOINT_ANGULAR_SLOP) ? 0.f : 0.1f * (JOINT_BAUMGARTE / dt) * C;
+                    S.coneBias = (C < JOINT_ANGULAR_SLOP) ? 0.f : -(JOINT_BAUMGARTE / dt) * C;
                 }
                 else
                 {

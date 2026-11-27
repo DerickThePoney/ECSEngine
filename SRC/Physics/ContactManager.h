@@ -21,6 +21,8 @@ public:
 
     void CollideContacts(PhysicsEngine* Engine, BroadPhase& parBroadPhase);
 
+    void TranslateContacts(const vec3& Delta);
+
 #ifdef PERFORM_SECURITY_CHECKS
     void DebugDrawContacts(BroadPhase& parBroadPhase);
 #endif

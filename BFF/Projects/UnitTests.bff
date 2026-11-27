@@ -2,7 +2,7 @@
 {
     .ProjectName = 'UnitTests'
     .ProjectPath = 'SRC/Tools'
-    .AdditionnalIncludePaths = {"SRC", "External/Test/doctest/doctest" }
+    .AdditionnalIncludePaths = {"SRC", "SRC/Games/Orbital", "External/Test/doctest/doctest" }
 
     .SolutionFolder = 'Tools'
 

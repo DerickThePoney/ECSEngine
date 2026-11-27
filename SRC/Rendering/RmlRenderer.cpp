@@ -232,7 +232,10 @@ void RmlRenderer::ReleaseTexture(Rml::TextureHandle texture)
 void RmlRenderer::SetTransform(const Rml::Matrix4f* transform)
 {
     if (transform == nullptr)
+    {
         FCurrentMatrix = mat4::Identity();
+        return;
+    }
 
     auto row0 = transform->GetRow(0);
     vec4 row0_glm(row0[0], row0[1], row0[2], row0[3]);

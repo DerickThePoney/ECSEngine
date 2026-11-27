@@ -8,3 +8,4 @@ DECLARE_MODULE_AND_TEMPLATE(LinkToOwnerModule, LinkToOwnerModuleTemplate)
 #include "Games/Generated/ModuleLists.inl"
 DECLARE_MODULE_AND_TEMPLATE(RigidbodyModule, RigidbodyModuleTemplate)
 DECLARE_MODULE_AND_TEMPLATE(BoxColliderModule, BoxColliderModuleTemplate)
+DECLARE_MODULE_AND_TEMPLATE(PhysicsFloatingOriginModule, PhysicsFloatingOriginModuleTemplate)

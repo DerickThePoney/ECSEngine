@@ -15,6 +15,8 @@ public:
     void Init(const vec3& parInitialPosition, const quat& parIntialOrientation, const float parInitialTime);
     void Update(const float parCurrentTime);
 
+    void Shift(const vec3& Delta);
+
     void PushNewFullKeyframe(const vec3& parNewPosition, const quat& parNewOrientation, const float parTime);
     void PushNewPositionKeyframe(const vec3& parNewPosition, const float parTime);
     void PushNewRotationKeyframe(const quat& parNewOrientation, const float parTime);

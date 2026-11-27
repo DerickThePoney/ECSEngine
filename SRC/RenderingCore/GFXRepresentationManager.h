@@ -15,6 +15,8 @@ public:
     ~GFXRepresentationManager();
     void Update(float parCurrentTime);
 
+    void ShiftRepresentations(const vec3& Delta);
+
     void OnGameplayFrameEnded();
 
     u32 CreateGFXRepresentation(const GFXRepresentationInitialiser& parInit);

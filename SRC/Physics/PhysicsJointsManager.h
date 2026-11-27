@@ -16,6 +16,7 @@ public:
     PhysicsJointHandle CreateDistanceJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const DistanceJointConfig& Config);
     PhysicsJointHandle CreateBallJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const BallJointConfig& Config);
     PhysicsJointHandle CreateHingeJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const HingeJointConfig& Config);
+    PhysicsJointHandle CreateWeldJoint(const PhysicsBodyHandle& BodyA, const PhysicsBodyHandle& BodyB, const WeldJointConfig& Config);
 
     void DestroyJoint(const PhysicsJointHandle& Handle);
 
@@ -60,6 +61,15 @@ private:
     std::vector<HingeJointRecord> FHingeJoints;
 
     IdGenerator FHingeJointsIdGenerator;
+
+    struct WeldJointRecord
+    {
+        WeldJoint Joint;
+        PhysicsJointHandle Handle;
+    };
+    std::vector<WeldJointRecord> FWeldJoints;
+
+    IdGenerator FWeldJointsIdGenerator;
 };
 
 } // namespace Physics

@@ -1,9 +1,22 @@
 #pragma once
-#include "ECSGameplay_Common/CameraMoverSystem.h"
+#include "DebrisLifetimeSystem.h"
 #include "ECSGameplay_Common/IScenarioUpdater.h"
 #include "ECSGameplay_Common/PhysicsUpdateSystem.h"
 #include "ECSGameplay_Common/SynchroWithRenderSystem.h"
+#include "KeplerWarpAdvanceSystem.h"
+#include "KeplerWarpCaptureSystem.h"
+#include "OrbitalCameraMoverSystem.h"
+#include "PhysicsFloatingOriginSystem.h"
+#include "PlanetGravitySystem.h"
+#include "PlanetOrbitalPathFollowingSystem.h"
 #include "RocketControllerSystem.h"
+#include "RocketDragSystem.h"
+#include "RocketMassSystem.h"
+#include "RocketSASSystem.h"
+#include "RocketStagingSystem.h"
+#include "RocketSteeringSystem.h"
+#include "RocketThrustSystem.h"
+#include "RocketUIController.h"
 
 namespace ECSEngine
 {
@@ -30,9 +43,23 @@ private:
     SceneScenario* FScenario = nullptr;
     std::string FScenarioFileName;
 
-    CameraMoverSystem FCameraMoverSystem;
+    PhysicsFloatingOriginSystem FFloatingOriginSystem;
+    OrbitalCameraMoverSystem FCameraMoverSystem;
     SynchroWithRenderSystem FRenderingSystem;
     PhysicsUpdateSystem FPhysicsSystem;
-    RocketControllerSystem FRocketSystem;
+    RocketControllerSystem FRocketControllerSystem;
+    RocketSteeringSystem FRocketSteeringSystem;
+    RocketThrustSystem FRocketThrustSystem;
+    RocketSASSystem FRocketSASSystem;
+    RocketDragSystem FRocketDragSystem;
+    DebrisLifetimeSystem FDebrisLifetimeSystem;
+    PlanetGravitySystem FPlanetGravitySystem;
+    RocketMassSystem FRocketMassSystem;
+    RocketStagingSystem FRocketStagingSystem;
+    PlanetOrbitalPathFollowingSystem FPlanetOrbitSystem;
+    KeplerWarpCaptureSystem FKeplerWarpCaptureSystem;
+    KeplerWarpAdvanceSystem FKeplerWarpAdvanceSystem;
+
+    UI::RocketUIController FRocketUIController;
 };
 } // namespace ECSEngine

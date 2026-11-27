@@ -27,12 +27,15 @@ PhysicsUpdateSystem::~PhysicsUpdateSystem()
 {
 }
 
-void PhysicsUpdateSystem::VirtualUpdate()
+void PhysicsUpdateSystem::ExternalSyncTransformsFromPhysics()
 {
-    parent_type::VirtualUpdate();
+    LockControllers();
+    SyncTransformsFromPhysics();
+    UnlockControllers();
+}
 
-    Physics::UpdatePhysics();
-
+void PhysicsUpdateSystem::SyncTransformsFromPhysics()
+{
     ModuleAccessor<RigidbodyModule> RigidBodyAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<PositionModule> PositionAccessor(EEntityWorlds::STANDARD);
     ModuleAccessor<OrientationModule> OrientationAccessor(EEntityWorlds::STANDARD);
@@ -64,6 +67,14 @@ void PhysicsUpdateSystem::VirtualUpdate()
             }
         }
     }
+}
+
+void PhysicsUpdateSystem::VirtualUpdate()
+{
+    parent_type::VirtualUpdate();
+
+    Physics::UpdatePhysics();
+    SyncTransformsFromPhysics();
 }
 
 } // namespace ECSEngine

@@ -274,9 +274,27 @@ jobs:
         run: py -u Script/Compil/BuildAll.py -e -c Final -m msbuild.exe
         shell: bash
 
+  prototype-names:
+    runs-on: ubuntu-latest
+    outputs:
+      games: ${{ steps.games.outputs.games }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - id: games
+        run: |
+          games=$(python3 -c 'import json; print(json.dumps([item["name"] for item in json.load(open("Script/Generation/prototypes.json", encoding="utf-8"))]))')
+          echo "games=$games" >> "$GITHUB_OUTPUT"
+
   generate-assets:
     runs-on: windows-latest
-    needs: build-release
+    needs: [build-release, prototype-names]
+    strategy:
+      fail-fast: false
+      matrix:
+        game: ${{ fromJson(needs.prototype-names.outputs.games) }}
 
     steps:
       - uses: actions/checkout@v6
@@ -302,7 +320,7 @@ jobs:
         shell: bash
 
       - name: Run Asset cooking
-        run: py -u Script/Generation/GenerateData.py
+        run: py -u Script/Generation/GenerateData.py --game ${{ matrix.game }}
         shell: bash
 
 

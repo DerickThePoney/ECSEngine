@@ -61,7 +61,10 @@ void GFXRepresentation::Initialise(const GFXRepresentationInitialiser& parInit)
 
     const MemoryView<const std::unique_ptr<AbstractGFXOperatorDescriptor>> operators = descriptor->OperatorDescriptors();
     FGFXOperators.reserve(operators.size());
-    forrange(i, 0, operators.size()) { FGFXOperators.push_back(std::unique_ptr<AbstractGFXOperator>(operators[i]->CreateOperator())); }
+    forrange(i, 0, operators.size())
+    {
+        FGFXOperators.push_back(std::unique_ptr<AbstractGFXOperator>(operators[i]->CreateOperator()));
+    }
 }
 
 void GFXRepresentation::Update(float parCurrentTime)
@@ -87,6 +90,12 @@ void GFXRepresentation::Update(float parCurrentTime)
 void GFXRepresentation::SwapQueues()
 {
     FCurrentMessageQueue = 1 - FCurrentMessageQueue;
+}
+
+void GFXRepresentation::Shift(const vec3& Delta)
+{
+    if (FCarrier != nullptr)
+        FCarrier->Shift(Delta);
 }
 
 void GFXRepresentation::ProcessMessages()

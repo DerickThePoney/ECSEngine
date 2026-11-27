@@ -4,12 +4,19 @@
 #include "RocketManagerModule.h"
 
 #include "Common/SavingSystemImplementation.h"
+#include "Common/TimeManager.h"
+#include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSCore/EntityFactory.h"
+#include "ECSCore/EntityTemplate.h"
 #include "ECSCore/EntityTemplateManagerMethods.h"
+#include "ECSCore/ModuleAccessor.h"
 #include "ECSCore/ModuleParameters.h"
 #include "ECSCore/ModuleUtils.h"
-#include "ECSCore/ECSCorePropertyDrawer.h"
 #include "ECSGameplay_Common/PhysicsJointSpawner.h"
+#include "ECSGameplay_Common/RigidbodyModule.h"
+#include "FuelTankModule.h"
+#include "NozzleEngineModule.h"
+#include "Physics/PhysicsAPI.h"
 
 CEREAL_REGISTER_TYPE(ECSEngine::RocketManagerModuleTemplate);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ECSEngine::ModuleTemplate, ECSEngine::RocketManagerModuleTemplate);
@@ -25,27 +32,65 @@ Module* RocketManagerModuleTemplate::CreateInstance(const EntityId& parUnitId, c
 
 void RocketManagerModuleTemplate::VirtualDrawEditor()
 {
-    const auto OldTemplateBody = FRocketBodyTemplateName;
-    EDITOR_PROPERTY_ENTITY_TEMPLATE("Rocket body", FRocketBodyTemplate, FRocketBodyTemplateName);
-    if (FRocketBodyTemplateName != OldTemplateBody)
+    if (ImGui::CollapsingHeader("Rocket recipe"))
     {
-        FRocketBodyTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketBodyTemplateName);
+        FRecipe.DrawInEditor();
     }
 
-    const auto OldTemplateNozzle = FRocketNozzleTemplateName;
-    EDITOR_PROPERTY_ENTITY_TEMPLATE("Rocket Nozzle", FRocketNozzleTemplate, FRocketNozzleTemplateName);
-    if (FRocketNozzleTemplateName != OldTemplateNozzle)
+    const auto OldTemplateCamera = FRocketCameraMoverTemplateName;
+    EDITOR_PROPERTY_ENTITY_TEMPLATE("Rocket Camera Mover", FRocketCameraMoverTemplate, FRocketCameraMoverTemplateName);
+    if (FRocketCameraMoverTemplateName != OldTemplateCamera)
     {
-        FRocketNozzleTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketNozzleTemplateName);
+        FRocketCameraMoverTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketCameraMoverTemplateName);
     }
 
-    FBallConfig.DrawInEditor();
+    EDITOR_PROPERTY_SIMPLE("Axial drag area", FAxialDragArea);
+    EDITOR_PROPERTY_SIMPLE("Broadside drag area", FBroadsideDragArea);
+    EDITOR_PROPERTY_SIMPLE("Weathercock", FWeathercock);
+
+    EDITOR_PROPERTY_SIMPLE("Debris max lifetime", FDebrisMaxLifetime);
+    EDITOR_PROPERTY_SIMPLE("Debris cull radius", FDebrisCullRadius);
 }
 
 void RocketManagerModuleTemplate::VirtualPostLoad()
 {
-    FRocketBodyTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketBodyTemplateName);
-    FRocketNozzleTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketNozzleTemplateName);
+    FRocketCameraMoverTemplate = EntityTemplateManager::Instance().GetEntityTemplate(FRocketCameraMoverTemplateName);
+
+    FRecipe.FetchEntityTemplates();
+
+    const std::vector<RocketPartRecipe>& parts = FRecipe.FRocketPartRecipes;
+    forrange(i, 0, parts.size())
+    {
+        const RocketPartRecipe& part = parts[i];
+        AssertReleaseMsg(part.FEntityTemplate != nullptr, std::format("Rocket part {} has no entity template", i).c_str());
+        if (part.FEntityTemplate == nullptr)
+            continue;
+
+        if (i == 0)
+        {
+            AssertReleaseMsg(part.FJointType == ERocketPartJoint::NONE, "Rocket part 0 must have no joint");
+        }
+        else
+        {
+            AssertReleaseMsg(part.FJointType != ERocketPartJoint::NONE, std::format("Rocket part {} must have a joint", i).c_str());
+        }
+
+        if (part.FRole == ERocketPartRole::ENGINE)
+        {
+            AssertReleaseMsg(part.FEntityTemplate->HasModule<NozzleEngineModule>(), std::format("Rocket part {} is an engine without a NozzleEngineModule", i).c_str());
+
+            const bool bTankIndexInRange = part.FFuelTankIndex >= 0 && static_cast<size_t>(part.FFuelTankIndex) < parts.size();
+            AssertReleaseMsg(bTankIndexInRange, std::format("Rocket part {} fuel tank index is out of range", i).c_str());
+            if (bTankIndexInRange)
+            {
+                AssertReleaseMsg(parts[part.FFuelTankIndex].FRole == ERocketPartRole::FUEL_TANK, std::format("Rocket part {} does not drain a fuel tank", i).c_str());
+            }
+        }
+        else if (part.FRole == ERocketPartRole::FUEL_TANK)
+        {
+            AssertReleaseMsg(part.FEntityTemplate->HasModule<FuelTankModule>(), std::format("Rocket part {} is a fuel tank without a FuelTankModule", i).c_str());
+        }
+    }
 }
 
 IMPLEMENT_SAVELOAD_ABILITIES(RocketManagerModule);
@@ -57,12 +102,214 @@ void RocketManagerModule::SaveLoad(Chunk& parChunk)
 
 RocketManagerModule::RocketManagerModule()
     : Module()
-    , JointCreatedDelegate(DELEGATE(&RocketManagerModule::OnJointCreated, *this))
 {
 }
 
 RocketManagerModule::~RocketManagerModule()
 {
+}
+
+float RocketManagerModule::AxialDragArea() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->AxialDragArea();
+}
+
+float RocketManagerModule::BroadsideDragArea() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->BroadsideDragArea();
+}
+
+float RocketManagerModule::Weathercock() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->Weathercock();
+}
+
+float RocketManagerModule::DebrisMaxLifetime() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->DebrisMaxLifetime();
+}
+
+float RocketManagerModule::DebrisCullRadius() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->DebrisCullRadius();
+}
+
+const EntityId RocketManagerModule::ActiveEngine() const
+{
+    i32 EngineIndex = ActiveEnginePartIndex();
+    if (EngineIndex == -1)
+        return EntityId();
+
+    return FActive.FParts[EngineIndex].FId;
+}
+
+const EntityId RocketManagerModule::ActiveEngineFuelTank() const
+{
+    i32 EngineIndex = ActiveEnginePartIndex();
+    if (EngineIndex == -1)
+        return EntityId();
+
+    i32 TankIndex = FActive.FParts[EngineIndex].FFuelTankIndex;
+    AssertRelease(TankIndex >= 0 && TankIndex < FActive.FParts.size());
+    return FActive.FParts[TankIndex].FId;
+}
+
+const Physics::PhysicsJointHandle RocketManagerModule::ActiveEngineJointHandle() const
+{
+    i32 EngineIndex = ActiveEnginePartIndex();
+    if (EngineIndex == -1)
+        return Physics::PhysicsJointHandle();
+
+    return FActive.FParts[EngineIndex].FJointHandle;
+}
+
+const EntityId RocketManagerModule::RootId() const
+{
+    AssertRelease(FActive.FParts.size() > 0);
+    return FActive.FParts[0].FId;
+}
+
+const EntityId RocketManagerModule::RootIdForDebrisIndex(u32 Index) const
+{
+    AssertRelease(FDebris.size() > Index);
+    AssertRelease(FDebris[Index].FDebrisParts.FParts.size() > 0);
+    return FDebris[Index].FDebrisParts.FParts[0].FId;
+}
+
+void RocketManagerModule::IncrementDebrisLifetime(const float DT)
+{
+    foreachitem(debris, FDebris)
+    {
+        debris.FLifetime += DT;
+    }
+}
+
+float RocketManagerModule::LifetimeForDebrisIndex(u32 Index) const
+{
+    AssertRelease(FDebris.size() > Index);
+    return FDebris[Index].FLifetime;
+}
+
+void RocketManagerModule::KillDebris(u32 Index)
+{
+    AssertRelease(FDebris.size() > Index);
+
+    foreachitem(debrisPart, FDebris[Index].FDebrisParts.FParts)
+    {
+        EntityFactory::MarkEntityAsDead(debrisPart.FId);
+    }
+    FDebris.erase(FDebris.begin() + Index);
+}
+
+void RocketManagerModule::KillAllDebris()
+{
+    foreachitem(debris, FDebris)
+    {
+        foreachitem(debrisPart, debris.FDebrisParts.FParts)
+        {
+            EntityFactory::MarkEntityAsDead(debrisPart.FId);
+        }
+    }
+    FDebris.clear();
+}
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::Stage(const RigidbodyAccessor& Rigidbodies)
+{
+    if (!FbWantsStaging)
+        return false;
+    FbWantsStaging = false;
+
+    i32 DecouplerIndex = NextDecouplerIndex();
+    if (DecouplerIndex == -1)
+        return false;
+
+    const RigidbodyModule* RootBody = Rigidbodies[FActive.FParts[DecouplerIndex - 1].FId];
+    AssertRelease(RootBody != nullptr);
+    quat Orientation;
+    if (!Physics::GetBodyOrientation(RootBody->BodyHandle(), Orientation))
+        return false;
+
+    Debris& newDebrisGroup = FDebris.emplace_back();
+    forrange(i, DecouplerIndex, FActive.FParts.size())
+    {
+        newDebrisGroup.FDebrisParts.FParts.push_back(FActive.FParts[i]);
+    }
+    FActive.FParts.resize(DecouplerIndex);
+
+    foreachitem(part, newDebrisGroup.FDebrisParts.FParts)
+    {
+        part.FParent -= DecouplerIndex;
+        if (part.FRole == ERocketPartRole::ENGINE)
+            part.FFuelTankIndex -= DecouplerIndex;
+    }
+    RocketPart& RootDebrisPart = newDebrisGroup.FDebrisParts.FParts[0];
+    RootDebrisPart.FParent = -1;
+
+    // Destroy the joint
+    Physics::DestroyJoint(RootDebrisPart.FJointHandle);
+
+    // Apply the separation speed
+    const vec3 SeparationVelocity = RootDebrisPart.FSeparationSpeed * ((mat4)Orientation).Column(1).xyz();
+
+    ApplyImpulseToAllActiveBodies(Rigidbodies, SeparationVelocity, true);
+    ApplyImpulseToAllBodiesInGroup(Rigidbodies, newDebrisGroup.FDebrisParts, Invert(SeparationVelocity), true);
+
+    return true;
+}
+
+template bool RocketManagerModule::Stage<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&);
+
+i32 RocketManagerModule::ActiveEnginePartIndex() const
+{
+    reverseforrange(i, 0, FActive.FParts.size())
+    {
+        if (FActive.FParts[i].FRole == ERocketPartRole::ENGINE)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+i32 RocketManagerModule::NextDecouplerIndex() const
+{
+    reverseforrange(i, 0, FActive.FParts.size())
+    {
+        if (FActive.FParts[i].FbDecoupler)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+void RocketManagerModule::SetRocketThrottle(const float Value)
+{
+    FRocketThrottle = Clamp01(Value);
+}
+
+void RocketManagerModule::SetSASActivated(const bool Value)
+{
+    FWasSASActivated = FSASActivated;
+    FSASActivated = Value;
+    if (FWasSASActivated && !FSASActivated)
+    {
+        ClearSASTarget();
+    }
+}
+
+void RocketManagerModule::SetSASTarget(const quat& Target)
+{
+    FSASTarget = Target;
+    FHasSASTarget = true;
 }
 
 void RocketManagerModule::VirtualInit(const EntityId& parUnitId, const ModuleParameters::ParameterContainer& parParameters)
@@ -74,25 +321,361 @@ void RocketManagerModule::VirtualInit(const EntityId& parUnitId, const ModulePar
 
     const RocketManagerModuleTemplate* moduleTemplate = Template<RocketManagerModuleTemplate>();
 
-    // Create the body
-    ModuleParameters::ParameterContainer container = parParameters;
-    FBodyId = EntityFactory::RequestCreateEntity(moduleTemplate->GetBodyTemplate(), container);
+    // Create the rocket
+    RocketRuntime::BuildRocketRuntime(FActive, moduleTemplate->Recipe(), Position, EulerAngles);
 
-    // compute nozzle position
-    const Physics::BallJointConfig& JointConfig = moduleTemplate->GetJointConfig();
-    const mat4 R = EulerAnglesXYZ(EulerAngles.x, EulerAngles.y, EulerAngles.z); // rotation only
-    const vec3 n = Normalize((R * vec4::MakeHomogeneousDirectionVec4(vec3(0.f, -1.f, 0.f))).xyz());
-    const vec3 NozzlePosition = Position + (R * vec4::MakeHomogeneousDirectionVec4(JointConfig.FCommon.FAnchorALocal - JointConfig.FCommon.FAnchorBLocal)).xyz();
-    container.Set<ModuleParameters::Position>(NozzlePosition);
-
-    FNozzleId = EntityFactory::RequestCreateEntity(moduleTemplate->GetNozzleTemplate(), container);
-
-    PhysicsJointSpawner::Instance().AddBallJointToSpawn(FBodyId, FNozzleId, JointConfig, &JointCreatedDelegate);
+    // Create camera mover template
+    ModuleParameters::ParameterContainer CamContainer = parParameters;
+    CamContainer.Set<ModuleParameters::TargetId>(parUnitId);
+    EntityFactory::RequestCreateEntity(moduleTemplate->GetRocketCameraMoverTemplate(), CamContainer);
 }
 
-void RocketManagerModule::OnJointCreated(const Physics::PhysicsJointHandle& Handle)
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+template<typename RigidbodyAccessor>
+void RocketManagerModule::SetPositionAndVelocityForAllPartsUsingOffsets(const RigidbodyAccessor& Rigidbodies,
+      const vec3& CoMPosition,
+      const vec3& CoMVelocity,
+      const MemoryView<const vec3>& parts) const
 {
-    FJointHandle = Handle;
+    AssertRelease(parts.size() == FActive.FParts.size());
+
+    forrange(i, 0, FActive.FParts.size())
+    {
+        const EntityId& partId = FActive.FParts[i].FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        bool bSuccess = Physics::SetBodyPosition(rigidbody->BodyHandle(), CoMPosition + parts[i]);
+        AssertRelease(bSuccess);
+
+        bSuccess = Physics::SetBodyVelocity(rigidbody->BodyHandle(), CoMVelocity);
+        AssertRelease(bSuccess);
+    }
 }
+
+template void RocketManagerModule::SetPositionAndVelocityForAllPartsUsingOffsets<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      const vec3&,
+      const vec3&,
+      const MemoryView<const vec3>&) const;
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+template<typename RigidbodyAccessor>
+void RocketManagerModule::ComputePartOffsetAndClearRotationVelocity(const RigidbodyAccessor& Rigidbodies, const vec3& CoMPosition, MemoryView<vec3>& parts) const
+{
+    AssertRelease(parts.size() == FActive.FParts.size());
+
+    forrange(i, 0, FActive.FParts.size())
+    {
+        const EntityId& partId = FActive.FParts[i].FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        vec3 partPos;
+        bool bSuccess = Physics::GetBodyPosition(rigidbody->BodyHandle(), partPos);
+        AssertRelease(bSuccess);
+
+        bSuccess = Physics::SetBodyRotationVelocity(rigidbody->BodyHandle(), vec3{ 0.f });
+        AssertRelease(bSuccess);
+
+        parts[i] = partPos - CoMPosition;
+    }
+}
+
+template void RocketManagerModule::ComputePartOffsetAndClearRotationVelocity<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      const vec3& CoMPosition,
+      MemoryView<vec3>& parts) const;
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeActiveCenterOfMass(const RigidbodyAccessor& Rigidbodies, vec3& OutPosition, vec3* OutVelocity) const
+{
+    return ComputeCenterOfMassInGroup(Rigidbodies, FActive, OutPosition, OutVelocity);
+}
+
+template bool RocketManagerModule::ComputeActiveCenterOfMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
+template bool RocketManagerModule::ComputeActiveCenterOfMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, vec3&, vec3*) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeCenterOfMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, vec3& OutPosition, vec3* OutVelocity) const
+{
+    AssertRelease(DebrisIndex < FDebris.size());
+    return ComputeCenterOfMassInGroup(Rigidbodies, FDebris[DebrisIndex].FDebrisParts, OutPosition, OutVelocity);
+}
+
+template bool RocketManagerModule::ComputeCenterOfMassInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, vec3&, vec3*) const;
+template bool RocketManagerModule::ComputeCenterOfMassInDebrisIndex<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&,
+      u32,
+      vec3&,
+      vec3*) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeCenterOfMassInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, vec3& OutPosition, vec3* OutVelocity) const
+{
+    vec3 weightedPosition{ 0.f };
+    vec3 weightedVelocity{ 0.f };
+    float totalMass = 0.f;
+
+    for (const RocketPart& part : Group.FParts)
+    {
+        const EntityId& partId = part.FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        if (rigidbody == nullptr)
+        {
+            return false;
+        }
+
+        const Physics::PhysicsBodyHandle& bodyHandle = rigidbody->BodyHandle();
+        vec3 centerOfMass;
+        float mass = 0.f;
+        if (!Physics::GetBodyCenterOfMass(bodyHandle, centerOfMass) || !Physics::GetBodyMass(bodyHandle, mass))
+        {
+            return false;
+        }
+
+        weightedPosition = weightedPosition + centerOfMass * mass;
+        totalMass += mass;
+
+        if (OutVelocity != nullptr)
+        {
+            vec3 velocity;
+            if (!Physics::GetBodyVelocity(bodyHandle, velocity))
+            {
+                return false;
+            }
+            weightedVelocity = weightedVelocity + velocity * mass;
+        }
+    }
+
+    if (totalMass <= 0.f)
+    {
+        return false;
+    }
+
+    const float inverseTotalMass = 1.f / totalMass;
+    OutPosition = weightedPosition * inverseTotalMass;
+    if (OutVelocity != nullptr)
+    {
+        *OutVelocity = weightedVelocity * inverseTotalMass;
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ComputeCenterOfMassInGroup<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const RocketPartGroup&, vec3&, vec3*) const;
+template bool RocketManagerModule::ComputeCenterOfMassInGroup<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&,
+      const RocketPartGroup&,
+      vec3&,
+      vec3*) const;
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+template<typename EngineAccessor>
+bool RocketManagerModule::ComputeActiveThrust(const EngineAccessor& Engines, float& OutThrust) const
+{
+    OutThrust = 0.f;
+    foreachitemconst(part, FActive.FParts)
+    {
+        if (part.FRole != ERocketPartRole::ENGINE)
+            continue;
+
+        const NozzleEngineModule* engine = Engines[part.FId];
+        AssertRelease(engine != nullptr);
+        if (engine->Throttle() > 0.f)
+            OutThrust += engine->Throttle() * engine->MaxThrust();
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ComputeActiveThrust<ModuleAccessor<NozzleEngineModule>>(const ModuleAccessor<NozzleEngineModule>&, float&) const;
+template bool RocketManagerModule::ComputeActiveThrust<ManualLockModuleAccessor<NozzleEngineModule>>(const ManualLockModuleAccessor<NozzleEngineModule>&, float&) const;
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeActiveTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const
+{
+    return ComputeTotalMassInGroup(Rigidbodies, FActive, OutMass);
+}
+
+template bool RocketManagerModule::ComputeActiveTotalMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, float& OutMass) const;
+template bool RocketManagerModule::ComputeActiveTotalMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, float& OutMass) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeActiveDirectionalInertia(const RigidbodyAccessor& Rigidbodies, const vec3& Axis, float& OutInertia) const
+{
+    OutInertia = 0.f;
+    if (LengthSq(Axis) < 1.e-8f)
+        return false;
+
+    vec3 stackCom;
+    if (!ComputeActiveCenterOfMass(Rigidbodies, stackCom))
+        return false;
+
+    const vec3 axis = Normalize(Axis);
+    mat3 totalInertia;
+    foreachitemconst(part, FActive.FParts)
+    {
+        const RigidbodyModule* rigidbody = Rigidbodies[part.FId];
+        AssertRelease(rigidbody != nullptr);
+
+        float mass = 0.f;
+        vec3 bodyCom;
+        mat3 bodyInertia;
+        if (!Physics::GetBodyMass(rigidbody->BodyHandle(), mass) || !Physics::GetBodyCenterOfMass(rigidbody->BodyHandle(), bodyCom) || !Physics::GetBodyInertiaWorld(rigidbody->BodyHandle(), bodyInertia))
+            return false;
+
+        const vec3 r = bodyCom - stackCom;
+        const mat3 outer(r * r.x, r * r.y, r * r.z);
+        mat3 shift = mat3::Identity() * Dot(r, r) - outer;
+        shift *= mass;
+        totalInertia = totalInertia + bodyInertia + shift;
+    }
+
+    OutInertia = Dot(axis, totalInertia * axis);
+    return OutInertia > 1.e-4f;
+}
+
+template bool RocketManagerModule::ComputeActiveDirectionalInertia<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const vec3&, float&) const;
+template bool RocketManagerModule::ComputeActiveDirectionalInertia<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, const vec3&, float&) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeTotalMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, float& OutMass) const
+{
+    AssertRelease(DebrisIndex < FDebris.size());
+    return ComputeTotalMassInGroup(Rigidbodies, FDebris[DebrisIndex].FDebrisParts, OutMass);
+}
+
+template bool RocketManagerModule::ComputeTotalMassInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, float& OutMass) const;
+template bool RocketManagerModule::ComputeTotalMassInDebrisIndex<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&,
+      u32,
+      float& OutMass) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeTotalMassInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, float& OutMass) const
+{
+    OutMass = 0.f;
+    foreachitemconst(part, Group.FParts)
+    {
+        const EntityId& partId = part.FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        float Mass = 0.f;
+        if (!Physics::GetBodyMass(rigidbody->BodyHandle(), Mass))
+        {
+            return false;
+        }
+        OutMass += Mass;
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ComputeTotalMassInGroup<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const RocketPartGroup&, float& OutMass) const;
+template bool RocketManagerModule::ComputeTotalMassInGroup<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&,
+      const RocketPartGroup&,
+      float& OutMass) const;
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyForceToAllActiveBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Force, const bool bTreatAsAcceleration) const
+{
+    return ApplyForceToAllBodiesInGroup(Rigidbodies, FActive, Force, bTreatAsAcceleration);
+}
+
+template bool RocketManagerModule::ApplyForceToAllActiveBodies<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const vec3&, const bool) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyForceToAllBodiesInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, const vec3& Force, const bool bTreatAsAcceleration) const
+{
+    AssertRelease(DebrisIndex < FDebris.size());
+    return ApplyForceToAllBodiesInGroup(Rigidbodies, FDebris[DebrisIndex].FDebrisParts, Force, bTreatAsAcceleration);
+}
+
+template bool RocketManagerModule::ApplyForceToAllBodiesInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, const vec3&, const bool) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyForceToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies, const RocketPartGroup& Group, const vec3& Force, const bool bTreatAsAcceleration) const
+{
+    for (const RocketPart& part : Group.FParts)
+    {
+        const EntityId& partId = part.FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        if (!Physics::AddForceToBody(rigidbody->BodyHandle(), Force, bTreatAsAcceleration))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ApplyForceToAllBodiesInGroup<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      const RocketPartGroup&,
+      const vec3&,
+      const bool) const;
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyImpulseToAllActiveBodies(const RigidbodyAccessor& Rigidbodies, const vec3& Impulse, const bool bTreatAsVelocityChange) const
+{
+    return ApplyImpulseToAllBodiesInGroup(Rigidbodies, FActive, Impulse, bTreatAsVelocityChange);
+}
+
+template bool RocketManagerModule::ApplyImpulseToAllActiveBodies<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const vec3&, const bool) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyImpulseToAllBodiesInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, const vec3& Impulse, const bool bTreatAsVelocityChange) const
+{
+    AssertRelease(DebrisIndex < FDebris.size());
+    return ApplyImpulseToAllBodiesInGroup(Rigidbodies, FDebris[DebrisIndex].FDebrisParts, Impulse, bTreatAsVelocityChange);
+}
+
+template bool RocketManagerModule::ApplyImpulseToAllBodiesInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      u32,
+      const vec3&,
+      const bool) const;
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ApplyImpulseToAllBodiesInGroup(const RigidbodyAccessor& Rigidbodies,
+      const RocketPartGroup& Group,
+      const vec3& Impulse,
+      const bool bTreatAsVelocityChange) const
+{
+    for (const RocketPart& part : Group.FParts)
+    {
+        const EntityId& partId = part.FId;
+        const RigidbodyModule* const rigidbody = Rigidbodies[partId];
+        AssertRelease(rigidbody != nullptr);
+
+        if (!Physics::AddImpulseToBody(rigidbody->BodyHandle(), Impulse, bTreatAsVelocityChange))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ApplyImpulseToAllBodiesInGroup<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,
+      const RocketPartGroup&,
+      const vec3&,
+      const bool) const;
 
 } // namespace ECSEngine

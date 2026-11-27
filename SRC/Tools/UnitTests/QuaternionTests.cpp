@@ -1,7 +1,9 @@
 #include "stdafx.h"
 
+#include "Math/MathFunctions.h"
 #include "Math/Matrix.h"
 #include "Math/Quaternion.h"
+#include "Math/QuaternionUtils.h"
 #include "doctest.h"
 
 using namespace ECSEngine;
@@ -84,5 +86,50 @@ TEST_SUITE("Quaternion tests")
             CHECK(m.FValues[14] == 0.f);
             CHECK(m.FValues[15] == 1.f);
         }
+    }
+
+    TEST_CASE("Quaternion rotation")
+    {
+        const quat quarter(vec3(0.f, 0.f, 1.f), Pi() * 0.5f);
+        CHECK(quarter.x == doctest::Approx(0.f).epsilon(1e-5f));
+        CHECK(quarter.y == doctest::Approx(0.f).epsilon(1e-5f));
+        CHECK(quarter.z == doctest::Approx(Sin(Pi() * 0.25f)).epsilon(1e-5f));
+        CHECK(quarter.w == doctest::Approx(Cos(Pi() * 0.25f)).epsilon(1e-5f));
+
+        const quat half = quarter * quarter;
+        CHECK(half.x == doctest::Approx(0.f).epsilon(1e-5f));
+        CHECK(half.y == doctest::Approx(0.f).epsilon(1e-5f));
+        CHECK(half.z == doctest::Approx(1.f).epsilon(1e-5f));
+        CHECK(half.w == doctest::Approx(0.f).epsilon(1e-5f));
+
+        const quat identity = quarter * Conjugate(quarter);
+        CHECK(identity.x == doctest::Approx(0.f).epsilon(1e-5f));
+        CHECK(identity.y == doctest::Approx(0.f).epsilon(1e-5f));
+        CHECK(identity.z == doctest::Approx(0.f).epsilon(1e-5f));
+        CHECK(identity.w == doctest::Approx(1.f).epsilon(1e-5f));
+
+        const quat scaled = Normalize(quarter * 4.f);
+        CHECK(Dot(scaled, scaled) == doctest::Approx(1.f));
+        CHECK(Dot(scaled, quarter) == doctest::Approx(1.f));
+
+        CHECK(Lerp(quarter, half, 0.f) == quarter);
+        CHECK(Lerp(quarter, half, 1.f) == half);
+
+        const quat cancelled = quarter + Conjugate(quarter);
+        CHECK(cancelled.z == doctest::Approx(0.f).epsilon(1e-5f));
+        CHECK(cancelled.w == doctest::Approx(2.f * quarter.w).epsilon(1e-5f));
+
+        CHECK(AddVectorToQuaternion(quarter, vec3(0.f)) == quarter);
+
+        const mat4 asMatrix = static_cast<mat4>(quarter);
+        const vec4 rotated = asMatrix * vec4(1.f, 0.f, 0.f, 0.f);
+        CHECK(rotated.x == doctest::Approx(0.f).epsilon(1e-4f));
+        CHECK(rotated.y == doctest::Approx(1.f).epsilon(1e-4f));
+        CHECK(rotated.z == doctest::Approx(0.f).epsilon(1e-4f));
+        CHECK(rotated.w == doctest::Approx(0.f).epsilon(1e-4f));
+
+        const float alignment = Dot(quat::FromMat4(asMatrix), quarter);
+        const bool sameRotation = alignment == doctest::Approx(1.f).epsilon(1e-4f) || alignment == doctest::Approx(-1.f).epsilon(1e-4f);
+        CHECK(sameRotation);
     }
 }

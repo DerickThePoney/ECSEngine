@@ -7,11 +7,6 @@
 namespace ECSEngine
 {
 
-float Radians(const float parAngleDegree)
-{
-    return parAngleDegree * Pi() / 180.f;
-}
-
 vec3 Radians(const vec3& parV)
 {
     return vec3(Radians(parV.x), Radians(parV.y), Radians(parV.z));
@@ -37,14 +32,29 @@ float Atan2(float x, float y)
     return atan2f(x, y);
 }
 
+double Atan2(double x, double y)
+{
+    return atan2(x, y);
+}
+
 float Cos(float x)
 {
     return cosf(x);
 }
 
+double Cos(double x)
+{
+    return cos(x);
+}
+
 float Sin(float x)
 {
     return sinf(x);
+}
+
+double Sin(double x)
+{
+    return sin(x);
 }
 
 bool IsNan(float x)

@@ -12,6 +12,7 @@ struct PhysicsJointHandle;
 struct DistanceJointConfig;
 struct BallJointConfig;
 struct HingeJointConfig;
+struct WeldJointConfig;
 class PhysicsCollisionPresetManager;
 class PhysicsContactEventManager;
 
@@ -25,6 +26,9 @@ void ShutdownPhysics();
 
 // Physics update
 void UpdatePhysics();
+void FlushMovedBodies();
+
+bool ShiftWorld(const vec3& Delta);
 // TODO BACKWARD UPDATE
 
 // Body creation/destruction
@@ -38,9 +42,13 @@ bool SetBodyOrientation(const PhysicsBodyHandle& Handle, const quat& Orientation
 bool SetBodyRotationVelocity(const PhysicsBodyHandle& Handle, const vec3& RotationVelocity);
 
 bool GetBodyPosition(const PhysicsBodyHandle& Handle, vec3& Position);
+bool GetBodyCenterOfMass(const PhysicsBodyHandle& Handle, vec3& CenterOfMass);
 bool GetBodyVelocity(const PhysicsBodyHandle& Handle, vec3& Velocity);
 bool GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation);
 bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity);
+bool GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass);
+bool GetBodyInertiaWorld(const PhysicsBodyHandle& Handle, mat3& OutInertia);
+bool SetBodyMass(const PhysicsBodyHandle& Handle, const float Mass);
 
 bool AddForceToBody(const PhysicsBodyHandle& Handle, const vec3& Force, bool bTreatAsAcceleration);
 bool AddForceAtPointToBody(const PhysicsBodyHandle& Handle, const vec3& Force, const vec3& Point, bool bTreatPointAsLocalCoord, bool bTreatAsAcceleration);
@@ -54,6 +62,7 @@ bool AddRotationImpulseToBody(const PhysicsBodyHandle& Handle, const vec3& Rotat
 const PhysicsJointHandle CreateDistanceJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const DistanceJointConfig& Config);
 const PhysicsJointHandle CreateBallJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const BallJointConfig& Config);
 const PhysicsJointHandle CreateHingeJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const HingeJointConfig& Config);
+const PhysicsJointHandle CreateWeldJoint(const PhysicsBodyHandle& HandleA, const PhysicsBodyHandle& HandleB, const WeldJointConfig& Config);
 
 void DestroyJoint(const PhysicsJointHandle& JointHandle);
 

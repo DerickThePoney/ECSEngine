@@ -65,6 +65,15 @@ struct BallJointConfig
     }
 };
 
+struct WeldJointConfig
+{
+    JointConfig FCommon;
+
+    void DrawInEditor();
+
+    SERIALIZE() { PROPERTYFIELD(Common, JointConfig{ }); }
+};
+
 struct HingeJointConfig
 {
     JointConfig FCommon;

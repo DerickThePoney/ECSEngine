@@ -17,6 +17,16 @@ protected:
     KeyboardCommand FUp;
     KeyboardCommand FDown;
 
-    KeyboardCommand FFireEngines;
+    KeyboardCommand FSASToggle;
+
+    KeyboardCommand FIncreaseThrottle;
+    KeyboardCommand FDecreaseThrottle;
+    KeyboardCommand FFullThrottle;
+    KeyboardCommand FCutThrottle;
+
+    KeyboardCommand FIncreaseTimeWarp;
+    KeyboardCommand FDecreaseTimeWarp;
+
+    KeyboardCommand FStage;
 };
 } // namespace ECSEngine

@@ -28,6 +28,8 @@ public:
 
     AABB3f GetFatAABB3f(const PhysicsBodyHandle& handle) const;
 
+    void TranslateTree(const vec3& Delta);
+
     void Raycast(const Ray3D& parRay, std::vector<PhysicsBodyHandle>& parLeafsHit);
 
 #ifdef PERFORM_SECURITY_CHECKS

@@ -23,6 +23,7 @@ public:
     void Initialise(const GFXRepresentationInitialiser& parInit);
     void Update(float parCurrentTime);
     void SwapQueues();
+    void Shift(const vec3& Delta);
 
     GFXMessage& GetCurrentQueueForPushingMessage() { return FMessages[1 - FCurrentMessageQueue]; }
 

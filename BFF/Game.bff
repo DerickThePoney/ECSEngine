@@ -90,6 +90,15 @@
 
 #include "Utils/BuildSolutionProjects.bff"
 
+; Checked in Configuration Manager. Libraries stay unchecked so a solution build
+; does not start one FASTBuild process per library. The startup launcher can then
+; be built on its own (Build Only Startup Project, or Build Selection).
+.SolutionBuildProject = { 'Launcher-Proj' }
+ForEach(.LauncherProject in .AllPrototypeLauncherProjects)
+{
+    ^SolutionBuildProject + '$LauncherProject$-Proj'
+}
+
 {
     .ProjectList = .'$GameName$Projects' + .AssetCookerProjects + .DataPackerProjects + .UnitTestsProjects + .AllPrototypeLibraries + .AllPrototypeLauncherProjects
     #include "Utils/SolutionFile.bff"

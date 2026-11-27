@@ -47,6 +47,11 @@ void BallJointConfig::DrawInEditor()
     }
 }
 
+void WeldJointConfig::DrawInEditor()
+{
+    FCommon.DrawInEditor();
+}
+
 void HingeJointConfig::DrawInEditor()
 {
     FCommon.DrawInEditor();

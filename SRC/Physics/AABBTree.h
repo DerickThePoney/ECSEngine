@@ -46,6 +46,8 @@ public:
 
     AABB3f GetFatAABB3f(const PhysicsBodyHandle& parHandle) const;
 
+    void TranslateTree(const vec3& Delta);
+
 #ifdef PERFORM_SECURITY_CHECKS
     void DebugTree();
 #endif

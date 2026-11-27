@@ -1,0 +1,317 @@
+#include "stdafx.h"
+
+#include "RocketUIController.h"
+
+#include "Common/CameraManager.h"
+#include "ECSCore/AdjustableDebugParameters.h"
+#include "ECSCore/ScopedModuleAccessor.h"
+#include "ECSCore/WorldIds.h"
+#include "ECSGameplay_Common/PhysicsFloatingOriginModule.h"
+#include "ECSGameplay_Common/RigidbodyModule.h"
+#include "FuelTankModule.h"
+#include "NozzleEngineModule.h"
+#include "OrbitalPathFollowerModule.h"
+#include "Physics/PhysicsAPI.h"
+#include "Physics/PhysicsEngineConfiguration.h"
+#include "PlanetAtmosphereModule.h"
+#include "PlanetGravityModule.h"
+#include "RenderingCore/DrawCommands.h"
+#include "RocketCameraMoverModule.h"
+#include "RocketManagerModule.h"
+#include "TimeWarpManager.h"
+
+namespace ECSEngine
+{
+namespace UI
+{
+using AccessHelpers = ScopedModuleAccessor<MC<RocketManagerModule, EEntityWorlds::STANDARD>,
+      MC<RigidbodyModule, EEntityWorlds::STANDARD>,
+      MC<PlanetGravityModule, EEntityWorlds::STANDARD>,
+      MC<PlanetAtmosphereModule, EEntityWorlds::STANDARD>,
+      MC<FuelTankModule, EEntityWorlds::STANDARD>,
+      MC<NozzleEngineModule, EEntityWorlds::STANDARD>,
+      MC<PhysicsFloatingOriginModule, EEntityWorlds::STANDARD>,
+      MC<OrbitalPathFollowerModule, EEntityWorlds::STANDARD>,
+      MC<RocketCameraMoverModule, EEntityWorlds::CAMERA>>;
+
+void RocketUIController::VirtualUpdate()
+{
+    UIController::VirtualUpdate();
+
+    AccessHelpers accessHelpers;
+
+    ImGui::Begin("Rocket UI", (bool*)0, ImGuiWindowFlags_AlwaysAutoResize);
+
+    u32 rocketIndex = 0;
+    foreachitem(rocketManager, accessHelpers.Accessor<RocketManagerModule>())
+    {
+        ImGui::SeparatorText(std::format("Rocket {}", rocketIndex++).c_str());
+        ImGui::Indent();
+
+        if (!rocketManager.CurrentGravityTarget().Valid())
+        {
+            ImGui::Unindent();
+            continue;
+        }
+
+        const PlanetGravityModule* planetModule = accessHelpers.GetModule<PlanetGravityModule>(rocketManager.CurrentGravityTarget());
+        const RigidbodyModule* planetRigidbodyModule = accessHelpers.GetModule<RigidbodyModule>(planetModule->UnitId());
+        vec3 PlanetPosition;
+        vec3 PlanetVelocity;
+        Physics::GetBodyCenterOfMass(planetRigidbodyModule->BodyHandle(), PlanetPosition);
+        Physics::GetBodyVelocity(planetRigidbodyModule->BodyHandle(), PlanetVelocity);
+
+        vec3 RocketPosition;
+        vec3 RocketVelocity;
+        const bool hasVesselCenterOfMass = rocketManager.ComputeActiveCenterOfMass(accessHelpers.Accessor<RigidbodyModule>(), RocketPosition, &RocketVelocity);
+        AssertRelease(hasVesselCenterOfMass);
+        if (!hasVesselCenterOfMass)
+        {
+            ImGui::Unindent();
+            continue;
+        }
+
+        RocketVelocity -= PlanetVelocity;
+
+        const vec3 PlanetToRocket = RocketPosition - PlanetPosition;
+        const float LPlanetToRocket = Length(PlanetToRocket);
+        const vec3 UpDirection = Normalize(PlanetToRocket);
+        const float Altitude = LPlanetToRocket - planetModule->PlanetRadius();
+        const float VerticalSpeed = Dot(RocketVelocity, UpDirection);
+        const float HorizontalSpeed = Length(RocketVelocity - VerticalSpeed * UpDirection);
+
+        ImGui::SeparatorText("Altitude and speed data");
+        ImGui::Text("Altitude : %.3f m", Altitude);
+        ImGui::Text("Vertical speed : %.3f m/s", VerticalSpeed);
+        ImGui::Text("Horizontal speed : %.3f m/s", HorizontalSpeed);
+        ImGui::Text("Warp : %ux", TimeWarpManager::Instance().CurrentTimeWarpMultiplier());
+
+        const PlanetAtmosphereModule* atmosphereModule = accessHelpers.GetModule<PlanetAtmosphereModule>(rocketManager.CurrentGravityTarget());
+        const float rho = (atmosphereModule != nullptr) ? atmosphereModule->DensityAt(Max(0.f, Altitude)) : 0.f;
+        if (rho > 0.f)
+        {
+            const float dynamicPressure = 0.5f * rho * LengthSq(RocketVelocity);
+            ImGui::Text("In atmosphere");
+            ImGui::Text("Air density : %.5f kg/m3", rho);
+            ImGui::Text("Dynamic pressure : %.3f Pa", dynamicPressure);
+        }
+        else
+        {
+            ImGui::Text("In space");
+        }
+
+        const float rocketSpeedSq = LengthSq(RocketVelocity);
+        const float energy = 0.5f * rocketSpeedSq - planetModule->PlanetGravityConstant() / LPlanetToRocket; // ε
+        const vec3 h = Cross(PlanetToRocket, RocketVelocity); // specific angular momentum
+        const float hSq = Dot(h, h);
+        const float eccentricity = sqrtf(1.f + 2.f * energy * hSq / (planetModule->PlanetGravityConstant() * planetModule->PlanetGravityConstant()));
+        const float semiMajor = -planetModule->PlanetGravityConstant() / (2.f * energy); // a, negative on a hyperbola
+        const float periapsisRadius = semiMajor * (1.f - eccentricity);
+        const float periapsisAltitude = periapsisRadius - planetModule->PlanetRadius();
+
+        const float apoapsisAltitude = semiMajor * (1.f + eccentricity) - planetModule->PlanetRadius();
+
+        ImGui::SeparatorText("Trajectory data");
+        ImGui::Text("Energy : %.3f", energy);
+        ImGui::Text("Eccentricity : %.3f", eccentricity);
+        ImGui::Text("Periapsis : %.3f", periapsisAltitude);
+        ImGui::Text("Apoapsis : %.3f", (energy < 0) ? apoapsisAltitude : -1.f);
+
+        FHasPeriapsis = false;
+        FHasApoapsis = false;
+        FHasTransferBurn = false;
+        FOrbitPoints.clear();
+
+        ImGui::Checkbox("Draw predicted trajectory", &FDrawPredictedPath);
+
+        ImGui::SeparatorText("Engine data");
+        ImGui::Text("Engine activated : %d", rocketManager.EngineFiring());
+        float CurrentThrottle = rocketManager.RocketThrottle();
+        ImGui::SliderFloat("Rocket throttle", &CurrentThrottle, 0.f, 1.f);
+        rocketManager.SetRocketThrottle(CurrentThrottle);
+
+        FuelTankModule* fuelTank = accessHelpers.GetModule<FuelTankModule>(rocketManager.ActiveEngineFuelTank());
+        AssertRelease(fuelTank != nullptr);
+        float RemainingFuelMass = fuelTank->CurrentRemainingFuelMass();
+        ImGui::ProgressBar(RemainingFuelMass / fuelTank->GetMaxFuelMass(), vec2(-1.f, 0.f), std::format("Remaining fuel mass {}", RemainingFuelMass).c_str());
+
+        float Mass = 0.f;
+        rocketManager.ComputeActiveTotalMass(accessHelpers.Accessor<RigidbodyModule>(), Mass);
+
+        float Thrust = 0.f;
+        rocketManager.ComputeActiveThrust(accessHelpers.Accessor<NozzleEngineModule>(), Thrust);
+        const float Weight = Mass * Length(rocketManager.LastTurnGravity());
+        const float TWR = (Weight > 1e-4f) ? Thrust / Weight : 0.f;
+
+        NozzleEngineModule* nozzleEngine = accessHelpers.GetModule<NozzleEngineModule>(rocketManager.ActiveEngine());
+        AssertRelease(nozzleEngine != nullptr);
+        const float RemainingDV = nozzleEngine->ISP() * 9.80665 * log(Mass / (Mass - RemainingFuelMass));
+        ImGui::Text("Thrust to weight ratio: %.3f", TWR);
+        ImGui::Text("Remaining DV: %.3f", RemainingDV);
+
+        ImGui::SeparatorText("SAS data");
+        bool bSASActivated = rocketManager.SASActivated();
+        ImGui::Checkbox("SAS Activated", &bSASActivated);
+        rocketManager.SetSASActivated(bSASActivated);
+
+        int SASMode = (int)rocketManager.SASMode();
+        ImGui::RadioButton("Stability", &SASMode, (int)ESASMode::STABILITY);
+        ImGui::SameLine();
+        ImGui::RadioButton("Prograde", &SASMode, (int)ESASMode::PROGRADE);
+        ImGui::SameLine();
+        ImGui::RadioButton("Retrograde", &SASMode, (int)ESASMode::RETROGRADE);
+        ImGui::RadioButton("Radial out", &SASMode, (int)ESASMode::RADIALOUT);
+        ImGui::SameLine();
+        ImGui::RadioButton("Radial in", &SASMode, (int)ESASMode::RADIALIN);
+        ImGui::SameLine();
+        ImGui::RadioButton("Normal", &SASMode, (int)ESASMode::NORMAL);
+        ImGui::SameLine();
+        ImGui::RadioButton("Anti-normal", &SASMode, (int)ESASMode::ANTINORMAL);
+
+        rocketManager.SetSASMode((ESASMode)SASMode);
+
+        ImGui::Checkbox("Draw SAS Target", &FDrawSASTarget);
+        FHasSASTargetDraw = false;
+        if (bSASActivated && FDrawSASTarget && rocketManager.HasSASTarget())
+        {
+            const vec3 nose = (mat4(rocketManager.SASTarget()) * vec4(0.f, 1.f, 0.f, 0.f)).xyz();
+            FSASTargetOrigin = RocketPosition;
+            FSASTargetDirection = Normalize(nose);
+            FHasSASTargetDraw = true;
+        }
+
+        if (FDrawPredictedPath)
+        {
+            const float mu = planetModule->PlanetGravityConstant();
+            const vec3 eVec = Cross(RocketVelocity, h) * (1.f / mu) - UpDirection;
+            vec3 periDir;
+            if (LengthSq(eVec) < 1.e-8f)
+            {
+                const vec3 fallback = (fabsf(h.y) < 0.9f * Length(h)) ? vec3(0.f, 1.f, 0.f) : vec3(1.f, 0.f, 0.f);
+                periDir = Normalize(Cross(h, fallback));
+            }
+            else
+            {
+                periDir = Normalize(eVec);
+            }
+            FPeriapsis = PlanetPosition + periDir * periapsisRadius;
+            FHasPeriapsis = true;
+            if (energy < 0.f && hSq > 1.e-4f)
+            {
+                const vec3 motionDir = Normalize(Cross(h, periDir));
+                const float eDraw = Min(eccentricity, 0.999f);
+                const float p = hSq / mu;
+                constexpr u32 sampleCount = 128;
+                FOrbitPoints.resize(sampleCount);
+                for (u32 i = 0; i < sampleCount; ++i)
+                {
+                    const float theta = (float)i / (float)sampleCount * 2.f * Pi();
+                    const float cosTheta = Cos(theta);
+                    const float sinTheta = Sin(theta);
+                    const float rho = p / Max(1.f + eDraw * cosTheta, 1.e-4f);
+                    const vec3 direction = periDir * cosTheta + motionDir * sinTheta;
+                    FOrbitPoints[i] = PlanetPosition + direction * rho;
+                }
+                FApoapsis = PlanetPosition - periDir * (semiMajor * (1.f + eccentricity));
+                FHasApoapsis = true;
+            }
+        }
+
+        const float transferRadius = LPlanetToRocket;
+        if (transferRadius > planetModule->PlanetRadius())
+        {
+            foreachitem(follower, accessHelpers.Accessor<OrbitalPathFollowerModule>())
+            {
+                if (follower.ParentObject() != rocketManager.CurrentGravityTarget())
+                    continue;
+
+                const float moonOrbitRadius = follower.OrbitRadius();
+                if (transferRadius >= moonOrbitRadius)
+                    continue;
+
+                const RigidbodyModule* moonBody = accessHelpers.GetModule<RigidbodyModule>(follower.UnitId());
+                if (moonBody == nullptr)
+                    continue;
+
+                vec3 moonPosition;
+                if (!Physics::GetBodyCenterOfMass(moonBody->BodyHandle(), moonPosition))
+                    continue;
+
+                vec3 moonOffset = moonPosition - PlanetPosition;
+                moonOffset.y = 0.f;
+                if (LengthSq(moonOffset) < 1.f)
+                    continue;
+
+                const vec3 moonDir = Normalize(moonOffset);
+                const float phase = Pi() * (1.f - powf((transferRadius + moonOrbitRadius) / (2.f * moonOrbitRadius), 1.5f));
+                const float c = Cos(phase);
+                const float s = Sin(phase);
+                const vec3 burnDir(moonDir.x * c + moonDir.z * s, 0.f, moonDir.z * c - moonDir.x * s);
+                FTransferBurn = PlanetPosition + Normalize(burnDir) * transferRadius;
+                FHasTransferBurn = true;
+                break;
+            }
+        }
+
+        PhysicsFloatingOriginModule* origin = accessHelpers.GetModule<PhysicsFloatingOriginModule>(rocketManager.UnitId());
+        if (origin != nullptr)
+        {
+            ImGui::SeparatorText("Floating origin");
+            ImGui::Text("Origin shift enabled : %s", Physics::GetConfig().FbEnableOriginShift ? "yes" : "no");
+
+            const dvec3& absoluteOrigin = origin->Origin();
+            ImGui::Text("Origin : %.3f %.3f %.3f", absoluteOrigin.x, absoluteOrigin.y, absoluteOrigin.z);
+            ImGui::Text("Local vessel COM : %.3f %.3f %.3f", RocketPosition.x, RocketPosition.y, RocketPosition.z);
+            ImGui::Text("Distance to local zero : %.3f m", Length(RocketPosition));
+
+            float bubbleRadius = static_cast<float>(origin->BubbleRadius());
+            if (ImGui::SliderFloat("Bubble radius", &bubbleRadius, 50.f, 20000.f, "%.0f m"))
+                origin->SetBubbleRadius(bubbleRadius);
+            FOriginBubbleRadius = bubbleRadius;
+
+            ImGui::Text("Planet local COM : %.3f %.3f %.3f", PlanetPosition.x, PlanetPosition.y, PlanetPosition.z);
+
+            foreachitem(mover, accessHelpers.Accessor<RocketCameraMoverModule>())
+            {
+                if (mover.TargetedRocket() != rocketManager.UnitId())
+                    continue;
+
+                ImGui::Text("Camera distance : %.3f m", mover.Distance());
+                const Camera* camera = CameraManager::Instance().GetCamera(mover.CamId());
+                if (camera != nullptr)
+                {
+                    ImGui::Text("Near plane : %.4f", camera->Near());
+                    ImGui::Text("Far plane : %.1f", camera->Far());
+                }
+            }
+        }
+        ImGui::Unindent();
+    }
+
+    ImGui::End();
+}
+
+void RocketUIController::DrawDebug(Rendering::DrawCommandBuffer* buffer, const Rendering::MaterialInstanceHandle& material) const
+{
+    if (!FOrbitPoints.empty())
+        buffer->DrawLines(material, FOrbitPoints.data(), (u32)FOrbitPoints.size(), 0xFFFFFF00u, true);
+    if (FHasPeriapsis)
+        buffer->DrawDebugSphere(material, FPeriapsis, 10.f, 0xFF00FF00u);
+    if (FHasApoapsis)
+        buffer->DrawDebugSphere(material, FApoapsis, 10.f, 0xFF0000FFu);
+    if (FHasTransferBurn)
+        buffer->DrawDebugSphere(material, FTransferBurn, 150.f, 0xFF44FF88u);
+
+    if (FHasSASTargetDraw)
+        buffer->DrawDebugArrow(material, FSASTargetOrigin, FSASTargetDirection, 20.f, 0xFF00FFFFu);
+
+    ADJUSTABLE_DEBUG_PARAMETER_BOOLEAN(drawOriginBubble, false, "Draw floating point origin", "Physics/Floating Point Origin");
+    if (drawOriginBubble)
+    {
+        constexpr float originMarkerRadius = 5.f;
+        buffer->DrawDebugSphere(material, vec3(0.f), FOriginBubbleRadius, 0xFF00FFFFu);
+        buffer->DrawDebugSphere(material, vec3(0.f), originMarkerRadius, 0xFFFFFFFFu);
+    }
+}
+} // namespace UI
+} // namespace ECSEngine

@@ -5,6 +5,7 @@
 #include "BallJointBatch.h"
 #include "DistanceJointBatch.h"
 #include "HingeJointBatch.h"
+#include "WeldJointBatch.h"
 
 namespace ECSEngine
 {
@@ -17,6 +18,7 @@ void JointBatchRegistry::Initialize()
     FBatches[(u8)EJointType::DISTANCE] = new DistanceJointBatch();
     FBatches[(u8)EJointType::BALL] = new BallJointBatch();
     FBatches[(u8)EJointType::HINGE] = new HingeJointBatch();
+    FBatches[(u8)EJointType::WELD] = new WeldJointBatch();
 }
 
 void JointBatchRegistry::Shutdown()

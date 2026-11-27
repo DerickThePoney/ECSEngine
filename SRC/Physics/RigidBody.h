@@ -51,6 +51,7 @@ public:
     mat3 FInverseInertiaTensorWorld;
     float FMass = 0.f;
     float FInvMass = 1.f;
+    float FDensity = 1.f;
 
     float FGravityScale = 1.f;
 

@@ -14,5 +14,4 @@
     #include "../Utils/MakeProjectStandard.bff"
     #undef USE_PRECOMPILED_HEADERS
 }
-.SolutionBuildProject = 'Launcher-Proj'
 
