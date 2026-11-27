@@ -12,6 +12,62 @@
 
 namespace ECSEngine
 {
+namespace PlanetGravityHelpers
+{
+vec3 ComputeGravityDueToPlanet(const vec3& pos, const vec3& planetPos, const float Mu)
+{
+    vec3 r = pos - planetPos;
+    const float lr = Max(Length(r), 1.f);
+    const float lr_3 = lr * lr * lr;
+    return Invert(Mu * r / lr_3);
+}
+
+bool ApplyGravityOnActiveGroup(ModuleAccessor<RigidbodyModule>& rigidbodyAccessor,
+      RocketManagerModule* rocket,
+      const vec3& planetPos,
+      const vec3& planetSpeedGravityTerm,
+      const float Mu)
+{
+    vec3 vesselPosition;
+    const bool hasVesselCenterOfMass = rocket->ComputeActiveCenterOfMass(rigidbodyAccessor, vesselPosition);
+    AssertRelease(hasVesselCenterOfMass);
+    if (!hasVesselCenterOfMass)
+        return false;
+
+    vec3 gravityAcceleration = ComputeGravityDueToPlanet(vesselPosition, planetPos, Mu);
+
+    // Hackos
+    rocket->SetLastTurnGravity(gravityAcceleration);
+
+    // apply additional gravity term
+    gravityAcceleration += planetSpeedGravityTerm;
+
+    rocket->ApplyForceToAllActiveBodies(rigidbodyAccessor, gravityAcceleration, true);
+    return true;
+}
+
+bool ApplyGravityOnDebris(ModuleAccessor<RigidbodyModule>& rigidbodyAccessor,
+      RocketManagerModule* rocket,
+      const vec3& planetPos,
+      const vec3& planetSpeedGravityTerm,
+      const float Mu)
+{
+    forrange(i, 0, rocket->DebrisCount())
+    {
+        vec3 debrisPos;
+        const bool hasVesselCenterOfMass = rocket->ComputeCenterOfMassInDebrisIndex(rigidbodyAccessor, i, debrisPos);
+        AssertRelease(hasVesselCenterOfMass);
+        if (!hasVesselCenterOfMass)
+            continue;
+
+        vec3 gravityAcceleration = ComputeGravityDueToPlanet(debrisPos, planetPos, Mu) + planetSpeedGravityTerm;
+
+        rocket->ApplyForceToAllBodiesInDebrisIndex(rigidbodyAccessor, i, gravityAcceleration, true);
+    }
+    return true;
+}
+} // namespace PlanetGravityHelpers
+
 void PlanetGravitySystem::VirtualInit()
 {
     ModuleSystem::VirtualInit();
@@ -33,14 +89,6 @@ void PlanetGravitySystem::VirtualUpdate()
 
     foreachitem(rocket, rocketManagerAccessor)
     {
-        vec3 vesselPosition;
-        const bool hasVesselCenterOfMass = rocket.ComputeActiveCenterOfMass(rigidbodyAccessor, vesselPosition);
-        AssertRelease(hasVesselCenterOfMass);
-        if (!hasVesselCenterOfMass)
-            continue;
-
-        vec3 gravityAcceleration{ 0.f };
-
         const EntityId& CurrentTargetGravity = rocket.CurrentGravityTarget();
         if (!CurrentTargetGravity.Valid())
             continue;
@@ -57,15 +105,8 @@ void PlanetGravitySystem::VirtualUpdate()
         if (!hasPlanetCenter)
             continue;
 
-        vec3 r = vesselPosition - planetPosition;
-        const float lr = Max(Length(r), 1.f);
-        const float lr_3 = lr * lr * lr;
-        gravityAcceleration -= planetGravity->PlanetGravityConstant() * r / lr_3;
-
-        // Hackos
-        rocket.SetLastTurnGravity(gravityAcceleration);
-
         const OrbitalPathFollowerModule* const orbitFollowerModule = orbitFollowerAccessor[CurrentTargetGravity];
+        vec3 planetSpeedGravityTerm;
         if (orbitFollowerModule != nullptr)
         {
             EntityId ParentPlanet = orbitFollowerModule->ParentObject();
@@ -79,10 +120,11 @@ void PlanetGravitySystem::VirtualUpdate()
             AssertRelease(hasPlanetCenter);
 
             vec3 Offset = planetPosition - parentPlanetPosition;
-            gravityAcceleration -= float(orbitFollowerModule->MeanMotion() * orbitFollowerModule->MeanMotion()) * Offset;
+            planetSpeedGravityTerm -= float(orbitFollowerModule->MeanMotion() * orbitFollowerModule->MeanMotion()) * Offset;
         }
 
-        rocket.ApplyForceToAllActiveBodies(rigidbodyAccessor, gravityAcceleration, true);
+        PlanetGravityHelpers::ApplyGravityOnActiveGroup(rigidbodyAccessor, &rocket, planetPosition, planetSpeedGravityTerm, planetGravity->PlanetGravityConstant());
+        PlanetGravityHelpers::ApplyGravityOnDebris(rigidbodyAccessor, &rocket, planetPosition, planetSpeedGravityTerm, planetGravity->PlanetGravityConstant());
     }
 }
 } // namespace ECSEngine

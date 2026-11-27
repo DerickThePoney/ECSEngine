@@ -159,6 +159,13 @@ const EntityId RocketManagerModule::RootId() const
     return FActive.FParts[0].FId;
 }
 
+const EntityId RocketManagerModule::RootIdForDebrisIndex(u32 Index) const
+{
+    AssertRelease(FDebris.size() > Index);
+    AssertRelease(FDebris[Index].FParts.size() > 0);
+    return FDebris[Index].FParts[0].FId;
+}
+
 template<typename RigidbodyAccessor>
 bool RocketManagerModule::Stage(const RigidbodyAccessor& Rigidbodies)
 {

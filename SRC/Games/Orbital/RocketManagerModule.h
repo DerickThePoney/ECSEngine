@@ -120,6 +120,7 @@ public:
     const EntityId ActiveEngineFuelTank() const;
     const Physics::PhysicsJointHandle ActiveEngineJointHandle() const;
     const EntityId RootId() const;
+    const EntityId RootIdForDebrisIndex(u32 Index) const;
 
     bool WantsStaging() const { return FbWantsStaging; }
     void SetStaging(bool Value) { FbWantsStaging = Value; }
