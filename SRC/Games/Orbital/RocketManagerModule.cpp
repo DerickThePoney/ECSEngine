@@ -124,6 +124,18 @@ float RocketManagerModule::Weathercock() const
     return Temp->Weathercock();
 }
 
+float RocketManagerModule::DebrisMaxLifetime() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->DebrisMaxLifetime();
+}
+
+float RocketManagerModule::DebrisCullRadius() const
+{
+    const RocketManagerModuleTemplate* const Temp = Template<RocketManagerModuleTemplate>();
+    return Temp->DebrisCullRadius();
+}
+
 const EntityId RocketManagerModule::ActiveEngine() const
 {
     i32 EngineIndex = ActiveEnginePartIndex();
@@ -162,8 +174,45 @@ const EntityId RocketManagerModule::RootId() const
 const EntityId RocketManagerModule::RootIdForDebrisIndex(u32 Index) const
 {
     AssertRelease(FDebris.size() > Index);
-    AssertRelease(FDebris[Index].FParts.size() > 0);
-    return FDebris[Index].FParts[0].FId;
+    AssertRelease(FDebris[Index].FDebrisParts.FParts.size() > 0);
+    return FDebris[Index].FDebrisParts.FParts[0].FId;
+}
+
+void RocketManagerModule::IncrementDebrisLifetime(const float DT)
+{
+    foreachitem(debris, FDebris)
+    {
+        debris.FLifetime += DT;
+    }
+}
+
+float RocketManagerModule::LifetimeForDebrisIndex(u32 Index) const
+{
+    AssertRelease(FDebris.size() > Index);
+    return FDebris[Index].FLifetime;
+}
+
+void RocketManagerModule::KillDebris(u32 Index)
+{
+    AssertRelease(FDebris.size() > Index);
+
+    foreachitem(debrisPart, FDebris[Index].FDebrisParts.FParts)
+    {
+        EntityFactory::MarkEntityAsDead(debrisPart.FId);
+    }
+    FDebris.erase(FDebris.begin() + Index);
+}
+
+void RocketManagerModule::KillAllDebris()
+{
+    foreachitem(debris, FDebris)
+    {
+        foreachitem(debrisPart, debris.FDebrisParts.FParts)
+        {
+            EntityFactory::MarkEntityAsDead(debrisPart.FId);
+        }
+    }
+    FDebris.clear();
 }
 
 template<typename RigidbodyAccessor>
@@ -183,20 +232,20 @@ bool RocketManagerModule::Stage(const RigidbodyAccessor& Rigidbodies)
     if (!Physics::GetBodyOrientation(RootBody->BodyHandle(), Orientation))
         return false;
 
-    RocketPartGroup& newDebrisGroup = FDebris.emplace_back();
+    Debris& newDebrisGroup = FDebris.emplace_back();
     forrange(i, DecouplerIndex, FActive.FParts.size())
     {
-        newDebrisGroup.FParts.push_back(FActive.FParts[i]);
+        newDebrisGroup.FDebrisParts.FParts.push_back(FActive.FParts[i]);
     }
     FActive.FParts.resize(DecouplerIndex);
 
-    foreachitem(part, newDebrisGroup.FParts)
+    foreachitem(part, newDebrisGroup.FDebrisParts.FParts)
     {
         part.FParent -= DecouplerIndex;
         if (part.FRole == ERocketPartRole::ENGINE)
             part.FFuelTankIndex -= DecouplerIndex;
     }
-    RocketPart& RootDebrisPart = newDebrisGroup.FParts[0];
+    RocketPart& RootDebrisPart = newDebrisGroup.FDebrisParts.FParts[0];
     RootDebrisPart.FParent = -1;
 
     // Destroy the joint
@@ -206,7 +255,7 @@ bool RocketManagerModule::Stage(const RigidbodyAccessor& Rigidbodies)
     const vec3 SeparationVelocity = RootDebrisPart.FSeparationSpeed * ((mat4)Orientation).Column(1).xyz();
 
     ApplyImpulseToAllActiveBodies(Rigidbodies, SeparationVelocity, true);
-    ApplyImpulseToAllBodiesInGroup(Rigidbodies, newDebrisGroup, Invert(SeparationVelocity), true);
+    ApplyImpulseToAllBodiesInGroup(Rigidbodies, newDebrisGroup.FDebrisParts, Invert(SeparationVelocity), true);
 
     return true;
 }
@@ -356,7 +405,7 @@ template<typename RigidbodyAccessor>
 bool RocketManagerModule::ComputeCenterOfMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, vec3& OutPosition, vec3* OutVelocity) const
 {
     AssertRelease(DebrisIndex < FDebris.size());
-    return ComputeCenterOfMassInGroup(Rigidbodies, FDebris[DebrisIndex], OutPosition, OutVelocity);
+    return ComputeCenterOfMassInGroup(Rigidbodies, FDebris[DebrisIndex].FDebrisParts, OutPosition, OutVelocity);
 }
 
 template bool RocketManagerModule::ComputeCenterOfMassInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, vec3&, vec3*) const;
@@ -440,7 +489,7 @@ template<typename RigidbodyAccessor>
 bool RocketManagerModule::ComputeTotalMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, float& OutMass) const
 {
     AssertRelease(DebrisIndex < FDebris.size());
-    return ComputeTotalMassInGroup(Rigidbodies, FDebris[DebrisIndex], OutMass);
+    return ComputeTotalMassInGroup(Rigidbodies, FDebris[DebrisIndex].FDebrisParts, OutMass);
 }
 
 template bool RocketManagerModule::ComputeTotalMassInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, float& OutMass) const;
@@ -488,7 +537,7 @@ template<typename RigidbodyAccessor>
 bool RocketManagerModule::ApplyForceToAllBodiesInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, const vec3& Force, const bool bTreatAsAcceleration) const
 {
     AssertRelease(DebrisIndex < FDebris.size());
-    return ApplyForceToAllBodiesInGroup(Rigidbodies, FDebris[DebrisIndex], Force, bTreatAsAcceleration);
+    return ApplyForceToAllBodiesInGroup(Rigidbodies, FDebris[DebrisIndex].FDebrisParts, Force, bTreatAsAcceleration);
 }
 
 template bool RocketManagerModule::ApplyForceToAllBodiesInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, u32, const vec3&, const bool) const;
@@ -531,7 +580,7 @@ template<typename RigidbodyAccessor>
 bool RocketManagerModule::ApplyImpulseToAllBodiesInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, const vec3& Impulse, const bool bTreatAsVelocityChange) const
 {
     AssertRelease(DebrisIndex < FDebris.size());
-    return ApplyImpulseToAllBodiesInGroup(Rigidbodies, FDebris[DebrisIndex], Impulse, bTreatAsVelocityChange);
+    return ApplyImpulseToAllBodiesInGroup(Rigidbodies, FDebris[DebrisIndex].FDebrisParts, Impulse, bTreatAsVelocityChange);
 }
 
 template bool RocketManagerModule::ApplyImpulseToAllBodiesInDebrisIndex<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&,

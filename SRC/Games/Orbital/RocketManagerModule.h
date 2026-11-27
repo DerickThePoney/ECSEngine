@@ -30,6 +30,8 @@ public:
         PROPERTYFIELD(AxialDragArea, 0.f);
         PROPERTYFIELD(BroadsideDragArea, 0.f);
         PROPERTYFIELD(Weathercock, 0.f);
+        PROPERTYFIELD(DebrisMaxLifetime, 10.f * 60.f);
+        PROPERTYFIELD(DebrisCullRadius, 4000.f);
     }
 
     const RocketRecipe& Recipe() const { return FRecipe; }
@@ -39,6 +41,8 @@ public:
     float AxialDragArea() const { return FAxialDragArea; }
     float BroadsideDragArea() const { return FBroadsideDragArea; }
     float Weathercock() const { return FWeathercock; }
+    float DebrisMaxLifetime() const { return FDebrisMaxLifetime; }
+    float DebrisCullRadius() const { return FDebrisCullRadius; }
 
 protected:
     void VirtualDrawEditor() override;
@@ -53,6 +57,9 @@ private:
     float FAxialDragArea = 0.f;
     float FBroadsideDragArea = 0.f;
     float FWeathercock = 0.f;
+
+    float FDebrisMaxLifetime = 10.f * 60.f;
+    float FDebrisCullRadius = 4000.f;
 };
 
 enum class ESASMode : u8
@@ -114,6 +121,9 @@ public:
     float BroadsideDragArea() const;
     float Weathercock() const;
 
+    float DebrisMaxLifetime() const;
+    float DebrisCullRadius() const;
+
     u32 ActivePartsSize() const { return FActive.FParts.size(); }
 
     const EntityId ActiveEngine() const;
@@ -128,6 +138,10 @@ public:
     template<typename RigidbodyAccessor>
     bool Stage(const RigidbodyAccessor& Rigidbodies);
 
+    void IncrementDebrisLifetime(const float DT);
+    float LifetimeForDebrisIndex(u32 Index) const;
+    void KillDebris(u32 Index);
+    void KillAllDebris();
     u32 DebrisCount() const { return FDebris.size(); }
 
     template<typename RigidbodyAccessor>
@@ -184,7 +198,13 @@ protected:
 
 private:
     RocketPartGroup FActive;
-    std::vector<RocketPartGroup> FDebris;
+
+    struct Debris
+    {
+        RocketPartGroup FDebrisParts;
+        float FLifetime = 0.f;
+    };
+    std::vector<Debris> FDebris;
 
     vec3 FLastTurnGravity = vec3(0.f, -1.f, 0.f);
 
