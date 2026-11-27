@@ -13,6 +13,7 @@
 #include "RocketDragSystem.h"
 #include "RocketMassSystem.h"
 #include "RocketSASSystem.h"
+#include "RocketStagingSystem.h"
 #include "RocketSteeringSystem.h"
 #include "RocketThrustSystem.h"
 #include "RocketUIController.h"
@@ -54,6 +55,7 @@ private:
     DebrisLifetimeSystem FDebrisLifetimeSystem;
     PlanetGravitySystem FPlanetGravitySystem;
     RocketMassSystem FRocketMassSystem;
+    RocketStagingSystem FRocketStagingSystem;
     PlanetOrbitalPathFollowingSystem FPlanetOrbitSystem;
     KeplerWarpCaptureSystem FKeplerWarpCaptureSystem;
     KeplerWarpAdvanceSystem FKeplerWarpAdvanceSystem;

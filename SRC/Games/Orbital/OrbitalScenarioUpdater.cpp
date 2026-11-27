@@ -77,6 +77,7 @@ void OrbitalScenarioUpdater::Initialise()
     FDebrisLifetimeSystem.Init();
     FPlanetGravitySystem.Init();
     FRocketMassSystem.Init();
+    FRocketStagingSystem.Init();
     FPlanetOrbitSystem.Init();
     FKeplerWarpCaptureSystem.Init();
     FKeplerWarpAdvanceSystem.Init();
@@ -116,6 +117,7 @@ void OrbitalScenarioUpdater::Destroy()
     }
     FFloatingOriginSystem.Destroy();
     FRocketMassSystem.Destroy();
+    FRocketStagingSystem.Destroy();
     FRocketSASSystem.Destroy();
     FRocketDragSystem.Destroy();
     FDebrisLifetimeSystem.Destroy();
@@ -205,6 +207,7 @@ void OrbitalScenarioUpdater::GameplayUpdate()
     {
         SCOPED_PROFILE(OrbitalScenarioUpdater::GameplayUpdate::PhysicsAdvance);
         FKeplerWarpCaptureSystem.Update(); // exit edge clears FbActive
+        FRocketStagingSystem.Update();
         FRocketMassSystem.Update();
         FRocketSteeringSystem.Update();
         FRocketThrustSystem.Update();
