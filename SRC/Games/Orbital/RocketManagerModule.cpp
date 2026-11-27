@@ -488,6 +488,26 @@ bool RocketManagerModule::ComputeActiveTotalMass(const RigidbodyAccessor& Rigidb
 template bool RocketManagerModule::ComputeActiveTotalMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, float& OutMass) const;
 template bool RocketManagerModule::ComputeActiveTotalMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, float& OutMass) const;
 
+template<typename EngineAccessor>
+bool RocketManagerModule::ComputeActiveThrust(const EngineAccessor& Engines, float& OutThrust) const
+{
+    OutThrust = 0.f;
+    foreachitemconst(part, FActive.FParts)
+    {
+        if (part.FRole != ERocketPartRole::ENGINE)
+            continue;
+
+        const NozzleEngineModule* engine = Engines[part.FId];
+        AssertRelease(engine != nullptr);
+        if (engine->Throttle() > 0.f)
+            OutThrust += engine->Throttle() * engine->MaxThrust();
+    }
+    return true;
+}
+
+template bool RocketManagerModule::ComputeActiveThrust<ModuleAccessor<NozzleEngineModule>>(const ModuleAccessor<NozzleEngineModule>&, float&) const;
+template bool RocketManagerModule::ComputeActiveThrust<ManualLockModuleAccessor<NozzleEngineModule>>(const ManualLockModuleAccessor<NozzleEngineModule>&, float&) const;
+
 template<typename RigidbodyAccessor>
 bool RocketManagerModule::ComputeTotalMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, float& OutMass) const
 {

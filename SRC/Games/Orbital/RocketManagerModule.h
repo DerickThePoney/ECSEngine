@@ -162,6 +162,9 @@ public:
     template<typename RigidbodyAccessor>
     bool ComputeActiveTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const;
 
+    template<typename EngineAccessor>
+    bool ComputeActiveThrust(const EngineAccessor& Engines, float& OutThrust) const;
+
     template<typename RigidbodyAccessor>
     bool ComputeTotalMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, float& OutMass) const;
 
