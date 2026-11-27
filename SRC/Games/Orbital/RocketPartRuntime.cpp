@@ -61,9 +61,11 @@ bool BuildRocketRuntime(RocketPartGroup& OutGroup, const RocketRecipe& Recipe, c
         if (i > 0)
         {
             part.FParent = i - 1;
+            i32 ParentIndex = part.FParent;
+            if (OutGroup.FParts[ParentIndex].FRole == ERocketPartRole::ENGINE)
+                ParentIndex = OutGroup.FParts[ParentIndex].FFuelTankIndex;
 
-            EntityId ParentId = OutGroup.FParts[part.FParent].FId;
-
+            const EntityId ParentId = OutGroup.FParts[ParentIndex].FId;
             switch (part.FJointType)
             {
             case ERocketPartJoint::BALL:
