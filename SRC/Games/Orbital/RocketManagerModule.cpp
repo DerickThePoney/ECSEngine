@@ -513,6 +513,44 @@ template bool RocketManagerModule::ComputeActiveTotalMass<ModuleAccessor<Rigidbo
 template bool RocketManagerModule::ComputeActiveTotalMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, float& OutMass) const;
 
 template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeActiveDirectionalInertia(const RigidbodyAccessor& Rigidbodies, const vec3& Axis, float& OutInertia) const
+{
+    OutInertia = 0.f;
+    if (LengthSq(Axis) < 1.e-8f)
+        return false;
+
+    vec3 stackCom;
+    if (!ComputeActiveCenterOfMass(Rigidbodies, stackCom))
+        return false;
+
+    const vec3 axis = Normalize(Axis);
+    mat3 totalInertia;
+    foreachitemconst(part, FActive.FParts)
+    {
+        const RigidbodyModule* rigidbody = Rigidbodies[part.FId];
+        AssertRelease(rigidbody != nullptr);
+
+        float mass = 0.f;
+        vec3 bodyCom;
+        mat3 bodyInertia;
+        if (!Physics::GetBodyMass(rigidbody->BodyHandle(), mass) || !Physics::GetBodyCenterOfMass(rigidbody->BodyHandle(), bodyCom) || !Physics::GetBodyInertiaWorld(rigidbody->BodyHandle(), bodyInertia))
+            return false;
+
+        const vec3 r = bodyCom - stackCom;
+        const mat3 outer(r * r.x, r * r.y, r * r.z);
+        mat3 shift = mat3::Identity() * Dot(r, r) - outer;
+        shift *= mass;
+        totalInertia = totalInertia + bodyInertia + shift;
+    }
+
+    OutInertia = Dot(axis, totalInertia * axis);
+    return OutInertia > 1.e-4f;
+}
+
+template bool RocketManagerModule::ComputeActiveDirectionalInertia<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, const vec3&, float&) const;
+template bool RocketManagerModule::ComputeActiveDirectionalInertia<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, const vec3&, float&) const;
+
+template<typename RigidbodyAccessor>
 bool RocketManagerModule::ComputeTotalMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, float& OutMass) const
 {
     AssertRelease(DebrisIndex < FDebris.size());

@@ -342,6 +342,18 @@ bool PhysicsEngine::GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass) co
     return true;
 }
 
+bool PhysicsEngine::GetBodyInertiaWorld(const PhysicsBodyHandle& Handle, mat3& OutInertia) const
+{
+    const RigidBody* body = GetRigidBody(Handle);
+    if (body == nullptr)
+    {
+        return false;
+    }
+
+    OutInertia = Invert(body->FInverseInertiaTensorWorld);
+    return true;
+}
+
 bool PhysicsEngine::SetBodyMass(const PhysicsBodyHandle& Handle, const float Mass)
 {
     RigidBody* body = GetRigidBody(Handle);

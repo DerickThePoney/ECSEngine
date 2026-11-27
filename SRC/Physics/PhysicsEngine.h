@@ -54,6 +54,7 @@ public:
     bool GetBodyOrientation(const PhysicsBodyHandle& Handle, quat& Orientation) const;
     bool GetBodyRotationVelocity(const PhysicsBodyHandle& Handle, vec3& RotationVelocity) const;
     bool GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass) const;
+    bool GetBodyInertiaWorld(const PhysicsBodyHandle& Handle, mat3& OutInertia) const;
     bool SetBodyMass(const PhysicsBodyHandle& Handle, const float Mass);
 
     // body forces and torques

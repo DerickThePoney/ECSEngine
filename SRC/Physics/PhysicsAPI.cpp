@@ -159,6 +159,12 @@ bool GetBodyMass(const PhysicsBodyHandle& Handle, float& Mass)
     return Engine.GetBodyMass(Handle, Mass);
 }
 
+bool GetBodyInertiaWorld(const PhysicsBodyHandle& Handle, mat3& OutInertia)
+{
+    PhysicsEngine& Engine = PhysicsEngine::Instance();
+    return Engine.GetBodyInertiaWorld(Handle, OutInertia);
+}
+
 bool SetBodyMass(const PhysicsBodyHandle& Handle, const float Mass)
 {
     PhysicsEngine& Engine = PhysicsEngine::Instance();

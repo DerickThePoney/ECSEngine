@@ -178,7 +178,21 @@ void RocketSASSystem::VirtualUpdate()
         if (LengthSq(Axis) > 1.e-8f && Angle > targetRadius)
             desiredOmega = Normalize(Axis) * Min(maxAngSpeed, Angle / ttt);
 
-        vec3 torque = arriveGain * (desiredOmega - Omega);
+        const vec3 rateError = desiredOmega - Omega;
+        vec3 torque = arriveGain * rateError;
+        float stackInertia = 0.f;
+        float rootInertia = 0.f;
+        if (LengthSq(rateError) > 1.e-8f && rocketManager.ComputeActiveDirectionalInertia(rigidbodyAccessor, rateError, stackInertia))
+        {
+            mat3 rootInertiaTensor;
+            if (Physics::GetBodyInertiaWorld(rootBody->BodyHandle(), rootInertiaTensor))
+            {
+                const vec3 axis = Normalize(rateError);
+                rootInertia = Dot(axis, rootInertiaTensor * axis);
+                if (rootInertia > 1.e-4f)
+                    torque *= stackInertia / rootInertia;
+            }
+        }
         if (Length(torque) > maxTorque)
             torque = Normalize(torque) * maxTorque;
 
