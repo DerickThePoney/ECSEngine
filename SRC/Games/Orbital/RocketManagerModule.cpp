@@ -479,15 +479,6 @@ template bool RocketManagerModule::ComputeCenterOfMassInGroup<ManualLockModuleAc
 /********************************************************************************************/
 /********************************************************************************************/
 
-template<typename RigidbodyAccessor>
-bool RocketManagerModule::ComputeActiveTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const
-{
-    return ComputeTotalMassInGroup(Rigidbodies, FActive, OutMass);
-}
-
-template bool RocketManagerModule::ComputeActiveTotalMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, float& OutMass) const;
-template bool RocketManagerModule::ComputeActiveTotalMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, float& OutMass) const;
-
 template<typename EngineAccessor>
 bool RocketManagerModule::ComputeActiveThrust(const EngineAccessor& Engines, float& OutThrust) const
 {
@@ -507,6 +498,19 @@ bool RocketManagerModule::ComputeActiveThrust(const EngineAccessor& Engines, flo
 
 template bool RocketManagerModule::ComputeActiveThrust<ModuleAccessor<NozzleEngineModule>>(const ModuleAccessor<NozzleEngineModule>&, float&) const;
 template bool RocketManagerModule::ComputeActiveThrust<ManualLockModuleAccessor<NozzleEngineModule>>(const ManualLockModuleAccessor<NozzleEngineModule>&, float&) const;
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+template<typename RigidbodyAccessor>
+bool RocketManagerModule::ComputeActiveTotalMass(const RigidbodyAccessor& Rigidbodies, float& OutMass) const
+{
+    return ComputeTotalMassInGroup(Rigidbodies, FActive, OutMass);
+}
+
+template bool RocketManagerModule::ComputeActiveTotalMass<ModuleAccessor<RigidbodyModule>>(const ModuleAccessor<RigidbodyModule>&, float& OutMass) const;
+template bool RocketManagerModule::ComputeActiveTotalMass<ManualLockModuleAccessor<RigidbodyModule>>(const ManualLockModuleAccessor<RigidbodyModule>&, float& OutMass) const;
 
 template<typename RigidbodyAccessor>
 bool RocketManagerModule::ComputeTotalMassInDebrisIndex(const RigidbodyAccessor& Rigidbodies, u32 DebrisIndex, float& OutMass) const
