@@ -32,7 +32,8 @@ void RocketSteeringSystem::VirtualUpdate()
         }
 
         const vec3& TargetAngle = rocketManager.TargetSteeringAngle();
-        Physics::SetBallTargetEulerAngles(NozzleJointHandle, true, TargetAngle, 15.f, rocketManager.IsSteering() ? 500.f : 0.1f);
+        const float Torque = rocketManager.IsSteering() ? 500.f : 0.1f;
+        Physics::SetBallTargetEulerAngles(NozzleJointHandle, true, TargetAngle, 15.f, Torque);
     }
 }
 } // namespace ECSEngine

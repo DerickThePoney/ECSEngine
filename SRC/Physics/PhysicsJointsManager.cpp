@@ -3,6 +3,7 @@
 #include "PhysicsJointsManager.h"
 
 #include "Common/Logger.h"
+#include "Math/MathFunctions.h"
 #include "PhysicsEngine.h"
 #include "RigidBody.h"
 
@@ -389,8 +390,20 @@ void PhysicsJointsManager::SetBallTargetEulerAngles(const PhysicsJointHandle& Jo
         return;
     }
 
+    vec3 Target = EulerYawRollPitch;
+    const float MaxCone = joint->FConfig.FMaxConeAngle;
+    const float Tilt = sqrtf(Target.x * Target.x + Target.z * Target.z);
+    if (MaxCone > 0.f && Tilt > MaxCone)
+    {
+        const float Scale = MaxCone / Tilt;
+        Target.x *= Scale;
+        Target.z *= Scale;
+    }
+    if (MaxCone > 0.f)
+        Target.y = Clamp(Target.y, -MaxCone, MaxCone);
+
     joint->FEnableMotor = bEnable;
-    joint->FTargetEulerAngles = EulerYawRollPitch;
+    joint->FTargetEulerAngles = Target;
     joint->FMotorStiffness = Stiffness;
     joint->FMaxMotorTorque = MaxTorque;
 }
