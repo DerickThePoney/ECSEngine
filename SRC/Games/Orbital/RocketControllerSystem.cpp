@@ -129,7 +129,7 @@ void RocketControllerSystem::VirtualUpdate()
         {
             if (FStage.Evaluate())
             {
-                // TODO
+                rocketManager.SetStaging(true);
             }
         }
     }
