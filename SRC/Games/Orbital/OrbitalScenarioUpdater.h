@@ -1,4 +1,5 @@
 #pragma once
+#include "DebrisLifetimeSystem.h"
 #include "ECSGameplay_Common/IScenarioUpdater.h"
 #include "ECSGameplay_Common/PhysicsUpdateSystem.h"
 #include "ECSGameplay_Common/SynchroWithRenderSystem.h"
@@ -50,6 +51,7 @@ private:
     RocketThrustSystem FRocketThrustSystem;
     RocketSASSystem FRocketSASSystem;
     RocketDragSystem FRocketDragSystem;
+    DebrisLifetimeSystem FDebrisLifetimeSystem;
     PlanetGravitySystem FPlanetGravitySystem;
     RocketMassSystem FRocketMassSystem;
     PlanetOrbitalPathFollowingSystem FPlanetOrbitSystem;

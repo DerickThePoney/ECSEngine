@@ -74,6 +74,7 @@ void OrbitalScenarioUpdater::Initialise()
     FRocketThrustSystem.Init();
     FRocketSASSystem.Init();
     FRocketDragSystem.Init();
+    FDebrisLifetimeSystem.Init();
     FPlanetGravitySystem.Init();
     FRocketMassSystem.Init();
     FPlanetOrbitSystem.Init();
@@ -117,6 +118,7 @@ void OrbitalScenarioUpdater::Destroy()
     FRocketMassSystem.Destroy();
     FRocketSASSystem.Destroy();
     FRocketDragSystem.Destroy();
+    FDebrisLifetimeSystem.Destroy();
     FRocketThrustSystem.Destroy();
     FRocketSteeringSystem.Destroy();
     FRocketControllerSystem.Destroy();
@@ -157,6 +159,9 @@ void OrbitalScenarioUpdater::GameplayUpdate()
 
     PlanetarySOIManager::Instance().Update();
     FScenario->Update();
+
+    // Before rails capture and before thrust, drag, and gravity.
+    FDebrisLifetimeSystem.Update();
 
     if (bIsWarping)
     {
