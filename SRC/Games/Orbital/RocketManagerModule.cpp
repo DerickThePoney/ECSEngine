@@ -47,6 +47,9 @@ void RocketManagerModuleTemplate::VirtualDrawEditor()
     EDITOR_PROPERTY_SIMPLE("Axial drag area", FAxialDragArea);
     EDITOR_PROPERTY_SIMPLE("Broadside drag area", FBroadsideDragArea);
     EDITOR_PROPERTY_SIMPLE("Weathercock", FWeathercock);
+
+    EDITOR_PROPERTY_SIMPLE("Debris max lifetime", FDebrisMaxLifetime);
+    EDITOR_PROPERTY_SIMPLE("Debris cull radius", FDebrisCullRadius);
 }
 
 void RocketManagerModuleTemplate::VirtualPostLoad()
